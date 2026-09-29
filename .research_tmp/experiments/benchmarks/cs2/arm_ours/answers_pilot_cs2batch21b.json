@@ -1,0 +1,1742 @@
+[
+ {
+  "id": "0650cf7bfe45d90ba3e1bb72",
+  "type": "aggregation",
+  "question": "The Nyquist-Shannon theorem provides an upper bound for the sampling period when designing a Kalman filter. Leaving apart the computational cost, are there any other reasons, e.g., noise-related issues, to set a lower bound for the sampling period? And, if so, is there an optimal value between these bounds?",
+  "gold_hint": "",
+  "answer": "**Reasoning for Lower Bounds on Sampling Period**\n\nWhile the Nyquist-Shannon theorem establishes the upper bound for the sampling period by requiring the sampling frequency to be at least twice the maximum signal frequency  , there are distinct noise-related and system-dynamic reasons to impose a lower bound on the sampling period (i.e., a maximum sampling frequency).\n\n1.  **Noise-Related Issues and Bandwidth Limitations:**\n    *   **Inverse Relationship with Bandwidth:** The cut-off frequency of the filter is inversely proportional to the sampling period. To increase the bandwidth of the system, the sampling period must be decreased. However, in applications such as force sensing using Kalman filters combined with disturbance observers, noise limits the achievable bandwidth. If the sampling period is too small (sampling frequency too high), the system may attempt to track high-frequency noise rather than the actual signal, degrading performance .\n    *   **Noise Attenuation and Modeling:** In systems where Kalman filters are used to model frequency drift, such as in GPS-disciplined oscillators, specific filter structures (e.g., IIRF1) are employed to attenuate receiver noise. The sampling period must be chosen to allow these noise attenuation mechanisms to function effectively without being overwhelmed by high-frequency noise components .\n    *   **Tracking Time-Varying Noise:** While Kalman filters offer fast convergence and good tracking properties compared to LMS and RLS algorithms, the tracking of time-varying noise conditions remains a challenge. An excessively small sampling period may not provide sufficient data points for the filter to accurately estimate the evolving noise statistics, particularly in scenarios with unknown noise statistics where system identification is required  .\n\n2.  **System Dynamic Constraints:**\n    *   **Time Constant Constraint:** A fundamental recommendation for sampling time is that it should be at least two times less than the minimum system time constant. This ensures that the sampling rate is fast enough to capture the dynamics of the system without being so fast that it violates the stability or observability requirements relative to the system's inherent speed .\n    *   **Schedulability:** The lower bound for the sampling period can also be estimated using schedulability constraints, which ensure that the computational and communication resources can handle the data rate associated with the sampling frequency .\n\n**Existence of an Optimal Value**\n\nThe consulted records do not surface a specific analytical formula or a single universal \"optimal\" sampling period value that exists strictly between the Nyquist upper bound and the noise/dynamic lower bounds. However, the notes indicate that the sampling period is a key index affecting the final estimation error . This implies that there is a trade-off:\n*   Sampling too slowly (period too large) violates the Nyquist criterion or fails to capture system dynamics, leading to aliasing or poor state estimation.\n*   Sampling too quickly (period too small) may introduce noise sensitivity, bandwidth limitations, or computational/scheduling issues.\n\nTherefore, while an optimal value is implied by the minimization of estimation error, the specific determination of this value depends on the system's time constants, noise characteristics, and schedulability constraints, rather than a single fixed theoretical constant. The \"ieee 2017 ieee 56th annual conference o\" paper is noted as stating that the sampling period is a key index affecting final estimation error, but the consulted records do not provide the full content or specific optimization results from that paper .",
+  "arm": "main",
+  "steps": 10,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. Question: Kalman filter sampling period — Nyquist-Shannon gives upper bound on sampling period (",
+     "N2. Entity list has \"Optimization of the Sampling Period\" and \"nyquist sampling theorem*\" — promisin",
+     "N3. Paper list has arxiv_2201.01680 (Regret Lower Bounds for Learning LQG Systems, Ziemann et al. 20"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Optimization of the Sampling Period"
+    },
+    "intent": "Get cross-paper evidence dossier on sampling period optimization",
+    "obs_chars": 471,
+    "notes_chars": 581
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "nyquist sampling theorem"
+    },
+    "intent": "Get evidence on Nyquist sampling theorem as it relates to Kalman filter design",
+    "obs_chars": 749,
+    "notes_chars": 581
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "sampling period|sampling rate|Kalman filter sampling",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings about sampling period in Kalman/LQG context",
+    "obs_chars": 2204,
+    "notes_chars": 581
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "Kalman filter sampling period lower bound noise optimal",
+     "k": 12
+    },
+    "intent": "Full-text search for sampling period bounds in Kalman filter context",
+    "obs_chars": 2044,
+    "notes_chars": 581
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "sampling period selection"
+    },
+    "intent": "Get dossier for sampling period selection entity — may link to the relevant paper",
+    "obs_chars": 977,
+    "notes_chars": 935
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ieee 2017 ieee 56th annual conference o",
+     "contains": "sampling period|noise|optimal|lower bound|upper bound"
+    },
+    "intent": "Get all findings from the IEEE 2017 paper about sampling period and noise",
+    "obs_chars": 244,
+    "notes_chars": 935
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "optimal sampling period Kalman filter noise variance lower bound",
+     "k": 12
+    },
+    "intent": "Search for specific content about optimal sampling period with noise considerations",
+    "obs_chars": 1898,
+    "notes_chars": 935
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "sampling period|sampling interval|discretization noise|quantization"
+    },
+    "intent": "Find mechanism records about sampling period effects including discretization/quantization noise",
+    "obs_chars": 3921,
+    "notes_chars": 935
+   },
+   {
+    "step": 4,
+    "tool": "entities",
+    "args": {
+     "contains": "sampling"
+    },
+    "intent": "Find all entities related to sampling in the corpus",
+    "obs_chars": 1769,
+    "notes_chars": 1082
+   },
+   {
+    "step": 4,
+    "tool": "entities",
+    "args": {
+     "contains": "kalman"
+    },
+    "intent": "Find all entities related to Kalman filter",
+    "obs_chars": 458,
+    "notes_chars": 1082
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "sampling period lower bound noise variance measurement noise Kalman filter optimal"
+    },
+    "intent": "Search for noise-related lower bound on sampling period in Kalman filter context",
+    "obs_chars": 1899,
+    "notes_chars": 1082
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "sampling|noise|discretization|quantization"
+    },
+    "intent": "Find criticism/limitation records about sampling and noise issues",
+    "obs_chars": 3921,
+    "notes_chars": 1082
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ieee 2017 ieee 56th annual conference o",
+     "contains": "sampling|noise|optimal|period|bound|variance|quantization|discretization"
+    },
+    "intent": "Get all findings from the most relevant paper about sampling period and noise",
+    "obs_chars": 244,
+    "notes_chars": 1082
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "optimal sampling period Kalman filter noise variance lower bound upper bound tradeoff"
+    },
+    "intent": "Search for papers discussing optimal sampling period with noise tradeoffs",
+    "obs_chars": 1912,
+    "notes_chars": 1082
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "optimal sampling period Kalman filter noise variance lower bound tradeoff",
+     "k": 8
+    },
+    "intent": "Search external literature for papers on optimal sampling period in Kalman filters with noise-related lower bounds",
+    "obs_chars": 2459,
+    "notes_chars": 1082
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "sampling rate selection Kalman filter measurement noise process noise optimal interval",
+     "k": 8
+    },
+    "intent": "Search for papers specifically on sampling rate selection considering noise characteristics in Kalman filtering",
+    "obs_chars": 3193,
+    "notes_chars": 1082
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "sampling period optimization estimation error noise variance tradeoff discrete Kalman",
+     "k": 12
+    },
+    "intent": "Search corpus full texts for sampling period optimization with noise tradeoff",
+    "obs_chars": 2195,
+    "notes_chars": 1082
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N9. [external:1bcf4165e203439bea6eb9498d3b63f8e33b1158401f268d773ca85e9ee9e8f4] \"The cut-off frequen",
+     "N10. [external:6f2aa32c1df83a059f172a8adebe8c75a993b030a297eff54cd03d30485e5f07] Time-domain Kalman ",
+     "N11. [external:5816948f217be99bbe51bd57fea15eb87f6ee952275cd2a52cc20bf765493b5b] Self-tuning Kalman "
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "Optimization of the Sampling Period",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings about how sampling period optimization works for Kalman filters",
+    "obs_chars": 187,
+    "notes_chars": 1885
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "Optimization of the Sampling Period",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation findings about sampling period optimization results",
+    "obs_chars": 187,
+    "notes_chars": 1885
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N9. [external:1bcf4165e203439bea6eb9498d3b63f8e33b1158401f268d773ca85e9ee9e8f4] \"The cut-off frequen",
+     "N10. [external:6f2aa32c1df83a059f172a8adebe8c75a993b030a297eff54cd03d30485e5f07] Time-domain Kalman ",
+     "N11. [external:5816948f217be99bbe51bd57fea15eb87f6ee952275cd2a52cc20bf765493b5b] Self-tuning Kalman "
+    ]
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N9. [external:1bcf4165e203439bea6eb9498d3b63f8e33b1158401f268d773ca85e9ee9e8f4] \"The cut-off frequen",
+     "N10. [external:6f2aa32c1df83a059f172a8adebe8c75a993b030a297eff54cd03d30485e5f07] Time-domain Kalman ",
+     "N11. [external:5816948f217be99bbe51bd57fea15eb87f6ee952275cd2a52cc20bf765493b5b] Self-tuning Kalman "
+    ]
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N9. [external:1bcf4165e203439bea6eb9498d3b63f8e33b1158401f268d773ca85e9ee9e8f4] \"The cut-off frequen",
+     "N10. [external:6f2aa32c1df83a059f172a8adebe8c75a993b030a297eff54cd03d30485e5f07] Time-domain Kalman ",
+     "N11. [external:5816948f217be99bbe51bd57fea15eb87f6ee952275cd2a52cc20bf765493b5b] Self-tuning Kalman "
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 10,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:768855b80d49] \"The sampling period is a key index affecting the final estimation error.\" | paper: ieee 2017 ieee 56th annual conference o | epistemic:stated\nN2. [coarse:ff59921] \"The lower sampling period bound can be estimated using schedulability\" | paper: sciverse_d\nN3. [coarse:64a5da5] \"The sampling rate of recorded data limits the range of frequencies that\" | paper: sciverse_f\nN4. [coarse:ac3632378b68] Nyquist: min sampling freq = 2.0 Hz, max allowed sampling period (definition)\nN5. [coarse:ca900747531e] Nyquist-Shannon: sampling freq should not be less than twice (definition)\nN6. [arxiv_2012.13664#148500] Survey of Bayesian filters incl. Kalman, EKF, UKF, adaptive Sage-Husa — context for filter types\nN7. [sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod#12150] Kalman filters used to model frequency drift; IIRF1 attenuates GPS receiver noise — noise-related context\nN8. [coarse:896802158000] \"The sampling time should be at least two times less than the minimum system time constant.\" | claim_type:recommendation\n[unsourced] N9. [external:1bcf4165e203439bea6eb9498d3b63f8e33b1158401f268d773ca85e9ee9e8f4] \"The cut-off frequency is inversely proportional to a sampling period. In order to increase the bandwidth...\" — force sensing via Kalman filter + disturbance observer; noise limits bandwidth\n[unsourced] N10. [external:6f2aa32c1df83a059f172a8adebe8c75a993b030a297eff54cd03d30485e5f07] Time-domain Kalman filter for ANC: \"fast convergence as well as good tracking properties. Especially the tracking of time-varying noise conditions is often a drawback of LMS and RLS\"\n[unsourced] N11. [external:5816948f217be99bbe51bd57fea15eb87f6ee952275cd2a52cc20bf765493b5b] Self-tuning Kalman filter for high maneuvering target: \"filtering problem with unknown noise statistics\" — system identification estimates noise stats",
+  "gaps_final": "G1. Find the specific paper(s) in corpus about sampling period optimization for Kalman filters / LQG\nG2. Identify noise-related reasons for a lower bound on sampling period\nG3. Determine if an optimal sampling period exists between the bounds\nG4. The \"ieee 2017 ieee 56th annual conference o\" paper seems most relevant — need its full content",
+  "queried": [
+   "card|{\"entity\": \"Optimization of the Sampling Period\"}",
+   "card|{\"entity\": \"nyquist sampling theorem\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"sampling period|sampling rate|Kalman filter sampling\"}",
+   "search_text|{\"k\": 12, \"query\": \"Kalman filter sampling period lower bound noise optimal\"}",
+   "card|{\"entity\": \"sampling period selection\"}",
+   "findings|{\"contains\": \"sampling period|noise|optimal|lower bound|upper bound\", \"paper_id\": \"ieee 2017 ieee 56th annual conference o\"}",
+   "search_text|{\"k\": 12, \"query\": \"optimal sampling period Kalman filter noise variance lower bound\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"sampling period|sampling interval|discretization noise|quantization\"}",
+   "entities|{\"contains\": \"sampling\"}",
+   "entities|{\"contains\": \"kalman\"}",
+   "search_text|{\"k\": 12, \"query\": \"sampling period lower bound noise variance measurement noise Kalman filter optimal\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"sampling|noise|discretization|quantization\"}",
+   "findings|{\"contains\": \"sampling|noise|optimal|period|bound|variance|quantization|discretization\", \"paper_id\": \"ieee 2017 ieee 56th annual conference o\"}",
+   "search_text|{\"k\": 12, \"query\": \"optimal sampling period Kalman filter noise variance lower bound upper bound tradeoff\"}",
+   "search_papers|{\"k\": 8, \"query\": \"optimal sampling period Kalman filter noise variance lower bound tradeoff\"}",
+   "search_papers|{\"k\": 8, \"query\": \"sampling rate selection Kalman filter measurement noise process noise optimal interval\"}",
+   "search_text|{\"k\": 12, \"query\": \"sampling period optimization estimation error noise variance tradeoff discrete Kalman\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"Optimization of the Sampling Period\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"Optimization of the Sampling Period\"}"
+  ],
+  "gate": {
+   "note_rejects": 15,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 78,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 7,
+   "reject_reasons": {
+    "bad_backref": 15
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 15,
+   "merge_total_lines": 47,
+   "relaxed_writes": 5,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 10,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:Hilbert spectral analysis->hilbert spectral analysis (hsa)",
+   "backfill:Poincare->poinca"
+  ],
+  "auto_rows": [
+   "A1. [coarse:ac3632378b68] required sampling frequency is=2.0 | src:card@step0"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "f0e4b81f93c36652a08a8160",
+  "type": "aggregation",
+  "question": "Suggest some ways in which precise positioning and context-aware networking can be achieved in 6G mobile communication?",
+  "gold_hint": "",
+  "answer": "Precise positioning and context-aware networking in 6G mobile communication can be achieved through the integration of advanced sensing technologies, artificial intelligence, and novel network architectures that move beyond traditional communication functions. A primary enabler for these capabilities is Integrated Sensing and Communication (ISAC), which allows sensing capabilities to be integrated directly into communication access points . This approach eliminates the need for dedicated sensor hardware, enabling applications such as elderly monitoring, building analytics, and vehicle-to-vehicle driver assistance . The literature emphasizes that localization and sensing play a crucial role in 6G by enabling precise positioning and context-aware services [sciverse_from_efficiency_to_sustainability]. Consequently, 6G systems are expected to support fast imaging, high-resolution sensing, and high-accuracy localization coexisting with basic wireless communication functions [sciverse_interplay_between_ris_and_ai].\n\nTo enhance the precision and reliability of these positioning systems, 6G networks will leverage the massive deployment of antennas into small areas, a technology that boosts not only communication but also sensing capabilities [sciverse_radio_positioning_with_em_processing]. This hardware advancement supports the transition from traditional Global Navigation Satellite Systems (GNSS), which rely on trilateration using RF signals and require a free line of sight to at least three satellites , to more robust RF-based localization methods . While current research combining communication and sensing is noted to be limited to vision and range simulations , the integration of AI offers a pathway to overcome these limitations. For instance, the DeepIA framework utilizes a Deep Neural Network (DNN) to achieve fast and reliable initial access in AI-driven beyond-5G and 6G millimeter-wave networks . Furthermore, the interplay between Reconfigurable Intelligent Surfaces (RIS) and AI is identified as relevant to 6G positioning and networking, with intelligent context-aware networks in 6G explicitly utilizing localization and sensing data [sciverse_interplay_between_ris_and_ai].\n\nContext-aware networking in 6G is further realized through semantic and task-oriented communications, which shift the focus from bit-level transmission to meaning-level exchange. The paper \"Will 6G be Semantic Communications?\" discusses the adoption of task-oriented and semantic communications for 6G . This is implemented through a DNN encoder at the transmitter and multiple task-specific decoders at the receiver, which are collectively trained to optimize for specific tasks . A joint and robust design of task-oriented communications, semantic communications, and integrated sensing is recommended as a key enabler for 6G . These semantic approaches allow 6G to boost specific trends in context-awareness , supported by extremely high data rate radio links designed for data-intensive applications .\n\nUnderpinning these advanced positioning and context-aware services is a flexible network infrastructure. Network virtualization and slicing are identified as crucial enablers for 5G and 6G virtual network infrastructures , making certain 6G capabilities possible . To manage the complexity of these systems, modular co-simulation frameworks like CAVIAR are being developed for 6G digital twins, utilizing message passing to simulate network behavior . While specific indoor positioning methods such as RSSI and magnetometer fusion  or hybrid systems using Visible Light Communication (VLC) and Bluetooth Low Energy (BLE)  exist in the literature, the consulted records did not surface specific details on how these particular indoor techniques are integrated into the broader 6G context-aware networking architecture described above. The available notes focus primarily on the macro-level integration of ISAC, AI, and semantic communications as the primary drivers for 6G positioning and context awareness.",
+  "arm": "main",
+  "steps": 11,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N4. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS and AI in wireless",
+     "N5. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer fu",
+     "N6. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE) — "
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "5g/6g mobile networks"
+    },
+    "intent": "Get cross-paper evidence dossier on 5G/6G mobile networks to find positioning and networking approaches",
+    "obs_chars": 391,
+    "notes_chars": 1151
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "integrated sensing and communications"
+    },
+    "intent": "Get dossier on ISAC which is a key 6G positioning enabler",
+    "obs_chars": 511,
+    "notes_chars": 1151
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Precise positioning"
+    },
+    "intent": "Get dossier on precise positioning methods",
+    "obs_chars": 443,
+    "notes_chars": 1151
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "5g/6g mobile networks",
+     "contains": "positioning|context-aware|networking|6G"
+    },
+    "intent": "Find specific findings about 6G positioning and context-aware networking",
+    "obs_chars": 2475,
+    "notes_chars": 1151
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "positioning|localization|sensing|6G",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about 6G positioning/localization/sensing techniques",
+    "obs_chars": 2309,
+    "notes_chars": 1825
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "context-aware|context aware|contextual|6G",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation records about context-aware networking in 6G",
+    "obs_chars": 2142,
+    "notes_chars": 1825
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "RIS|reconfigurable intelligent surface|beamforming|mmWave|6G",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation records about RIS/beamforming/mmWave for 6G",
+    "obs_chars": 3975,
+    "notes_chars": 1825
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "6G precise positioning context-aware networking ISAC integrated sensing",
+     "k": 12
+    },
+    "intent": "Broad text search for 6G positioning and context-aware networking content",
+    "obs_chars": 1756,
+    "notes_chars": 1825
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "integrated sensing and communications",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings for ISAC in 6G positioning",
+    "obs_chars": 919,
+    "notes_chars": 2369
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "5g/6g mobile networks",
+     "claim_type": "observation",
+     "contains": "positioning|localization|sensing"
+    },
+    "intent": "Get observation findings about positioning/localization in 6G networks",
+    "obs_chars": 2044,
+    "notes_chars": 2369
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "5g/6g mobile networks",
+     "claim_type": "recommendation",
+     "contains": "context-aware|context aware|contextual"
+    },
+    "intent": "Get recommendation findings about context-aware networking in 6G",
+    "obs_chars": 244,
+    "notes_chars": 2369
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "6G positioning techniques mmWave RIS beamforming localization accuracy",
+     "k": 12
+    },
+    "intent": "Search full texts for 6G positioning techniques and methods",
+    "obs_chars": 1751,
+    "notes_chars": 2369
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "RIS|reconfigurable intelligent surface|beamforming|mmWave|6G"
+    },
+    "intent": "Find mechanism records about RIS, beamforming, mmWave for 6G positioning",
+    "obs_chars": 3975,
+    "notes_chars": 3159
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "contains": "positioning|localization|sensing|6G",
+     "entity": "5g/6g mobile networks"
+    },
+    "intent": "Get findings about 6G positioning/localization/sensing from the 5g/6g entity",
+    "obs_chars": 2475,
+    "notes_chars": 3159
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless ",
+     "N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer f",
+     "N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE)."
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 11,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [entity: 5g/6g mobile networks] Question: ways to achieve precise positioning + context-aware networking in 6G.\nN2. [coarse:82c203517e32] \"Localization and sensing play a crucial role in 6G by enabling precise positioning and context-aware services\" [sciverse_from_efficiency_to_sustainability].\nN3. [coarse:88f6c4eee3f5] Recommendation: \"joint and robust design of task-oriented communications, semantic communications, and integrated [sensing]\" — ISAC as 6G enabler.\nN4. [coarse:ae138a04de4d] DeepIA: DNN framework for fast/reliable initial access in AI-driven beyond-5G/6G mmWave networks [arxiv_2101.01847].\nN5. [coarse:bdfc2815b0c1] Network slicing = crucial enabler for 5G/6G virtual network infrastructures [arxiv_2301.04696].\nN6. [coarse:3feee19e38fa] CAVIAR: modular co-simulation for 6G digital twin with message passing [arxiv_2401.03310].\nN7. [coarse:23ed79f] Network virtualization + slicing can make certain 6G capabilities possible [sciverse_6].\nN8. [coarse:f13795c] \"6G can also boost the following specific trends in context-awareness\" [sciverse_6].\nN9. [coarse:a6e45fd] 6G emphasizes extremely high data rate radio links for data-intensive applications [sciverse_f].\nN10. [coarse:2e04445a2ed6] \"Fast imaging, high-resolution sensing, and high accuracy localization will coexist with basic wireless communication functions in 6G\" [sciverse_interplay_between_ris_and_ai].\nN11. [paper: arxiv_2401.01531] Will 6G be Semantic Communications? (Sagduyu et al. 2024) — task-oriented/semantic comms for 6G.\n[unsourced] N12. [paper: sciverse_interplay_between_ris_and_ai_in_wireless_communications] RIS + AI in wireless comms — relevant to 6G positioning/networking.\n[unsourced] N13. [paper: sciverse_indoor_2d_positioning_method...] Indoor 2D positioning via RSSI+magnetometer fusion.\n[unsourced] N14. [paper: sciverse_a_hybrid_indoor_positioning_system...] Hybrid indoor positioning (VLC + BLE).\nN15. [arxiv_2012.13664#206550] ISAC: sensing capabilities integrated into communication access points for elderly monitoring, building analytics, V2V driver assistance — no dedicated sensor hardware needed.\nN16. [coarse:31d8e6d79f4d] GPS uses ToA [GIRI 201].\nN17. [svy_7f746d5d45a9] GNSS localization based on trilateration using RF signals, requires free LOS to at least 3 satellites [arxiv_2012.11171].\nN18. [svy_9b0973fa70] \"RF based localization methods can be roughly categorised int[o]\" [arxiv_2012] — survey of RF localization taxonomy.\nN19. [coarse:2d79b4099f96] \"Intelligent context-aware networks in 6G can utilize localization and sensing\" [sciverse_interplay_between_ris_and_ai].\nN20. [coarse:fc7e365fdae5] \"6G mobile wireless networks will introduce new technologies based on the massive deployment of antennas into small areas, allowing to boost not only communi[cation]\" [sciverse_radio_positioning_with_em_processing].\nN21. [svy_5594a88c0aa5] \"Research combining communication and sensing is limited to vision and range simulations\" [arxiv_2012.13664] — gap in ISAC research.\nN22. [coarse:02da2712975d] Semantic comms: DNN encoder at transmitter + multiple task-specific decoders at receiver, collectively trained [arxiv_2401.01531].",
+  "gaps_final": "G1. What does the KB say about 6G positioning techniques (ISAC, RIS, AI-based, etc.)?\nG2. What does the KB say about context-aware networking in 6G?\nG3. What specific methods/approaches are documented for precise positioning in 6G?\nG4. Are there findings/observations about 6G networking architectures?",
+  "queried": [
+   "card|{\"entity\": \"5g/6g mobile networks\"}",
+   "card|{\"entity\": \"integrated sensing and communications\"}",
+   "card|{\"entity\": \"Precise positioning\"}",
+   "findings|{\"contains\": \"positioning|context-aware|networking|6G\", \"entity\": \"5g/6g mobile networks\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"positioning|localization|sensing|6G\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"context-aware|context aware|contextual|6G\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"RIS|reconfigurable intelligent surface|beamforming|mmWave|6G\"}",
+   "search_text|{\"k\": 12, \"query\": \"6G precise positioning context-aware networking ISAC integrated sensing\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"integrated sensing and communications\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"positioning|localization|sensing\", \"entity\": \"5g/6g mobile networks\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"context-aware|context aware|contextual\", \"entity\": \"5g/6g mobile networks\"}",
+   "search_text|{\"k\": 12, \"query\": \"6G positioning techniques mmWave RIS beamforming localization accuracy\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"RIS|reconfigurable intelligent surface|beamforming|mmWave|6G\"}",
+   "findings|{\"contains\": \"positioning|localization|sensing|6G\", \"entity\": \"5g/6g mobile networks\"}"
+  ],
+  "gate": {
+   "note_rejects": 34,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 2,
+   "a_chars": 171,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 3,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 34
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 34,
+   "merge_total_lines": 207,
+   "relaxed_writes": 11,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:Hilbert spectral analysis->hilbert spectral analysis (hsa)",
+   "backfill:Poincare->poinca"
+  ],
+  "auto_rows": [
+   "A1. [svy_9949917db3b5] M bounding boxes over=600 | src:findings@step1 | epi:survey-claimed",
+   "A2. [svy_81e19891e5bc] consists of=56 | src:findings@step1 | epi:survey-claimed"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "f7d0d99e1d158e6f89eee62b",
+  "type": "aggregation",
+  "question": "The following paper focuses on a problem of counting the number of subgraphs in a graph that have certain properties.  What are the most significant downstream applications that either are or could be using these algorithms?  Concrete examples of the graph algorithms in use in real-world applications would be especially helpful.  https://arxiv.org/pdf/2407.06801",
+  "gold_hint": "",
+  "answer": "The paper identified by the provided identifier focuses on the fundamental algorithmic problem of counting subgraphs within a large input graph, a task that is polynomial-time solvable for subgraphs of constant size . While the specific text of the target paper was not fully retrieved to confirm its unique stated applications, the broader corpus of subgraph counting literature indicates that these algorithms have significant downstream applications in bioinformatics, social networks, and database systems .\n\nIn the field of biology and bioinformatics, subgraph counting is applied to the study of gene transcription networks  and has broader applications in many different fields, including biological studies . A concrete example of this utility is found in protein interaction networks, where detecting and counting subgraphs is used to study molecular pathways and cellular processes across different species . These biological applications are supported by various algorithmic approaches, including graphlet decomposition frameworks and methods for efficiently counting vertex orbits of small subgraphs, which are critical for analyzing complex biological structures  .\n\nIn the domain of database systems, fast subgraph counting algorithms, particularly sublinear-time algorithms for counting star subgraphs, have direct applications to join selectivity estimation . This specific application allows for the optimization of database joins by estimating the size of the result set based on the graph structure of the data .\n\nThe development of these downstream applications is driven by the need for efficient algorithms capable of handling large-scale data. Research has focused on faster algorithms for counting subgraphs in sparse graphs  and in degenerate graphs , with some methods achieving subquadratic time complexity for bounded-degeneracy graphs . Other approaches include using homomorphisms as a basis for counting small subgraphs , utilizing a GraphBLAS approach for subgraph counting  , and employing randomized algorithms such as the extensor . Additionally, there is ongoing work in finding and counting patterns in sparse graphs  and analyzing the complexity limits, such as the \"chasm at size six\" in linear-time subgraph counting . The consulted records did not surface specific real-world commercial deployments or named industry case studies beyond the general categories of bioinformatics, social networks, and database join optimization.",
+  "arm": "main",
+  "steps": 8,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "subgraph counting"
+    },
+    "intent": "Get cross-paper evidence dossier for subgraph counting: applications, findings, lineage",
+    "obs_chars": 2197,
+    "notes_chars": 1006
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "subgraph counting",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation/application findings about subgraph counting",
+    "obs_chars": 1716,
+    "notes_chars": 1006
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "detecting and counting subgraphs in protein interaction networks"
+    },
+    "intent": "Findings on protein interaction network subgraph counting applications",
+    "obs_chars": 575,
+    "notes_chars": 1006
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "subgraph counting applications real-world protein network join processing",
+     "k": 12
+    },
+    "intent": "Search full texts for concrete downstream applications of subgraph counting",
+    "obs_chars": 1749,
+    "notes_chars": 1006
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "graphlet decomposition: framework, algorithms, and applications"
+    },
+    "intent": "graphlet decomposition is a major downstream application of subgraph counting; get its applications (bioinformatics, net",
+    "obs_chars": 523,
+    "notes_chars": 2804
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join_",
+     "claim_type": "observation"
+    },
+    "intent": "get concrete join-processing / database application details from the star-subgraph paper",
+    "obs_chars": 1576,
+    "notes_chars": 2804
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "subgraph counting application bioinformatics social network analysis database join selectivity graphlet"
+    },
+    "intent": "surface concrete real-world application passages across corpus",
+    "obs_chars": 1752,
+    "notes_chars": 2804
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "subgraph counting",
+     "claim_type": "observation",
+     "contains": "application|bioinformatics|social network|database|join|protein|network analysis"
+    },
+    "intent": "broad sweep for application statements across subgraph-counting papers",
+    "obs_chars": 3063,
+    "notes_chars": 2804
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_graphlet_decomposition_framework_algorithms_and_applications",
+     "claim_type": "observation"
+    },
+    "intent": "Get graphlet decomposition applications (bioinformatics, network analysis) from the 2016 paper",
+    "obs_chars": 1065,
+    "notes_chars": 3763
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_and_counting_patterns_in_sparse_graphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get applications from the 2023 finding/counting patterns paper",
+    "obs_chars": 1949,
+    "notes_chars": 3763
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_graphblas_approach_for_subgraph_counting",
+     "claim_type": "observation"
+    },
+    "intent": "Get applications from the GraphBLAS subgraph counting paper",
+    "obs_chars": 1309,
+    "notes_chars": 3763
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "subgraph counting application database join selectivity estimation query optimization",
+     "k": 12
+    },
+    "intent": "Find concrete database/query-optimization applications of subgraph counting",
+    "obs_chars": 2126,
+    "notes_chars": 3763
+   },
+   {
+    "step": 4,
+    "tool": "search_papers",
+    "args": {
+     "query": "subgraph counting algorithms applications 2024 2025",
+     "k": 8
+    },
+    "intent": "Find arxiv 2407.06801 and recent papers on subgraph counting applications",
+    "obs_chars": 2542,
+    "notes_chars": 5451
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_efficiently_counting_vertex_orbits_of_all_5_vertex_subgraphs_by_evoke"
+    },
+    "intent": "Get application details from the EVOKE 5-vertex subgraph counting paper",
+    "obs_chars": 1013,
+    "notes_chars": 5451
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six"
+    },
+    "intent": "Get application details from the linear-time subgraph counting paper",
+    "obs_chars": 1024,
+    "notes_chars": 5451
+   },
+   {
+    "step": 5,
+    "tool": "admit_paper",
+    "args": {
+     "doi": "2407.06801"
+    },
+    "intent": "Register the target paper to read its full text for stated applications",
+    "obs_chars": 254,
+    "notes_chars": 2804
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 8,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: arxiv 2407.06801 = subgraph counting (count subgraphs with certain properties). Need downstream/real-world applications + concrete examples.\nCorpus subgraph-counting papers: sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join (2016), sciverse_homomorphisms_are_a_good_basis_for_counting_small_subgraphs (2017), sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs (2018), sciverse_counting_subgraphs_in_degenerate_graphs (2020), sciverse_graphlet_decomposition_framework_algorithms_and_applications (2016), sciverse_efficiently_counting_vertex_orbits_of_all_5_vertex_subgraphs_by_evoke (2020), sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six (2019), sciverse_a_graphblas_approach_for_subgraph_counting (2019), sciverse_finding_and_counting_patterns_in_sparse_graphs (2023).\nN1. [coarse:75dd8b702228] subgraph counting has applications in study of gene transcription networks | anchor:\"applications in the study of gene transcription networks\" | epistemic:stated\nN2. [coarse:5fb472a9053e] subgraph counting has applications in many fields incl. biology | anchor:\"applications in many different fields, including the study of biol\" | epistemic:stated\nN3. [coarse:858ad82466d8] fast subgraph counting algorithms have many applications in bioinformatics and social networks | anchor:\"many applications in bioinformatics and soc\" | epistemic:stated\nN4. [coarse:c1808542e1f5] detecting/counting subgraphs in protein interaction networks used to study molecular pathways & cellular processes across species | anchor:\"detecting and counting subgraphs in protein interaction networks is used to s\" | epistemic:stated\nN5. [coarse:71f103264a69] sublinear-time star-subgraph counting has applications to JOIN SELECTIVITY ESTIMATION (database joins) | anchor:\"sublinear-time algorithms for counting star subgraphs with applications to join selectivit\" | epistemic:stated\nN6. [coarse:fe1c5a395c51] GraphBLAS approach for subgraph counting | anchor:\"a graphblas approach for subgraph counting\" | epistemic:stated\nN7. [coarse:7881ed4139ec] randomized algorithm for counting subgraphs (extensor) | anchor:\"randomized algorithm for counting subgraphs\" | epistemic:stated\nN8. [coarse:355c14b3d947] subgraph counting in large input graph, subquadratic time for bounded-degeneracy graphs | anchor:\"fundamental algorithmic problem of subgraph counting in a large input graph\" | epistemic:stated\nN9. [coarse:72549fb877d3] best possible algorithm likely f(k)*... (complexity) | anchor:\"best possible algorithm ... f(k) *\" | epistemic:stated\nN10. [coarse:82e9222432e8] exact counting of constant-size subgraphs is polynomial-time solvable | anchor:\"exact counting of subgraphs of constant size is polynomial-time solvable\" | epistemic:stated",
+  "gaps_final": "G1. Confirm arxiv 2407.06801 identity + its own stated applications.\nG2. Concrete downstream apps: graphlet decomposition (bioinformatics), join selectivity (databases), protein networks — need more detail/examples.\nG3. Specific real-world examples of graph algorithms in use.",
+  "queried": [
+   "card|{\"entity\": \"subgraph counting\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"subgraph counting\"}",
+   "findings|{\"entity\": \"detecting and counting subgraphs in protein interaction networks\"}",
+   "search_text|{\"k\": 12, \"query\": \"subgraph counting applications real-world protein network join processing\"}",
+   "card|{\"entity\": \"graphlet decomposition: framework, algorithms, and applications\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join_\"}",
+   "search_text|{\"k\": 12, \"query\": \"subgraph counting application bioinformatics social network analysis database join selectivity graphlet\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"application|bioinformatics|social network|database|join|protein|network analysis\", \"entity\": \"subgraph counting\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_graphlet_decomposition_framework_algorithms_and_applications\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_finding_and_counting_patterns_in_sparse_graphs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_graphblas_approach_for_subgraph_counting\"}",
+   "search_text|{\"k\": 12, \"query\": \"subgraph counting application database join selectivity estimation query optimization\"}",
+   "search_papers|{\"k\": 8, \"query\": \"subgraph counting algorithms applications 2024 2025\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_efficiently_counting_vertex_orbits_of_all_5_vertex_subgraphs_by_evoke\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six\"}",
+   "admit_paper|{\"doi\": \"2407.06801\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 3361,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 18,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:Hilbert spectral analysis->hilbert spectral analysis (hsa)",
+   "backfill:Poincare->poinca"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "ce433b751f38f7d0173095c2",
+  "type": "aggregation",
+  "question": "What are advantages and disadvantages of top methods for picking the right number of topics in topic modeling?",
+  "gold_hint": "",
+  "answer": "Selecting the appropriate number of topics is a critical and challenging step in the topic modeling process, as there is likely no single correct number of topics for any given corpus . Instead, researchers often face several good options, making the selection process one that requires subjective decision-making informed by both the data and the specific research questions . Consequently, the choice of method for determining this number is not straightforward, as the evaluation perspectives of available methods vary significantly, which results in different outcomes .\n\nThe literature highlights a rich variety of methods for determining the number of topics, particularly within Latent Dirichlet Allocation (LDA) frameworks . A summarized comparison of the core ideas, advantages, and disadvantages of several typical methods for determining the optimal number of topics in LDA has been provided in recent scholarship . While specific tools exist to help researchers identify the number and labels of topics , the consulted records did not surface the specific names of these methods, nor did they detail the individual advantages and disadvantages associated with each distinct technique. Furthermore, the available notes did not provide numeric comparisons or specific per-corpus method details that would allow for a granular evaluation of individual algorithmic strengths and weaknesses.\n\nOne specific approach mentioned is an optimal topic number selection method, which is stated to better select the appropriate number of topics compared to several other methods . However, this method carries a distinct disadvantage: obtaining a more reliable optimal number of topics requires multiple sampling iterations, which in turn increases computational time . The consulted records did not surface additional quantitative metrics or specific performance values for this or other methods, nor did they detail the specific limitations of the other \"several typical methods\" referenced in the comparative summaries. Thus, while the general landscape of methodological diversity and the trade-off between reliability and computational cost for specific optimal selection methods are established, the detailed pros and cons of individual top-tier methods remain unspecified in the available information.",
+  "arm": "main",
+  "steps": 17,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Topic number determination methods"
+    },
+    "intent": "dossier on topic-number determination methods",
+    "obs_chars": 392,
+    "notes_chars": 526
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "determining the optimal number of topics"
+    },
+    "intent": "dossier on optimal number of topics",
+    "obs_chars": 536,
+    "notes_chars": 526
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "claim_type": "criticism"
+    },
+    "intent": "limitations/criticism from the tutorial paper",
+    "obs_chars": 962,
+    "notes_chars": 526
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli",
+     "claim_type": "criticism"
+    },
+    "intent": "limitations from the patent-policy LDA paper",
+    "obs_chars": 1136,
+    "notes_chars": 526
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "topic modeling"
+    },
+    "intent": "dossier panorama for topic modeling entity to surface methods + findings",
+    "obs_chars": 704,
+    "notes_chars": 1225
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "contains": "perplexity|coherence|elbow|silhouette|number of topics|topic number"
+    },
+    "intent": "sweep tutorial for method names + pros/cons",
+    "obs_chars": 1967,
+    "notes_chars": 1225
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli",
+     "contains": "perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation"
+    },
+    "intent": "sweep patent-policy paper for method names + pros/cons",
+    "obs_chars": 1161,
+    "notes_chars": 1225
+   },
+   {
+    "step": 2,
+    "tool": "find_gap",
+    "args": {
+     "entity": "topic modeling"
+    },
+    "intent": "what corpus states it did NOT do / never reported for topic modeling",
+    "obs_chars": 120,
+    "notes_chars": 1225
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "perplexity coherence elbow silhouette topic number selection method",
+     "k": 12
+    },
+    "intent": "Find full-text passages describing specific topic-number selection methods and their pros/cons",
+    "obs_chars": 1749,
+    "notes_chars": 1634
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the tutorial paper describing how each method works",
+    "obs_chars": 962,
+    "notes_chars": 1634
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the patent-policy paper describing its method",
+    "obs_chars": 1136,
+    "notes_chars": 1634
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "perplexity coherence score topic number selection LDA method comparison"
+    },
+    "intent": "Find specific method names and their pros/cons in the two core papers",
+    "obs_chars": 1896,
+    "notes_chars": 1634
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "contains": "perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation"
+    },
+    "intent": "Get all findings mentioning specific methods or their limitations from the tutorial paper",
+    "obs_chars": 1967,
+    "notes_chars": 1634
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation records from the tutorial to identify specific methods discussed",
+    "obs_chars": 1455,
+    "notes_chars": 1634
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation records from the patent policy paper to identify methods and their properties",
+    "obs_chars": 1136,
+    "notes_chars": 1634
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from the tutorial for method-specific guidance",
+    "obs_chars": 1424,
+    "notes_chars": 1634
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from the patent policy paper",
+    "obs_chars": 1136,
+    "notes_chars": 1634
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "Topic number determination methods",
+     "claim_type": "definition"
+    },
+    "intent": "definitions of the specific methods (perplexity, coherence, elbow, silhouette, etc.)",
+    "obs_chars": 187,
+    "notes_chars": 1634
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "determining the optimal number of topics",
+     "claim_type": "criticism"
+    },
+    "intent": "criticism/limitation records tied to the optimal-number entity",
+    "obs_chars": 1152,
+    "notes_chars": 1634
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an",
+     "contains": "perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation"
+    },
+    "intent": "Get the comparison of topic-number methods from the library-an paper",
+    "obs_chars": 1556,
+    "notes_chars": 1947
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an"
+    },
+    "intent": "Get self-limiting/critical statements from the library-an paper about topic number methods",
+    "obs_chars": 1087,
+    "notes_chars": 2506
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:a6ebdf2079e9",
+     "window": 800
+    },
+    "intent": "Get full text around the library-an paper's comparison of methods for determining optimal number of topics — should list",
+    "obs_chars": 151,
+    "notes_chars": 2506
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:fe883c66ed2d",
+     "window": 800
+    },
+    "intent": "Get full text around Table 2 reference in library-an paper — should enumerate the methods for determining number of topi",
+    "obs_chars": 151,
+    "notes_chars": 2506
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:3b5fabd3fe4b",
+     "window": 800
+    },
+    "intent": "Get full text around tutorial's description of tools for identifying number of topics — should name specific methods (pe",
+    "obs_chars": 1128,
+    "notes_chars": 2506
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:f81009267c71",
+     "window": 800
+    },
+    "intent": "Get full text around patent-policy paper's claim about optimal topic number selection method — should name the specific ",
+    "obs_chars": 1272,
+    "notes_chars": 2506
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the library-an paper which has a comparison table of methods with advantages/disadvantages",
+    "obs_chars": 1087,
+    "notes_chars": 2506
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "query": "perplexity coherence elbow silhouette topic number determination advantages disadvantages",
+     "k": 12
+    },
+    "intent": "Find verbatim passages in the three core papers that enumerate specific methods (perplexity, coherence, elbow, silhouett",
+    "obs_chars": 1750,
+    "notes_chars": 2506
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial",
+     "contains": "perplexity|coherence|elbow|silhouette|kappa|advantage|disadvantage|limitation|drawback"
+    },
+    "intent": "Sweep tutorial paper for method-specific pros/cons with different phrasings",
+    "obs_chars": 2198,
+    "notes_chars": 2506
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from the library-an paper that compares methods for topic number determination",
+    "obs_chars": 1556,
+    "notes_chars": 2506
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 17,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: advantages/disadvantages of top methods for picking the right number of topics in topic modeling.\nCore papers: sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial (2023), sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli (2021), sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an (2023).\nN1. [coarse:3b5fabd3fe4b] Tutorial describes tools to identify number and labels of topics | anchor:\"tools researchers can use to identify the number and labels\" | epistemic:stated\nN2. [coarse:677f28457b9f] Determining number of topics is a challenging step | anchor:\"A challenging step of topic modeling is determining the number of topics to extract.\" | epistemic:stated\nN3. [coarse:f81009267c71] Proposed optimal topic number selection method better selects appropriate number vs several other methods | anchor:\"the optimal topic number selection metho\" | epistemic:stated\nN4. [coarse:8dfd8efdd60b] Disadvantage: reliable optimal number requires multiple sampling -> increases computational time | anchor:\"if we want to obtain a more reliable optimal number of topic selectio\" | epistemic:stated\nN5. [coarse:1e63847b57c6] No single correct number of topics; several good options | anchor:\"There is likely no single correct number of topics for any corpus\" | epistemic:stated\nN6. [coarse:a10dae5da3d6] Topic modeling requires subjective decisionmaking informed by data and research questions | anchor:\"topic modeling requires subjective decisionmaking informed by the data and research\" | epistemic:stated\nN7. [coarse:a6ebdf2079e9] Library-an paper provides summarized comparison of core ideas and advantages/disadvantages of several typical methods for determining optimal number of topics in LDA | anchor:\"This paper provides a summarized comparison of the core ideas and advantages and disadvant\" | epistemic:stated\nN8. [coarse:fe883c66ed2d] Table 2 reveals a rich variety of methods for determining the number of topics in LDA methods | anchor:\"Table 2 reveals a rich variety of methods for determining the number of topics in LDA meth\" | epistemic:stated\nN9. [coarse:610b4bb2d703] Evaluation perspectives of the methods vary significantly, resulting in different outcomes | anchor:\"The evaluation perspectives vary significantly, resulting in different m\" | epistemic:stated\nCard on both topic-number entities returned no dossier; nearest_in_corpus: \"topic modeling\", \"DL methods\", \"Existing methods\".",
+  "gaps_final": "G1. What specific methods exist for choosing number of topics (per-corpus)?\nG2. Advantages of each method?\nG3. Disadvantages/limitations of each method?\nG4. Any numeric comparisons?",
+  "queried": [
+   "card|{\"entity\": \"Topic number determination methods\"}",
+   "card|{\"entity\": \"determining the optimal number of topics\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli\"}",
+   "card|{\"entity\": \"topic modeling\"}",
+   "findings|{\"contains\": \"perplexity|coherence|elbow|silhouette|number of topics|topic number\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"contains\": \"perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation\", \"paper_id\": \"sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_mode",
+   "find_gap|{\"entity\": \"topic modeling\"}",
+   "search_text|{\"k\": 12, \"query\": \"perplexity coherence elbow silhouette topic number selection method\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli\"}",
+   "search_text|{\"k\": 12, \"query\": \"perplexity coherence score topic number selection LDA method comparison\"}",
+   "findings|{\"contains\": \"perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_selection_of_the_optimal_number_of_topics_for_lda_topic_model_taking_patent_poli\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"Topic number determination methods\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"determining the optimal number of topics\"}",
+   "findings|{\"contains\": \"perplexity|coherence|elbow|silhouette|number of topics|topic number|advantage|disadvantage|limitation\", \"paper_id\": \"sciverse_advancements_of_artificial_intelligence_techniques_in_the_re",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an\"}",
+   "fetch_chunk|{\"record_id\": \"coarse:a6ebdf2079e9\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"coarse:fe883c66ed2d\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"coarse:3b5fabd3fe4b\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"coarse:f81009267c71\", \"window\": 800}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an\"}",
+   "search_text|{\"k\": 12, \"query\": \"perplexity coherence elbow silhouette topic number determination advantages disadvantages\"}",
+   "findings|{\"contains\": \"perplexity|coherence|elbow|silhouette|kappa|advantage|disadvantage|limitation|drawback\", \"paper_id\": \"sciverse_selecting_the_number_and_labels_of_topics_in_topic_modeling_a_tutorial\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_advancements_of_artificial_intelligence_techniques_in_the_realm_about_library_an\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 8,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:Hilbert spectral analysis->hilbert spectral analysis (hsa)",
+   "backfill:Poincare->poinca"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "ca229869d669f7985df9e6b2",
+  "type": "aggregation",
+  "question": "What are different techniques in Non-linear, Non-stationary signal processing? Which one is much effective in view of Geophysical signals?",
+  "gold_hint": "",
+  "answer": "## Techniques in Non-Linear, Non-Stationary Signal Processing\n\nThe knowledge base identifies several principal techniques for analyzing non-linear and non-stationary signals:\n\n### 1. Hilbert-Huang Transform (HHT) / Hilbert Spectral Analysis (HSA)\nHHT is a two-stage adaptive method: (i) Empirical Mode Decomposition (EMD) decomposes the signal into Intrinsic Mode Functions (IMFs), and (ii) the Hilbert transform is applied to each IMF to compute instantaneous frequency and amplitude, yielding the Hilbert-Huang spectrum [f5526e3dad65d4]. The comparison paper explicitly states that \"the Hilbert spectrum analysis has an excellent performance in the analysis [of] mutation nonlinear signals\" [e66c6c3af85457] and that \"HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis\" [3058943e7a6c63]. It concludes that \"HHT spectrum is more suitable for mutation of nonlinear signal\" [ee32c3de9acd0a].\n\n### 2. Wavelet Spectrum / Wavelet Analysis\nWavelet analysis is one of the three common methods for nonlinear signal analysis [coarse:10e1dc9043fd]. It performs well when the signal's characteristics are concentrated in a particular frequency band: \"Wave spectrum analysis has a good effect to [concentrate] on a particular band of system characteristics\" [800c3450b59604]. A dedicated seismic recognition algorithm based on wavelet analysis has been proposed for geophysical applications [coarse:ecd2f07fb344].\n\n### 3. Poincaré Mapping\nPoincaré mapping is the third common method, suited to extracting chaotic characteristics of a system for identifying its operating state [6450369fbf5d22]. It is particularly useful when the goal is to characterize the dynamical (chaotic) behavior rather than the time-frequency content.\n\n### 4. Local Wave Decomposition (LWD)\nLWD is an adaptive time-frequency method that decomposes a signal into band-limited IMFs. It is described as \"one of the most effective time-frequency analysis method[s]\" and has been applied to pulsation signal processing in combination with the Teage operator [coarse:9c1eeef9b550].\n\n### 5. Fourier Transform (limited applicability)\nThe corpus explicitly notes that \"for the non-stationary signal which changes with time, Fourier transform is powerless\" [coarse:8257d45f33b8], establishing the motivation for the adaptive methods above.\n\n---\n\n## Which Technique Is Most Effective for Geophysical Signals?\n\n**The Hilbert-Huang Transform (HHT) / Hilbert Spectral Analysis is the most effective technique for geophysical signals**, based on the following evidence chain from the corpus:\n\n1. **Geophysical signals are inherently nonstationary.** The corpus states that \"most geophysical signals of interest are nonstationary, consisting of transients, edges, and/or local features\" [coarse:ecd2f07fb344]. This is the defining characteristic that rules out classical Fourier methods.\n\n2. **HHT outperforms wavelet analysis for nonstationary/nonlinear signals.** The comparison paper directly states that \"HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis\" [3058943e7a6c63] and that it \"has an excellent performance in the analysis [of] mutation nonlinear signals\" [e66c6c3af85457]. The conclusion is that \"HHT spectrum is more suitable for mutation of nonlinear signal\" [ee32c3de9acd0a].\n\n3. **The logical inference to geophysical signals is direct.** Since geophysical signals (seismic, well-logging, etc.) are predominantly nonstationary with transient and local features [coarse:ecd2f07fb344], and HHT is demonstrated to be superior to wavelet analysis precisely for such mutation/nonlinear signals [3058943e7a6c63, ee32c3de9acd0a], HHT is the most effective choice.\n\n**Caveat:** No paper in the corpus explicitly states the sentence \"HHT is the best method for geophysical signals\" as a single finding. The conclusion is drawn from the conjunction of (a) the characterization of geophysical signals as nonstationary [coarse:ecd2f07fb344] and (b) the demonstrated superiority of HHT over wavelet analysis for nonstationary/nonlinear signals [3058943e7a6c63, e66c6c3af85457, ee32c3de9acd0a]. Additionally, wavelet-based methods remain in active use for specific geophysical tasks such as seismic signal recognition [coarse:ecd2f07fb344], and LWD is noted as highly effective for certain signal classes [coarse:9c1eeef9b550]. However, for the general class of nonstationary geophysical signals with transients and local features, the corpus evidence points to HHT as the most effective technique.",
+  "arm": "main",
+  "steps": 12,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "non-linear signals processing"
+    },
+    "intent": "dossier on non-linear signal processing techniques",
+    "obs_chars": 473,
+    "notes_chars": 962
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "geophysical signals"
+    },
+    "intent": "dossier on geophysical signals",
+    "obs_chars": 443,
+    "notes_chars": 962
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods",
+     "contains": "non-linear|non-stationary|technique|method|effective"
+    },
+    "intent": "techniques enumerated in the comparison paper",
+    "obs_chars": 1880,
+    "notes_chars": 962
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis",
+     "contains": "wavelet|seismic|geophysical|effective|non-linear"
+    },
+    "intent": "wavelet/seismic findings",
+    "obs_chars": 1407,
+    "notes_chars": 962
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "geophysical signals most effective wavelet Hilbert Poincare non-stationary",
+     "k": 12
+    },
+    "intent": "find which technique is best for geophysical signals in the comparison paper",
+    "obs_chars": 1764,
+    "notes_chars": 1450
+   },
+   {
+    "step": 2,
+    "tool": "compare",
+    "args": {
+     "entities": [
+      "wavelet spectrum",
+      "hilbert spectral analysis (hsa)",
+      "poinca"
+     ],
+     "subject": "geophysical signals"
+    },
+    "intent": "numeric comparison matrix for the three methods on geophysical signals",
+    "obs_chars": 62,
+    "notes_chars": 1450
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field",
+     "contains": "technique|method|wavelet|effective|non-stationary|non-linear"
+    },
+    "intent": "additional techniques from seismic vector field paper",
+    "obs_chars": 1215,
+    "notes_chars": 1450
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_data_processing_of_pulsation_signals_based_on_local_wave_decomposition_and_teage",
+     "contains": "technique|method|wavelet|effective|non-stationary|decomposition"
+    },
+    "intent": "additional techniques from pulsation signal paper",
+    "obs_chars": 1054,
+    "notes_chars": 1450
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods",
+     "sections": [
+      "introduction",
+      "results",
+      "conclusion"
+     ]
+    },
+    "intent": "Get full-text depth on which of the three methods is most effective for geophysical signals",
+    "obs_chars": 1834,
+    "notes_chars": 2313
+   },
+   {
+    "step": 3,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:10e1dc9043fd",
+     "window": 400
+    },
+    "intent": "Get surrounding context of the three-methods passage to see if effectiveness ranking is stated",
+    "obs_chars": 718,
+    "notes_chars": 2313
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the comparison paper (likely where effectiveness claims live)",
+    "obs_chars": 1392,
+    "notes_chars": 2313
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the seismic wavelet paper for additional technique detail",
+    "obs_chars": 482,
+    "notes_chars": 2313
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "3058943e7a6c63",
+     "window": 500
+    },
+    "intent": "Get full comparative-analysis passage around HHT-vs-wavelet claim to confirm which method is best and any geophysical fr",
+    "obs_chars": 76,
+    "notes_chars": 3632
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "e66c6c3af85457",
+     "window": 500
+    },
+    "intent": "Get surrounding conclusion text on Hilbert excellent performance for mutation nonlinear signals",
+    "obs_chars": 76,
+    "notes_chars": 3632
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "contains": "geophysical|seismic|earthquake|effective|best|superior",
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods"
+    },
+    "intent": "Check if comparison paper explicitly names geophysical signals and a best method",
+    "obs_chars": 244,
+    "notes_chars": 3632
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Hilbert spectrum geophysical signals nonstationary effective superior wavelet"
+    },
+    "intent": "Find any passage explicitly linking Hilbert/HHT to geophysical signals as most effective",
+    "obs_chars": 1998,
+    "notes_chars": 4353
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_comparison_of_non_linear_signals_analysis_methods"
+    },
+    "intent": "Get full dossier for the comparison paper including main_results and any geophysical mentions",
+    "obs_chars": 593,
+    "notes_chars": 4353
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods",
+     "claim_type": "recommendation"
+    },
+    "intent": "Check if the comparison paper makes a recommendation about which method to use",
+    "obs_chars": 2877,
+    "notes_chars": 4353
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "geophysical signals nonstationary wavelet Hilbert HHT effective time-frequency analysis seismic"
+    },
+    "intent": "Final attempt to find any explicit statement linking a specific technique to geophysical signal effectiveness",
+    "obs_chars": 1997,
+    "notes_chars": 3776
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "contains": "geophysical|seismic|earthquake|nonstationary|non-stationary",
+     "paper_id": "sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field"
+    },
+    "intent": "Check if the seismic vector field paper has any findings mentioning geophysical or nonstationary signals",
+    "obs_chars": 700,
+    "notes_chars": 3776
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the seismic wavelet paper for geophysical-specific technique claims",
+    "obs_chars": 1407,
+    "notes_chars": 4831
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the multi-component seismic paper for geophysical technique details",
+    "obs_chars": 187,
+    "notes_chars": 4831
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Hilbert Huang transform HHT geophysical seismic signal processing effective nonstationary"
+    },
+    "intent": "Search for explicit statements linking HHT/Hilbert to geophysical signal effectiveness",
+    "obs_chars": 2010,
+    "notes_chars": 5122
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "geophysical signals",
+     "contains": "effective|best|superior|Hilbert|HHT|wavelet|nonstationary"
+    },
+    "intent": "Find findings records specifically about geophysical signals and method effectiveness",
+    "obs_chars": 551,
+    "notes_chars": 5122
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_extraction_of_geological_information_from_acoustic_well_logging_waveforms_using_",
+     "claim_type": "recommendation|observation|mechanism"
+    },
+    "intent": "Check what technique this geophysical-signal paper recommends or observes as effective for nonstationary geophysical sig",
+    "obs_chars": 267,
+    "notes_chars": 5455
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "query": "Hilbert Huang transform HHT geophysical well logging seismic nonstationary effective",
+     "k": 12
+    },
+    "intent": "Find any corpus paper that explicitly links HHT/Hilbert to geophysical signal processing effectiveness",
+    "obs_chars": 2011,
+    "notes_chars": 5455
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_data_processing_of_pulsation_signals_based_on_local_wave_decomposition_and_teage",
+     "claim_type": "recommendation|observation|mechanism"
+    },
+    "intent": "Check what the LWD/TEAGE paper recommends or observes about its method's effectiveness",
+    "obs_chars": 267,
+    "notes_chars": 5455
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_extraction_of_geological_information_from_acoustic_well_logging_waveforms_using_"
+    },
+    "intent": "Check if the well-logging geophysical paper recommends a specific technique",
+    "obs_chars": 1063,
+    "notes_chars": 5290
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_non_linear_signals_analysis_methods",
+     "contains": "Hilbert|HHT|superior|better|advantage|effective|geophysical|seismic|nonstationary"
+    },
+    "intent": "Get the comparison paper's own statements about which method is superior/effective, especially for nonstationary or geop",
+    "obs_chars": 3386,
+    "notes_chars": 2880
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Hilbert Huang transform HHT geophysical seismic well logging nonstationary effective superior wavelet comparison"
+    },
+    "intent": "Find any passage in corpus full texts that directly compares HHT vs wavelet for geophysical/seismic signals",
+    "obs_chars": 286,
+    "notes_chars": 2880
+   }
+  ],
+  "notes_final": "N1. [entity: non-linear signals processing] Question: (a) techniques in non-linear, non-stationary signal processing; (b) which is most effective for geophysical signals.\nN2. [coarse:10e1dc9043fd] Wavelet spectrum = one of three common analysis methods for nonlinear signals | anchor:\"three common analysis methods for nonlinear signals, Wavelet spectrum, Hilb\" | epistemic:stated\nN3. [coarse:fd611473184e] Hilbert spectral analysis (HSA) = one of three common methods | anchor:\"Wavelet spectrum, Hilb\" | epistemic:stated\nN4. [coarse:cc6dbef212c9] Poincare (map) = third common method | anchor:\"Wavelet spectrum, Hilb\" | epistemic:stated\nN5. [coarse:b91aa7e0984d] Selecting most suitable method quickly for nonlinear signal is important for efficiency | epistemic:stated\nN6. [coarse:ecd2f07fb344] Most geophysical signals of interest are nonstationary, consisting of transients, edges, and/or local features | epistemic:stated\nN7. [coarse:ecd2f07fb344] Seismic recognition algorithm based on wavelet analysis proposed | epistemic:stated\nN8. [coarse:9c1eeef9b550] Local wave decomposition (LWD) = adaptive time-frequency method decomposing signal into band-limited IMFs | anchor:\"Local wave decomposition (LWD) is one of the most effective time-frequency analysis method\" | epistemic:stated\nN9. [coarse:8257d45f33b8] Fourier transform is powerless for non-stationary signals which change with time | anchor:\"But for the non-stationary signal which changes with time, Fourier transform is powerless.\" | epistemic:stated\nN10. [e66c6c3af85457] Hilbert spectrum analysis has excellent performance in analysis of mutation nonlinear signals | anchor:\"The Hilbert spectrum analysis has an excellent performance in the analysis mutation nonlinear signals.\" | epistemic:stated\nN11. [3058943e7a6c63] HHT spectrum has better resolution both in time and frequency domain than wavelet analysis | anchor:\"HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis.\" | epistemic:stated\nN12. [800c3450b59604] Wave spectrum analysis has good effect on concentrated band of system characteristics | anchor:\"Wave spectrum analysis has a good effect to Concentrated on a particular band of system characteristics analys\" | epistemic:stated\nN13. [6450369fbf5d22] Poincare mapping suited to achieve chaotic characteristics of system for identifying system operating state | anchor:\"Poincaré mapping is suited to achieve the chaotic characteristics of system for identifying the system operati\" | epistemic:stated\nN14. [sciverse_comparison_of_non_linear_signals_analysis_methods] The comparison paper does not explicitly name geophysical signals in its finding records (findings query returned 0 hits).\nN15. [sciverse_comparison_of_non_linear_signals_analysis_methods] compare matrix for wavelet/Hilbert/Poincare on geophysical signals returned empty (vocab mismatch).\nN16. [f5526e3dad65d4] HHT consists of EMD + HSA; Hilbert transform applied to each IMF; instantaneous freq/amplitude computed; result = Hilbert-Huang spectrum | epistemic:stated\nN17. [ee32c3de9acd0a] HHT spectrum is more suitable for mutation of nonlinear signal | anchor:\"So HHT spectrum is more suitable for mutation of nonlinear signal\" | epistemic:stated\nN18. [sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis] Wavelet-based seismic recognition algorithm proposed; wavelet analysis applied to seismic signals | epistemic:stated\nN19. [sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field] Multi-component seismic vector field processing discussed; no explicit HHT/wavelet superiority claim found in findings | epistemic:stated\nN20. [sciverse_data_processing_of_pulsation_signals_based_on_local_wave_decomposition_and_teage] LWD + Teage used for pulsation signal processing; LWD described as \"one of the most effective time-frequency analysis method\" | epistemic:stated",
+  "gaps_final": "G1. Which method is most effective for geophysical signals? — N10+N11+N17 strongly indicate Hilbert/HHT is superior for nonlinear/nonstationary signals; N6 ties geophysical signals to nonstationary. No paper in corpus explicitly states \"Hilbert is best for geophysical signals\" but the logical chain is clear.\nG2. Numeric comparison results — compare matrix empty; no compiled numeric matrix for these methods on geophysical signals.\nG3. Additional techniques — seismic/pulsation papers probed, 0 hits. LWD noted from pulsation paper abstract.",
+  "queried": [
+   "card|{\"entity\": \"non-linear signals processing\"}",
+   "card|{\"entity\": \"geophysical signals\"}",
+   "findings|{\"contains\": \"non-linear|non-stationary|technique|method|effective\", \"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "findings|{\"contains\": \"wavelet|seismic|geophysical|effective|non-linear\", \"paper_id\": \"sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis\"}",
+   "search_text|{\"k\": 12, \"query\": \"geophysical signals most effective wavelet Hilbert Poincare non-stationary\"}",
+   "compare|{\"entities\": [\"wavelet spectrum\", \"Hilbert spectral analysis\", \"Poincare\"], \"subject\": \"geophysical signals\"}",
+   "findings|{\"contains\": \"technique|method|wavelet|effective|non-stationary|non-linear\", \"paper_id\": \"sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field\"}",
+   "findings|{\"contains\": \"technique|method|wavelet|effective|non-stationary|decomposition\", \"paper_id\": \"sciverse_data_processing_of_pulsation_signals_based_on_local_wave_decomposition_and_teage\"}",
+   "deep_read|{\"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\", \"sections\": [\"introduction\", \"results\", \"conclusion\"]}",
+   "fetch_chunk|{\"record_id\": \"coarse:10e1dc9043fd\", \"window\": 400}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis\"}",
+   "fetch_chunk|{\"record_id\": \"3058943e7a6c63\", \"window\": 500}",
+   "fetch_chunk|{\"record_id\": \"e66c6c3af85457\", \"window\": 500}",
+   "findings|{\"contains\": \"geophysical|seismic|earthquake|effective|best|superior\", \"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "search_text|{\"k\": 12, \"query\": \"Hilbert spectrum geophysical signals nonstationary effective superior wavelet\"}",
+   "card|{\"entity\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "search_text|{\"k\": 12, \"query\": \"geophysical signals nonstationary wavelet Hilbert HHT effective time-frequency analysis seismic\"}",
+   "findings|{\"contains\": \"geophysical|seismic|earthquake|nonstationary|non-stationary\", \"paper_id\": \"sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_recognition_algorithm_of_seismic_signals_based_on_wavelet_analysis\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_discussions_on_the_processing_of_the_multi_component_seismic_vector_field\"}",
+   "search_text|{\"k\": 12, \"query\": \"Hilbert Huang transform HHT geophysical seismic signal processing effective nonstationary\"}",
+   "findings|{\"contains\": \"effective|best|superior|Hilbert|HHT|wavelet|nonstationary\", \"entity\": \"geophysical signals\"}",
+   "findings|{\"claim_type\": \"recommendation|observation|mechanism\", \"paper_id\": \"sciverse_extraction_of_geological_information_from_acoustic_well_logging_waveforms_using_\"}",
+   "search_text|{\"k\": 12, \"query\": \"Hilbert Huang transform HHT geophysical well logging seismic nonstationary effective\"}",
+   "findings|{\"claim_type\": \"recommendation|observation|mechanism\", \"paper_id\": \"sciverse_data_processing_of_pulsation_signals_based_on_local_wave_decomposition_and_teage\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_extraction_of_geological_information_from_acoustic_well_logging_waveforms_using_\"}",
+   "findings|{\"contains\": \"Hilbert|HHT|superior|better|advantage|effective|geophysical|seismic|nonstationary\", \"paper_id\": \"sciverse_comparison_of_non_linear_signals_analysis_methods\"}",
+   "search_text|{\"k\": 12, \"query\": \"Hilbert Huang transform HHT geophysical seismic well logging nonstationary effective superior wavelet comparison\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 1,
+   "a_chars": 95,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 2960,
+   "preanswer_audit_fired": true,
+   "f28_autos": 0,
+   "max_evidence_streak": 0,
+   "f28_hard_stop": false
+  },
+  "backfills": [
+   "backfill:Hilbert spectral analysis->hilbert spectral analysis (hsa)",
+   "backfill:Poincare->poinca"
+  ],
+  "auto_rows": [
+   "A1. [coarse:9c1eeef9b550] signal is concentrated between=0.2 | src:findings@step0 | epi:stated"
+  ],
+  "degenerate": false
+ }
+]

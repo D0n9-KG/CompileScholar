@@ -1,0 +1,3092 @@
+Table Pre-training: A Survey on Model Architectures, Pre-training Objectives, and Downstream Tasks 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below:
+
+ Description: 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ arXiv is now an independent nonprofit! 
+ Learn more 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ License: arXiv.org perpetual non-exclusive license
+ 
+ 
+arXiv:2201.09745v4 [cs.CL] 29 Apr 2022 
+ 
+ 
+
+# Table Pre-training: A Survey on
+Model Architectures, Pre-training Objectives, and Downstream Tasks
+
+ 
+ 
+ Haoyu Dong
+ 
+    
+ Zhoujun Cheng
+ 
+    
+ Xinyi He
+ 
+    
+ Mengyu Zhou
+ 
+    
+ Anda Zhou
+ 
+    
+ Fan Zhou
+ 
+    
+ Ao Liu
+ 
+    
+ Shi Han
+ 
+    
+ Dongmei Zhang{hadong, mezho, shihan, dongmeiz}@microsoft.com,
+{blankcheng, zhoufan98}@sjtu.edu.cn,
+hxyhxy@stu.xjtu.edu.cn,
+a.d.zhou@sms.ed.ac.uk,
+zeitmond@gmail.com
+ 
+
+ Abstract 
+ 
+ Following the success of pre-training paradigm in the natural language domain, a flurry of table pre-training frameworks have been proposed and have achieved new state-of-the-arts on various downstream tasks such as table question answering, table type recognition, column relation classification, table search, and formula prediction.
+Various model architectures have been explored to best leverage the characteristics of structured tables, especially specially-designed attention mechanisms.
+Moreover, to fully exploit the supervision signals in unlabeled tables, diverse pre-training objectives have been designed and evaluated, for example, denoising cell values, predicting numerical relationships, and learning a neural SQL executor. This survey aims to provide a review of model designs, pre-training objectives, and downstream tasks for table pre-training, and we further share our thoughts on existing challenges and future opportunities. 
+
+ 
+ 
+ 
+
+## 1 Introduction
+
+ 
+ Tables are widely used to organize and present data in various document types and database systems such as webpages, spreadsheets, PDFs, and MySQL, gaining increasing attention from the research community.
+Following the success of large-scale pre-training in natural language (NL), a flurry of research works have been proposed to leverage unlabeled tables for self-supervised pre-training and achieve promising results in table type classification  Wang et al. (2021c) , cell type classification  Gol et al. (2019) ; Wang et al. (2020) , table question answering (QA)  Herzig et al. (2020) ; Yin et al. (2020) , table search  Wang et al. (2021b) , entity linking  Deng et al. (2020) , column type identification   Chen et al. (2019a) ; Guo et al. (2020) , table augmentation  Deng et al. (2020) ; Iida et al. (2021) , formula prediction  Cheng et al. (2021a) , etc.
+On the one hand, similar to NL that has already proved the success of large-scale pre-training, tables have dense semantics stored in textual headers, captions, and notes.
+On the other hand, different from NL, tables have distinct information (intuitive formats, well-organised numerical values, formulas, etc.) and various structures (relational tables, entity tables, matrix tables, forms, etc.), and thus require special model designs and pre-training objectives to achieve optimal results.
+
+ 
+ 
+ Figure 1: Examples of real-world web, PDF, and spreadsheet tables. 
+ 
+ 
+ To best leverage table characteristics while maintaining capabilities to understand text within/out of tables, various Tabular Language Models (TaLMs) are proposed for table pre-training. For example, TaBERT  Yin et al. (2020) encoded tables and text by concatenating a row-wise transformer with column-wise vertical attention layers, pre-trained with Masked Language Models (MLM) and Masked Column Prediction (MCP), and achieved SOTA results on benchmarks of table QA. TaPas  Herzig et al. (2020) pioneeringly proposed an end-to-end table-text joint reasoning framework using transformers without explicitly generating logical forms for table QA, and TaPas
+also employed MLM for pre-training.
+TURL  Deng et al. (2020) was the first work to learn entity representations from relational tables to enhance table knowledge matching and table augmentation, and it restricted each cell to aggregating information from the located row and column via masked attention.
+TUTA  Wang et al. (2020) then extended the success of table pre-training to generally structured tables using tree-based attention and tree-based positional encoding based on a novel unified bi-tree structure. TUTA achieved new SOTA results on five representative table structure understanding datasets.
+Far different from previous pre-training objectives, TaPEx  Liu et al. (2021) explored to learn a neural SQL executor and demonstrated surprising effectiveness on table-text joint reasoning. Recently, UnifiedSKG  Xie et al. (2022) explored to directly fine-tune T5 on 21 datasets across 6 tasks and achieved promising and even SOTA results.
+
+ 
+ 
+ We believe that the structured table provides a distinct perspective to explore frontier neural architectures and inspire new research directions. Since the table often interacts with programming languages such as SQLs and spreadsheet formulas, it additionally spawns cross-domain applications such as semantic parsing  Yu et al. (2018) , logic-to-text  Chen et al. (2020c) , and formula prediction  Chen et al. (2021a) .
+In this paper, we first introduce preliminaries of table types, table structures, cell information, and table corpora in Section  2 . Then we give a comprehensive review of table modeling architectures, table pre-training objectives, and downstream tasks in Sections  3 , 4 , 5 . At last, we share our vision on table pre-training in Section  6 .
+
+ 
+ 
+ 
+
+## 2 Preliminaries
+
+ 
+ Tables can be roughly categorized into three primary forms: well-structured tables, semi-structured tables, and unstructured tables.
+Database tables are well structured with an ordinarily-defined relational schema so that precise support execution of formal languages such as SQL and R. In contrast, semi-structured tables are usually human-crafted with markup languages or end-user tools such as HTML code, Latex code, spreadsheets, and Word documents. They have flexible structures but lack meta-information to record them and thus challenge precise and automatic information retrieval. Image tables are even unstructured because they only record raw RGB information, e.g., scanned tables from books, screenshots of web tables, and even handwritten drafts. They need to be digitized before any higher-level information retrieval.
+
+ 
+ 
+ In this paper, we mainly focus on semi- and well-structured tables. We neglect image tables because they have distinct visual challenges and are desirable to be discussed separately.
+
+ 
+ 
+
+### 2.1 Table Structure
+
+ 
+ Tables are flexible with various structures, including relational tables, entity tables, matrix tables, layout tables, forms, etc. They also have orientations (horizontal/vertical) and hierarchies (flat/hierarchical). As shown in Figure  1 , the structure of a flat relational table is definite and straightforward in a database-like form, wherein each row is a record, each column is a field, and there is no hierarchy. An entity table simply records an entity and its attributes.
+A matrix table has both horizontal and vertical orientations. In fact, there are various categorization methodologies on the table structure, which are summarized in detail by   Zhang and Balog (2020) .
+
+ 
+ 
+ 
+
+### 2.2 Cell Information
+
+ 
+ Typically, a cell is the intersection of one row and one column in a table. And multiple cells can be merged into a larger cell that occupies multiple rows and columns. Cells are basic units to record text, numerical values, formats, formulas, etc.
+
+ 
+ 
+ 1) Text. Text is a critical component in the table to record meta information in headers, notes, and captions, as well as data region cells. Texts in tables are basically in NL but often have short lengths and concise meanings to meet the space restriction in documents.
+
+ 
+ 
+ 2) Numerical values. A large proportion of cells store numerical values. Unlike text, numerical values could have arithmetical relationships, such as sum and proportion, and statistical characteristics, such as distribution and trend.
+
+ 
+ 
+ 3) Visual formats. Tables have various intuitive formats to present the table structure or content, such as border, alignment, background color, and font  Dong et al. (2020) .
+
+ 
+ 
+ 4) Formulas. In several popular end-user tools such as Excel and Google Sheet, spreadsheet formulas are used to store the logical and numerical relationships between cells.
+
+ 
+ 
+ 5) Other elements such as hyperlinks, images, and icons can also be inserted into a cell. A table can even be nested in Word documents by inserting sub-tables into individual cells.
+
+ 
+ 
+ 
+
+### 2.3 Key Differences Between Table and Text
+
+ 
+ Although leveraging frontier LMs for table pre-training is common, we summarize three differences that need to be considered carefully.
+(1) Structures. Unlike sequential NL text, tables have two-dimensional structures with optional top and left headers.
+(2) Visual Formats. Unlike plain NL text, tables usually use intuitive formats to better represent table structures and data highlights, e.g., color, alignment, font.
+(3) Numerical values. Tables usually contain well-organized numerical values for easy-lookup and comparison, and there are various calculation relationships among numerical values, which can be recorded by the spreadsheet formula.
+
+ 
+ 
+ 
+
+### 2.4 Existing Large Table Corpus
+
+ 
+ Web Tables 
+Large corpora include WDC Web Table Corpus  1 1 
+ 1 
+ 
+ 
+ 
+ http://webdatacommons.org/framework/ (233M tables), Dresden Web Tables Corpus  Eberius et al. (2015) (174M tables), WebTables  Cafarella et al. (2008) (154M tables), and WikiTables (1.6M tables). More details are summarized by   Zhang and Balog (2020) .
+
+ 
+ 
+ Spreadsheet Tables FUSE  Barik et al. (2015) included 249,376 web-crawled spreadsheets. Chen and Cafarella (2013) obtained 410,554 Excel files from 51,252 Internet domains TUTA  Wang et al. (2021c) collected 13.5 million spreadsheet files from 1.75 million web sites.
+
+ 
+ 
+ CSV Tables 
+GitTables  Hulsebos et al. (2021) collected 1M+ tables from CSV files in GitHub repositories. Tables in GitTables are found to resemble typical database tables.
+
+ 
+ 
+ Other Kinds of Tables 
+TableArXiv  2 2 
+ 2 
+ 
+ 
+ 
+ http://boston.lti.cs.cmu.edu/eager/table-arxiv/ 
+contains 341,573 tables extracted from scientific publications on arxiv.org.
+
+ 
+ 
+ 
+ 
+
+## 3 Model
+
+ 
+ Since two-dimensional structure information is crucial for understanding semi-structured tables, many neural architectures have been proposed to jointly capture structure and semantic information.
+Table2Vec  Zhang et al. (2019) adopted skip-gram neural network models to train word embeddings with row/column population.
+CNNs  Dong et al. (2019a) ; Chen et al. (2019a) were adapted to capture spatial information in two-dimensional tables.
+Bidirectional RNNs and LSTMs have been widely used to capture the order of rows/columns  Nishida et al. (2017) ; Gol et al. (2019) ; Fetahu et al. (2019) ; Kardas et al. (2020) . Later works explored graph neural networks for table understanding and question answering  Zayats et al. (2021) ; Zhang et al. (2020) ; Koci et al. (2018) ; Du et al. (2021) .
+While CNNs, RNNs, and GNNs have been widely used for table modeling, few people adopted them for large-scale table pre-training (except a CNN-based TCN  Wang et al. (2021a) ). The main reason is that most of them train (or directly consume) token/word embeddings separately from the CNN/RNN/GNN model , thus restricting models’ capabilities in understanding cell texts together with table structures.
+
+ 
+ 
+ Recently, a flurry of works explored to use transformer-based language models (LMs) for table pre-training, and we call them Tabular Language Models (TaLMs), e.g., TaPas  Herzig et al. (2020) , TaBERT  Yin et al. (2020) , TURL  Deng et al. (2020) , TUTA  Wang et al. (2021c) , Tabnet  Arik and Pfister (2021) , VIME  Yoon et al. (2020) , KGPT  Wang et al. (2021b) , RPT  Tang et al. (2021) , StruG  Deng et al. (2021) ,
+TabTransformer  Huang et al. (2020) , GraPPa  Yu et al. (2020) , GAP  Shi et al. (2021) ,
+BRIDGE  Lin et al. (2020) ,
+TABBIE  Iida et al. (2021) , TaPEx  Liu et al. (2021) , ForTaP  Cheng et al. (2021a) , MATE  Eisenschlos et al. (2021) , STTP  Xing and Wan (2021) , GTR  Wang et al. (2021b) , TableFormer  Yang et al. (2022) , and FLAP  Authors (2021) .
+The advantage of using transformers is that they can pre-train semantic and structural representations jointly and inherit the text understanding power of existing NL pre-trained models such as BERT, BART  Lewis et al. (2020) , and T5  Raffel et al. (2020) .
+Works like UnifiedSKG  Xie et al. (2022) and TableGPT  Gong et al. (2020) , while without table-specific pre-training, directly fine-tuned LMs on table tasks and achieved promising and even SOTA results, demonstrating that pre-training is transferable from text to tables , e.g., in linguistic and world knowledge aspects.
+Considering that using transformer-based TaLMs is a common choice for table pre-training, in the following subsections, we dig deeper into TaLMs on sequence serialization, input embedding, the encoder and decoder architecture, the attention mechanism, and model efficiency.
+
+ 
+ 
+
+### 3.1 Tabular Sequence Serialization
+
+ 
+ TaLMs require a sequence of tokens to be the model input like LMs.
+A straightforward yet common method is to linearize raw tables row by row. Most works such as TaPas, MATE, TableFormer, TUTA, and TURL, performed in this way. In TaPEx, the table is also linearized row by row but it additionally inserts several special tokens to indicate table components such as [HEAD] and [ROW] representing the region of table headers and rows respectively.
+TABBIE linearized tables by rows and columns separately for two transformers.y
+TableGPT distinctly adapted a template-based table serialization way on relatively simple tables.
+Experiments conducted by UnifiedSKG showed that putting external text (like questions) ahead of tables could help T5 to generalize better on tabular tasks.
+  Li et al. (2021) directly encoded markup languages like NL. Some works linearized a specific part of a table, e.g., TaBERT Yin et al. (2020) linearized most relevant rows to the input utterance, and StruG and GraPPa only took headers as input without data cells.
+
+ 
+ 
+ 
+
+### 3.2 Input Featurization and Embedding
+
+ 
+ Cell Text Encoding 
+Most table pre-training methods tokenized cell text using WordPiece and learned token embeddings  Devlin et al. (2018) , such as TaBERT, TaPas, MATE, StruG, TableFormer, TUTA, ForTaP, and TABBIE. Some works also used the BPE tokenization following Roberta  Liu et al. (2019) or BART  Lewis et al. (2020) , e.g., GraPPa and TaPEx. TURL was initialized by TinyBERT  Jiao et al. (2020) and additionally learned embeddings based on an entity vocabulary. Rather than directly using the vocabulary parsed from NL corpora, TUTA constructed a table-specific vocabulary using WordPiece based on large table corpora and merged it with BERT’s vocabulary.
+
+ 
+ 
+ Positional Encoding 
+Following NL pre-trained models, most TaLMs embedded 1D sequential positions in the serialized tabular sequence, e.g., TaPas, MATE, StruG, GraPPa, and TaPEx. Some other works divided the whole sequence into multiple pieces and counted positions in each piece separately: TUTA treated each cell as an independent piece and locally encoded positional information of tokens inside a cell; TURL regarded the table caption and the header as two separate pieces. Therefore it used two local positional encodings for them.
+
+ 
+ 
+ In addition to 1D sequential positions, tables have structured rows and columns that contain two-dimensional and hierarchical information.
+Works such as TaPas, MATE, and TUTA, learned column/row embeddings based on column/row IDs and showed increased performance. However, considering hierarchical structures, as Figure  1 (c) shows, column/row encoding results in limited representation capability. TUTA further devised explicit/implicit tree-based positional embeddings to jointly encode the spatial and hierarchical positions and showed significant effectiveness on generally structured tables. However, it has not proved helpful for downstream tasks that only involve flat and relational tables.
+
+ 
+ 
+ Numerical Encoding 
+A large number of numerical values are distributed in tables and challenge BERT-based models to learn optimal representations since these methods simply tokenized and encoded numerical values in the same way as NL text. It corrupts the original recording structure of numbers into fragments and introduces difficulties in number representation  Thawani et al. (2021) . However, understanding numerical values and their relationships is crucial for table content understanding, especially for tables in financial reports and scientific papers that involve a variety of numerical reasoning, such as aggregation, division, sorting, and change ratio.
+
+ 
+ 
+ Explorations on learning better number representations have surged in the NLP field recently  Thawani et al. (2021) , while few works attempted in tabular data.
+TaPas and MATE devised a unique rank embedding for column-wise number comparison, bringing improvements on answering comparatives or superlative questions. FLAP added extra feature encoding to indicate whether the text summary mentioned the value. TUTA distinguished numerical values from pure text via embedding over four discrete numerical features: magnitude, precision, the first digit, and the last digit. It is highly desirable to explore more numerical embedding methods in future works, e.g., considering arithmetical and statistical perspectives.
+
+ 
+ 
+ Format Encoding 
+Formats contain valuable hints about table structures and data highlights, but only a few TaLMs considered them. E.g., TUTA learned format embeddings together with the transformer backbone to distinguish whether a cell has merge, border, formula, font bold, font color, and fill color.
+
+ 
+ 
+
+#### 3.2.1 Others
+
+ 
+ Apart from the typical encoding listed above, TaPas Herzig et al. (2020) designed ”Previous Answer Embedding” for the conversational scenario, marking whether a tabular cell answered the last question.
+
+ 
+ 
+ Table 1: Encoder and decode architectures of TaLMs. 
+ 
+ 
+ 
+ 
+ Encoder | 
+ TaPas, TaBERT, TURL, TUTA, StruG, GraPPa, MATE, DoT, | 
+
+ 
+ ForTaP, TableFormer, TABBIE, BRIDGE, etc. | 
+
+ 
+ Encoder+Decoder | 
+ KGPT, RPT, TaPEx, GAP, STTP, FLAP, UnifiedSKG, etc. | 
+
+ 
+ Decoder | 
+ TableGPT, etc. | 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+### 3.3 Encoder and Decoder Architecture
+
+ 
+ Existing table pre-training models mainly inherit the architectures from language models such as BERT, GPT-2  Radford et al. (2019) , and BART. Depending on the focused downstream tasks, these models adopted different components, i.e., encoders or decoders, as summarized in Table  1 . Most of them adopted the encoder part of transformers similar to BERT, including TURL, StruG, TaPas, GraPPa, MATE, TUTA, ForTap, and TableFormer. Typically, a single encoder is applied on the sequential inputs constructed from tables and associated texts, if any, to learn the contextual representations of the inputs. Additional modules such as classification layers are applied to the encoder for downstream tasks. Some works even employed more than one encoder to capture the structural information of tables. TaBERT stacked column-wise self-attention layers on the row-wise encoder. TABBIE employed two encoders to encode the table row-wise and column-wise separately, then aggregated the representations obtained from both encoders. DoT  Krichene et al. (2021) also used two encoders, one acting as a pruning model to select the most relevant tokens from the input and the other one used for performing specific tasks. Another
+branch of TaLMs used an encoder-decoder architecture to better enable sequence generation tasks such as table-to-text. KGPT used two alternative encoders, a GNN-based graph encoder and a transformer-based sequential encoder; each can be combined with a transformer decoder. RPT also adopted the encoder-decoder model, similar to a BERT model combined with a GPT model. TaPEx and UnifiedSKG implemented the encoder-decoder (text-to-text) model based on BART and T5, respectively, for downstream tasks such as text-to-SQL parsing, table-based QA, and table fact verification. STTP  Xing and Wan (2021) focused on table-to-text generation by fine-tuning BART on table-structure-aware self-supervised tasks.
+Instead of pre-training, TableGPT directly fine-tunes the GPT-2 decoder to take advantage of its contextual knowledge learned from linguistic corpora.
+
+ 
+ 
+ Table 2: Attention mechanisms of TaLMs. 
+ 
+ 
+ 
+ 
+ Dense | 
+ Self attention | 
+ TaPas, TaPEx, etc. | 
+
+ 
+ Self attention with attention bias | 
+ TableFormer | 
+
+ 
+ 
+ 
+ Sparse | 
+ Serial row/column attention layers | 
+ TaBERT | 
+
+ 
+ Parallel row/column attention layers | 
+ TABBIE | 
+
+ 
+ Parallel row/column attention heads | 
+ MATE | 
+
+ 
+ Joint row/column attention | 
+ TURL | 
+
+ 
+ Joint bi-tree-based attention | 
+ TUTA | 
+
+ 
+ | 
+ Joint layout-based graph attention | 
+ GTR | 
+
+ 
+ | 
+ Joint knowledge-triple-based graph attention | 
+ KGPT | 
+
+ 
+
+ 
+ 
+ 
+ 
+
+### 3.4 Structure-based Attention
+
+ 
+ The attention mechanism is essential for TaLMs to compute contextual representations  Vaswani et al. (2017) . Besides many of them that directly adopt self-attention, e.g., TaPas, StruG, GraPPa, and TaPEx, a series of structure-based attention mechanisms have been proposed to better leverage the tabular structure, as summarized in Table  2 .
+
+ 
+ 
+ Self-attention may introduce a lot of irrelevant and even noisy contexts and have lots of unnecessary computations  Wang et al. (2021c) , while table structures can be leveraged towards precise and efficient attention. In Table  2 , “dense” means all inputs in the table are visible in self-attention, while “sparse” means only parts of the table are visible.
+TaBERT learned tabular representations serially by first producing row-wise encoding with a transformer and then column representation with vertical attention layers using row-wise encodings as inputs.
+TURL designed a restricted attention mechanism in which each token/entity attends to tokens in the same row/column.
+TUTA proposed joint bi-tree-based attention, which took in both spatial and hierarchical information from tables. More specifically, for a structured table, TUTA defines cell coordinates and cell-to-cell distance from a bi-dimensional tree generated from the table. The bi-tree-based attention is restricted to attending tokens within the tree-based distance threshold.
+Cell embedding in TABBIE is an average of its row and column embeddings, where row/column embeddings are separately calculated by row/column transformers.
+MATE used different types of attention heads, i.e., row attention head and column attention head, which are restricted to attending tokens in the same row and column (query tokens can attend to all tokens).
+GTR, which mainly focused on table retrieval, transformed a table into a tabular graph and used joint layout-based graph attention similar to the graph transformer to capture structural information.
+The graph transformer in KGPT enforced to use the structure (knowledge triple) as a hard constraint of attention, e.g., in the first encoder layer, each node was restricted to attend to tokens in its located knowledge triple.
+Tabnet  Arik and Pfister (2021) applied a sequential attention mechanism to generate an interpretable feature selection mask during each decision step.
+Rather than hard attention masking, TableFormer proposed to use soft attention biases when computing attention scores between two structural components. Structure-based attention not only improves model performance but potentially benefits model efficiency, and we will introduce it in Section  3.5 .
+
+ 
+ 
+ 
+
+### 3.5 Model Efficiency
+
+ 
+ Most TaLMs are inefficient at dealing with long sequences due to the quadratic complexity of self-attention  Vaswani et al. (2017) ; Tay et al. (2020) . Unfortunately, tables from webs and spreadsheets usually contain dozens of rows or columns, posing a significant challenge to the memory and computational efficiency  Eisenschlos et al. (2021) . A naive way  Herzig et al. (2020) ; Liu et al. (2021) is truncating the input by a maximum sequence length, but it may lose critical information. So there emerge many other strategies:
+
+ 
+ 
+ Input selection   One intuitive way is to filter the important part of the table before feeding them to the model. TaBERT extracted content snapshot , the most relevant table rows to the NL sentence(s) regarding n-gram overlap ratio. Similarly, TaPas with intermediate pre-training  Eisenschlos et al. (2020) ranked columns by Jaccard coefficient between the NL and each column tokens. The model was twice as fast to train as TaPas while achieving similar performance. TUTA randomly sampled out 50 % 50\% text cells and 90 % 90\% numeric cells during pre-training since spreadsheets are usually large while limited semantics are introduced by similar data cells. Instead of using heuristics to prune inputs, DoT presented a model with two transformers: a pruning transformer selected top- K K tokens, and a task-specific transformer took them as inputs.
+The architecture was two times faster to train, while the memory bottleneck depended on the size of the pruning transformer.
+A small or medium-size pruning transformer was usually enough to achieve comparative performance with large-size TaPas, but falls behind on more challenging datasets like WTQ  Pasupat and
+Liang (2015) .
+While input selection is effective for tasks with table-text joint input like table QA and fact verification, it may fail for tasks that (1) all cells are required to be predicted, e.g., cell type classification; (2) table is the only input, e.g., table-to-text and formula prediction.
+
+ 
+ 
+ Input splitting   An alternative way is to split a large table into multiple chunks and feed chunks separately into the model. TUTA split the table into chunks containing the same header row(s) and non-overlapped data rows in its downstream task, cell type classification  Dong et al. (2019a) .
+For formula prediction, SpreadsheetCoder  Chen et al. (2021a) (not a pre-training method but a typical case) split the target table by chunks with N = 3 N=3 adjacent table rows/columns. The chunks were encoded by a BERT  Devlin et al. (2018) encoder and then aggregated by convolutional layers. Splitting the input table allows encoding all table cells, while it costs more time due to multiple inferences of the encoder and is thus not used by most table pre-training methods.
+
+ 
+ 
+ Sparse attention   MATE leveraged the sparse attention of table encoding by an efficient implementation to reduce memory cost. In MATE, row and column attentions were designed for different attention heads, implemented following ETC  Ainslie et al. (2020) by dividing the input into a global part G G attending to and from everything and a local part attending to G G and tokens within a radius R R . The model scaled linearly concerning memory ( 8,000 8,000 tokens at most) and speed with this efficient attention implementation. Note that though sparse attention based on table structure is widely adopted by TaLMs, they mainly aimed to improve performance (e.g., accuracy) instead of efficiency. Replacing these sparse attentions with efficient implementations can largely mitigate the memory issue: ForTaP used the TVM  Chen et al. (2018) framework to compile a CUDA kernel to implement sparse tree-attention in TUTA, and the maximum input sequence length was up to 8,000 tokens.
+
+ 
+ 
+ 
+ 
+
+## 4 Pre-training Objectives
+
+ 
+ The pre-training objectives of TaLMs fall into two categories: Denoising autoencoder and task-specific objectives. Following the idea of Masked Language Modeling (MLM)  Devlin et al. (2018) , many objectives adopt self-supervised labels for a TaLM to remove synthetic noises as autoencoder. Meanwhile, a variety of other pre-training objectives take inspirations from specific downstream tasks to design new supervisions. The former apply self-supervised learning and denoise the table itself, and the latter build supervision according to external supervision signals or specific tasks.
+
+ 
+ 
+
+### 4.1 Denoising Autoencoder Objectives
+
+ 
+ For denoising autoencoder objectives, TaLMs take partially corrupted inputs and recover the original ones. Most TaLMs applied token-level MLM on tabular sequences in the same way as NL sequences.
+More advanced denoising objectives considered the table structure information such as cell and column.
+
+ 
+ 
+
+#### 4.1.1 Token-level
+
+ 
+ Most pre-training models used token MLM   Devlin et al. (2018) by masking the input tokens at random and then predicting those masked tokens.
+TaPas, MATE, and TableFormer followed the standard MLM procedure to randomly mask 15% of tokens. Larger ratio was taken by TURL (20%) and TUTA (30%) to make recovering more challenging.
+Certain restrictions could also be applied on what tokens to mask. E.g., MLM used in TaBERT only masked tokens in external NL context, and MLM used in TURL and GraPPa masked both NL context and table headers.
+
+ 
+ 
+ 
+
+#### 4.1.2 Cell-level
+
+ 
+ We list three kinds of cell-level objectives as follows.
+
+ 
+ 
+ Masking and recovery :
+A table cell could correspond to one or multiple token(s) in the tabular sequence. Slightly different masking strategies were designed.
+TUTA used a whole-cell masking strategy to capture relationships of neighboring cells.
+Cell Value Recovery (CVR) objective used in TaBERT applied the span-based prediction objective to deal with multiple value tokens.
+In TCN, each token represented a cell, and 10% of table cells were masked for recovery from the set of cell values.
+
+ 
+ 
+ Cell cloze :
+TUTA sampled cell positions based on the bi-tree structure as candidate choices. At each sampled position, the model was encouraged to retrieve its corresponding cell string.
+
+ 
+ 
+ Classifying cell corruption :
+TABBIE corrupted cells using two strategies, frequency-based and intra-table cell swapping.
+
+ 
+ 
+ 
+
+#### 4.1.3 Column-level
+
+ 
+ Masked Column Prediction (MCP) was introduced by TaBERT to recover the names and data types of masked columns. GAP proposed to recover columns names using column values or the input utterance. Both of them assumed that tables were vertically-oriented and relational.
+
+ 
+ 
+ Table 3: Downstream task evaluation for table pre-training. In this table, we try to cluster some similar tasks, e.g.,column type relation classification and a series of tasks of data preparation. We also merge sub-tasks like logic-to-text, into main tasks like table-to-text. 
+ 
+ 
+ 
+ 
+ Task | 
+ Description | 
+ Model | 
+
+ 
+ Table question answering | 
+ Given a table and a question in NL, output an answer. | 
+ TaPas, TaBERT, StruG, GraPPa, TaPEx, GAP, MATE, | 
+
+ 
+ | 
+ The question-answer pair should be supported by the table. | 
+ ForTaP, BRIDGE, TableFormer, UnifiedSKG | 
+
+ 
+ Table fact verification | 
+ Verify whether a textual hypothesis holds based on the given
+table. | 
+ MATE, TableFormer, UnifiedSKG | 
+
+ 
+ Table-to-text | 
+ Generate textual description(s) from the given table. | 
+ KGPT, TableGPT, FLAP, STTP, UnifiedSKG | 
+
+ 
+ Table type classification | 
+ Classify the table into different structural types. | 
+ TUTA | 
+
+ 
+ Cell type classification | 
+ Identify
+cell structural types in the table. | 
+ TUTA, ForTaP | 
+
+ 
+ Column type | 
+ Associate a column in a table with the KB type of entities it contains. | 
+ TURL, TABBIE, TCN | 
+
+ 
+ relation classification | 
+ Associate a pair of columns in a table with the KB relation that | 
+ | 
+
+ 
+ | 
+ holds between each pair of entities in a given row of the columns. | 
+ | 
+
+ 
+ Table augmentation | 
+ Expand the table with additional data. | 
+ TURL, TABBIE | 
+
+ 
+ Formula prediction | 
+ Predict a spreadsheet formula for the target cell in the table. | 
+ ForTaP | 
+
+ 
+ Entity linking | 
+ Find phrases of text, called mentions, in cells and | 
+ TURL | 
+
+ 
+ | 
+ associate each with its referent entity. | 
+ | 
+
+ 
+ Table search | 
+ Retrieve semantically relevant tables based on NL queries. | 
+ GTR | 
+
+ 
+ Data preparation | 
+ Include six subtasks: data discovery, data validation, data filtering, | 
+ RPT | 
+
+ 
+ | 
+ data structuring, data enrichment, and data cleaning. | 
+ | 
+
+ 
+ Machine learning applications | 
+ Various tasks using categorical or continuous features stored | 
+ Tabnet, VIME, TabTransformer | 
+
+ 
+ | 
+ in tabular format, e.g., the competitions held by Kaggle and KDD Cup. | 
+ | 
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+### 4.2 Task-specific Objectives
+
+ 
+ To achieve SOTA performances on downstream task(s), denoising objectives might not be enough.
+Then task-specific objectives were proposed and proved to be highly effective.
+
+ 
+ 
+
+#### 4.2.1 Objectives by Downstream Tasks
+
+ 
+ In this section, representative objectives are grouped by tasks. Definitions of the downstream tasks can be found in Table  3 .
+
+ 
+ 
+ Table QA and semantic parsing: 
+There are a variety of works on table QA and semantic parsing, and we list some representative ones here.
+A critical technical component of text-to-SQL is the alignment between text and tabular data.
+GraPPa designed an objective: given an NL sentence and table headers, predicting whether a column appears in the SQL query and what operation is triggered.
+StruG used several grounding tasks of text-to-SQL as objectives, including selecting columns mentioned in sentences, finding cell values from sentences, and mapping column-value.
+TaPEx proposed to learn a novel neural SQL executor given a table and a synthesized executable SQL query. PReasM  Yoran et al. (2021) synthesized at scale question-paragraph pairs that required different reasoning skills to enhance numerical reasoning abilities. GAP learned to compose complex SQL based on tabular data.
+
+ 
+ 
+ Table fact verification: 
+Entailment check is highly related with QA. Eisenschlos et al. (2020) used an intermediate pre-training objective of synthetic table fact checking targeting both real-world table fact verification and table QA. TaPEx, as described above, also showed benefits for table fact check.
+
+ 
+ 
+ Entity linking: 
+TURL proposed a Masked Entity Recovery (MER) objective by masking a certain percentage of input entity cells and then recovering the linked entity based on surrounding entity cells and table metadata. It helped the model capture the factual knowledge embedded in the table content and the associations between table metadata and table content.
+
+ 
+ 
+ Table type classification and table search: 
+TUTA provided each table with text segments and was pre-trained to retrieve the corresponding tables using text segments.
+
+ 
+ 
+ Numerical reasoning (formula-driven): 
+ForTaP proposed to predict numerical reference and numerical calculation relationships, and aimed to benefit all related tasks involving table numerical reasoning, e.g., table QA and formula prediction.
+
+ 
+ 
+ 
+
+#### 4.2.2 Objectives by Data Sources
+
+ 
+ The above objectives are possible with human-created and machine-synthesized data on different sources of tables.
+
+ 
+ 
+ Human-created: 
+Human-created data usually show higher quality than web-crawled ones which might require careful prepossessing for their size, diversity and noises.
+It is common to manually add extra labels for existing dataset. E.g., ToTTo, a well-labeled dataset for table-to-text with NL descriptions and corresponding web tables, was used by StruG for pre-training.
+Also, human-created labels can be collected in smart ways. E.g., ForTaP extracted existing formulas from a large web-crawled spreadsheet corpus and extracted numerical reference and calculation relationships from them for pre-training.
+And large fine-grained labeled datasets were also used for pre-training, e.g., ToTTo, a well-labeled dataset for table-to-text with NL descriptions and corresponding web tables, was used by StruG for pre-training.
+
+ 
+ 
+ Machine-synthesized: 
+Synthesized data are more targeted and controllable, but require careful designs to ensure meaningfulness and diversity.
+GraPPa proposed an SCFG (synchronous context-free grammar) and applied it to synthesize sentence-SQL pairs over tables.
+ Eisenschlos et al. (2020) created counterfactual and synthetic statements for existing Wikipedia tables: For the counterfactual ones, it got tables and sentences from Wikipedia as positive examples and created minimally differing refuted examples; For the synthetic ones, it built table-dependent statements by synthesizing them from the pre-defined probabilistic CFG (context-free grammar).
+TaPEx randomly selected tables from the training set of WIKITQ  Pasupat and
+Liang (2015) and instantiated SQL templates to synthesize table-SQL pairs.
+
+ 
+ 
+ 
+ 
+ 
+
+## 5 Downstream Tasks
+
+ 
+ As shown in Figure  2 , tasks of table understanding often have intersections with domains like NL, programming language, and computer vision, and thus prefer different capabilities of table modeling.
+For example, table question answering is a prevalent cross-domain task that requires models to understand tables and NL questions jointly, and to enable robust reasoning over tables, semantic parsing becomes a widely-studied task of parsing NL questions to programming languages such as SQLs, logical forms, or python code. Question answering over visual documents is a cross-domain task of computer vision, tabular data, and NL.
+We think that classifying tasks by domains presents a fresh perspective to future works on multi-modal modeling, but it is not an absolutely strict or static categorization, e.g., table QA can involve programming languages via semantic parsing  Yin et al. (2020) , while it can also use end-to-end prediction  Herzig et al. (2020) without explicitly using a programming language. In addition to categorizing tasks by domains, tasks can also be categorized by their scenarios, e.g., data preparation represents a range of tasks for data preparation. The machine learning application covers various machine learning benchmarks or competitions where features and labels are stored in a tabular form.
+
+ 
+ 
+ In Table  3 , due to space limitation, we only list downstream tasks that have been evaluated by existing TaLMs. Nonetheless, it is highly desirable for future work to demonstrate the effectiveness of table pre-training on more tasks such as table format generation  Dong et al. (2020) , data analysis  Zhou et al. (2020) , and table error detection  Huang and He (2018) ; Zhang et al. (2021) .
+
+ 
+ 
+ Figure 2: Downstream task categorization by domains.
+ 
+ 
+ 
+ 
+
+## 6 Conclusion and Discussion
+
+ 
+ This paper presents a comprehensive review of model architectures, objectives, and downstream tasks of table pre-training.
+Although the “pre-training and fine-tuning” paradigm has demonstrated its success on many table tasks, there still exist key challenges (opportunities) for future research:
+
+ 
+ 
+ Combining Diverse Bi-dimensional Cell Features Effectively 
+Tables are arranged in two-dimension, including not only text but also quantities, visual formats, hyperlinks, and even spreadsheet formulas, it is non-trivial to learn high-level representations from such diverse and raw information. It particularly challenges existing language models that directly consume a flat sequence. Should tables be linearized like NL text? How to maintain and combine the structural, textual, formatting, and numerical information in a most effective way is still an open challenge.
+
+ 
+ 
+ Universal Framework for Downstream Tasks 
+Almost all TaLMs only focus on one or two downstream tasks (as shown in Table  3 ) so that they have sufficient flexibility on model designs (e.g., Section  4.2 ) to achieve the best performance. But it is desirable to unify the advantages of existing methods and support various downstream tasks simultaneously like what BERT and GPT did in the NL domain. However, the diversity of table downstream tasks presents a significant challenge, e.g., entity linking and formula prediction and entity linking may need far different feature sets, sampling mechanisms, and model capabilities. It’s a highly demanding direction to explore a universal framework by integrating the advantages of different TaLMs.
+
+ 
+ 
+ Visualizing, Probing, and Comparing What Aspects TaLMs Learned from Table Pre-training 
+To achieve a universal framework, we need to dig more deeper into what aspects of existing TaLMs learned from table pre-training.
+Attention layers in transformers are often challenged for being opaque. In the NL domain, to uncover linguistic and world knowledge learned by pre-trained LMs, there exist attentive works on studying the outputs of pre-trained LMs on carefully designed input sentences  Linzen et al. (2016) , examining the internal vector representations of pre-trained LMs through methods such as probing tasks  Adi et al. (2016) ; Belinkov et al. (2017) , and
+visualizing attention maps of a pre-trained LMs  Bahdanau et al. (2014) ; Vig (2019) ; Rogers et al. (2020) . Later works even studied and probed attention layers head-by-head and found substantial syntactic information captured in BERT  Clark et al. (2019) . Some TaLMs claimed their abilities on table-text joint reasoning (TaPas, TaBERT, TaPEx, …), table structure understanding (TUTA, TableFormer, …), and numerical reasoning (ForTaP, …), but there still lack attentive works on visualizing, probing, and comparing these intangible pre-trained TaLM models, leaving a large space to be exploited.
+
+ 
+ 
+ Consistency and Discrepancy Between LMs and TaLMs 
+Recently, UnifiedSKG explored to directly fine-tune T5 on 21 datasets across 6 tasks. On the one hand, the frontier LM (T5) could easily achieve promising or even SOTA results on table tasks, demonstrating a strong relationship between text and tables, e.g., in linguistic and world knowledge aspects. On the other hand, without table-specific model design and pre-training, it still fell far behind TaLMs with table pre-training on WikiTQ (-8.2%) and SQA (-12.1%); even larger margins may exist on untested tasks, such as formula prediction. It shows the necessity of table-specific pre-training, e.g., in structural and reasoning aspects.
+(1) Is the initialization from advanced LMs necessary for table pre-training? Will TaLMs gradually “forget” the inherited knowledge from LMs during large-scale table pre-training?
+(2) When zero-shot LMs are large enough (considering that GPT-3 has not been fully exploited on table tasks yet), do existing table pre-training strategies still have performance gains?
+(3) During table pre-training, how to best inherit the knowledge from LMs while exploit table-specific capabilities?
+
+ 
+ 
+ Efficient Transformers for Big Tables 
+Due to the limitation of the input length of existing large-scale pre-trained language models, they usually need to split tables into several parts  Wang et al. (2020) to be input to the model or only feed a specific part of a table (sometimes called ”content snapshot”) to the model according to the requirement of a specific task   Yin et al. (2020) ; Herzig et al. (2020) . ForTaP and MATE are great trials but still have a limited maximum length (around 8,000 tokens) constraint that is not applicable to larger tables, such as a large proportion of spreadsheet tables. We wonder if there exists a general sampling method that is effective and general for various downstream tasks, and if there does not exist one, what we can do better in the pre-training stage.
+
+ 
+ 
+ 
+
+## References
+
+ 
+ 
+ Adi et al. [2016] 
+ 
+Yossi Adi, Einat Kermany, Yonatan Belinkov, Ofer Lavi, and Yoav Goldberg.
+ 
+ 
+ Fine-grained analysis of sentence embeddings using auxiliary
+prediction tasks.
+ 
+ 
+ arXiv preprint arXiv:1608.04207 , 2016.
+ 
+ 
+
+ 
+ Ainslie et al. [2020] 
+ 
+Joshua Ainslie, Santiago Ontanon, Chris Alberti, Vaclav Cvicek, Zachary Fisher,
+Philip Pham, Anirudh Ravula, Sumit Sanghai, Qifan Wang, and Li Yang.
+ 
+ 
+ Etc: Encoding long and structured inputs in transformers.
+ 
+ 
+ In Proceedings of the 2020 Conference on Empirical Methods in
+Natural Language Processing (EMNLP) , pages 268–284, 2020.
+ 
+ 
+
+ 
+ Appalaraju et al. [2021] 
+ 
+Srikar Appalaraju, Bhavan Jasani, Bhargava Urala Kota, Yusheng Xie, and
+R Manmatha.
+ 
+ 
+ Docformer: End-to-end transformer for document understanding.
+ 
+ 
+ arXiv preprint arXiv:2106.11539 , 2021.
+ 
+ 
+
+ 
+ Arik and Pfister [2021] 
+ 
+Sercan Ö Arik and Tomas Pfister.
+ 
+ 
+ Tabnet: Attentive interpretable tabular learning.
+ 
+ 
+ In Proceedings of the AAAI Conference on Artificial
+Intelligence , pages 6679–6687, 2021.
+ 
+ 
+
+ 
+ Authors [2021] 
+ 
+Anonymous Authors.
+ 
+ 
+ Flap: Table-to-text generation with feature indication and numerical
+reasoning pretraining.
+ 
+ 
+ ACL Rolling Review Nov. , 2021.
+ 
+ 
+
+ 
+ Bahdanau et al. [2014] 
+ 
+Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio.
+ 
+ 
+ Neural machine translation by jointly learning to align and
+translate.
+ 
+ 
+ arXiv preprint arXiv:1409.0473 , 2014.
+ 
+ 
+
+ 
+ Banik et al. [2013] 
+ 
+Eva Banik, Claire Gardent, and Eric Kow.
+ 
+ 
+ The kbgen challenge.
+ 
+ 
+ In the 14th European Workshop on Natural Language Generation
+(ENLG) , pages 94–97, 2013.
+ 
+ 
+
+ 
+ Barik et al. [2015] 
+ 
+Titus Barik, Kevin Lubick, Justin Smith, John Slankas, and Emerson Murphy-Hill.
+ 
+ 
+ Fuse: a reproducible, extendable, internet-scale corpus of
+spreadsheets.
+ 
+ 
+ In 2015 IEEE/ACM 12th Working Conference on Mining Software
+Repositories , pages 486–489. IEEE, 2015.
+ 
+ 
+
+ 
+ Belinkov et al. [2017] 
+ 
+Yonatan Belinkov, Nadir Durrani, Fahim Dalvi, Hassan Sajjad, and James Glass.
+ 
+ 
+ What do neural machine translation models learn about morphology?
+ 
+ 
+ arXiv preprint arXiv:1704.03471 , 2017.
+ 
+ 
+
+ 
+ Bhagavatula et al. [2015] 
+ 
+Chandra Sekhar Bhagavatula, Thanapon Noraset, and Doug Downey.
+ 
+ 
+ Tabel: entity linking in web tables.
+ 
+ 
+ In International Semantic Web Conference . Springer, 2015.
+ 
+ 
+
+ 
+ Cafarella et al. [2008] 
+ 
+Michael J Cafarella, Alon Y Halevy, Yang Zhang, Daisy Zhe Wang, and Eugene Wu.
+ 
+ 
+ Uncovering the relational web.
+ 
+ 
+ In WebDB , 2008.
+ 
+ 
+
+ 
+ Chen and Cafarella [2013] 
+ 
+Zhe Chen and Michael Cafarella.
+ 
+ 
+ Automatic web spreadsheet data extraction.
+ 
+ 
+ In Proceedings of the 3rd International Workshop on Semantic
+Search over the Web , 2013.
+ 
+ 
+
+ 
+ Chen and Mooney [2008] 
+ 
+David L Chen and Raymond J Mooney.
+ 
+ 
+ Learning to sportscast: a test of grounded language acquisition.
+ 
+ 
+ In Proceedings of the 25th international conference on Machine
+learning , pages 128–135, 2008.
+ 
+ 
+
+ 
+ Chen et al. [2018] 
+ 
+Tianqi Chen, Thierry Moreau, Ziheng Jiang, Lianmin Zheng, Eddie Yan, Haichen
+Shen, Meghan Cowan, Leyuan Wang, Yuwei Hu, Luis Ceze, et al.
+ 
+ 
+ { \{ TVM } \} : An automated { \{ End-to-End } \} optimizing compiler for
+deep learning.
+ 
+ 
+ In 13th USENIX Symposium on Operating Systems Design and
+Implementation (OSDI 18) , pages 578–594, 2018.
+ 
+ 
+
+ 
+ Chen et al. [2019a] 
+ 
+Jiaoyan Chen, Ernesto Jiménez-Ruiz, Ian Horrocks, and Charles Sutton.
+ 
+ 
+ Colnet: Embedding the semantics of web tables for column type
+prediction.
+ 
+ 
+ In Proceedings of the AAAI Conference on Artificial
+Intelligence , pages 29–36, 2019.
+ 
+ 
+
+ 
+ Chen et al. [2019b] 
+ 
+Wenhu Chen, Hongmin Wang, Jianshu Chen, Yunkai Zhang, Hong Wang, Shiyang Li,
+Xiyou Zhou, and William Yang Wang.
+ 
+ 
+ Tabfact: A large-scale dataset for table-based fact verification.
+ 
+ 
+ arXiv preprint:1909.02164 , 2019.
+ 
+ 
+
+ 
+ Chen et al. [2020a] 
+ 
+Wenhu Chen, Jianshu Chen, Yu Su, Zhiyu Chen, and William Yang Wang.
+ 
+ 
+ Logical natural language generation from open-domain tables.
+ 
+ 
+ In Proceedings of the 58th Annual Meeting of the Association for
+Computational Linguistics , pages 7929–7942, 2020.
+ 
+ 
+
+ 
+ Chen et al. [2020b] 
+ 
+Wenhu Chen, Hanwen Zha, Zhiyu Chen, Wenhan Xiong, Hong Wang, and William Wang.
+ 
+ 
+ Hybridqa: A dataset of multi-hop question answering over tabular and
+textual data.
+ 
+ 
+ arXiv preprint arXiv:2004.07347 , 2020.
+ 
+ 
+
+ 
+ Chen et al. [2020c] 
+ 
+Zhiyu Chen, Wenhu Chen, Hanwen Zha, Xiyou Zhou, Yunkai Zhang, Sairam
+Sundaresan, and William Yang Wang.
+ 
+ 
+ Logic2text: High-fidelity natural language generation from logical
+forms.
+ 
+ 
+ In Proceedings of the 2020 Conference on Empirical Methods in
+Natural Language Processing: Findings , 2020.
+ 
+ 
+
+ 
+ Chen et al. [2021a] 
+ 
+Xinyun Chen, Petros Maniatis, Rishabh Singh, Charles Sutton, Hanjun Dai, Max
+Lin, and Denny Zhou.
+ 
+ 
+ Spreadsheetcoder: Formula prediction from semi-structured context.
+ 
+ 
+ In International Conference on Machine Learning . PMLR, 2021.
+ 
+ 
+
+ 
+ Chen et al. [2021b] 
+ 
+Zhiyu Chen, Wenhu Chen, Charese Smiley, Sameena Shah, Iana Borova, Dylan
+Langdon, Reema Moussa, Matt Beane, Ting-Hao Huang, Bryan Routledge, et al.
+ 
+ 
+ Finqa: A dataset of numerical reasoning over financial data.
+ 
+ 
+ arXiv preprint arXiv:2109.00122 , 2021.
+ 
+ 
+
+ 
+ Cheng et al. [2021a] 
+ 
+Zhoujun Cheng, Haoyu Dong, Fan Cheng, Ran Jia, Pengfei Wu, Shi Han, and Dongmei
+Zhang.
+ 
+ 
+ Fortap: Using formulae for numerical-reasoning-aware table
+pretraining.
+ 
+ 
+ arXiv preprint arXiv:2109.07323 , 2021.
+ 
+ 
+
+ 
+ Cheng et al. [2021b] 
+ 
+Zhoujun Cheng, Haoyu Dong, Zhiruo Wang, Ran Jia, Jiaqi Guo, Yan Gao, Shi Han,
+Jian-Guang Lou, and Dongmei Zhang.
+ 
+ 
+ Hitab: A hierarchical table dataset for question answering and
+natural language generation.
+ 
+ 
+ arXiv preprint arXiv:2108.06712 , 2021.
+ 
+ 
+
+ 
+ Cheung et al. [2016] 
+ 
+Shing-Chi Cheung, Wanjun Chen, Yepang Liu, and Chang Xu.
+ 
+ 
+ Custodes: automatic spreadsheet cell clustering and smell detection
+using strong and weak features.
+ 
+ 
+ In Proceedings of the 38th International Conference on Software
+Engineering , pages 464–475, 2016.
+ 
+ 
+
+ 
+ Chi et al. [2019] 
+ 
+Zewen Chi, Heyan Huang, Heng-Da Xu, Houjin Yu, Wanxuan Yin, and Xian-Ling Mao.
+ 
+ 
+ Complicated table structure recognition.
+ 
+ 
+ arXiv preprint arXiv:1908.04729 , 2019.
+ 
+ 
+
+ 
+ Clark et al. [2019] 
+ 
+Kevin Clark, Urvashi Khandelwal, Omer Levy, and Christopher D Manning.
+ 
+ 
+ What does bert look at? an analysis of bert’s attention.
+ 
+ 
+ arXiv preprint arXiv:1906.04341 , 2019.
+ 
+ 
+
+ 
+ Cutrona et al. [2020] 
+ 
+Vincenzo Cutrona, Federico Bianchi, Ernesto Jiménez-Ruiz, and Matteo
+Palmonari.
+ 
+ 
+ Tough tables: Carefully evaluating entity linking for tabular data.
+ 
+ 
+ In International Semantic Web Conference , pages 328–343.
+Springer, 2020.
+ 
+ 
+
+ 
+ Deng et al. [2020] 
+ 
+Xiang Deng, Huan Sun, Alyssa Lees, You Wu, and Cong Yu.
+ 
+ 
+ Turl: table understanding through representation learning.
+ 
+ 
+ Proceedings of the VLDB Endowment , 2020.
+ 
+ 
+
+ 
+ Deng et al. [2021] 
+ 
+Xiang Deng, Ahmed Hassan, Christopher Meek, Oleksandr Polozov, Huan Sun, and
+Matthew Richardson.
+ 
+ 
+ Structure-grounded pretraining for text-to-sql.
+ 
+ 
+ In Proceedings of the 2021 Conference of the North American
+Chapter of the Association for Computational Linguistics , 2021.
+ 
+ 
+
+ 
+ Devlin et al. [2018] 
+ 
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova.
+ 
+ 
+ Bert: Pre-training of deep bidirectional transformers for language
+understanding.
+ 
+ 
+ arXiv preprint arXiv:1810.04805 , 2018.
+ 
+ 
+
+ 
+ Dong et al. [2019a] 
+ 
+Haoyu Dong, Shijie Liu, Zhouyu Fu, Shi Han, and Dongmei Zhang.
+ 
+ 
+ Semantic structure extraction for spreadsheet tables with a
+multi-task learning architecture.
+ 
+ 
+ In Workshop on Document Intelligence at NeurIPS 2019 , 2019.
+ 
+ 
+
+ 
+ Dong et al. [2019b] 
+ 
+Haoyu Dong, Shijie Liu, Shi Han, Zhouyu Fu, and Dongmei Zhang.
+ 
+ 
+ Tablesense: Spreadsheet table detection with convolutional neural
+networks.
+ 
+ 
+ In Proceedings of the AAAI Conference on Artificial
+Intelligence , volume 33, pages 69–76, 2019.
+ 
+ 
+
+ 
+ Dong et al. [2020] 
+ 
+Haoyu Dong Dong, Jinyu Wang, Zhouyu Fu, Shi Han, and Dongmei Zhang.
+ 
+ 
+ Neural formatting for spreadsheet tables.
+ 
+ 
+ In Proceedings of the 29th ACM International Conference on
+Information Knowledge Management , pages 305–314, 2020.
+ 
+ 
+
+ 
+ Dou et al. [2016] 
+ 
+Wensheng Dou, Chang Xu, Shing-Chi Cheung, and Jun Wei.
+ 
+ 
+ Cacheck: detecting and repairing cell arrays in spreadsheets.
+ 
+ 
+ IEEE Transactions on Software Engineering , 43(3):226–251,
+2016.
+ 
+ 
+
+ 
+ Du et al. [2021] 
+ 
+Lun Du, Fei Gao, Xu Chen, Ran Jia, Junshan Wang, Jiang Zhang, Shi Han, and
+Dongmei Zhang.
+ 
+ 
+ Tabularnet: A neural network architecture for understanding semantic
+structures of tabular data.
+ 
+ 
+ In Proceedings of the 27th ACM SIGKDD Conference on Knowledge
+Discovery Data Mining , pages 322–331, 2021.
+ 
+ 
+
+ 
+ Eberius et al. [2015] 
+ 
+Julian Eberius, Katrin Braunschweig, and Others.
+ 
+ 
+ Building the dresden web table corpus: A classification approach.
+ 
+ 
+ In 2015 IEEE/ACM 2nd International Symposium on Big Data
+Computing (BDC) , pages 41–50. IEEE, 2015.
+ 
+ 
+
+ 
+ Eisenschlos et al. [2020] 
+ 
+Julian Eisenschlos, Syrine Krichene, and Thomas Mueller.
+ 
+ 
+ Understanding tables with intermediate pre-training.
+ 
+ 
+ In Proceedings of the 2020 Conference on Empirical Methods in
+Natural Language Processing: Findings , 2020.
+ 
+ 
+
+ 
+ Eisenschlos et al. [2021] 
+ 
+Julian Eisenschlos, Maharshi Gor, Thomas Mueller, and William Cohen.
+ 
+ 
+ Mate: Multi-view attention for table transformer efficiency.
+ 
+ 
+ In Proceedings of the 2021 Conference on Empirical Methods in
+Natural Language Processing , 2021.
+ 
+ 
+
+ 
+ Fetahu et al. [2019] 
+ 
+Besnik Fetahu, Avishek Anand, and Maria Koutraki.
+ 
+ 
+ Tablenet: An approach for determining fine-grained relations for
+wikipedia tables.
+ 
+ 
+ In The World Wide Web Conference , pages 2736–2742, 2019.
+ 
+ 
+
+ 
+ Gao et al. [2019] 
+ 
+Liangcai Gao, Yilun Huang, Hervé Déjean, Jean-Luc Meunier, Qinqin Yan,
+Yu Fang, Florian Kleber, and Eva Lang.
+ 
+ 
+ Icdar 2019 competition on table detection and recognition (ctdar).
+ 
+ 
+ In 2019 International Conference on Document Analysis and
+Recognition (ICDAR) , pages 1510–1515. IEEE, 2019.
+ 
+ 
+
+ 
+ Garncarek et al. [2020] 
+ 
+Łukasz Garncarek, Rafał Powalski, Tomasz Stanisławek, Bartosz
+Topolski, Piotr Halama, Michał Turski, and Filip Graliński.
+ 
+ 
+ Lambert: Layout-aware (language) modeling for information extraction.
+ 
+ 
+ arXiv preprint arXiv:2002.08087 , 2020.
+ 
+ 
+
+ 
+ Ghasemi-Gol and
+Szekely [2018] 
+ 
+Majid Ghasemi-Gol and Pedro Szekely.
+ 
+ 
+ Tabvec: Table vectors for classification of web tables.
+ 
+ 
+ arXiv preprint:1802.06290 , 2018.
+ 
+ 
+
+ 
+ Ghasemi Gol et al. [2019] 
+ 
+Majid Ghasemi Gol, Jay Pujara, and Pedro Szekely.
+ 
+ 
+ Tabular cell classification using pre-trained cell embeddings.
+ 
+ 
+ In 2019 IEEE International Conference on Data Mining (ICDM) ,
+pages 230–239, 2019.
+ 
+ 
+
+ 
+ Gol et al. [2019] 
+ 
+Majid Ghasemi Gol, Jay Pujara, and Pedro Szekely.
+ 
+ 
+ Tabular cell classification using pre-trained cell embeddings.
+ 
+ 
+ In 2019 IEEE International Conference on Data Mining (ICDM) ,
+pages 230–239. IEEE, 2019.
+ 
+ 
+
+ 
+ Gong et al. [2020] 
+ 
+Heng Gong, Yawei Sun, Xiaocheng Feng, Bing Qin, Wei Bi, Xiaojiang Liu, and Ting
+Liu.
+ 
+ 
+ Tablegpt: Few-shot table-to-text generation with table structure
+reconstruction and content matching.
+ 
+ 
+ In Proceedings of the 28th International Conference on
+Computational Linguistics , pages 1978–1988, 2020.
+ 
+ 
+
+ 
+ Guo et al. [2020] 
+ 
+Tong Guo, Derong Shen, Tiezheng Nie, and Yue Kou.
+ 
+ 
+ Web table column type detection using deep learning and probability
+graph model.
+ 
+ 
+ In International Conference on Web Information Systems and
+Applications , pages 401–414. Springer, 2020.
+ 
+ 
+
+ 
+ Hameed and Naumann [2020] 
+ 
+Mazhar Hameed and Felix Naumann.
+ 
+ 
+ Data preparation: A survey of commercial tools.
+ 
+ 
+ ACM SIGMOD Record , 49(3):18–29, 2020.
+ 
+ 
+
+ 
+ Hancock et al. [2019] 
+ 
+Braden Hancock, Hongrae Lee, and Cong Yu.
+ 
+ 
+ Generating titles for web tables.
+ 
+ 
+ In The World Wide Web Conference , pages 638–647, 2019.
+ 
+ 
+
+ 
+ [49] 
+ 
+Felienne Hermans and Emerson Murphy-Hill.
+ 
+ 
+ Enron’s spreadsheets and related emails: A dataset and analysis.
+ 
+ 
+ In 2015 IEEE/ACM 37th IEEE International Conference on Software
+Engineering .
+ 
+ 
+
+ 
+ Herzig et al. [2020] 
+ 
+Jonathan Herzig, Pawel Krzysztof Nowak, Thomas Mueller, Francesco Piccinno, and
+Julian Eisenschlos.
+ 
+ 
+ Tapas: Weakly supervised table parsing via pre-training.
+ 
+ 
+ In Proceedings of the 58th Annual Meeting of the Association for
+Computational Linguistics , pages 4320–4333, 2020.
+ 
+ 
+
+ 
+ Hu et al. [2019] 
+ 
+Kevin Hu, Michiel A Bakker, Stephen Li, Tim Kraska, and César Hidalgo.
+ 
+ 
+ Vizml: A machine learning approach to visualization recommendation.
+ 
+ 
+ In Proceedings of the 2019 CHI Conference on Human Factors in
+Computing Systems , pages 1–12, 2019.
+ 
+ 
+
+ 
+ Huang and He [2018] 
+ 
+Zhipeng Huang and Yeye He.
+ 
+ 
+ Auto-detect: Data-driven error detection in tables.
+ 
+ 
+ In Proceedings of the 2018 International Conference on
+Management of Data , 2018.
+ 
+ 
+
+ 
+ Huang et al. [2020] 
+ 
+Xin Huang, Ashish Khetan, Milan Cvitkovic, and Zohar Karnin.
+ 
+ 
+ Tabtransformer: Tabular data modeling using contextual embeddings.
+ 
+ 
+ arXiv preprint:2012.06678 , 2020.
+ 
+ 
+
+ 
+ Hulsebos et al. [2021] 
+ 
+Madelon Hulsebos, Çağatay Demiralp, and Paul Groth.
+ 
+ 
+ Gittables: A large-scale corpus of relational tables.
+ 
+ 
+ arXiv preprint arXiv:2106.07258 , 2021.
+ 
+ 
+
+ 
+ Iida et al. [2021] 
+ 
+Hiroshi Iida, Dung Thai, Varun Manjunatha, and Mohit Iyyer.
+ 
+ 
+ Tabbie: Pretrained representations of tabular data.
+ 
+ 
+ In Proceedings of the 2021 Conference of the North American
+Chapter of the Association for Computational Linguistics: Human Language
+Technologies , pages 3446–3456, 2021.
+ 
+ 
+
+ 
+ Jiao et al. [2020] 
+ 
+Xiaoqi Jiao, Yichun Yin, Lifeng Shang, Xin Jiang, Xiao Chen, Linlin Li, Fang
+Wang, and Qun Liu.
+ 
+ 
+ TinyBERT: Distilling BERT for natural language understanding.
+ 
+ 
+ In Findings of the Association for Computational Linguistics:
+EMNLP 2020 . Association for Computational Linguistics, 2020.
+ 
+ 
+
+ 
+ Joulin et al. [2016] 
+ 
+Armand Joulin, Edouard Grave, Piotr Bojanowski, and Tomas Mikolov.
+ 
+ 
+ Bag of tricks for efficient text classification.
+ 
+ 
+ arXiv preprint arXiv:1607.01759 , 2016.
+ 
+ 
+
+ 
+ Kale and Rastogi [2020] 
+ 
+Mihir Kale and Abhinav Rastogi.
+ 
+ 
+ Text-to-text pre-training for data-to-text tasks.
+ 
+ 
+ In Proceedings of the 13th International Conference on Natural
+Language Generation , pages 97–102, 2020.
+ 
+ 
+
+ 
+ Kardas et al. [2020] 
+ 
+Marcin Kardas, Piotr Czapla, Pontus Stenetorp, Sebastian Ruder, Sebastian
+Riedel, Ross Taylor, and Robert Stojnic.
+ 
+ 
+ Axcell: Automatic extraction of results from machine learning papers.
+ 
+ 
+ In Proceedings of the 2020 Conference on Empirical Methods in
+Natural Language Processing (EMNLP) , 2020.
+ 
+ 
+
+ 
+ Koci et al. [2018] 
+ 
+Elvis Koci, Maik Thiele, Wolfgang Lehner, and Oscar Romero.
+ 
+ 
+ Table recognition in spreadsheets via a graph representation.
+ 
+ 
+ In 2018 13th IAPR International Workshop on Document Analysis
+Systems (DAS) , pages 139–144. IEEE, 2018.
+ 
+ 
+
+ 
+ Koci et al. [2019] 
+ 
+Elvis Koci, Maik Thiele, Josephine Rehak, Oscar Romero, and Wolfgang Lehner.
+ 
+ 
+ Deco: A dataset of annotated spreadsheets for layout and table
+recognition.
+ 
+ 
+ In International Conference on Document Analysis and
+Recognition . IEEE, 2019.
+ 
+ 
+
+ 
+ Krichene et al. [2021] 
+ 
+Syrine Krichene, Thomas Müller, and Julian Martin Eisenschlos.
+ 
+ 
+ Dot: An efficient double transformer for nlp tasks with tables.
+ 
+ 
+ arXiv preprint arXiv:2106.00479 , 2021.
+ 
+ 
+
+ 
+ Lebret et al. [2016] 
+ 
+Rémi Lebret, David Grangier, and Michael Auli.
+ 
+ 
+ Neural text generation from structured data with application to the
+biography domain.
+ 
+ 
+ In Proceedings of the 2016 Conference on Empirical Methods in
+Natural Language Processing , pages 1203–1213, 2016.
+ 
+ 
+
+ 
+ Lewis et al. [2020] 
+ 
+Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed,
+Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer.
+ 
+ 
+ Bart: Denoising sequence-to-sequence pre-training for natural
+language generation, translation, and comprehension.
+ 
+ 
+ In Proceedings of the 58th Annual Meeting of the Association for
+Computational Linguistics , 2020.
+ 
+ 
+
+ 
+ Li et al. [2020] 
+ 
+Minghao Li, Lei Cui, Shaohan Huang, Furu Wei, Ming Zhou, and Zhoujun Li.
+ 
+ 
+ Tablebank: Table benchmark for image-based table detection and
+recognition.
+ 
+ 
+ In Proceedings of the 12th Language Resources and Evaluation
+Conference , pages 1918–1925, 2020.
+ 
+ 
+
+ 
+ Li et al. [2021] 
+ 
+Junlong Li, Yiheng Xu, Lei Cui, and Furu Wei.
+ 
+ 
+ Markuplm: Pre-training of text and markup language for visually-rich
+document understanding.
+ 
+ 
+ 2021.
+ 
+ 
+
+ 
+ Liang et al. [2009] 
+ 
+Percy Liang, Michael I Jordan, and Dan Klein.
+ 
+ 
+ Learning semantic correspondences with less supervision.
+ 
+ 
+ In Proceedings of the Joint Conference of the 47th Annual
+Meeting of the ACL and the 4th International Joint Conference on Natural
+Language Processing of the AFNLP , pages 91–99, 2009.
+ 
+ 
+
+ 
+ Lin et al. [2020] 
+ 
+Xi Victoria Lin, Richard Socher, and Caiming Xiong.
+ 
+ 
+ Bridging textual and tabular data for cross-domain text-to-sql
+semantic parsing.
+ 
+ 
+ In Findings of the Association for Computational Linguistics:
+EMNLP 2020 , pages 4870–4888, 2020.
+ 
+ 
+
+ 
+ Linzen et al. [2016] 
+ 
+Tal Linzen, Emmanuel Dupoux, and Yoav Goldberg.
+ 
+ 
+ Assessing the ability of lstms to learn syntax-sensitive
+dependencies.
+ 
+ 
+ Transactions of the Association for Computational Linguistics ,
+4:521–535, 2016.
+ 
+ 
+
+ 
+ Liu et al. [2019] 
+ 
+Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer
+Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov.
+ 
+ 
+ Roberta: A robustly optimized bert pretraining approach, 2019.
+ 
+ 
+
+ 
+ Liu et al. [2021] 
+ 
+Qian Liu, Bei Chen, Jiaqi Guo, Zeqi Lin, and Jian-guang Lou.
+ 
+ 
+ Tapex: Table pre-training via learning a neural sql executor.
+ 
+ 
+ arXiv preprint arXiv:2107.07653 , 2021.
+ 
+ 
+
+ 
+ Moosavi et al. [2021] 
+ 
+Nafise Sadat Moosavi, Andreas Rücklé, Dan Roth, and Iryna Gurevych.
+ 
+ 
+ Learning to reason for text generation from scientific tables.
+ 
+ 
+ arXiv preprint arXiv:2104.08296 , 2021.
+ 
+ 
+
+ 
+ Nishida et al. [2017] 
+ 
+Kyosuke Nishida, Kugatsu Sadamitsu, Ryuichiro Higashinaka, and Yoshihiro
+Matsuo.
+ 
+ 
+ Understanding the semantic structures of tables with a hybrid deep
+neural network architecture.
+ 
+ 
+ In Thirty-First AAAI Conference on Artificial Intelligence ,
+2017.
+ 
+ 
+
+ 
+ Novikova et al. [2016] 
+ 
+Jekaterina Novikova, Oliver Lemon, and Verena Rieser.
+ 
+ 
+ Crowd-sourcing nlg data: Pictures elicit better data.
+ 
+ 
+ In Proceedings of the 9th International Natural Language
+Generation conference , pages 265–273, 2016.
+ 
+ 
+
+ 
+ Parikh et al. [2020] 
+ 
+Ankur Parikh, Xuezhi Wang, Sebastian Gehrmann, Manaal Faruqui, Bhuwan Dhingra,
+Diyi Yang, and Dipanjan Das.
+ 
+ 
+ Totto: A controlled table-to-text generation dataset.
+ 
+ 
+ In Proceedings of the 2020 Conference on Empirical Methods in
+Natural Language Processing (EMNLP) , pages 1173–1186, 2020.
+ 
+ 
+
+ 
+ Park et al. [2018] 
+ 
+Noseong Park, Mahmoud Mohammadi, Kshitij Gorde, Sushil Jajodia, Hongkyu Park,
+and Youngmin Kim.
+ 
+ 
+ Data synthesis based on generative adversarial networks.
+ 
+ 
+ arXiv preprint arXiv:1806.03384 , 2018.
+ 
+ 
+
+ 
+ Pasupat and
+Liang [2015] 
+ 
+Panupong Pasupat and Percy Liang.
+ 
+ 
+ Compositional semantic parsing on semi-structured tables.
+ 
+ 
+ In Proceedings of the 53rd Annual Meeting of the Association for
+Computational Linguistics and the 7th International Joint Conference on
+Natural Language Processing , 2015.
+ 
+ 
+
+ 
+ Powell et al. [2008] 
+ 
+Stephen G Powell, Kenneth R Baker, and Barry Lawson.
+ 
+ 
+ A critical review of the literature on spreadsheet errors.
+ 
+ 
+ Decision Support Systems , 46(1):128–138, 2008.
+ 
+ 
+
+ 
+ Radford et al. [2019] 
+ 
+Alec Radford, Jeff Wu, Rewon Child, David Luan, Dario Amodei, and Ilya
+Sutskever.
+ 
+ 
+ Language models are unsupervised multitask learners.
+ 
+ 
+ 2019.
+ 
+ 
+
+ 
+ Raffel et al. [2020] 
+ 
+Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael
+Matena, Yanqi Zhou, Wei Li, and Peter J. Liu.
+ 
+ 
+ Exploring the limits of transfer learning with a unified text-to-text
+transformer.
+ 
+ 
+ Journal of Machine Learning Research , 21(140):1–67, 2020.
+ 
+ 
+
+ 
+ Rogers et al. [2020] 
+ 
+Anna Rogers, Olga Kovaleva, and Anna Rumshisky.
+ 
+ 
+ A primer in bertology: What we know about how bert works.
+ 
+ 
+ Transactions of the Association for Computational Linguistics ,
+8:842–866, 2020.
+ 
+ 
+
+ 
+ Shi et al. [2020] 
+ 
+Peng Shi, Patrick Ng, Zhiguo Wang, Henghui Zhu, Alexander Hanbo Li, Jun Wang,
+Cicero Nogueira dos Santos, and Bing Xiang.
+ 
+ 
+ Learning contextual representations for semantic parsing with
+generation-augmented pre-training.
+ 
+ 
+ arXiv preprint arXiv:2012.10309 , 2020.
+ 
+ 
+
+ 
+ Shi et al. [2021] 
+ 
+Peng Shi, Patrick Ng, Zhiguo Wang, Henghui Zhu, Alexander Hanbo Li, Jun Wang,
+Cicero Nogueira dos Santos, and Bing Xiang.
+ 
+ 
+ Learning contextual representations for semantic parsing with
+generation-augmented pre-training.
+ 
+ 
+ In Proceedings of the AAAI Conference on Artificial
+Intelligence , 2021.
+ 
+ 
+
+ 
+ Somepalli et al. [2021] 
+ 
+Gowthami Somepalli, Micah Goldblum, Avi Schwarzschild, C Bayan Bruss, and Tom
+Goldstein.
+ 
+ 
+ Saint: Improved neural networks for tabular data via row attention
+and contrastive pre-training.
+ 
+ 
+ arXiv preprint arXiv:2106.01342 , 2021.
+ 
+ 
+
+ 
+ Suadaa et al. [2021] 
+ 
+Lya Hulliyyatus Suadaa, Hidetaka Kamigaito, Kotaro Funakoshi, Manabu Okumura,
+and Hiroya Takamura.
+ 
+ 
+ Towards table-to-text generation with numerical reasoning.
+ 
+ 
+ In Proceedings of the 59th Annual Meeting of the Association for
+Computational Linguistics and the 11th International Joint Conference on
+Natural Language Processing (Volume 1: Long Papers) , pages 1451–1465, 2021.
+ 
+ 
+
+ 
+ Sun et al. [2016] 
+ 
+Huan Sun, Hao Ma, Xiaodong He, Wen-tau Yih, Yu Su, and Xifeng Yan.
+ 
+ 
+ Table cell search for question answering.
+ 
+ 
+ In Proceedings of the 25th International Conference on World
+Wide Web , pages 771–782, 2016.
+ 
+ 
+
+ 
+ Sun et al. [2019] 
+ 
+Yibo Sun, Zhao Yan, Duyu Tang, Nan Duan, and Bing Qin.
+ 
+ 
+ Content-based table retrieval for web queries.
+ 
+ 
+ Neurocomputing , 349:183–189, 2019.
+ 
+ 
+
+ 
+ Tang et al. [2021] 
+ 
+Nan Tang, Ju Fan, Fangyi Li, Jianhong Tu, Xiaoyong Du, Guoliang Li, Sam Madden,
+and Mourad Ouzzani.
+ 
+ 
+ Rpt: relational pre-trained transformer is almost all you need
+towards democratizing data preparation.
+ 
+ 
+ Proceedings of the VLDB Endowment , 14(8):1254–1261, 2021.
+ 
+ 
+
+ 
+ Tay et al. [2020] 
+ 
+Yi Tay, Mostafa Dehghani, Dara Bahri, and Donald Metzler.
+ 
+ 
+ Efficient transformers: A survey.
+ 
+ 
+ arXiv preprint arXiv:2009.06732 , 2020.
+ 
+ 
+
+ 
+ Thawani et al. [2021] 
+ 
+Avijit Thawani, Jay Pujara, Filip Ilievski, and Pedro Szekely.
+ 
+ 
+ Representing numbers in nlp: a survey and a vision.
+ 
+ 
+ In Proceedings of the 2021 Conference of the North American
+Chapter of the Association for Computational Linguistics: Human Language
+Technologies , pages 644–656, 2021.
+ 
+ 
+
+ 
+ Vaswani et al. [2017] 
+ 
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin.
+ 
+ 
+ Attention is all you need.
+ 
+ 
+ In Advances in neural information processing systems , pages
+5998–6008, 2017.
+ 
+ 
+
+ 
+ Vig [2019] 
+ 
+Jesse Vig.
+ 
+ 
+ A multiscale visualization of attention in the transformer model.
+ 
+ 
+ arXiv preprint arXiv:1906.05714 , 2019.
+ 
+ 
+
+ 
+ Wang et al. [2015] 
+ 
+Yushi Wang, Jonathan Berant, and Percy Liang.
+ 
+ 
+ Building a semantic parser overnight.
+ 
+ 
+ In Proceedings of the 53rd Annual Meeting of the Association for
+Computational Linguistics and the 7th International Joint Conference on
+Natural Language Processing (Volume 1: Long Papers) , pages 1332–1342, 2015.
+ 
+ 
+
+ 
+ Wang et al. [2020] 
+ 
+Zhiruo Wang, Haoyu Dong, Ran Jia, Jia Li, Zhiyi Fu, Shi Han, and Dongmei Zhang.
+ 
+ 
+ Tuta: Tree-based transformers for generally structured table
+pre-training.
+ 
+ 
+ arXiv preprint arXiv:2010.12537 , 2020.
+ 
+ 
+
+ 
+ Wang et al. [2021a] 
+ 
+Daheng Wang, Prashant Shiralkar, Colin Lockard, Binxuan Huang, Xin Luna Dong,
+and Meng Jiang.
+ 
+ 
+ Tcn: Table convolutional network for web table interpretation.
+ 
+ 
+ In Proceedings of the Web Conference 2021 , pages 4020–4032,
+2021.
+ 
+ 
+
+ 
+ Wang et al. [2021b] 
+ 
+Fei Wang, Kexuan Sun, Muhao Chen, Jay Pujara, and Pedro Szekely.
+ 
+ 
+ Retrieving complex tables with multi-granular graph representation
+learning.
+ 
+ 
+ arXiv preprint arXiv:2105.01736 , 2021.
+ 
+ 
+
+ 
+ Wang et al. [2021c] 
+ 
+Zhiruo Wang, Haoyu Dong, Ran Jia, Jia Li, Zhiyi Fu, Shi Han, and Dongmei Zhang.
+ 
+ 
+ Tuta: Tree-based transformers for generally structured table
+pre-training.
+ 
+ 
+ In Proceedings of the 27th ACM SIGKDD Conference on Knowledge
+Discovery Data Mining , pages 1780–1790, 2021.
+ 
+ 
+
+ 
+ Wiseman et al. [2017] 
+ 
+Sam Wiseman, Stuart M Shieber, and Alexander M Rush.
+ 
+ 
+ Challenges in data-to-document generation.
+ 
+ 
+ In Proceedings of the 2017 Conference on Empirical Methods in
+Natural Language Processing , pages 2253–2263, 2017.
+ 
+ 
+
+ 
+ Xie et al. [2022] 
+ 
+Tianbao Xie, Chen Henry Wu, Peng Shi, Ruiqi Zhong, Torsten Scholak, Michihiro
+Yasunaga, Chien-Sheng Wu, Ming Zhong, Pengcheng Yin, Sida I Wang, et al.
+ 
+ 
+ Unifiedskg: Unifying and multi-tasking structured knowledge grounding
+with text-to-text language models.
+ 
+ 
+ arXiv preprint arXiv:2201.05966 , 2022.
+ 
+ 
+
+ 
+ Xing and Wan [2021] 
+ 
+Xinyu Xing and Xiaojun Wan.
+ 
+ 
+ Structure-aware pre-training for table-to-text generation.
+ 
+ 
+ In Findings of the Association for Computational Linguistics:
+ACL-IJCNLP 2021 , pages 2273–2278, 2021.
+ 
+ 
+
+ 
+ Xu et al. [2020] 
+ 
+Yiheng Xu, Minghao Li, Lei Cui, Shaohan Huang, Furu Wei, and Ming Zhou.
+ 
+ 
+ Layoutlm: Pre-training of text and layout for document image
+understanding.
+ 
+ 
+ In Proceedings of the 26th ACM SIGKDD International Conference
+on Knowledge Discovery Data Mining , pages 1192–1200, 2020.
+ 
+ 
+
+ 
+ Yan and He [2020] 
+ 
+Cong Yan and Yeye He.
+ 
+ 
+ Auto-suggest: Learning-to-recommend data preparation steps using data
+science notebooks.
+ 
+ 
+ In Proceedings of the 2020 ACM SIGMOD International Conference
+on Management of Data , pages 1539–1554, 2020.
+ 
+ 
+
+ 
+ Yang et al. [2022] 
+ 
+Jingfeng Yang, Aditya Gupta, Shyam Upadhyay, Luheng He, Rahul Goel, and Shachi
+Paul.
+ 
+ 
+ Tableformer: Robust transformer modeling for table-text encoding.
+ 
+ 
+ arXiv preprint arXiv:2203.00274 , 2022.
+ 
+ 
+
+ 
+ Yin et al. [2020] 
+ 
+Pengcheng Yin, Graham Neubig, Wen-tau Yih, and Sebastian Riedel.
+ 
+ 
+ Tabert: Pretraining for joint understanding of textual and tabular
+data.
+ 
+ 
+ In Proceedings of the 58th Annual Meeting of the Association for
+Computational Linguistics , 2020.
+ 
+ 
+
+ 
+ Yoon et al. [2020] 
+ 
+Jinsung Yoon, Yao Zhang, James Jordon, and Mihaela van der Schaar.
+ 
+ 
+ Vime: Extending the success of self-and semi-supervised learning to
+tabular domain.
+ 
+ 
+ Advances in Neural Information Processing Systems , 33, 2020.
+ 
+ 
+
+ 
+ Yoran et al. [2021] 
+ 
+Ori Yoran, Alon Talmor, and Jonathan Berant.
+ 
+ 
+ Turning tables: Generating examples from semi-structured tables for
+endowing language models with reasoning skills.
+ 
+ 
+ arXiv preprint arXiv:2107.07261 , 2021.
+ 
+ 
+
+ 
+ Yu et al. [2018] 
+ 
+Tao Yu, Rui Zhang, Kai Yang, Michihiro Yasunaga, Dongxu Wang, Zifan Li, James
+Ma, Irene Li, Qingning Yao, Shanelle Roman, et al.
+ 
+ 
+ Spider: A large-scale human-labeled dataset for complex and
+cross-domain semantic parsing and text-to-sql task.
+ 
+ 
+ In Proceedings of the 2018 Conference on Empirical Methods in
+Natural Language Processing , pages 3911–3921, 2018.
+ 
+ 
+
+ 
+ Yu et al. [2020] 
+ 
+Tao Yu, Chien-Sheng Wu, Xi Victoria Lin, Yi Chern Tan, Xinyi Yang, Dragomir
+Radev, Caiming Xiong, et al.
+ 
+ 
+ Grappa: Grammar-augmented pre-training for table semantic parsing.
+ 
+ 
+ In International Conference on Learning Representations , 2020.
+ 
+ 
+
+ 
+ Zayats et al. [2021] 
+ 
+Vicky Zayats, Kristina Toutanova, and Mari Ostendorf.
+ 
+ 
+ Representations for question answering from documents with tables and
+text.
+ 
+ 
+ In Proceedings of the 16th Conference of the European Chapter of
+the Association for Computational Linguistics: Main Volume , pages
+2895–2906, 2021.
+ 
+ 
+
+ 
+ Zhang and Balog [2017] 
+ 
+Shuo Zhang and Krisztian Balog.
+ 
+ 
+ Entitables: Smart assistance for entity-focused tables.
+ 
+ 
+ In Proceedings of the 40th International ACM SIGIR Conference on
+Research and Development in Information Retrieval , pages 255–264, 2017.
+ 
+ 
+
+ 
+ Zhang and Balog [2018] 
+ 
+Shuo Zhang and Krisztian Balog.
+ 
+ 
+ Ad hoc table retrieval using semantic similarity.
+ 
+ 
+ In Proceedings of the 2018 world wide web conference , pages
+1553–1562, 2018.
+ 
+ 
+
+ 
+ Zhang and Balog [2020] 
+ 
+Shuo Zhang and Krisztian Balog.
+ 
+ 
+ Web table extraction, retrieval, and augmentation: A survey.
+ 
+ 
+ ACM Transactions on Intelligent Systems and Technology (TIST) ,
+2020.
+ 
+ 
+
+ 
+ Zhang et al. [2019] 
+ 
+Li Zhang, Shuo Zhang, and Krisztian Balog.
+ 
+ 
+ Table2vec: Neural word and entity embeddings for table population and
+retrieval.
+ 
+ 
+ In Proceedings of International ACM SIGIR Conference on Research
+and Development in Information Retrieval , 2019.
+ 
+ 
+
+ 
+ Zhang et al. [2020] 
+ 
+Xingyao Zhang, Linjun Shou, Jian Pei, Ming Gong, Lijie Wen, and Daxin Jiang.
+ 
+ 
+ A graph representation of semi-structured data for web question
+answering.
+ 
+ 
+ In Proceedings of the 28th International Conference on
+Computational Linguistics , pages 51–61, 2020.
+ 
+ 
+
+ 
+ Zhang et al. [2021] 
+ 
+Yakun Zhang, Xiao Lv, Haoyu Dong, Wensheng Dou, Shi Han, Dongmei Zhang, Jun
+Wei, and Dan Ye.
+ 
+ 
+ Semantic table structure identification in spreadsheets.
+ 
+ 
+ In Proceedings of the 30th ACM SIGSOFT International Symposium
+on Software Testing and Analysis , pages 283–295, 2021.
+ 
+ 
+
+ 
+ Zheng et al. [2021] 
+ 
+Xinyi Zheng, Douglas Burdick, Lucian Popa, Xu Zhong, and Nancy Xin Ru Wang.
+ 
+ 
+ Global table extractor (gte): A framework for joint table
+identification and cell structure recognition using visual context.
+ 
+ 
+ In Proceedings of the IEEE/CVF Winter Conference on Applications
+of Computer Vision , pages 697–706, 2021.
+ 
+ 
+
+ 
+ Zhong et al. [2017] 
+ 
+Victor Zhong, Caiming Xiong, and Richard Socher.
+ 
+ 
+ Seq2sql: Generating structured queries from natural language using
+reinforcement learning.
+ 
+ 
+ arXiv:1709.00103 , 2017.
+ 
+ 
+
+ 
+ Zhong et al. [2019] 
+ 
+Xu Zhong, Jianbin Tang, and Antonio Jimeno Yepes.
+ 
+ 
+ Publaynet: largest dataset ever for document layout analysis.
+ 
+ 
+ In 2019 International Conference on Document Analysis and
+Recognition (ICDAR) , pages 1015–1022. IEEE, 2019.
+ 
+ 
+
+ 
+ Zhou et al. [2020] 
+ 
+Mengyu Zhou, Wang Tao, Ji Pengxin, Han Shi, and Zhang Dongmei.
+ 
+ 
+ Table2analysis: Modeling and recommendation of common analysis
+patterns for multi-dimensional data.
+ 
+ 
+ Proceedings of the AAAI Conference on Artificial Intelligence ,
+34(01):320–328, Apr. 2020.
+ 
+ 
+
+ 
+ Zhou et al. [2021] 
+ 
+Mengyu Zhou, Qingtao Li, Xinyi He, Yuejiang Li, Yibo Liu, Wei Ji, Shi Han,
+Yining Chen, Daxin Jiang, and Dongmei Zhang.
+ 
+ 
+ Table2charts: Recommending charts by learning shared table
+representations.
+ 
+ 
+ In Proceedings of the 27th ACM SIGKDD Conference on Knowledge
+Discovery Data Mining , KDD ’21, page 2389–2399, New York, NY, USA,
+2021. Association for Computing Machinery.
+ 
+ 
+
+ 
+ Zhu et al. [2021] 
+ 
+Fengbin Zhu, Wenqiang Lei, Youcheng Huang, Chao Wang, Shuo Zhang, Jiancheng Lv,
+Fuli Feng, and Tat-Seng Chua.
+ 
+ 
+ Tat-qa: A question answering benchmark on a hybrid of tabular and
+textual content in finance.
+ 
+ 
+ arXiv preprint arXiv:2105.07624 , 2021.
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ Table 4: Downstream task evaluation for table pre-training, a 2D view of Table  3 . 
+ 
+ 
+ 
+ 
+ | 
+ Table | 
+ Table | 
+ Table | 
+ Table | 
+ Cell | 
+ Column | 
+ Table | 
+ Formula | 
+ Entity | 
+ Table | 
+ Data | 
+ Machine | 
+
+ 
+ | 
+ question | 
+ fact | 
+ -to-text | 
+ type | 
+ type | 
+ type relation | 
+ augmentation | 
+ prediction | 
+ linking | 
+ search | 
+ preparation | 
+ learning | 
+
+ 
+ | 
+ answering | 
+ verification | 
+ | 
+ classification | 
+ classification | 
+ classification | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ applications | 
+
+ 
+ | 
+ Sec  A.2.1 | 
+ Sec  A.2.3 | 
+ Sec  A.2.2 | 
+ Sec  A.1.2 | 
+ Sec  A.1.1 | 
+ Sec  A.5.1 | 
+ Sec  A.5.2 | 
+ Sec  A.3.2 | 
+ Sec  A.5.1 | 
+ Sec  A.2.4 | 
+ Sec  A.7 | 
+ Sec  A.8 | 
+
+ 
+ TAPAS | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TaBERT | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TURL | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ yes | 
+ yes | 
+ | 
+ yes | 
+ | 
+ | 
+ | 
+
+ 
+ TUTA | 
+ | 
+ | 
+ | 
+ yes | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ Tabnet | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ Yes | 
+
+ 
+ VIME | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ Yes | 
+
+ 
+ KGPT | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ RPT | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ yes | 
+ | 
+
+ 
+ StruG | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TabTransformer | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ Yes | 
+
+ 
+ GraPPa | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TABBIE | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ yes | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TaPEx | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ FORTAP | 
+ yes | 
+ | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ MATE | 
+ yes | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ TableGPT | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ GTR | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+
+ 
+ TableFormer | 
+ yes | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ FLAP | 
+ | 
+ | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+ UnifiedSKG | 
+ yes | 
+ yes | 
+ yes | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+ | 
+
+ 
+
+ 
+ 
+ 
+
+## Appendix A Downstream Tasks and Datasets
+
+ 
+
+### A.1 Table Structure Understanding
+
+ 
+ Understanding the structure of tables is the premise of many other downstream tasks, e.g., question answering, table-to-text, and formula suggestion. Even the pre-training stage relies on the table type and header regions, e.g., in the data pre-processing stage of pre-training, TaBERT filters relational tables and ”flattens” top headers if they cross multiple rows, and TUTA extracts tree-based positions
+based on header hierarchies. This section introduces two representative tasks of table structure understanding, table type classification and cell type classification. 
+
+ 
+ 
+
+#### A.1.1 Cell Type Classification
+
+ 
+ Cell type classification is to identify
+cell types in the table  Dong et al. [2019a] ; Koci et al. [2019] ; Gol et al. [2019] . Existing public datasets include deexcelerator (DeEx)  Koci et al. [2019] , SAUS  Gol et al. [2019] , and CIUS  Gol et al. [2019] , where cells are categorize into metadata, notes, data, top attribute, left attribute, and derived. WebSheet  Dong et al. [2019a] provides a fine-grained taxonomy of headers, including index, index name, and value name, but is not publicly available now. To better leverage cell-level information,   Ghasemi Gol et al. [2019] encodes contextual (cell text) and stylistic (cell formats) features to embeddings via unsupervised training, and then trains an LSTM-based model for supervised cell classification. TUTA   Wang et al. [2020] optimizes cell embedding layers, attention layers, and the cell classification head jointly via a transformer-based framework. 
+
+ 
+ 
+ 
+
+#### A.1.2 Table Type Classification
+
+ 
+ This task is to classify tables into different structural types  Nishida et al. [2017] ; Ghasemi-Gol and
+Szekely [2018] ; Eberius et al. [2015] . However, most datasets are not publicly available, except the July 2015 Common Crawl (WCC) in Ghasemi-Gol and
+Szekely [2018] where tables are categorized into five types: relational, entity, matrix, list, and non-data. To enable table-level classification, TUTA extends its pre-training backbone with a simple multi-layer classification head upon the special global [CLS] token of the table  Wang et al. [2020] . 
+
+ 
+ 
+ 
+ 
+
+### A.2 Table and Natural Language
+
+ 
+
+#### A.2.1 Question Answering over Tables
+
+ 
+ A general problem formulation of Table QA is defined as follows: given a table and a question in NL, output an answer, and the question-answer pair should be fully supported by the table.
+Table QA has many benchmark datasets, mainly focusing on DB tables  Wang et al. [2015] ; Yu et al. [2018] ; Zhong et al. [2017] and relational web tables  Pasupat and
+Liang [2015] ; Sun et al. [2016] . Recently, it has been extended to QA  Cheng et al. [2021b] over complex statistical report tables (questions are revised from real sentences that are meaningful, diverse, and natural rather than written from scratch), QA  Chen et al. [2021b] ; Zhu et al. [2021] over financial tables, and jointly QA over tables and text  Chen et al. [2020b] ; Chen et al. [2021b] ; Zhu et al. [2021] . In general, applying pre-training models to this task has three kinds of approaches: (1) TaBERT  Yin et al. [2020] feeds the embeddings outputted by the encoder to a logical forms generator and uses the generated logical forms to return answers by executing on tables; (2) TAPAS  Herzig et al. [2020] does not generate logical forms, and simply extends the encoder with classification heads for cell selection and operator selection; (3) TaPEx  Liu et al. [2021] uses an encoder-decoder architecture that decodes answers in a way like a sequence generation. 
+
+ 
+ 
+ 
+
+#### A.2.2 Table-to-Text
+
+ 
+ Table-to-text, i.e., generating textual descriptions from (semi-) structured tables, is another prevalent task that can benefit from table pre-training.
+There are many existing datasets for table-to-text   Liang et al. [2009] ; Chen and Mooney [2008] ; Wiseman et al. [2017] ; Novikova et al. [2016] ; Banik et al. [2013] ; Lebret et al. [2016] . Recently, a large-scale controlled table-to-text dataset (ToTTo) is proposed for text generation over Wikipedia tables with annotated highlighted cells as conditions  Parikh et al. [2020] . NumericNLG  Suadaa et al. [2021] and SciGen  Moosavi et al. [2021] are proposed to generate reasoning-aware paragraph-level descriptions for tables in scientific papers. LogicNLG  Chen et al. [2020a] is built for generating logical textual descriptions from Wikipedia tables. Logic2Text  Chen et al. [2020c] shares the same idea with LogicNLG to incorporate logical inference in table-to-text but contains annotated logical forms to enhance the generation fidelity. HiTab  Cheng et al. [2021b] is the first to introduce hierarchical tables as the generation context, posing new challenges compared with previous datasets. Many prior approaches  Gong et al. [2020] ; Kale and Rastogi [2020] ; Chen et al. [2020a] ; Cheng et al. [2021b] on these datasets directly utilize pre-trained language models by first transforming the table into a textual sequence. A recent branch of works  Xing and Wan [2021] ; Authors [2021] has focused on better table understanding by pre-training the transformer model on structure-aware self-supervised tasks. 
+
+ 
+ 
+ 
+
+#### A.2.3 Table Fact Verification
+
+ 
+ This is a binary entailment task to verify whether a textual hypothesis holds based on the given
+table. TabFact  Chen et al. [2019b] is a big human-labeled dataset for table fact verification to evaluate the effectiveness of table-text joint modeling. Methods like TAPAS  Eisenschlos et al. [2020] and TaPEx  Liu et al. [2021] encode table and text together and outputs the truth value of entailment via a simple MLP-based binary classifier over the [CLS] token embeddings and a transformer-based decoder, respectively. 
+
+ 
+ 
+ 
+
+#### A.2.4 Table Search by Natural Language
+
+ 
+ Table search by NL seeks to retrieve semantically relevant tables based on NL queries. WikiTables  Zhang and Balog [2018] is a benchmark dataset containing 60 queries and 3,120 candidate tables. WebQueryTable  Sun et al. [2019] contains 21,113
+queries collected from search logs of a commercial search engine and 273,816 candidate tables. GTR  Wang et al. [2021b] encodes tables with a tabular graph transformer, contexts with a BERT-based model  Devlin et al. [2018] , and queries with a FastText method  Joulin et al. [2016] , and calculates the relevance score of the query-table and query-context matching by multi-layer perceptron (MLP). 
+
+ 
+ 
+ 
+ 
+
+### A.3 Table and Programming Language
+
+ 
+
+#### A.3.1 Semantic Parsing Towards Table Question Answering
+
+ 
+ Semantic parsing, usually seen as an important intermediate task of table question answering, is to parse natural language queries to SQLs (text-to-SQL), logical forms, or other kinds of programming languages that can return answers through executing on one or more target tables. Public datasets includes Spider  Yu et al. [2018] , WikiSQL  Zhong et al. [2017] , etc. For example, StruG  Deng et al. [2021] , GraPPa  Yu et al. [2020] , GAP   Shi et al. [2020] promote semantic parsing through pre-training on synthetic or human-labeled table-text data. 
+
+ 
+ 
+ 
+
+#### A.3.2 Formula Prediction
+
+ 
+ Formula prediction is to predict a formula for the target cell in a table  Chen et al. [2021a] . Since writing formulas from scratch could be time-consuming
+and error-prone, it facilitates spreadsheet end-users by recommending formulas based on corresponding headers and other useful contexts. Enron  Hermans and Murphy-Hill [] is a large and public dataset of Excel Spreadsheets containing over 17K spreadsheets with rich table structures and formula types. In FORTAP  Cheng et al. [2021a] , based on the contextual embeddings of the target cell outputted by the pre-trained encoder, an LSTM-based decoder is adopted for formula generation. 
+
+ 
+ 
+ 
+
+#### A.3.3 Formula Error Detection
+
+ 
+ Formula error detection refers to the task of detecting spreadsheet formula errors. This task has real critical usage in the financial domain since formula errors can greatly degrade the quality of
+spreadsheets and cause financial losses  Powell et al. [2008] . Public datasets include CACheck  Dou et al. [2016] and CUSTODES  Cheung et al. [2016] . 
+
+ 
+ 
+ 
+ 
+
+### A.4 Table and Vision
+
+ 
+
+#### A.4.1 Image-based Table Detection and Cell Recognition
+
+ 
+ Since image tables are not the main focus of this paper as claimed in Section  2 , we only list two most representative tasks for image tables here, image-based table detection and cell recognition.
+Image-based table detection is a task of detecting table regions in visual documents, and cell recognition further decomposes a whole table region into individual cell regions. Recent public datasets include ICDAR 2019  Gao et al. [2019] , TableBank  Li et al. [2020] ,
+PubTabNet  Zhong et al. [2019] , SciTSR  Chi et al. [2019] , and FinTabNet  Zheng et al. [2021] . pre-training works on visual documents like LayoutLM  Xu et al. [2020] , DocFormer  Appalaraju et al. [2021] , and LAMBERT  Garncarek et al. [2020] can be potentially applied to these datasets. We will not expand this part due to the focus of this paper as stated in 2 . 
+
+ 
+ 
+ 
+
+#### A.4.2 Table Format Generation
+
+ 
+ Good-looking formatting is desirable for modern tables. Format generation refers to the task of generating formatting to better exhibit table structures and data relationships in a visual perspective.   Dong et al. [2020] provides three web-crawled datasets, SAUS, NCSE, and NSF, containing a total of 7,541 tables with high-quality table formatting. 
+
+ 
+ 
+ 
+ 
+
+### A.5 Table and Knowledge Graph
+
+ 
+
+#### A.5.1 Table Interpretation
+
+ 
+ Table interpretation is the task of converting Web tables into machine-understandable knowledge, including entity linking, column type identification, and relation extraction  Bhagavatula et al. [2015] . Entity linking is the task of finding phrases of text, called mentions, in cells and associating each with its referent entity. Column type classification is the task of associating a column in a table with the KB type of entities it contains. Relation extraction is the task of associating a pair of columns in a table with the KB relation that holds between each pair of entities in a given row of the columns. 
+
+ 
+ 
+ T2Dv2 Gold Standard  3 3 
+ 3 
+ 
+ 
+ 
+ http://webdatacommons.org/webtables/goldstandardV2.html contains 779 tables from various websites with manual annotations.
+SemTab challenge  4 4 
+ 4 
+ 
+ 
+ 
+ http://www.cs.ox.ac.uk/isg/challenges/sem-tab/ provides automatically generated tables with annotations from knowledge graph Cutrona et al. [2020] .
+WikiTable corpus  Bhagavatula et al. [2015] contains entity linking annotation from hyperlinks, and TURL  Deng et al. [2020] extends WikiTable corpus to the other tasks. 
+
+ 
+ 
+ 
+
+#### A.5.2 Table Augmentation
+
+ 
+ Table augmentation is the task of expanding a table with additional data  Zhang and Balog [2017] . Three sub-tasks are proposed for augmenting relational tables, including row population that suggests entity filings for table columns, cell filling that fills the cell values, and schema augmentation that recommends top headers to columns.
+Since this task can be self-supervised, one can also adopt it as a pre-training objective using unlabeled data. 
+
+ 
+ 
+ Knowledge graph augmentation is a task opposite to table augmentation. It enriches knowledge graphs with knowledge extracted from tabular data. Existing table pre-training works have not focused on this task. 
+
+ 
+ 
+ 
+ 
+
+### A.6 Table and Data Analysis
+
+ 
+ Tabular data is one of the important data formats in data analysis for business intelligence. There are two table analysis tasks – table transformation and visualization generation. Table transformation aims at transforming tables with operators like group by, pivot, aggregation, and so on  Yan and He [2020] . Besides, some works   Zhou et al. [2020] focus on creating analysis with transformation.
+Visualization generation aims at recommendation visualization to make tabular data human-friendly and expressive. VizML  Hu et al. [2019] and Table2Chart  Zhou et al. [2021] provide corresponding corpus. 
+
+ 
+ 
+ 
+
+### A.7 Table and Data Preparation
+
+ 
+ Data preparation consists of a series of tasks. Hameed and Naumann [2020] classify them into six broader categories: data discovery, data validation, data structuring, data enrichment, data filtering, and data cleaning.
+RPT  Tang et al. [2021] improves a range of data preparation tasks through large pre-training with a transformer-based denoising autoencoder.
+Here, we only introduce a representative data discovery task, spreadsheet table detection. 
+
+ 
+ 
+
+#### A.7.1 Spreadsheet Table Detection
+
+ 
+ Spreadsheets are flexible to use, but most tables on spreadsheets are not explicitly inserted by authors (by selecting the bounding box and clicking the ”Insert Table” button in Excel), so spreadsheet table detection is essential to recognize table layouts and detect table boundaries. TableSense  Dong et al. [2019b] gives a public dataset containing 2,615 table regions from 1,645 spreadsheets   5 5 
+ 5 
+ 
+ 
+ 
+ https://github.com/microsoft/TableSense . 
+
+ 
+ 
+ 
+ 
+
+### A.8 Table and Machine Learning Application
+
+ 
+ Since tabular data are often used to record categorical or continuous features and corresponding labels in machine learning applications (e.g., competitions held by Kaggle and KDD Cup such as product recommending and online advertising), this distinct scenario attracts research work such as VIME  Yoon et al. [2020] , SAINT  Somepalli et al. [2021] , TabTransformer  Huang et al. [2020] , and Tabnet  Arik and Pfister [2021] , to pre-train on unlabeled tabular data towards better featurization, feature selection, and contextual representation learning to achieve higher prediction accuracy in machine learning applications. Since there are pretty diverse machine learning applications, and most prediction tasks need complex reasoning over a specific set of domain-specific features, pre-training a general model has distinct challenges to handle those task diversity and reasoning complexity. 
+
+ 
+ 
+ 
+
+### A.9 Other Tasks
+
+ 
+ There are still many related tasks and datasets that have not been evaluated by table existing pre-training methods, but they are also helpful to evaluate the effectiveness of pre-training models, such as table title generation  Hancock et al. [2019] , pairwise table relation classification  Fetahu et al. [2019] , tabular data synthesis  Park et al. [2018] , table error detection  Huang and He [2018] , etc.

@@ -1,0 +1,52 @@
+# Introduction
+# Scientific Problem and Motivation
+## Limitations of Static Structural Models
+## Challenges in Traditional Molecular Dynamics
+### Computational Cost and Timescales
+### Energy-Barrier Trapping
+## The Need for Physically Consistent Ensembles
+# Theoretical Framework
+## Energy-Based Alignment (EBA)
+### Calibration of Conformational States
+### Handling Intractable Optimization
+## Energy Preference Optimization (EPO)
+### Online Refinement of Pretrained Generators
+### Stochastic Differential Equation Sampling
+### Energy-Ranking and List-wise Preference Optimization
+## Theoretical Unification via Masked Diffusion Models
+### Equivalence of Kinetic, Conditional Kinetic, and Geodesic Energy
+### Optimal Mask Schedules and Beta Distribution Parameterization
+# Data and Physical Feedback Sources
+## Dynamic PDB Dataset
+### Integration of All-Atom Molecular Dynamics Data
+### Physical Properties: Velocities, Forces, and Energies
+## Experimental Data as Physical Restraints
+### NMR Distance Restraints and Chemical Shifts
+### Cryo-EM Density Maps and Ensemble Refinement
+### EPR Distance Distributions
+# Methodology
+## Generative Model Architectures
+### Denoising Diffusion Models
+### Flow Matching Frameworks
+## Integration of Physical Feedback
+### Embedding Feedback in Training Objectives
+### Gradient-Based Feedback from Differentiable Energy Landscapes
+### Real-Time Parameter Updates via Experimental Data
+# Biological Applications
+## Allostery and Signal Transduction
+### Unraveling Allosteric Pathways
+### Case Study: Photoreceptor Vivid (VVD)
+## Ligand Binding and Drug Discovery
+### Induced-Fit vs. Conformational Selection
+### Enhancing Virtual Screening with Ensemble Flexibility
+# Evaluation and Validation
+## Benchmarking Against Molecular Dynamics Ensembles
+## Verification of Thermodynamic Consistency
+## Comparison with Static Structure Prediction
+# Limitations and Challenges
+## Accuracy of Underlying Energy Functions
+## Gaps in Specific Loss Function Modifications
+## Scarcity of Tools for Intrinsically Disordered Proteins
+# Future Directions
+## Closing the Loop Between Simulation and Inference
+## Integration with High-Resolution Experimental Data

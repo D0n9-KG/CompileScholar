@@ -1,0 +1,215 @@
+# Comparison of Non-linear Signals Analysis Methods
+
+Yanhuai $\mathbf{Q}\mathbf{u}^{1,\mathbf{a}}$ , Shuai Zhang<sup>1</sup> and Qingkai Han<sup>2</sup>
+
+Abstract. In modern engineering, linear is relative, while non-linear and non-stationary is absolute. There are many methods in non-linear signals processing. How to select a most suitable analysis method quickly for the nonlinear signal is particularly important, which can improve the signal processing efficiently. In this paper, three common analysis methods for nonlinear signals, Wavelet spectrum, Hilbert spectral analysis (HSA) and Poincaré mapping are researched and analyzed by some typical nonlinear signals from the complex electromechanical model test system. The effectiveness and application scopes of these approaches are obtained, which can provide a theoretical and practical basis for engineering application.
+
+# 1. Introduction
+
+The signal is the carrier of information. It is particularly important to process the problems in engineering efficiently by means of signal processing methods. In modern engineering, linear is relative, while non-linear and non-stationary is absolute[1]. Modern complex system has a high degree of complexity, which usually is a nonlinear system, and the signals from the system are mostly non-linear and non-stationary. How to make good use of these monitoring signals has some important theoretical and practical significance for the system's health operation, life prediction, fault prevention and diagnosis.
+
+But there are many methods in non-linear signals processing, such as wavelet analysis, the breakout HHT and some modern nonlinear theory methods. How to select a most suitable analysis method quickly for the nonlinear signal is particularly important, which can improve the signal processing efficiently. In this paper, three common analysis methods for nonlinear signals, Wavelet spectrum, Hilbert spectrum and Poincaré mapping are researched and analyzed by some typical nonlinear signals from the complex electromechanical model test system. The effectiveness and application scopes of these approaches are obtained, which can provide an theoretical and practical basis for engineering application.
+
+# 2. Source and acquisition of nonlinear signals
+
+Significant electromechanical equipments, such as aero-engine, turbobonator, turbine, blower, compressor and so on rotating machineries, play an important role in national economy, and how to guarantee which security and reliable operation has the vital significance. Rotor system is a vital component in complex electromechanical equipments, so its performance and security are very important. When the system work obvious nonlinear characteristics are shown, especially when the fault occurs. In this paper, the test rig model of a dual-disk rotor system is built. Through fault simulation, some typical nonlinear data is obtained by sensor. The specific test model was established as shown in figure 1. A shaft is supported
+
+MATEC Web of Conferences 232, 01014 (2018)  
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+© The Authors, published by EDP Sciences. This is an open access article distributed under the terms of the Creative Commons Attribution License 4.0 (http://creativecommons.org/licenses/by/4.0/).
+
+by two journal bearings. The two rigid disks are mounted along the shaft. The shaft total length is $480\mathrm{mm}$ . The diameters of the two disks are $80\mathrm{mm}$ , and the widths are $20\mathrm{mm}$ and $15\mathrm{mm}$ . The mass of two disks are $0.91364\mathrm{kg}$ and $0.9383\mathrm{kg}$ , respectively. A bolt with the mass of $1\mathrm{g}$ is installed on the top of the right disk.
+
+![](dt=2026-04-07/ht=16/bf8d12c0e3a77b26aea8b57c551ad41ae0ce7b723ef74383ff5a891bc10b510e.jpg)
+
+![](dt=2026-04-07/ht=16/f5dc2227ca740939cfa169154437adfcd8daa71bf1b2938f07b8d54148f826fb.jpg)
+
+In various faults of rotor system, the number caused by vibration accounts for more than $60\%$ , in which rub-impact and misalignment fault is most common[2]. And the nonlinear characteristics of signals are also obvious. We can obtain the non-linear signal of two kinds of faults by installing the rub-impact and misalignment devices shown in figure 2 based on the test system respectively. Specifically, (1) rub-impact device, as shown in figure 2(a), is composed of rub-impact rod support and copper rubbing rod, which is installed in the axial location of $20\mathrm{mm}$ from the right disk.
+
+In experiment, we alter the distance between rod and shaft to simulate rub-impact fault. In experiment, we alter the distance between rod and shaft to simulate rub-impact fault. (2) Some shims are added to the right support seat of the rotor test for simulating the bearing misalignment. The device is shown in figure 2(b)[3-4].
+
+![](dt=2026-04-07/ht=16/0f95c8bd23b7d23754940ae62f2366b85c0f02b446c9d142625fd6baedd8c8f1.jpg)
+
+![](dt=2026-04-07/ht=16/060c4c28fa039d1ac094fa446e0891e110db377eb1c746e92795f1df6afd62a0.jpg)
+
+So, three nonlinear Vibration signals in the normal operation (healthy), heavy rub-impact, misalignment conditions of the test system are collected by sensor. The corresponding waveforms, amplitude spectrums and the shaft center orbits are shown in figure3-5. Next, the three typical signal processing methods are applied to obtain nonlinear signals.
+
+MATEC Web of Conferences 232, 01014 (2018)
+
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+2
+
+![](dt=2026-04-07/ht=16/deeedf28feedf2854bc0988bb90659a2aeb7faf199b72b016ab109572fa9232c.jpg)
+
+![](dt=2026-04-07/ht=16/47269153000d01eef006774a3cf46a0fd22d69fae5e30c35501b11707c45c1a9.jpg)
+
+![](dt=2026-04-07/ht=16/bd1e5153df32df0636162a1c2bf314dff89721be43d546ed4b9cc7d3bb876221.jpg)
+
+![](dt=2026-04-07/ht=16/900345b1bc65ed930f97965b4c16f64d96f9983d923aa801cb8d12a2711cf613.jpg)
+
+![](dt=2026-04-07/ht=16/e25649183cab5f13dbde1738aa76aaa7385e49cb3ead9e3df121cd531791c2fb.jpg)
+
+![](dt=2026-04-07/ht=16/f521950b8374bcc8de31f310417db517df29441331409c95380a97bf5beddae5.jpg)
+
+# 3. Brief introductions of the nonlinear signals analysis methods
+
+# 3.1. Wavelet spectrum[5-7]
+
+Wavelet transform (WT) is defined, for a vibration signal $x(t)$ , as
+
+$$
+W T _ {x} (b, a) = a ^ {- 1 / 2} \int_ {- \infty} ^ {+ \infty} x (t) \phi^ {*} \left(\frac {t - b}{a}\right) d t \tag {1}
+$$
+
+Where $\varphi(t)$ is the basic wavelet function that satisfies certain very general conditions, 'a' is the dilation factor and 'b' is the translation of the origin. So we can obtain a family of functions $\{\varphi_{b,a}(t)\}$ by making the basic wavelet function dilate 'a' and translate 'b', i.e.
+
+$$
+\varphi_ {b, a} (t) = a ^ {- 1 / 2} \varphi \left(\frac {t - b}{a}\right) \tag {2}
+$$
+
+MATEC Web of Conferences 232, 01014 (2018)
+
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+3
+
+Wavelet Packet Decomposition (WPD) can make high frequency band undecomposed in WT further decompose, i.e., which can decompose the full frequency-band into multiple frequency bands based on WT. Because the substance of WPD is a set of band-pass filters from wide to narrow by binary, various applications can find optimal combination needed.
+
+Assume each level wavelet packet can be divided into two from the original frequency, so k levels wavelet packet can obtain 2k sub-bands. The range of each frequency decomposed is defined as
+
+$$
+f (j, i) = \left[ \frac {f _ {s} (j - 1)}{2 ^ {(i + 1)}}, \frac {f _ {s} j}{2 ^ {(j + 1)}} \right] \tag {3}
+$$
+
+Where, $f(j,i)$ is the range of jth frequency under the i level decomposition, and $j = 1,2,\dots,2^i$ , is $f_{s}$ sampling frequency.
+
+After decomposition we can obtained the time-frequency characteristic and time-frequency spectrum.
+
+# 3.2 Hilbert spectral analysis (HSA)[8-10]
+
+Hilbert spectral analysis (HSA) is part of HHT[4]. HHT consists of two parts: empirical mode decomposition (EMD) and Hilbert spectral analysis (HSA). To a given signal, firstly, it is adaptively decomposed into a set of complete and almost orthogonal components named intrinsic mode functions (IMF) by EMD method, and a residue and a collection of n IMFs, named are obtained. Furthermore the signal can be exactly reconstructed by a linear superposition:
+
+$$
+x (t) = \sum_ {i = 1} ^ {n} c _ {i} (t) + r _ {n} (t) \tag {4}
+$$
+
+Having obtained the IMFs, one applies the Hilbert transform to each IMF component,
+
+$$
+H \left[ c _ {i} (t) \right] = \frac {1}{\pi} \int_ {- \infty} ^ {\infty} \frac {c _ {i} (\tau)}{t - \tau} \mathrm {d} \tau \tag {5}
+$$
+
+After the Hilbert transform and together form a complex signal, and compute the instantaneous frequency and amplitude according to
+
+$$
+a _ {i} (t) = \sqrt {c _ {i} ^ {2} (t) + \left(H \left[ c _ {i} (t) \right]\right) ^ {2}}, \Phi_ {i} (t) = \arctan \frac {H \left[ c _ {i} (t) \right]}{c _ {i} (t)}, \omega_ {i} (t) = \frac {\mathrm {d} \Phi_ {i} (t)}{\mathrm {d} t} \tag {6}
+$$
+
+Finally, the original signal can be written as
+
+$$
+x (t) = \operatorname {R e} \sum_ {i = 1} ^ {n} a _ {i} (t) \exp (i \int \omega_ {i} (t) d t) \tag {7}
+$$
+
+Where the residue $r_n(t)$ has been left out, $\operatorname{Re}\{\cdot\}$ denotes the real part of a complex quantity. Equation(7) is designated as the Hilbert-Huang spectrum, $H(\omega, t)$ .
+
+# 3.3 Poincaré mapping[11]
+
+Poincaré mapping, in fact, is a dimension reduction method for chaotic characteristics analysis of nonlinear signals. Because a dynamic system with three dimensions or more exist very complex the phase space trajectory. At the same time, it is also hard to describe. So we can look for a plane in the transverse direction of the orbit to simplify the analysis, which is known as the Poincaré mapping.
+
+The detailed approach is shown as follows:
+
+Generally, a dynamic system can be expressed as a first-order nonlinear differential equations with $m$ dimension:
+
+$$
+x = F (x, \lambda) x = \left\{x _ {1}, x _ {2}, \dots , x _ {m} \right\} \tag {8}
+$$
+
+With the change of external control parameters, the orbits of these equations will be chaotic. The Poincaré mapping of the attractor can be expressed as follows:
+
+$$
+x (n + 1) = G (x (n), \lambda) \tag {9}
+$$
+
+$$
+x (n) = \left\{x _ {1} (n), x _ {2} (n), \dots , x _ {m - 1} (n) \right\} \tag {10}
+$$
+
+MATEC Web of Conferences 232, 01014 (2018)
+
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+4
+
+The equation expressed the trajectory and the section of the system in m- dimensional phase space and m-1 dimensional hyperplane, respectively. And the resulting points increasing with time can be expressed as $x(1)$ , $x(2)$ ,... and so on.
+
+If the phase space orbit of a dynamic system is a periodic or quasi-periodic, the Poincaré mapping is a finite point or a closed curve, if which is chaotic, the Poincaré mapping will fill an area of the hyperplane.
+
+Therefore, the Poincaré mapping is often as a criterion to distinguish the period, quasi-period and chaos when a dynamics system known. While some obviously chaotic characteristics are often shown in fault system.
+
+# 4. Comparative analysis
+
+In this part, we utilize Wavelet spectrum, Hilbert spectral analysis (HSA) and Poincaré mapping to process the practical measured nonlinear signals from test rotor system with healthy, rubbing and misalignment. The analysis results are shown in the figure 6-9, correspondingly.
+
+From the results of the three methods in figure6-8, we can analyze that by both HHT spectrum and the wavelet spectrum can show signal feature, given and represented the true frequency patterns of the signal. Moreover, HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis. So HHT spectrum is more suitable for mutation of nonlinear signal, while wavelet spectrum more suitable for Regularity and centered frequency.
+
+![](dt=2026-04-07/ht=16/b30aeacee3d2ff41a0694f82d3ebfaadd3c1502ab753b35042d7b53397afcab3.jpg)
+
+![](dt=2026-04-07/ht=16/e236854087cabeecf8fde099c6d3b88fe8de9a58bfa615d8be745d78e6ed7d98.jpg)
+
+![](dt=2026-04-07/ht=16/379dfd5bdafa5c64dc3991657400e02586b0b5cb51ac8ced1b8f4e8b179e297b.jpg)
+
+![](dt=2026-04-07/ht=16/2b91a1e7ab41913e25ee7b6c4808ca69b10a18dc36a636bd1065bd332cc88bf8.jpg)
+
+MATEC Web of Conferences 232, 01014 (2018)
+
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+5
+
+![](dt=2026-04-07/ht=16/c79ee338a5107027776785b8adfff7eb787ac64a7ebc8ac02c3c0d5e855a04e3.jpg)
+
+![](dt=2026-04-07/ht=16/c57dad1ed9b4cdf003b9614b9776cf089fee63cceb0555c1f5180ca7622b452f.jpg)
+
+![](dt=2026-04-07/ht=16/4575f0cad868ca4872b6bbe498d42703429535393c72f9b5c8afdc53591a9ef2.jpg)
+
+![](dt=2026-04-07/ht=16/95c74da9e1e3828181b963887f32ded8d5bc73fe29f12e5c98e4cb56bb395788.jpg)
+
+![](dt=2026-04-07/ht=16/129d3cd6f326e04617b4b42e8b2d617b9758c43113dbfab686be3304ecea5da0.jpg)
+
+From three kinds of nonlinear signal in the cases of Poincare section in figure 9 can easily determine a trend of the motion: (1) In healthy, the system state under periodic motion characteristics is significantly, and the Poincare section show the finite point set. (2) As rubbing fault occurs, the system showed a trend of chaotic motion. (3) In the case of misalignment of the system, the motion is more complex, and the Poincare cross section is shown as a region filled with hyperplane, and the chaotic characteristics of the system are significant. The signal characteristics can be known as the whole, but the details are not reflected.
+
+# 5. Conclusion
+
+In this paper, three common analysis methods for nonlinear signals, Wavelet spectrum, Hilbert spectral analysis (HSA) and Poincaré mapping are researched and analyzed by some typical nonlinear signals from the complex electromechanical model test system. The effectiveness and application scopes of these approaches are obtained. Poincaré mapping is suited to achieve the chaotic characteristics of system for identifying the system operating status. Wave spectrum analysis has a good effect to Concentrated on a particular band of system characteristics analysis. The Hilbert spectrum analysis has an excellent performance in the analysis mutation nonlinear signals.
+
+# References
+
+[1] K. Holger, S. Thomas, Nonlinear Time Series Analysis, Cambridge University Press, Camp, 1-20(1999).
+
+MATEC Web of Conferences 232, 01014 (2018)
+
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+6
+
+MATEC Web of Conferences 232, 01014 (2018)  
+EITCE 2018
+
+https://doi.org/10.1051/mateconf/201823201014
+
+7

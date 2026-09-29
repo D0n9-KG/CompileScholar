@@ -1,0 +1,55 @@
+# Introduction
+## Background on Re-ranking in Multi-stage Recommender Systems
+## The Accuracy-Fairness Trade-off in Ranking
+## Overview of the Elasticity Framework
+# Economic Analogy and Theoretical Foundation
+## The Commodity Tax Transfer Process
+### Item-Side Fairness as Supplier Tax
+### User-Side Accuracy as Consumer Cost
+## Definition of Utility in Re-ranking
+### User Utility and Satisfaction
+### Item Utility and Provider Exposure
+## Elasticity of Utility
+### Conceptual Definition
+### Distinction from Pareto Frontier Analysis
+### Mechanism vs. Observation
+# Methodology and Framework Components
+## Defining the Accuracy-Fairness Frontier
+### Optimization Across Preference Weights
+### Characterizing Optimal Points
+## Fairness-Aware Re-ranking (FAR) Algorithm
+### Iterative Generation of Ranking Lists
+### Balancing Ranking Quality and Provider Coverage
+### Personalized User Tolerance for Diversification
+## Alternative Optimization Approaches
+### Optimization over Fairness-Confusion Tensors
+### Multi-Objective Frameworks (e.g., Reject Option Classification)
+### Dynamic Rebalancing over Time Horizons
+# Factors Influencing Elasticity Magnitude
+## Structural Characteristics of the Model
+### Hypothesis Class and Rashomon Set
+### Model Sparsity and Complexity
+## Dataset and Distribution Dynamics
+### Covariate Shift and Temporal Drift
+### Fluctuating User Traffic
+## Complexity of Fairness Definitions
+### Group Fairness vs. Individual Fairness
+### Intersecting Protected Groups
+### Uni-dimensional vs. Multi-dimensional Constraints
+# Implications for System Design
+## Understanding Trade-off Sensitivity
+## Limitations of Static Trade-off Methods
+### Failure in Long-term Fairness and Short-term Accuracy
+### Impact of Low Traffic Scenarios
+## Role of Elasticity in Algorithmic Design
+### Theoretical Guidance vs. Dynamic Weight Adjustment
+### Post-hoc Evaluation vs. In-processing Optimization
+# Challenges and Limitations
+## Lack of Closed-Form Mathematical Formulations
+## Ambiguity in Utility Functional Forms
+## Generalizability Across Different Fairness Criteria
+## Computational and Practical Constraints
+# Conclusion
+## Future Research Directions
+### Deriving Precise Elasticity Coefficients
+### Integration into Neural Re-ranking Architectures

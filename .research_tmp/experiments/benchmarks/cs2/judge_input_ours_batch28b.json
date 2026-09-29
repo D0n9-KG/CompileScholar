@@ -1,0 +1,1290 @@
+[
+ {
+  "qid": "456d3c2c757f4b874abddb18",
+  "question": "What insights can be obtained about developer behavior from their GitHub commits and pull requests?",
+  "sections": [
+   {
+    "title": "Methodological Foundations and Data Sources",
+    "text": "To understand developer behavior, researchers have increasingly focused on leveraging useful content from diverse sources, including Git, CVS, archived communications, online forums, and Community Question Answer (CQA) sites [3]. Prior software engineering research has empirically explored GitHub functionality to influence developer behavior and software engineering practices [4]. Additionally, software engineering researchers have explored using GitHub processes to recommend specific developer behaviors [4]. Studying developer activities related to various development tasks from these various sources can guide the development of tools that help developers find desired information more easily [3]. In specific analyses such as Magnet and Sticky, both commit actions and pull requests are viewed as developmental activity [1]. However, data collection presents challenges; some commits in the GitHub dataset do not contain the logins of their developers, instead only having the name and email obtained from the developer's local Git settings [2]. To address this, surrogate logins are created for developers of commits without GitHub logins by concatenating their local Git names and emails [2]. Furthermore, because most accepted pull requests sent from fork repositories are absent in the histories of original repositories, developer information must be mined from both the original and fork repositories [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Therefore, we mine the developer information from both the original and fork repositories.",
+       "According to Kalliamvakou et al. [17], most of the accepted pull requests sent from fork repositories are absent in the histories of original repositories.",
+       "Both actions are viewed as developmental activity in our Magnet and Sticky analyses."
+      ],
+      "title": "magnet or sticky? measuring project characteristics from the perspective of developer attraction and retention",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "For the developers of commits without GitHub logits, we create surrogate logits by concatenating their local Git names and emails.",
+       "we have found that some commits of the GitHub data set do not contain logits of their developers, but instead only have the name and email obtained from the developer's local Git settings."
+      ],
+      "title": "expanding the number of reviewers in open-source projects by recommending appropriate developers",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Studying developer activities related to various development tasks from various sources can guide the development of tools that help developers to find the desired information more easily.",
+       "Therefore, researchers have recently focused on leveraging the useful content of these sources i.e., Git, CVS [21], archived communications online forums and CQA (Community Question Answer) sites [38], [12], [30], [16], [13], [19] to comprehend developers information needs."
+      ],
+      "title": "what do developers discuss about code comments?",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2108.07648",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Software engineering researchers have also explored using GitHub processes to recommend developer behaviors.",
+       "Additionally, prior software engineering research has empirically explored GitHub functionality."
+      ],
+      "title": "understanding the impact of github suggested changes on recommendations between developers",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Analytical Approaches and Validity Constraints",
+    "text": "Previous studies of pull request review acceptance have been carried out post factum, based either on developers describing their actions in interviews or as a statistical analysis of GitHub data [5]. While interviews provide qualitative insights, the validity of the results obtained through them might be threatened by faulty recollection, as well as by the difference between direct observation and self-report [5]. In contrast, statistical analysis of GitHub data allows for the identification of broader patterns. For instance, it is found that the success rate of pull requests for a project degrades comparatively with a large number of developers, such as more than 4,000, or a large number of forked projects, such as more than 3,000 [6]. These signals within pull requests serve as information cues that can indicate attributes such as technical quality, which may in turn change perceptions or bias judgments about a project or contributor [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "More formally, these signals are information cues that can indicate attributes such as technical quality [6], which may in turn change perceptions or bias judgments about a project or contributor.",
+       "Compared to the direct observation of the decision making, validity of the results obtained through interviews might be threatened by faulty recollection, as well as by the difference between",
+       "However, previous studies of pull review acceptance have been carried out post factum, based either on developers describing their actions in interviews [2], [4] or as a statistical analysis of GitHub data [3]."
+      ],
+      "title": "beyond the code itself: how programmers really look at pull requests",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "importantly, it finds out that success rate of pull requests for a project degrades comparatively with a large number developers (e.g., more than 4,000) or a large number of forked projects (e.g., more than 3,000).",
+       "While the extracted frequent technical topics and language or domain specific insights can help the developers with successful pull requests, project and developer specific insights can aid the GitHub project administrators with informed decision making in the management of pull requests, projects and developers involved."
+      ],
+      "title": "an insight into the pull requests of github",
+      "metadata": {
+       "year": 2014,
+       "doi": null,
+       "arxiv": "1807.01853",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Insights for Developers and Administrators",
+    "text": "The extracted frequent technical topics and language or domain-specific insights can help developers achieve successful pull requests [6]. Conversely, project and developer-specific insights can aid GitHub project administrators with informed decision-making in the management of pull requests, projects, and developers [6]. These insights allow for a more nuanced understanding of how individual contributions interact with project scale and community size. By analyzing these metrics, stakeholders can better understand the dynamics that influence the acceptance and success of contributions within large-scale open-source ecosystems.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "importantly, it finds out that success rate of pull requests for a project degrades comparatively with a large number developers (e.g., more than 4,000) or a large number of forked projects (e.g., more than 3,000).",
+       "While the extracted frequent technical topics and language or domain specific insights can help the developers with successful pull requests, project and developer specific insights can aid the GitHub project administrators with informed decision making in the management of pull requests, projects and developers involved."
+      ],
+      "title": "an insight into the pull requests of github",
+      "metadata": {
+       "year": 2014,
+       "doi": null,
+       "arxiv": "1807.01853",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Developer Perceptions of AI Tools",
+    "text": "Beyond traditional commit and pull request analysis, insights into developer behavior extend to their interactions with new tools. The results of research indicate that developers' opinions on GitHub Copilot are divided [7]. Most of the developers surveyed had met GitHub Copilot before attending the survey [7]. Concerns regarding the tool are primarily caused by security issues associated with its use [7]. This suggests that while adoption is widespread, trust and security remain significant factors influencing developer behavior and tool acceptance.",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "Concerns are caused by security issues associated with using of Github Copilot.",
+       "The results of the research indicate that developers' opinions are divided. Most of them met Github Copilot before attending the survey."
+      ],
+      "title": "Study of software developers' experience using the Github Copilot Tool in the software development process",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2301.04991",
+       "authors": [
+        "Mateusz Jaworski and Dariusz Piotrkowski"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 17,
+   "n_claims_usable": 17,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 508,
+   "n_sections": 4,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "7670af632f0932d5ed20c34e",
+  "question": "What interfaces have researchers developed for helping people optimize LLMs for a task, and what are the biggest remaining user problems?",
+  "sections": [
+   {
+    "title": "Automated Optimization and Prompt Engineering",
+    "text": "Researchers have developed various LLM-driven methods to automate the optimization of prompts, including OPRO, PromptAgent, EvoPrompt, RLPrompt, DSP, ProTeGi, PE2, and PREFER. Prompt engineering is defined as the process of crafting effective instructions to guide an LLM in generating desired outputs [2]. However, current prompt engineering techniques in SQL generation commonly fail to adapt well to changing data distributions or complex query requirements [3]. To mitigate issues such as hallucination, which conversational AI agents are prone to, the literature identifies prompt engineering and fine-tuning as the two most effective approaches [2]. Fine-tuning involves a structured seven-stage pipeline covering data preparation, model initialization, hyperparameter tuning, and deployment, utilizing parameter-efficient methods like LoRA and Half Fine-Tuning, though it faces challenges in managing imbalanced datasets. In specific domains, such as healthcare, emotion-aware LLMs (EA-LLMs) instructed by prompt engineering techniques are expected to emerge as communication channels between doctors and patients [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We expect a new intelligent system to emerge where EA-LLMs (instructed by prompt engineering techniques) act as communication channels between doctors and patients."
+      ],
+      "title": "accelerating the integration of chatgpt and other large‐scale ai models into biomedical research and healthcare",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Despite the benefits of conversational AI agents, they are prone towards hallucination.",
+       "The two most effective approaches proposed in the literature to mitigate the hallucination are: (1) PROMPT ENGINEERING and (2) FINE-TUNING [24, 35, 67].",
+       "Prompt engineering is the process of crafting effective instructions (or prompts) to guide the LLM in generating desired outputs."
+      ],
+      "title": "show me how: benefits and challenges of agent-augmented counterfactual explanations for non-expert users",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Current prompt engineering techniques in SQL generation commonly fail to adapt well to changing data distributions or complex query requirements."
+      ],
+      "title": "exploring the landscape of text-to-sql with large language models: progresses, challenges and opportunities",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "7.2 RQ4.2: What are potential future directions for advancing LLM-based text-to-SQL systems?",
+         "chunk_id": "sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#c27",
+         "char_start": 82295
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Direct Manipulation and Interactive Interfaces",
+    "text": "To address user difficulties in constructing effective prompts, iteratively refining AI-generated responses, and assessing response reliability in unfamiliar domains, the \"From Prompting to Partnering\" study designed a prototype featuring Reflective Prompting, Section Regeneration, Input-Output Mapping, and Confidence indicators. DirectGPT offers a direct manipulation interface on top of ChatGPT that transforms direct manipulation actions into engineered prompts, resulting in participants being 50% faster and relying on 50% fewer and 72% shorter prompts. In the context of text summarization, researchers have mapped the design space of human-AI interaction to develop digital tools that support people in writing summaries. Abscribe introduces AI Modifiers, which are buttons created from prompts, auto-labeled by an LLM, reusable across passages, and editable over time. This button-based approach contrasts with free-form conversational UIs, which lead users to adopt a polite and verbose style rather than direct actions. Interactive methods, such as those used in MISP and DialSQL, employ a mixed-initiative approach by asking follow-up questions to clarify user intent, helping to establish \"common ground\" between the user and the AI [4]. However, users can become frustrated if these conversations become repetitive or fail to address the core error [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "While effective for simple disambiguation, users can become frustrated if the conversation becomes repetitive or fails to address the core error [5].",
+       "Systems like MISP [16] and DialSQL [17] use a mixed-initiative approach, asking follow-up questions to clarify user intent (e.g., \"When you say 'sales,' do you mean 'sales amount' or 'number of sales'?\").",
+       "These interactive methods help establish \"common ground\" between the user and the AI"
+      ],
+      "title": "natural language interfaces for databases: what do users think?",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Assisted Debugging and Proactive Agents",
+    "text": "AutoCopilot generates concise textual responses and facilitates follow-up debugging questions, integrating LLM-based web search to provide up-to-date responses when existing documentation is insufficient [5]. A significant limitation of AutoCopilot is that it occasionally encounters incorrect full automation when it fails to identify a single automation function from multiple intents in a user's complex query [5]. Codellaborator functions as a proactive AI programming agent, where trade-offs exist between efficiency gains and workflow disruptions; the use of presence indicators and interaction context helps alleviate these disruptions. UniAutoML is a human-centered AutoML framework that uses LLMs to unify discriminative and generative AutoML, specifically addressing the lack of interpretability, user engagement, transparency, and user control found in traditional AutoML systems.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "To mirror real-world automation performance, AutoCopilot occasionally encounters incorrect full automation when it fails to identify a single automation function from the multiple intents in the user's query for performing complex tasks outlined in the study, or when it cannot accurately map multiple entities from the user's query to the appropriate automation function.",
+       "We integrated LLM-based web search for up-to-date follow-up responses when existing documentation fell short."
+      ],
+      "title": "do it for me vs. do it with me: investigating user perceptions of different paradigms of automation in copilots for feature-rich software",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Remaining User Problems and Design Challenges",
+    "text": "A major remaining problem is that relying on external resources like video tutorials, forums, and LLMs to navigate interfaces disrupts workflow, fails to provide contextually relevant help, and hinders self-directed learning [8]. A common mitigation strategy has been to provide simplified alternatives, such as dedicated beginner modes, separate novice-oriented applications, or AI-generated assistance [8]. Despite these efforts, it remains unclear how integrating the context of feature-rich applications helps novice end-users seek accurate and relevant assistance, as many of these interfaces are still at a nascent stage [7]. Furthermore, more insights are needed on where and how users struggle with LLMs to harness their full potential for software tasks [7]. From a design perspective, UX practitioners face challenges in working with \"AI as a design material,\" including the inherent complexity of the material itself [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Researchers have investigated the challenges for UX practitioners to work with \"AI as a design material,\" including the complexity of the material itself [39, 92, 102, 103]."
+      ],
+      "title": "designerly understanding: information needs for model transparency to support design ideation for ai-powered user experience",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2302.10395",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Furthermore, to harness the full potential of these LLM assistants for seeking help for their software tasks, we need more insights on where and how users struggle with these LLMs [31].",
+       "As many of these interfaces are still at a nascent stage, it is unclear how this current practice (i.e., integrating the context of these feature-rich applications) can help novice end-users in seeking accurate and relevant assistance from LLMs."
+      ],
+      "title": "why and when llm-based assistants can go wrong: investigating the effectiveness of prompt-based interactions for software help-seeking",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.08030",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "One common strategy has been to provide simplified alternatives, such as dedicated beginner modes [8], separate novice-oriented applications [9], or even AI-gene",
+       "This forces users to rely heavily on external resources, such as video tutorials, forums, and more recently, large language models (LLMs), to navigate the interfaces and learn the specific task-related tools, which may disrupt workflow and not always result in contextually relevant help, hindering self-directed learning and exploration [1], [5]–[7]."
+      ],
+      "title": "designing scaffolded interfaces for enhanced learning and performance in professional software",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 25,
+   "n_claims_usable": 25,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C25",
+     "sentence": "Fine-tuning involves a structured seven-stage pipeline covering data preparation, model initialization, hyperparameter tuning, and deployment, utilizing parameter-efficient methods like LoRA and Half "
+    },
+    {
+     "cid": "C1",
+     "sentence": "Researchers have developed various LLM-driven methods to automate the optimization of prompts, including OPRO, PromptAgent, EvoPrompt, RLPrompt, DSP, ProTeGi, PE2, and PREFER ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "This button-based approach contrasts with free-form conversational UIs, which lead users to adopt a polite and verbose style rather than direct actions ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "Abscribe introduces AI Modifiers, which are buttons created from prompts, auto-labeled by an LLM, reusable across passages, and editable over time ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "In the context of text summarization, researchers have mapped the design space of human-AI interaction to develop digital tools that support people in writing summaries ."
+    },
+    {
+     "cid": "C22",
+     "sentence": "DirectGPT offers a direct manipulation interface on top of ChatGPT that transforms direct manipulation actions into engineered prompts, resulting in participants being 50% faster and relying on 50% fe"
+    },
+    {
+     "cid": "C23",
+     "sentence": "To address user difficulties in constructing effective prompts, iteratively refining AI-generated responses, and assessing response reliability in unfamiliar domains, the \"From Prompting to Partnering"
+    },
+    {
+     "cid": "C21",
+     "sentence": "UniAutoML is a human-centered AutoML framework that uses LLMs to unify discriminative and generative AutoML, specifically addressing the lack of interpretability, user engagement, transparency, and us"
+    },
+    {
+     "cid": "C24",
+     "sentence": "Codellaborator functions as a proactive AI programming agent, where trade-offs exist between efficiency gains and workflow disruptions; the use of presence indicators and interaction context helps all"
+    }
+   ],
+   "word_count": 589,
+   "n_sections": 4,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[3]"
+   ]
+  }
+ },
+ {
+  "qid": "5acd0e1d36af3c52c3159b4b",
+  "question": "What interfaces have researchers developed to help people perform behavioral evaluation of ML models, and how do they accelerate annotation efforts?",
+  "sections": [
+   {
+    "title": "Defining Behavioral Evaluation",
+    "text": "Behavioral evaluation extends beyond aggregate metrics like accuracy or F1 score to examine model output patterns across input subgroups or slices [1]. This approach focuses on defining and testing the capabilities of an ML system against a specification of expected behaviors [1]. The method is closely related to subgroup or slice-based analysis, which calculates metrics on specific subsets of a dataset. For instance, facial classification models have been shown to perform significantly worse for darker-skinned women compared to lighter-skinned individuals, highlighting the need for such granular analysis [1]. However, many existing behavioral evaluation tools, including fairness toolkits, often fail to support the specific types of models, data, and behaviors that practitioners encounter in real-world scenarios [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Furthermore, many behavioral evaluation tools, such as fairness toolkits, often do not support the types of models, data, and behaviors that practitioners work with in the real world [17].",
+       "Buolamwini and Gebru [6] compared the performance of facial classification models across different demographic groups and found that the models performed significantly worse for darker-skinned women compared to lighter-skinned men.",
+       "behavioral evaluation focuses on defining and testing the capabilities of an ML system, its expected behavior on a specification of requirements",
+       "It requires going beyond measuring aggregate metrics, such as accuracy or F1 score, and understanding patterns of model output for subgroups, or slices, of input data.",
+       "They mentioned that technical terms such as \"metadata\" may be too niche for everyday users and could be renamed.",
+       "Since the participant often tests their model with their own inputs, they wished for a direct way to add new instances to ZENO. They also mentioned having more interactive transformations, for example, having a slider to gradually apply a transformation such as reducing the amplitude of an audio file.",
+       "we explored the challenges of ML evaluation and designed a general-purpose tool for evaluating models across behaviors.\n\nTo identify specific challenges for ML evaluation, we conducted formative interviews with 18 ML practitioners. From the interview results we derived four main design goals for an evaluation system, including supporting comparison over time and no-code analysis. We used these goa",
+       "rera et al.\n\n![](dt=2026-06-04/ht=19/7f88f41a5602357bb0b9d0f338fba855c0a662476d77d0a06ca14510e680254a.jpg)\n\nestimation. To reduce the learning curve and encourage the reuse of analyses, users should be able to use one framework to perform behavioral evaluations on most ML tasks.\n\n# 5 ZENO: AN INTERACTIVE EVALUATION FRAMEWORK\n\nWe used these goals to design and implement ZENO, a general-purpose fram"
+      ],
+      "title": "Zeno: An Interactive Framework for Behavioral Evaluation of Machine Learning",
+      "metadata": {
+       "year": 2023,
+       "doi": "10.1145/3544548.3581268",
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 INTRODUCTION",
+         "chunk_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning#c5",
+         "char_start": 3632
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Zeno: A General-Purpose Framework",
+    "text": "To address the limitations of existing tools, Zeno was designed to reduce the learning curve and encourage the reuse of analyses by allowing users to perform behavioral evaluations on most ML tasks within a single framework [1]. The design of Zeno was informed by formative interviews with 18 ML practitioners, from which four main design goals were derived, including the support for comparison over time and no-code analysis [1]. Zeno builds upon prior work in visual analytics and testing. For example, FairVis is a visual analytics system that allows users to compare subs, while Errudite is a similar system for NLP models that enables users to create specific tests. Additionally, Zeno incorporates concepts from software engineering, such as metamorphic testing, which involves perturbing inputs to check for consistent outputs. Checklist is a metamorphic testing tool for NLP models that perturbs text to evaluate robustness. User feedback on Zeno indicated a desire for a direct way to add new instances and more interactive transformations, such as a slider to reduce amplitude, to facilitate testing with custom inputs [1]. Participants also suggested automatically generating ZENO API functions and configuration files for common ML libraries to streamline integration. To make the tool more accessible, technical terms such as 'metadata' were identified as potentially too niche for everyday users and could be renamed [1]. Future work suggests that longer-term, in-situ studies would provide more nuanced feedback regarding the utility of ZENO's model comparison features.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Furthermore, many behavioral evaluation tools, such as fairness toolkits, often do not support the types of models, data, and behaviors that practitioners work with in the real world [17].",
+       "Buolamwini and Gebru [6] compared the performance of facial classification models across different demographic groups and found that the models performed significantly worse for darker-skinned women compared to lighter-skinned men.",
+       "behavioral evaluation focuses on defining and testing the capabilities of an ML system, its expected behavior on a specification of requirements",
+       "It requires going beyond measuring aggregate metrics, such as accuracy or F1 score, and understanding patterns of model output for subgroups, or slices, of input data.",
+       "They mentioned that technical terms such as \"metadata\" may be too niche for everyday users and could be renamed.",
+       "Since the participant often tests their model with their own inputs, they wished for a direct way to add new instances to ZENO. They also mentioned having more interactive transformations, for example, having a slider to gradually apply a transformation such as reducing the amplitude of an audio file.",
+       "we explored the challenges of ML evaluation and designed a general-purpose tool for evaluating models across behaviors.\n\nTo identify specific challenges for ML evaluation, we conducted formative interviews with 18 ML practitioners. From the interview results we derived four main design goals for an evaluation system, including supporting comparison over time and no-code analysis. We used these goa",
+       "rera et al.\n\n![](dt=2026-06-04/ht=19/7f88f41a5602357bb0b9d0f338fba855c0a662476d77d0a06ca14510e680254a.jpg)\n\nestimation. To reduce the learning curve and encourage the reuse of analyses, users should be able to use one framework to perform behavioral evaluations on most ML tasks.\n\n# 5 ZENO: AN INTERACTIVE EVALUATION FRAMEWORK\n\nWe used these goals to design and implement ZENO, a general-purpose fram"
+      ],
+      "title": "Zeno: An Interactive Framework for Behavioral Evaluation of Machine Learning",
+      "metadata": {
+       "year": 2023,
+       "doi": "10.1145/3544548.3581268",
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 INTRODUCTION",
+         "chunk_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning#c5",
+         "char_start": 3632
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Accelerating Annotation with Pretrained Models",
+    "text": "Several interfaces have been developed to accelerate annotation efforts by leveraging computational assistance. The sciverse_docspiral system leverages pretrained models for initial annotation, which significantly reduces the manual labeling workload compared to existing tools like COCO Annotator [3]. The data generated through this process is then used to train or fine-tune Progressive Models that better meet user requirements [3]. Similarly, TissueWand is a rapid histopathology annotation tool intended for the early stages of dataset curation, where no task-specific ML model yet exists to aid the effort [2][2]. This tool shows promise in replacing manual methods during these initial phases [2]. Another approach involves a CT-scan annotation tool for semantic segmentation that assists radiologists in labeling CT scans; this tool was evaluated by 6 radiologists. Cooperative Machine Learning (CML) techniques also aim to reduce manual labelling efforts by combining the power of computational capabilities and human intelligence.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Conclusions: The TissueWand tool shows promise to replace manual methods for early stages of dataset curation where no task-specific ML model yet exists to aid the effort."
+      ],
+      "title": "tissuewand, a rapid histopathology annotation tool",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The annotated data are then used to train or fine-tune to obtain Progressive Models that better meet user requirements.",
+       "Unlike existing tools such as COCO Annotator (Brooks, 2019), our system leverages pretrained models for initial annotation, significantly reducing the manual labeling workload."
+      ],
+      "title": "docspiral: a platform for integrated assistive document annotation through human-in-the-spiral",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Interactive and Adaptive Interfaces",
+    "text": "Beyond static annotation, various interfaces empower users to interact dynamically with ML systems. The Uncertainty-Performance Interface (UPI) couples confidence scores with outcome heat-maps, allowing decision makers to dynamically adjust their thresholds. Research by Bansal et al. indicates that users build more accurate mental models when an AI system discloses its own error likelihood. In the domain of learning from demonstrations (LfD), embedding the process within a configurable user interface empowers users to create customized primitives that the system can execute autonomously, enabling the automation of frequently repeated task sections [6]. Furthermore, some tools allow users to use an API to deliver input and extract output in addition to using a web-based interface, providing flexibility in interaction [5]. In the context of active learning, the annotation process can be accelerated by using Novel Activity Detectors that diversify the labels in the training set by issuing informed annotation requests, even when the classifier suffers from initial overconfidence [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "The annotation process was accelerated with two Novel Activity Detectors that diversified the labels in the training set by issuing informed annotation requests even when classifier suffers from initial overconfidence."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "In addition to using the web based interface for interacting with the tool, it is possible to use an API, both to deliver input, and to extract output."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Embedding LfD within a configurable user interface empowers the user to create customized primitives that the system can execute autonomously, enabling the automation of frequently repeated sections of the task."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Human Judgment and Trust",
+    "text": "Effective evaluation interfaces also account for human perception and trust. According to a HAI survey, domain experts and end-users judge outputs by supplying both task scores and subjective signals of trust, fairness, and usability. These subjective signals are critical for understanding the broader impact of ML systems beyond quantitative metrics.",
+    "citations": []
+   }
+  ],
+  "diag": {
+   "n_claims_input": 27,
+   "n_claims_usable": 27,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C3",
+     "sentence": "The method is closely related to subgroup or slice-based analysis, which calculates metrics on specific subsets of a dataset ."
+    },
+    {
+     "cid": "C13",
+     "sentence": "Future work suggests that longer-term, in-situ studies would provide more nuanced feedback regarding the utility of ZENO's model comparison features ."
+    },
+    {
+     "cid": "C11",
+     "sentence": "Participants also suggested automatically generating ZENO API functions and configuration files for common ML libraries to streamline integration ."
+    },
+    {
+     "cid": "C7",
+     "sentence": "Checklist is a metamorphic testing tool for NLP models that perturbs text to evaluate robustness ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "Additionally, Zeno incorporates concepts from software engineering, such as metamorphic testing, which involves perturbing inputs to check for consistent outputs ."
+    },
+    {
+     "cid": "C5",
+     "sentence": "For example, FairVis is a visual analytics system that allows users to compare subs, while Errudite is a similar system for NLP models that enables users to create specific tests [C4]."
+    },
+    {
+     "cid": "C4",
+     "sentence": "For example, FairVis is a visual analytics system that allows users to compare subs, while Errudite is a similar system for NLP models that enables users to create specific tests ."
+    },
+    {
+     "cid": "C26",
+     "sentence": "Cooperative Machine Learning (CML) techniques also aim to reduce manual labelling efforts by combining the power of computational capabilities and human intelligence ."
+    },
+    {
+     "cid": "C27",
+     "sentence": "Another approach involves a CT-scan annotation tool for semantic segmentation that assists radiologists in labeling CT scans; this tool was evaluated by 6 radiologists ."
+    },
+    {
+     "cid": "C20",
+     "sentence": "indicates that users build more accurate mental models when an AI system discloses its own error likelihood ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "The Uncertainty-Performance Interface (UPI) couples confidence scores with outcome heat-maps, allowing decision makers to dynamically adjust their thresholds ."
+    },
+    {
+     "cid": "C23",
+     "sentence": "According to a HAI survey, domain experts and end-users judge outputs by supplying both task scores and subjective signals of trust, fairness, and usability ."
+    }
+   ],
+   "word_count": 707,
+   "n_sections": 5,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "ef77a4f716eda4a6c980c9d7",
+  "question": "What is a good Ontology semantic similarity measure that considers multiple inheritance cases of concepts?",
+  "sections": [
+   {
+    "title": "Addressing Multiple Inheritance in Ontologies",
+    "text": "A significant challenge in computing semantic similarity within ontological structures is the accurate handling of concepts that possess multiple inheritance paths. Traditional measures often fail to capture the nuanced relationships inherent in such complex hierarchies. To address this limitation, a 2015 study introduced a novel similarity measure specifically designed to account for multiple inheritance in ontologies [2]. This approach aims to provide a more precise assessment of the relationship between concepts by integrating the structural complexity of the ontology into the calculation [2]. Furthermore, a subsequent 2018 paper proposed an improved synthetic weighted algorithm for ontology-based semantic similarity computation, which also targets these structural complexities [1]. The results from this 2018 algorithm indicate that it can effectively solve the problem of multiple inheritance, thereby enhancing the overall accuracy of the similarity computation [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results of semantic similarity computation based on ontology have higher accuracy and can solve the problem of multiple inheritance and the asymmetry of concepts.",
+       "improved synthetic weighted algorithm of ontology-based semantic similarity computation"
+      ],
+      "title": "improved synthetic weighted algorithm of ontology-based semantic similarity computation",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Then, we propose a new measure considering the multiple inheritance in ontologies and the common specificity feature of the evaluated concepts in order to obtain a more accurate similarity between concepts.",
+       "We compare the correlation obtained by our measure with human scores against other measures.",
+       "Finally, we evaluate the proposed measure using two datasets of biomedical term pairs scored for similarity by human experts and exploiting SNOMED CT as the input ontology."
+      ],
+      "title": "an ontology-based semantic similarity measure considering multi-inheritance in biomedicine",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Incorporating Concept Specificity and Asymmetry",
+    "text": "Beyond merely tracing inheritance paths, effective similarity measures must also consider the inherent properties of the concepts being evaluated. The 2015 measure explicitly incorporates the common specificity feature of the evaluated concepts to achieve a more accurate similarity score [2]. By factoring in specificity, the measure can better distinguish between general and specific terms, leading to a more granular understanding of their semantic relationship [2]. Additionally, the 2018 improved synthetic weighted algorithm addresses the issue of concept asymmetry, a common problem where the similarity score between two concepts may not be symmetric depending on the direction of comparison [1]. By resolving both the multiple inheritance and asymmetry issues, the 2018 method achieves higher accuracy in its semantic similarity computations compared to previous approaches [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results of semantic similarity computation based on ontology have higher accuracy and can solve the problem of multiple inheritance and the asymmetry of concepts.",
+       "improved synthetic weighted algorithm of ontology-based semantic similarity computation"
+      ],
+      "title": "improved synthetic weighted algorithm of ontology-based semantic similarity computation",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Then, we propose a new measure considering the multiple inheritance in ontologies and the common specificity feature of the evaluated concepts in order to obtain a more accurate similarity between concepts.",
+       "We compare the correlation obtained by our measure with human scores against other measures.",
+       "Finally, we evaluate the proposed measure using two datasets of biomedical term pairs scored for similarity by human experts and exploiting SNOMED CT as the input ontology."
+      ],
+      "title": "an ontology-based semantic similarity measure considering multi-inheritance in biomedicine",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluation Methodology and Datasets",
+    "text": "The validity of these proposed measures is established through rigorous evaluation against human expert judgments. The 2015 measure was tested using two distinct datasets consisting of biomedical term pairs that had been scored for similarity by human experts [2]. For these evaluations, the SNOMED CT ontology was utilized as the input ontology, providing a rich and complex domain structure for testing the measure's capabilities [2]. The primary metric for assessment was the correlation between the similarity scores generated by the proposed measure and the human expert scores [2]. This correlation analysis allowed the researchers to quantify how well the automated measure aligned with human perception of semantic similarity [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Then, we propose a new measure considering the multiple inheritance in ontologies and the common specificity feature of the evaluated concepts in order to obtain a more accurate similarity between concepts.",
+       "We compare the correlation obtained by our measure with human scores against other measures.",
+       "Finally, we evaluate the proposed measure using two datasets of biomedical term pairs scored for similarity by human experts and exploiting SNOMED CT as the input ontology."
+      ],
+      "title": "an ontology-based semantic similarity measure considering multi-inheritance in biomedicine",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Comparative Performance and Accuracy",
+    "text": "To determine the relative effectiveness of the new measures, they were compared against other existing similarity measures. The 2015 study specifically compared the correlation obtained by its proposed measure with human scores against those of other established measures [2]. This comparative analysis highlights the improvements offered by the new approach in capturing human-like similarity judgments [2]. Similarly, the 2018 paper reports that its improved synthetic weighted algorithm yields results with higher accuracy [1]. This increased accuracy is attributed to the algorithm's ability to handle the specific challenges of multiple inheritance and concept asymmetry [1]. Together, these findings suggest that incorporating structural and specific features of concepts leads to more robust and accurate semantic similarity measures.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results of semantic similarity computation based on ontology have higher accuracy and can solve the problem of multiple inheritance and the asymmetry of concepts.",
+       "improved synthetic weighted algorithm of ontology-based semantic similarity computation"
+      ],
+      "title": "improved synthetic weighted algorithm of ontology-based semantic similarity computation",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Then, we propose a new measure considering the multiple inheritance in ontologies and the common specificity feature of the evaluated concepts in order to obtain a more accurate similarity between concepts.",
+       "We compare the correlation obtained by our measure with human scores against other measures.",
+       "Finally, we evaluate the proposed measure using two datasets of biomedical term pairs scored for similarity by human experts and exploiting SNOMED CT as the input ontology."
+      ],
+      "title": "an ontology-based semantic similarity measure considering multi-inheritance in biomedicine",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 5,
+   "n_claims_usable": 5,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 481,
+   "n_sections": 4,
+   "n_citations": 2,
+   "record_level": 2,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "5e6e212dc63d2064ba909a08",
+  "question": "What is the difference between FMRI datasets and MRI datasets in terms of data analysis?",
+  "sections": [
+   {
+    "title": "Fundamental Data Structure and Acquisition",
+    "text": "The primary distinction between fMRI and MRI datasets lies in their dimensional structure and the physiological phenomena they capture. MRI is defined as anatomical imaging that provides high resolution, typically achieving in-plane resolutions of less than 1mm. In contrast, an fMRI dataset is conceptualized as a collection of a large number of data samples situated in a Euclidean space [3]. Structurally, an fMRI dataset can be viewed as a set of cuboid elements, known as voxels, which may have variable dimensions [2]. Each of these voxels is associated with a time-series that contains as many time-points as there are volumes acquired per session [2]. This temporal dimensionality allows fMRI data to capture states related to blood flow, which is considered a superiority over standard MRI data [1]. While MRI focuses on static anatomical structures, fMRI requires the acquisition of multiple volumes over time to construct these time-series, fundamentally altering the data's shape from a static 3D volume to a dynamic 4D structure.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The fMRI data has the superiority over MRI due to blood flow capturing states.",
+       "however, fMRI datasets need very detailed designed experiment to be conducted to learn the brain.",
+       "functional magnetic resonance imaging abbreviated as fMRI data from Haxby dataset [3]."
+      ],
+      "title": "comparison of machine learning classifiers for dimensionally reduced fmri data using random projection and principal component analysis",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "An fMRI dataset, can be seen as a set of cuboid elements (i.e., voxels) of variable dimension, each of which has an associated time-series of as many time-points as volumes acquired per session.",
+       "The first step in fMRI data analysis is to apply a series of \"pre-processing\" transformations with the aim of correcting for several potential artifacts introduced at data acquisition.",
+       "The aim of a (conventional) statistical analysis is to determine which voxels have a time-course that correlates with some known pattern of stimulation or experimental manipulation."
+      ],
+      "title": "statistical analysis of fmri time-series: a critical review of the glm approach",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "An fMRI dataset is a collection of large number of data sample in a Euclidean space, which can be expressed as",
+       "analysis of fmri signals from working memory tasks and resting-state of brain: neutrosophic-entropy-based clustering algorithm",
+       "The analysis of functional magnetic resonance imaging (fMRI) signals has an important role in determining brain activation patterns."
+      ],
+      "title": "analysis of fmri signals from working memory tasks and resting-state of brain: neutrosophic-entropy-based clustering algorithm",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Experimental Design and Pre-processing Requirements",
+    "text": "The analysis of fMRI data is heavily dependent on the experimental design used during acquisition. Unlike standard MRI, fMRI datasets require very detailed designed experiments to be conducted in order to effectively learn about the brain [1]. The first step in fMRI data analysis involves applying a series of pre-processing transformations aimed at correcting for several potential artifacts introduced during data acquisition [2]. These artifacts are a direct consequence of the dynamic nature of the scanning process. In contrast, while MRI images also require processing, the specific need for correcting temporal artifacts and aligning time-series data is unique to the functional modality. The requirement for detailed experimental design means that fMRI data is not merely a snapshot of anatomy but a record of physiological responses to specific stimuli or manipulations, necessitating rigorous pre-processing to ensure the integrity of the time-course data before any statistical analysis can begin.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "An fMRI dataset, can be seen as a set of cuboid elements (i.e., voxels) of variable dimension, each of which has an associated time-series of as many time-points as volumes acquired per session.",
+       "The first step in fMRI data analysis is to apply a series of \"pre-processing\" transformations with the aim of correcting for several potential artifacts introduced at data acquisition.",
+       "The aim of a (conventional) statistical analysis is to determine which voxels have a time-course that correlates with some known pattern of stimulation or experimental manipulation."
+      ],
+      "title": "statistical analysis of fmri time-series: a critical review of the glm approach",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "The fMRI data has the superiority over MRI due to blood flow capturing states.",
+       "however, fMRI datasets need very detailed designed experiment to be conducted to learn the brain.",
+       "functional magnetic resonance imaging abbreviated as fMRI data from Haxby dataset [3]."
+      ],
+      "title": "comparison of machine learning classifiers for dimensionally reduced fmri data using random projection and principal component analysis",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Statistical Analysis and Dimensionality Challenges",
+    "text": "Conventional statistical analysis of fMRI data aims to determine which specific voxels have a time-course that correlates with a known pattern of stimulation or experimental manipulation [2]. This approach treats the data from one scanning session, comprising t volumes, as a single observation [4]. However, this creates a high-dimensional, low-sample setting, which necessitates the inclusion of restrictions in conventional fMRI analysis approaches to prevent overfitting. To address this, regularization techniques are employed; for instance, L1 and L2 regularization approaches have shown visible improvements over nonconvex alternatives. A new 4D approach to fMRI data analysis has also been presented to handle these complex data structures [4]. The analysis of fMRI signals plays an important role in determining brain activation patterns [3]. For example, the analysis of task-fMRI data during working memory tasks has shown apparent differences in activation. Furthermore, neutrosophic-entropy-based clustering algorithms have been proposed for the analysis of fMRI signals from both working memory tasks and resting-state brain conditions [3]. These methods are critical for extracting meaningful physiological insights from the high-dimensional data.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "An fMRI dataset is a collection of large number of data sample in a Euclidean space, which can be expressed as",
+       "analysis of fmri signals from working memory tasks and resting-state of brain: neutrosophic-entropy-based clustering algorithm",
+       "The analysis of functional magnetic resonance imaging (fMRI) signals has an important role in determining brain activation patterns."
+      ],
+      "title": "analysis of fmri signals from working memory tasks and resting-state of brain: neutrosophic-entropy-based clustering algorithm",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "This paper presents a new approach to functional magnetic resonance imaging (FMRI) data analysis.",
+       "Here we treat the data from one scanning session (comprising $t$ volumes, say) as one observation."
+      ],
+      "title": "a 4d approach to the analysis of functional brain images: application to fmri data",
+      "metadata": {
+       "year": 2001,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "An fMRI dataset, can be seen as a set of cuboid elements (i.e., voxels) of variable dimension, each of which has an associated time-series of as many time-points as volumes acquired per session.",
+       "The first step in fMRI data analysis is to apply a series of \"pre-processing\" transformations with the aim of correcting for several potential artifacts introduced at data acquisition.",
+       "The aim of a (conventional) statistical analysis is to determine which voxels have a time-course that correlates with some known pattern of stimulation or experimental manipulation."
+      ],
+      "title": "statistical analysis of fmri time-series: a critical review of the glm approach",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Machine Learning and Representation Learning",
+    "text": "Machine learning techniques are increasingly applied to fMRI data to uncover complex patterns. A study comparing machine learning classifiers utilized fMRI data from the Haxby dataset [1]. In the domain of natural language processing and brain decoding, fMRI data from word observation tasks has been connected with shallow embeddings such as GloVe and Word2Vec. This integration allows for the mapping of linguistic features to neural activity. The use of specific datasets like the Haxby dataset highlights the importance of standardized benchmarks in evaluating the performance of these classifiers. The ability to link fMRI time-series with external representations, such as word embeddings, demonstrates the versatility of fMRI data in bridging cognitive science and computational modeling. These approaches move beyond simple correlation with stimulation patterns to more complex representations of brain function.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The fMRI data has the superiority over MRI due to blood flow capturing states.",
+       "however, fMRI datasets need very detailed designed experiment to be conducted to learn the brain.",
+       "functional magnetic resonance imaging abbreviated as fMRI data from Haxby dataset [3]."
+      ],
+      "title": "comparison of machine learning classifiers for dimensionally reduced fmri data using random projection and principal component analysis",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "MRI-Specific Analysis: Style Transfer and Reconstruction",
+    "text": "In contrast to the time-series focus of fMRI, MRI analysis often deals with spatial consistency and reconstruction. A novel medical image style transfer method called StyleMapper has been introduced to transfer medical scans to an unseen style using limited training data [5]. This method is particularly effective for MRI, as it allows for the alignment of medical images taken with different scanners into a single unified style dataset [5]. This alignment is crucial for training downstream tasks such as classification and detection [5]. Experimental results on breast magnetic resonance images have indicated the effectiveness of this style transfer method [5]. Additionally, SwinMR, a Swin transformer-based model, has been developed for fast MRI reconstruction. These techniques address the variability in MRI data arising from different hardware and acquisition protocols, ensuring that anatomical features are consistent across datasets. This is distinct from fMRI analysis, which prioritizes the temporal dynamics of blood flow over the spatial consistency of anatomical structures.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Experimental results on breast magnetic resonance images indicate the effectiveness of our method for style transfer.",
+       "Our style transfer method allows for the alignment of medical images taken with different scanners into a single unified style dataset, allowing for the training of other downstream tasks on such a dataset for tasks such as classification, object detection and others.",
+       "In this work we introduce a novel medical image style transfer method, StyleMapper, that can transfer medical scans to an unseen style with access to limited training data."
+      ],
+      "title": "Deep Learning for Breast MRI Style Transfer with Limited Training Data",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2301.02069",
+       "authors": [
+        "Shixing Cao",
+        "Nicholas Konz",
+        "James Duncan and Maciej A. Mazurowski"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Clinical Applications and Multi-Modal Integration",
+    "text": "Spatial prediction plays a critical role in automatic medical diagnosis from MRI imagery, including monitoring infectious disease, mapping disease risk, and detecting disease outbreaks [8]. Medical image databases often include images from various sources such as CT, X-ray, MRI, and PET, covering different body parts like the brain, lung, and abdomen [7]. In clinical settings, segmentation labels derived from MRI scans serve as ground truth for evaluating diagnostic algorithms. Multi-modal approaches are also common; for instance, an attention-like mechanism has been illustrated where multi-modal MRI at the reference time point is multiplied with subtraction images, which act as the attention gate [6]. The APIS dataset, designed as a paired CT-MRI dataset for ischemic stroke, exemplifies the integration of different imaging modalities. In such clinical studies, a high percentage of patients, specifically 98.8%, had additional MRI modalities such as T1 provided, along with DWI images, B0, and ADC maps. This multi-modal richness is a key feature of clinical MRI datasets, whereas fMRI datasets are typically focused on the temporal evolution of a single functional signal.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Sepahvand et al. [ 70 ] illustrate an attention-like mechanism. They multiply the multi-modal MRI at the reference (in contrast to follow-up) with subtraction images, which acts as the attention gate. Then the product is concatenated with the lesion map at the reference to feed the network."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Multi-timepoints.",
+         "chunk_id": "arxiv_2012.08317#c16",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Images from different sources (such as CT, X-ray, MRI, and PET) and different body parts (such as the brain, lung, and abdomen) are uploaded in this database."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "3.3 General Datasets",
+         "chunk_id": "arxiv_2012.15442#c23",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Spatial prediction plays a critical role in automatic medical diagnosis from MRI imagery, monitoring infectious disease and mapping disease risk [ 19 ] , detecting disease outbreak, analyzing environmental factors that cause diseases [ 20 ] , understanding drug epidemics [ 21 ] , as well as providing early alert for individuals on environmental triggers of asthma."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I-A Societal Applications",
+         "chunk_id": "arxiv_2012.13384#c3",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 26,
+   "n_claims_usable": 26,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C15",
+     "sentence": "MRI is defined as anatomical imaging that provides high resolution, typically achieving in-plane resolutions of less than 1mm ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "For example, the analysis of task-fMRI data during working memory tasks has shown apparent differences in activation ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "To address this, regularization techniques are employed; for instance, L1 and L2 regularization approaches have shown visible improvements over nonconvex alternatives ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "However, this creates a high-dimensional, low-sample setting, which necessitates the inclusion of restrictions in conventional fMRI analysis approaches to prevent overfitting ."
+    },
+    {
+     "cid": "C20",
+     "sentence": "In the domain of natural language processing and brain decoding, fMRI data from word observation tasks has been connected with shallow embeddings such as GloVe and Word2Vec ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "Additionally, SwinMR, a Swin transformer-based model, has been developed for fast MRI reconstruction ."
+    },
+    {
+     "cid": "C26",
+     "sentence": "8%, had additional MRI modalities such as T1 provided, along with DWI images, B0, and ADC maps ."
+    },
+    {
+     "cid": "C25",
+     "sentence": "The APIS dataset, designed as a paired CT-MRI dataset for ischemic stroke, exemplifies the integration of different imaging modalities ."
+    },
+    {
+     "cid": "C24",
+     "sentence": "In clinical settings, segmentation labels derived from MRI scans serve as ground truth for evaluating diagnostic algorithms ."
+    }
+   ],
+   "word_count": 943,
+   "n_sections": 6,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

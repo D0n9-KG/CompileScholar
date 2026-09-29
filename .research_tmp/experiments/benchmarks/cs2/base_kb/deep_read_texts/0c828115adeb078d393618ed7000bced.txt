@@ -1,0 +1,1165 @@
+Article
+
+# Selection of the Optimal Number of Topics for LDA Topic Model—Taking Patent Policy Analysis as an Example
+
+Jingxian Gan and Yong Qi *
+
+School of Intellectual Property, Nanjing University of Science and Technology, Nanjing 210094, China; ganjx@njust.edu.cn
+
+* Correspondence: qyong@njust.edu.cn
+
+Abstract: This study constructs a comprehensive index to effectively judge the optimal number of topics in the LDA topic model. Based on the requirements for selecting the number of topics, a comprehensive judgment index of perplexity, isolation, stability, and coincidence is constructed to select the number of topics. This method provides four advantages to selecting the optimal number of topics: (1) good predictive ability, (2) high isolation between topics, (3) no duplicate topics, and (4) repeatability.
+
+First, we use three general datasets to compare our proposed method with existing methods, and the results show that the optimal topic number selection method has better selection results. Then, we collected the patent policies of various provinces and cities in China (excluding Hong Kong, Macao, and Taiwan) as datasets. By using the optimal topic number selection method proposed in this study, we can classify patent policies well.
+
+Keywords: LDA; topic model; optimal number of topics; patent policy
+
+![](dt=2026-06-05/ht=13/e4144fb15d4f35e242d96b23a0c62bcd9fee7cdc51f933c6432644ba81268c7d.jpg)
+
+check for updates
+
+Citation: Gan, J.; Qi, Y. Selection of the Optimal Number of Topics for LDA Topic Model—Taking Patent Policy Analysis as an Example. Entropy 2021, 23, 1301. https://doi.org/10.3390/e23101301
+
+Academic Editor: Jaesung Lee
+
+Received: 21 July 2021
+
+Accepted: 30 September 2021
+
+Published: 3 October 2021
+
+Publisher's Note: MDPI stays neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+
+![](dt=2026-06-05/ht=13/b4e114a4596b1783d383c0b816835d66f5f090b90349c232ae2972a9ec749c5c.jpg)
+
+Copyright: © 2021 by the authors. Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (https://creativecommons.org/licenses/by/4.0/).
+
+# 1. Introduction
+
+From a text mining perspective, topics in a text corpus can be viewed as probability distributions of terms present in the corpus or clusters that define weights for those terms [1,2]. The LDA model (Latent Dirichlet Allocation) uses a probability distribution model to generate topics [3,4]. The principle is that a document is assumed to be generated from multiple topics according to a certain random probability distribution, and each topic is composed of words according to a random probability distribution.
+
+Thus, a document contains a collection of topics with different probabilities, and a topic contains a collection of words with different probabilities. Another important assumption of the LDA model is the "exchangeability" or "bag-of-words" hypothesis, which means that the importance of a word is not related to the order in which it appears in a document but rather to the frequency with which it appears [5,6].
+
+This text processing approach of the LDA topic model makes the dimensionality of the represented text greatly reduced and has great advantages in the processing of massive text [7-9], which has led to the widespread use of LDA topic generation models in knowledge mining, intelligence analysis, and other fields in recent years [5,10-12].
+
+However, the LDA topic model has a problem that it does not give the optimal number of topics for the text itself, and the exact number of topics needs to be determined by the model user in other ways [13]. The determination of the number of topics is crucial for text analysis, but how to determine the optimal number of topics for the LDA topic model has not been well studied. There are few studies about how many words should be selected to represent under each topic [14,15]. The commonly used perplexity metric also has some drawbacks [16]. In order to better select the optimal number of topics for LDA models, this study proposes a comprehensive judgment index based on perplexity, isolation, stability, and coincidence.
+
+#
+
+entropy
+
+MDPI
+
+Entropy 2021, 23, 1301. https://doi.org/10.3390/e23101301
+
+https://www.mdpi.com/journal/entropy
+
+# 2. Literature Review
+
+Some studies have shown that the effectiveness of topic classification in LDA models is closely related to the selection of the number of topics. If the number of topics selected is too small, the meaning under each topic will be too broad; if the number of topics selected is too large, it will lead to an over-clustering of data, producing useless topics or topics with too much similarity. To address this issue, Blei et al. (2003) proposed a perplexity model to determine the quality of topic models with different numbers of topics [3].
+
+They compared the output results by calculating the perplexity of the topic models with different number of topics, and the smaller the perplexity, the better the model with that number of topics. Although the perplexity can judge the predictive ability of the topic training model to a certain extent, when the number of topics is selected by the perplexity, the number of topics selected is often large, and similar topics are likely to appear, resulting in a low recognition of the topics.
+
+Arun (2010) uses the JS (Kullback-Leibler) scatterer to compare the similarity between topics and select the optimal number of topics, and the JS scatterer is smaller when the number of topics is close to the optimal value [17]. He et al. (2015) set different genetic degrees for each topic based on topic strength, use JS (Jensen-Shannon) scatterer to calculate the association between topics and screen out similar topics [18].
+
+Both JS divergence and JS divergence methods are based on the principle that the similarity between topics separated by a good topic model should be as small as possible. The method adopted by Guan et al. (2016) uses a combination of perplexity and JS divergence to select the optimal number of topics, which combines the advantages of JS divergence and improves the problem of using the perplexity formula alone, which leads to the selection of too large a number of topics [7]. The coherence method proposed by Röder et al.
+
+(2015) evaluates the classification effectiveness of a topic by measuring the degree of semantic co-occurrence between high-probability words in the topic [19]. Greene et al. (2014) verified the topic stability of the Non-negative Matrix Factorization (NMF) model based on the similarity of the topic word lists in the training and test sets, by which a more robust number of topics can be obtained [1]. However, this method may have the problem that the topics of multiple training sets point to the same test topic.
+
+Then, we use a toy example to show the differences and problems of the most commonly used methods of perplexity, JS divergence, and coherence. Assume that the following four documents are available for LDA training:
+
+Doc 1 = ['apple', 'pear', 'pear', 'apple', 'dog']
+
+Doc 2 = ['cat', 'dog', 'pig', 'cat', 'dog']
+
+Doc 3 = ['apple', 'pear', 'apple', 'dog']
+
+Doc 4 = ['pig', 'dog', 'dog'].
+
+The two test set documents are:
+
+Test1 = ['pear', 'apple', 'pig']
+
+Test2 = ['cat', 'dog'].
+
+First, the LDA model is used to train four documents with the number of topics $k$ set from two to four, and the "topic-word" probabilities are calculated for different numbers of topics, as shown in Table 1.
+
+With human intuition, the training set can be divided into two topics, animals $\{\mathrm{dog},$ cat, pig\} and fruits $\{\mathrm{apple},$ pear\}. We use the top two words in the probability ranking to determine the content of the topic. As can be seen from Table 1, when the number of topics is two, the first two words in Topic1 are 'apple' and 'pear', and the content of the topic can be judged to be fruit. The first two words in Topic2 are 'dog' and 'cat', so we can decide that the topic is about animals.
+
+Entropy 2021, 23, 1301
+
+2 of 45
+
+Table 1. "Topic-word" probability.
+
+![](dt=2026-06-05/ht=13/10891714ed4464839e1a2260659f1f7133660ccc55f054092fbe02092c9449c1.jpg)
+
+<table><tr><td>Topics</td><td>“Topic-Word” Probability</td><td>Topic Content</td></tr><tr><td rowspan="2">2</td><td>Topic1{&#x27;apple&#x27;: 0.37895802, &#x27;pear&#x27;: 0.29479387, &#x27;dog&#x27;: 0.21694316, &#x27;pig&#x27;: 0.06072744, &#x27;cat&#x27;: 0.048577495}</td><td>Fruits</td></tr><tr><td>Topic2{&#x27;dog&#x27;: 0.42677134, &#x27;cat&#x27;: 0.23052387, &#x27;pig&#x27;: 0.21749169, &#x27;apple&#x27;: 0.06457374, &#x27;pear&#x27;: 0.060639422}</td><td>Animals</td></tr><tr><td rowspan="3">3</td><td>Topic1{&#x27;apple&#x27;: 0.40487534, &#x27;pear&#x27;: 0.31113106, &#x27;dog&#x27;: 0.21715428, &#x27;pig&#x27;: 0.034434676, &#x27;cat&#x27;: 0.03240472}</td><td>Fruits</td></tr><tr><td>Topic2{&#x27;dog&#x27;: 0.4494548, &#x27;cat&#x27;: 0.24006312, &#x27;pig&#x27;: 0.23640023, &#x27;apple&#x27;: 0.037318606, &#x27;pear&#x27;: 0.03676326}</td><td>Animals</td></tr><tr><td>Topic3{&#x27;dog&#x27;: 0.21185784, &#x27;pig&#x27;: 0.2001333, &#x27;apple&#x27;: 0.19875155, &#x27;pear&#x27;: 0.196671, &#x27;cat&#x27;: 0.19258636}</td><td>Animals</td></tr><tr><td rowspan="4">4</td><td>Topic1{&#x27;apple&#x27;: 0.3716775, &#x27;dog&#x27;: 0.23012395, &#x27;pear&#x27;: 0.22663262, &#x27;pig&#x27;: 0.08662834, &#x27;cat&#x27;: 0.084937565}</td><td>Unknown</td></tr><tr><td>Topic2{&#x27;dog&#x27;: 0.4598837, &#x27;cat&#x27;: 0.24295807, &#x27;pig&#x27;: 0.24179693, &#x27;apple&#x27;: 0.02782605, &#x27;pear&#x27;: 0.027535275}</td><td>Animals</td></tr><tr><td>Topic3{&#x27;dog&#x27;: 0.20344584, &#x27;apple&#x27;: 0.20050451, &#x27;pig&#x27;: 0.20007579, &#x27;pear&#x27;: 0.19842108, &#x27;cat&#x27;: 0.19755279}</td><td>Unknown</td></tr><tr><td>Topic4{&#x27;apple&#x27;: 0.39690995, &#x27;pear&#x27;: 0.33073652, &#x27;dog&#x27;: 0.2127626, &#x27;pig&#x27;: 0.029939024, &#x27;cat&#x27;: 0.029651856}</td><td>Fruits</td></tr></table>
+
+When the number of topics is three, the first two words in Topic1 are "apple" and "pear", which can be judged as a fruit topic. The first two words in Topic2 are "dog" and "cat", which can be judged as an animals topic. The first two words in Topic3 are also animal-related, "dog" and "pig".
+
+When the number of topics is four, the first two words in Topic1 are 'apple' and 'dog', and the content of the topic cannot be determined. The first two words in Topic2 are animal-related, 'dog' and 'cat', which can be judged as an animals topic. The first two words in Topic3 are 'apple' and 'dog', and the content of the topic cannot be determined. The first two words in Topic4 are fruit-related, 'apple' and 'pear', which can be judged as a fruit topic.
+
+It can be seen that the LDA model with two topics is the most consistent with human intuition. In contrast, the LDA model with three topics has two animal-related repetitive topics, and the LDA model with four topics has two unknown topics that cannot be distinguished.
+
+Second, the topic probabilities of the test set documents are calculated for the LDA model with different numbers of topics. Table 2 shows the "document-topic" probabilities of the test set calculated by the LDA model for different numbers of topics.
+
+Table 2. "Document-topic" probability of test documents.
+
+![](dt=2026-06-05/ht=13/231305db99cd64360bf28bd8acdf47b3bd0cf8245ef965366d3d165a1358a540.jpg)
+
+<table><tr><td>Test Documents</td><td>Number of Topics = 2</td><td>Number of Topics = 3</td><td>Number of Topics = 4</td></tr><tr><td rowspan="4">Test1</td><td>P(Topic1 | Test1) = 0.6808042</td><td>P(Topic1 | Test1) = 0.59324664</td><td>P(Topic1 | Test1) = 0.06545124</td></tr><tr><td>P(Topic2 | Test1) = 0.3191958</td><td>P(Topic2 | Test1) = 0.31827474</td><td>P(Topic2 | Test1) = 0.30757654</td></tr><tr><td></td><td>P(Topic3 | Test1) = 0.08847858</td><td>P(Topic3 | Test1) = 0.06323278</td></tr><tr><td></td><td></td><td>P(Topic4 | Test1) = 0.56373950</td></tr><tr><td rowspan="4">Test2</td><td>P(Topic1 | Test2) = 0.18206072</td><td>P(Topic1 | Test2) = 0.11509656</td><td>P(Topic1 | Test2) = 0.08417302</td></tr><tr><td>P(Topic2 | Test2) = 0.81793930</td><td>P(Topic2 | Test2) = 0.77113570</td><td>P(Topic2 | Test2) = 0.74760187</td></tr><tr><td></td><td>P(Topic3 | Test2) = 0.11376770</td><td>P(Topic3 | Test2) = 0.08373206</td></tr><tr><td></td><td></td><td>P(Topic4 | Test2) = 0.08449302</td></tr></table>
+
+Entropy 2021, 23, 1301
+
+3 of 45
+
+Combining the "topic-word" probability in Table 1 and the "document-topic" probability in Table 2, we can determine the topic content of the test document. When the number of topics is two, the probability that the content of Test1 belongs to Topic1 Fruit is 0.6808 and the probability that it belongs to Topic2 Animals is 0.3192. The probability that the content of Test2 belongs to Topic1 Fruit is 0.1821 and the probability that it belongs to Topic2 Animals is 0.8179.
+
+When the number of topics is three, the probability that the content of Test1 belongs to Topic1 Fruit is 0.5932, the probability that it belongs to Topic2 Animals is 0.3182, and the probability that it belongs to Topic3 Animals is 0.0885. The probability that the content of Test2 belongs to Topic1 Fruit is 0.1151, the probability that it belongs to Topic2 Animals is 0.7711, and the probability that it belongs to Topic3 Animals is 0.1138.
+
+When the number of topics is four, the probability that the content of Test1 belongs to Topic1 Unknown topic is 0.0655, the probability that it belongs to Topic2 Animals is 0.3075, the probability that it belongs to Topic3 Unknown topic is 0.0632, and the probability that it belongs to Topic4 Fruit is 0.5637. The probability that the content of Test2 belongs to Topic1 Unknown topic is 0.0842, the probability of belonging to Topic2 Animals is 0.7476, the probability of belonging to Topic3 Unknown topic is 0.0837, and the probability of belonging to Topic4 Fruit topic is 0.0845.
+
+It is also clear from the topic determination of the test set documents by the LDA models with different numbers of topics that the "document-topic" probability obtained by the model with two topics is most consistent with our intuitive judgment. The LDA models with three and four topics produce duplicate and unknown topics, which interfere with the topic probability of the test documents and affect our judgment of the topic content of the documents.
+
+From the above analysis, it can be seen that the LDA model with two topics is most consistent with our intuitive judgment. Since this toy example is too simple, it is not difficult to manually select the optimal number of topics, but for a large number of documents, it will be very difficult to judge manually. Next, we will use different methods to select topics for this toy example to see whether the existing methods can select the optimal LDA model.
+
+Third, the number of topics for the LDA model was selected using the perplexity, JS divergence, coherence, and stability methods as well as our proposed optimal topic number selection method. Since the toy example has fewer words and texts, with only two words related to fruits and three words related to animals, the coherence, stability method, and our proposed optimal topic number selection method were calculated by using the top two words ranked for each topic to indicate the topic meaning. The calculation results are shown in Table 3.
+
+Table 3. Calculated scores of different topic number selection methods.
+
+![](dt=2026-06-05/ht=13/517ef732616466fdfe1eaa9b4bb24c726b3302edea0a593c35f99f39b48978ff.jpg)
+
+<table><tr><td>Topics</td><td>Perplexity</td><td>JS</td><td>Coherence</td><td>Stability</td><td>Coincidence</td><td>Optimal Topic Number Selection Method</td></tr><tr><td>2</td><td>2.2899</td><td>0.0471</td><td>0.8536</td><td>0.9630</td><td>2</td><td>100.9598</td></tr><tr><td>3</td><td>2.2567</td><td>0.0601</td><td>0.8047</td><td>0.9620</td><td>3</td><td>117.0119</td></tr><tr><td>4</td><td>2.2526</td><td>0.0637</td><td>0.7803</td><td>0.9623</td><td>4</td><td>147.0472</td></tr></table>
+
+The perplexity method considers the predictive ability of the model for documents. The principle is that if most of the words in a document are the top words in the probability ranking of the topics generated by LDA, then the prediction of the topic to which the document belongs is more accurate. On the contrary, it is difficult to determine the topic of the document. Therefore, the lower the perplexity, the better the prediction ability of the model. From Table 3, it can be seen that the optimal number of topics selected by the perplexity method is four.
+
+The JS divergence method considers that the topics generated by a topic model should be well differentiated from each other, and JS divergence is a measure of the difference
+
+Entropy 2021, 23, 1301
+
+4 of 45
+
+in word-probability distributions between topics to determine whether a topic model is good or bad. Therefore, for JS divergence, the greater the difference in the distribution of "topic-word" probabilities among topics, the better the topic generation model. Table 3 shows that the optimal number of topics selected by the JS divergence method is four.
+
+The coherence method considers the coherence of semantic information in the model, that is, the conditional likelihood is estimated for the combination of words for which the document contains the first $n$ of the topic words at the same time. Therefore, for the coherence method, the higher the probability that the words with the highest topic ranking can appear in a document at the same time, the better the classification effect of the model. From Table 3, we can see that the optimal number of topics selected by the coherence method is 2.
+
+The optimal number of topics selection method we propose adds the judgment of model stability and coincidence based on the consideration of the predictive ability and topic isolation of the model, as shown in Table 3 for stability and coincidence. The specific calculation method will be introduced in Section 3. From Table 3, we can see that the optimal number of topics selected by our proposed method is two.
+
+This toy example shows that both the perplexity method and the JS divergence method select the number of topics to be four, which is the maximum number of topics for our training of this small sample. The selection results of these two methods are not consistent with our intuitive judgment. From Table 2, we can see that the LDA model with four topics has unknown topics whose contents we cannot determine. The optimal number of topics selected by both the coherence method and our proposed method is two, which is consistent with our intuitive judgment of the number of topics.
+
+However, the sample of this toy example is too small to cover the various situations that may be faced in realistic data processing. In Section 3, we will give further examples to analyze the problems that realistic model training may face and how the stability and coincidence indexes can be solved. In Section 4, we further compare the effectiveness of these existing methods with our proposed method for topic number selection by using the 20news_groups dataset, which has larger data compared to this toy example.
+
+By analyzing the existing studies, it can be seen that although the LDA model can generate topics well by the probability distribution of words, it cannot give an optimal judgment about the number of topics to be selected. Most of the existing studies perform topic number selection from a certain feature that a good topic classification model should have. For example, the perplexity method considers that a good topic classification model should be able to effectively classify unknown documents outside the training set.
+
+The JS divergence or JS divergence approach considers that the less similar the content among the topics classified, the better the topic classification model. Both the coherence method and the stability method proposed by Greene judge the goodness of the topic classification by the similarity of the words within the same topic in the model. Although these existing topic selection methods are not comprehensive for topic classification, they also provide a good basis for us to think about how to judge whether a topic classification model is good or not.
+
+Based on the existing studies, it is known that a better topic selection model should have the following characteristics: (1) The topic model has certain predictive ability; i.e., the model can classify the unknown input corpus well. (2) There should be a certain degree of isolation between different topics generated by the model; i.e., the occurrence of duplicate topics is avoided. (3) The words within each topic generated by the topic model are correct. (4) The generated model is robust; i.e., the data from the same source consistently generated similar solutions.
+
+Based on these characteristics, this study proposes a comprehensive method for determining the optimal number of LDA topics. There is no research to select the number of topics for LDA models from a comprehensive perspective, and most of the existing methods are one-time tests, which make it difficult to ensure that the models can be reliably and stably implemented repeatedly. In view of the limitations of existing
+
+Entropy 2021, 23, 1301
+
+5 of 45
+
+studies, this paper will propose a comprehensive method for judging the optimal LDA topic number based on the above four characteristics that a good topic model should have.
+
+# 3. LDA Topic Model and Optimal Topic Number Selection Method
+
+# 3.1. Latent Dirichlet Allocation (LDA)
+
+Latent Dirichlet Allocation (LDA) is a document topic generation model proposed by Blei et al. (2003) after introducing the Dirichlet distribution based on Probabilistic Latent Semantic Analysis (PLSA). LDA is a classical model for generating Bayesian probability models, which is based on the assumption that documents are generated from multiple topics according to a certain random probability distribution, and each topic is composed of words according to a random probability distribution.
+
+Thus, a document is a collection of topics with different probabilities, and a topic is a collection of words with different probabilities. The LDA topic model calculates the probability of the conditional distribution (posterior distribution) of the hidden variables given the observed variables by using the joint distribution. The observed variable is the set of words and the hidden variable is the topic, whose probability map model is shown in Figure 1.
+
+![](dt=2026-06-05/ht=13/de6b4cf939083f7edd7adc592ff50d6acce35d601a9855903713c15728e257c5.jpg)
+
+The joint distribution of the observed and hidden variables corresponding to the generation process of the LDA model is shown in Equation (1).
+
+$$
+p \left(\beta_ {1: K}, \theta_ {1: D}, z _ {1: D}, w _ {1: D}\right) = \prod_ {i = 1} ^ {K} p (\beta) \prod_ {d = 1} ^ {D} p \left(\theta_ {d}\right) \left(\prod_ {n = 1} ^ {N} p \left(z _ {d, n} \mid \theta_ {d}\right) p \left(w _ {d, n} \mid \beta_ {1: K}, z _ {1: D}\right)\right) \tag {1}
+$$
+
+The concatenated symbol in Equation (1) describes the dependence of the random variables. Here, $\beta$ denotes the topic, $\theta$ denotes the probability of the topic, $z$ denotes the topic of a particular document or word, and $w$ is the word. $\beta_{1:K}$ is the set of all topics, where $\beta_{k}$ is the distribution of the words of the $k$ th topic. The proportion of that topic in the $d$ th document is $\theta_{d}$ , where $\theta_{d,k}$ denotes the proportion of the $k$ th topic in the $d$ th document.
+
+The set of topics contained in the $d$ th document is $z_{d}$ , where $z_{d,n}$ is the topic to which the $n$ th word in the $d$ th document belongs. The set of all words in the $d$ th document is denoted $w_{d}$ , where $w_{d,n}$ is the $n$ th word in the $d$ th document.
+
+$p(\beta)$ denotes a specific topic selected from the set of topics, $p(\theta_{d})$ denotes the probability of that topic in a specific document, $\prod_{n=1}^{N} p(z_{d,n}|\theta_{d})$ denotes the probability that the $n$ th word of the document corresponds to the topic to which it belongs when the topic is determined, and $p(w_{d,n}|\beta_{1:K}, z_{1:D})$ denotes the joint probability of the topic to which the $n$ th word of the document belongs and the word.
+
+# 3.2. Optimal Topic Number Selection Method
+
+# 3.2.1. Perplexity
+
+Perplexity is calculated as follows.
+
+$$
+\operatorname {p e r p l e x i t y} \left(D _ {\text {t e s t}}\right) = \exp \left\{\frac {- \sum_ {d = 1} ^ {M} \log p \left(w _ {d}\right)}{\sum_ {d = 1} ^ {M} N _ {d}} \right\} \tag {2}
+$$
+
+where $M$ is the size of the test corpus, $N_{d}$ is the size of the $d$ th text (that is, the number of words), and $p(w_{d})$ denotes the probability that word $w_{d}$ is generated in the document.
+
+Entropy 2021, 23, 1301
+
+6 of 45
+
+Existing studies found that although the perplexity can judge the predictive ability of the topic training model to a certain extent, when the number of topics is selected by the perplexity, the number of topics selected is often too large and does not converge, and similar topics are likely to appear, resulting in a low discrimination of topics. Therefore, this study further judges the number of topics by the inter-topic similarity of the training model to improve the accuracy.
+
+# 3.2.2. Isolation
+
+The isolation of the topic model is usually calculated using either the Kullback-Leibler divergence (JS divergence) or the Jensen-Shannon divergence (JS divergence). Since the JS divergence does not satisfy the symmetry and triangular inequality [17], the JS divergence is used for the calculation in this research section.
+
+The JS divergence formula is based on the deformation of the JS divergence formula. JS divergence is also called relative entropy; for two probability distributions $P$ and $Q$ , the more similar they are, the smaller the JS divergence, and the more isolated they are, the larger the JS divergence value. JS divergence is calculated by the following formula.
+
+$$
+\operatorname {K L} (P \mid | Q) = - \sum_ {x \in X} P (x) \log \frac {1}{P (x)} + \sum_ {x \in X} p (x) \log \frac {1}{Q (x)} \tag {3}
+$$
+
+Since the JS divergence formula is asymmetric, swapping the positions of $P$ and $Q$ will give different results, so the JS scattering formula after adjusting to symmetry is as follows.
+
+$$
+\mathrm {J S} (P | | Q) = \frac {1}{2} \mathrm {K L} \left(P | | \frac {P + Q}{2}\right) + \frac {1}{2} \mathrm {K L} \left(Q | | \frac {P + Q}{2}\right) \tag {4}
+$$
+
+The JS divergence takes a value between 0 and 1. When the distributions of $P$ and $Q$ are the same, the JS divergence takes a value of 0.
+
+In the calculation, first, the data are divided into training and test sets, and the training set text is used to complete the training of the LDA model under the given number of topics $k$ . Then, the test set text is used as the input of the model to get the word probability distribution of the test set corresponding to $k$ topics, and the average probability of each word is calculated based on the probability distribution of words corresponding to different topics. Finally, the standard deviation of the JS distance between the word probability distribution of each topic and the average probability distribution is calculated as the isolation degree when the number of topics is $k$ . The calculation formula is as follows.
+
+$$
+\sigma_ {\mathrm {J S}} = \sqrt {\frac {\sum_ {i = 1} ^ {k} [ \mathrm {J S} (S _ {i} | | S _ {a v e}) ] ^ {2}}{k}} \tag {5}
+$$
+
+where $S_{i}$ denotes the word distribution of the $i$ th topic and $S_{ave}$ denotes the average word distribution of the $k$ topics.
+
+# 3.2.3. Stability
+
+The stability of a clustering algorithm is expressed as the ability of this algorithm to consistently produce similar solutions for data originating from the same source [20]. Greene et al. (2014) proposed a method to verify the topic stability of the Non-negative Matrix Factorization (NMF) model using the similarity of the list of topic words, by which a more robust topic count can be obtained [1]. Drawing on this approach, this study improves it as part of the optimal topic number determination for LDA.
+
+# Topic Word Ranking Similarity Measurement
+
+Topic model algorithms usually take the ranking of words under each topic as their output. In the LDA model, these words are ranked based on the probability distribution of the words under the topic. Assume that the two topic lists are $R_{i}$ and $R_{j}$ , and each
+
+Entropy 2021, 23, 1301
+
+7 of 45
+
+topic contains a word ranking list. The ranking of words in the LDA model reflects the importance of words to this topic, and each topic is given a probabilistic ranking of all words in the entire corpus dictionary. Then, the similarity between a pair of ranked lists $(R_{i}, R_{j})$ can be evaluated using the symmetry metric. Most similarity algorithms do not take into account the ranking position of the words, and if the similarity calculation is performed for all words in each topic, the resulting similarity value is 1.
+
+Therefore, this study will represent each topic by the first $t$ words of that topic, where $t$ is less than the total number of words. This substitution not only makes the similarity between topics comparable but also greatly reduces the computational effort. In this study, the Jaccard index was used to calculate the similarity of word ranking lists for each pair of topics. An average Jaccard index (AJ index) was defined to calculate the word ranking, since it has a large impact on the meaning of the topic.
+
+The AJ index calculates the average of the word similarity for each pair of topics ranked from 1 to $t$ . The calculation is as follows.
+
+$$
+\mathrm {A J} \left(R _ {i}, R _ {j}\right) = \frac {1}{t} \sum_ {d = 1} ^ {t} \gamma_ {d} \left(R _ {i}, R _ {j}\right) \tag {6}
+$$
+
+$$
+\gamma_ {d} \left(R _ {i}, R _ {j}\right) = \frac {R _ {i , d} \cap R _ {j , d}}{R _ {i , d} \cup R _ {j , d}} \tag {7}
+$$
+
+In the above equation, $R_{i,d}$ denotes the list of the top $d$ words of the topic at the selected vocabulary depth of $t$ . The AJ index calculation is a symmetric calculation method that reflects both the degree of vocabulary relatedness of the two topics and the similarity of the ranking of the words.
+
+As an example, Table 4 shows the list of the top $d$ words for two topics $R_{i}$ and $R_{j}$ at a word depth of $t$ equal to 5.
+
+Table 4. Vocabulary depth and similarity.
+
+![](dt=2026-06-05/ht=13/3f94846f2f2ff20e41bd4fc9376d529931e4ad49a9ba843c6c73c52023cef698.jpg)
+
+<table><tr><td>d</td><td>R1,d</td><td>R2,d</td><td>Jacd</td><td>AJ</td></tr><tr><td>1</td><td>Results</td><td>Technology</td><td>0</td><td>0</td></tr><tr><td>2</td><td>Results, Translation</td><td>Technology, Contracts</td><td>0</td><td>0</td></tr><tr><td>3</td><td>Results, Translation, Technology</td><td>Technology, Contracts, Market</td><td>0.200</td><td>0.067</td></tr><tr><td>4</td><td>Results, Translation, Technology, Market</td><td>Technology, Contracts, Market, Regulations</td><td>0.333</td><td>0.133</td></tr><tr><td>5</td><td>Results, Translation, Technology, Market, Contracts</td><td>Technology, Contracts, Market, Regulations, Management</td><td>0.429</td><td>0.193</td></tr></table>
+
+As shown in Table 4, the values of $Jac_d$ represent the similarity of topics with the same number of words only, while the values of AJ represent the distribution of words in addition to the similarity of word lists in topics.
+
+Stability of the Topic Model
+
+Assume that two different sets containing $k$ topics are $S_{x} = (R_{x1},\dots ,R_{xk})$ and $S_{y} = (R_{y1},\dots ,R_{yk})$ . Construct a similarity matrix $M$ of $k\times k$ . Each $M_{ij}$ value represents the AJ similarity of a pair of topic word ranking lists $R_{xi}$ and $R_{xj}$ in two sets. Then, the similarity matrix $M$ is used to find the $R_{yi}$ with the highest AJ similarity to it for each $R_{xj}$ in the set $S_{x}$ . Finally, the AJ similarity of the selected $k$ optimal consistent combinations is summed and averaged, which is the stability of the subject set $S_{x}$ and $S_{y}$ . The formula is as follows.
+
+$$
+\operatorname {s t a b i l i t y} \left(S _ {x}, S _ {y}\right) = \frac {1}{k} \sum_ {i = 1} ^ {k} \mathrm {A J} \left(R _ {x i}, \pi \left(R _ {x i}\right)\right) \tag {8}
+$$
+
+The $\pi(R_{xi})$ in the above equation denotes the most matching arrangement with $R_{xi}$ in the $S_y$ set. The coherence of $S_x$ and $S_y$ takes a value between 0 and 1. The more coherent two topic sets are, the greater the value of their coherence, which takes the value of 1 when the two topics are the same.
+
+Entropy 2021, 23, 1301
+
+8 of 45
+
+An example is given below. Suppose there are two topic sets S1 and S2 that both contain three topics.
+
+The set of topics for s1 is:
+
+$$
+R _ {1 1} = \{T e n c h o l o g y, I n n o v a t i o n, P a t e n t s \}
+$$
+
+$$
+R _ {1 2} = \{I n f r i n g e m e n t, P r o t e c t i o n, E n f o r c e m e n t \}
+$$
+
+$$
+R _ {1 3} = \{E c o n o m y, F i n a n c i n g, P l e d g e \}.
+$$
+
+The set of topics for s2 is:
+
+$$
+R _ {2 1} = \{P r o t e c t i o n, I n f r i n g e m e n t, C o u n t e r f e i t i n g \}
+$$
+
+$$
+R _ {2 2} = \{E c o n o m y, p l e d g e, i n v e s t m e n t \}
+$$
+
+$$
+R _ {2 3} = \{I n v e n t i o n, T e n c h o l o g y, I n n o v a t i o n \}
+$$
+
+Then, the $S_{1}$ and $S_{2}$ similarity matrix $M$ is:
+
+$$
+\mathbf {M} = \begin{array}{c c c c} & R _ {2 1} & R _ {2 2} & R _ {2 3} \\ R _ {1 1} & 0. 0 0 & 0. 0 0 & 0. 2 8 \\ R _ {1 2} & 0. 5 & 0. 0 0 & 0. 0 0 \\ R _ {1 3} & 0. 0 0 & 0. 6 1 & 0. 0 0 \end{array} .
+$$
+
+The optimal coherence combination is:
+
+$$
+\pi = \left(R _ {1 1}, R _ {2 3}\right), \left(R _ {1 2}, R _ {2 1}\right), \left(R _ {1 3}, R _ {2 2}\right).
+$$
+
+The stability of $S_{1}$ and $S_{2}$ is:
+
+$$
+\text {s t a b i l i t y} (S _ {1}, S _ {2}) = \frac {0 . 2 8 + 0 . 5 + 0 . 6 1}{3} = 0. 4 6.
+$$
+
+# 3.2.4. Coincidence
+
+Three situations may occur when using the training model with the test model for stability measurement: (1) In the coherence combination of the training model and the test model, there are no repeatedly selected topics in the test model, as follows.
+
+$$
+\begin{array}{c c c c} & R _ {2 1} & R _ {2 2} & R _ {2 3} \\ R _ {1 1} & 0. 0 0 & 0. 0 0 & 0. 2 8 \\ R _ {1 2} & 0. 5 & 0. 0 0 & 0. 0 0 \\ R _ {1 3} & 0. 0 0 & 0. 6 1 & 0. 0 0 \end{array}
+$$
+
+(2) In the coherence combination of the training model and the test model, there are repeatedly selected topics in the test model, and there are some topics that are not selected, as follows.
+
+$$
+\begin{array}{c c c c} & R _ {2 1} & R _ {2 2} & R _ {2 3} \\ R _ {1 1} & 0. 2 8 & 0. 0 0 & 0. 0 0 \\ R _ {1 2} & 0. 5 & 0. 0 0 & 0. 0 0 \\ R _ {1 3} & 0. 0 0 & 0. 6 1 & 0. 0 0 \end{array}
+$$
+
+(3) In the coherence combination of training and testing models, there exists a certain training topic that appears to have the same maximum AJ value as the topics of more than two testing models, as follows.
+
+Entropy 2021, 23, 1301
+
+9 of 45
+
+![](dt=2026-06-05/ht=13/f7fa5559f9c9311ef060a8ebfcff0085c6314bf619dc2a2ec47896d50842cb31.jpg)
+
+<table><tr><td></td><td>R21</td><td>R22</td><td>R23</td></tr><tr><td>R11</td><td>0.00</td><td>0.5</td><td>0.5</td></tr><tr><td>R12</td><td>0.5</td><td>0.00</td><td>0.00</td></tr><tr><td>R13</td><td>0.00</td><td>0.61</td><td>0.00</td></tr></table>
+
+An optimal topic classification should be such that every topic word sequence under the training model corresponds to every topic word sequence under the test model. There are two cases that result in the topics of the training model and the test model not corresponding exactly. The first is that since the sampled dataset is smaller than the overall dataset, in some sampling, it may result in the topics trained in the training set not corresponding exactly to the test model.
+
+The second one is that when the number of topics in the test model is too large, it is easy to generate similar duplicate topics, which leads to the same value when calculating the stability of the training and test models. However, this aspect is mostly lacked in the existing studies. In order to improve the accuracy of the model stability measurement and make its applicability more complete, in this study, we add a consideration of whether the training model and the test model completely coincide in terms of topic connotation to the model stability measurement.
+
+The combination of the maximum coherence of the sets $S_{x}$ and $S_{y}$ can be derived according to the topic model similarity measure in Section 3.2.3. The number of times each topic in the test model overlaps with the topic of the training model is counted and accumulated, and finally, it is divided by the number of coincident topics to obtain the coincidence of the test and training models under that number of topics. The calculation formula is as follows.
+
+$$
+\text {C o i n c i d e n c e} = \frac {1}{c} \sum_ {i = 1} ^ {k} \operatorname {c o u n t} \left(\pi \left(R _ {x i}\right)\right) \tag {9}
+$$
+
+In the above equation, $c$ denotes the number of topics in the test model and the training model that coincide, and $k$ denotes the number of topics.
+
+As an example, let two sets of topics that both contain three topics, and the model similarity measures of training model $S_{1} = \{R_{11}, R_{12}, R_{13}\}$ and test model $S_{2} = \{R_{21}, R_{22}, R_{23}\}$ be as follows. In the first case, there are no duplicate selected topics in the test model for the coherent combination of the training and test models.
+
+![](dt=2026-06-05/ht=13/4f6886b3f2122911c8187a42e61fb94e0ebd3401c2ab66bc02b453942bd9a76f.jpg)
+
+<table><tr><td></td><td>R21</td><td>R22</td><td>R23</td></tr><tr><td>R11</td><td>0.00</td><td>0.00</td><td>0.28</td></tr><tr><td>R12</td><td>0.5</td><td>0.00</td><td>0.07</td></tr><tr><td>R13</td><td>0.00</td><td>0.61</td><td>0.00</td></tr></table>
+
+The optimal coherence combination is,
+
+$$
+\pi = (R _ {1 1}, R _ {2 1}), (R _ {1 2}, R _ {2 1}), (R _ {1 3}, R _ {2 2}).
+$$
+
+$R_{21}, R_{22}$ and $R_{23}$ in the test model occur once each; thus,
+
+$$
+\text {C o i n c i d e n c e} = \frac {1}{3} (1 + 1 + 1) = 1.
+$$
+
+In the second case, in the coherent combination of the training model and the test model, there are duplicate selected topics in the test model, and there are some topics that are not selected.
+
+![](dt=2026-06-05/ht=13/2de707c43052c4d8d0ceea4bcee63e9cbbd5a6bcbdb59176acda5f835a8f431a.jpg)
+
+<table><tr><td></td><td>R21</td><td>R22</td><td>R23</td></tr><tr><td>R11</td><td>0.28</td><td>0.00</td><td>0.00</td></tr><tr><td>R12</td><td>0.5</td><td>0.00</td><td>0.00</td></tr><tr><td>R13</td><td>0.00</td><td>0.61</td><td>0.00</td></tr></table>
+
+The optimal coherence combination is
+
+$$
+\pi = \left(R _ {1 1}, R _ {2 1}\right), \left(R _ {1 2}, R _ {2 1}\right), \left(R _ {1 3}, R _ {2 2}\right).
+$$
+
+Entropy 2021, 23, 1301
+
+10 of 45
+
+The test model has two occurrences of $R_{21}$ , zero occurrences of $R_{22}$ , and one occurrence of $R_{23}$ . Thus,
+
+$$
+C o i n c i d e n c e = \frac {1}{2} (2 + 0 + 1) = 1. 5.
+$$
+
+In the third case, there is a coherent combination of training and test models in which a certain training topic has the same maximum AJ value as more than two test model topics.
+
+$$
+\begin{array}{c c c c} & R _ {2 1} & R _ {2 2} & R _ {2 3} \\ R _ {1 1} & 0. 0 0 & 0. 5 & 0. 5 \\ R _ {1 2} & 0. 5 & 0. 0 0 & 0. 0 0 \\ R _ {1 3} & 0. 0 0 & 0. 6 1 & 0. 0 0 \end{array}
+$$
+
+The optimal coherence combination is
+
+$$
+\pi = (R _ {1 1}, R _ {2 2}), (R _ {1 1}, R _ {2 3}), (R _ {1 2}, R _ {2 1}), (R _ {1 3}, R _ {2 2}).
+$$
+
+The test model has one occurrence of $R_{21}$ , two occurrences of $R_{22}$ , and one occurrence of $R_{23}$ . Thus,
+
+$$
+\text {C o i n c i d e n c e} = \frac {1}{3} (1 + 2 + 1) = 1. 3 3.
+$$
+
+The value of model coincidence is greater than or equal to 1. When the value of model coincidence is 1, it means that the subjects of the training model and the test model can completely coincide, and the larger the value of coincidence means that the coincidence of the training model and the test model is worse. As in the case of model stability measurement, this study obtains multiple model coincidence values through multiple sampling training and finally averages them to obtain the average coincidence value as a basis for judgment.
+
+# 3.2.5. Optimal Topic Number Selection
+
+A reliable topic model should have three characteristics: first, the model has a good predictive capability, which means the model has low perplexity; second, there is a certain degree of isolation between different topics to avoid the appearance of duplicate topics, which means the similarity between topics is low; third, the model has a high stability, which means the model is repeatable. Fourth, the directionality of the topics of the model is unique and reliable, which means that the model has a low degree of coincidence.
+
+Existing studies have found that selecting the number of topics by the perplexity value often leads to the selection of too large a number of topics. In this study, the perplexity of the topic model is combined with the model isolation, stability, and the coincidence index proposed in this study to obtain a better number of topics by cyclically training and testing the model. It is important to note that here, since usually, the calculated values of the perplexity method are much larger than several other metrics. In order to avoid the influence bias among the indicators, we take the logarithm of the perplexity when using our proposed method. The final topic superiority scores are defined as follows.
+
+$$
+\text {T o p i c} = \frac {\text {P e r p l e x i t y} \times \text {C o i n c i d e n c e}}{\sigma_ {\mathrm {J S}} \times \text {S t a b i l i t y}} \tag {10}
+$$
+
+To calculate the degree of model stability for different topic numbers $k$ , first, an initial topic model is generated based on the complete dataset, and this model for the complete data is also the test model for the subsequent calculation of topic consistency, which is defined as $S_0$ . Second, $\tau$ samples are randomly selected from the overall dataset $n$ with a sampling rate of $\beta (0 < \beta < 1)$ . Third, a model is generated based on these $\tau$ samples as well, which is defined as $\{S_1,\dots ,S_\tau \}$ .
+
+Fourth, the stability and coincidence of each random sample topic model with the test model are calculated. In addition, the remaining $(1 - \beta)*n$ samples after the test samples are taken as the training set for the test samples, and the perplexity and isolation of each test sample are calculated. Finally, the $k$ topic
+
+Entropy 2021, 23, 1301
+
+11 of 45
+
+superiority scores of the $\tau$ sample models are averaged, and the minimum number of topics with the average topic superiority score value is the optimal number of topics $k$ . The calculation steps are shown in Figure 2.
+
+![](dt=2026-06-05/ht=13/84e3718581691ecb13f5ab70e14c34b090c03bff4ed3a6820ff5ebf9c56d4ed9.jpg)
+
+# The calculation steps are as follows:
+
+Step 1: The complete document set $n$ (after data cleaning) is trained by the LDA model to generate topic test models with different numbers of topics $S_{h,0}$ .
+
+Step 2: Samples are drawn from the complete document set $n$ with a sampling rate of $\beta$ as the test set. Then, the test set is used to train to generate test model $S_{h,i}$ under different numbers of topics.
+
+Step 3: Calculate the stability of the test model $S_{h,0}$ and the test model $S_{h,i}$ for the same number of topics. Calculate the coincidence of the test model $S_{h,0}$ and the test model $S_{h,i}$ for the same number of topics.
+
+Step 4: Calculate the isolation of models under different numbers of topics by using the $\beta \times n$ documents in the test set obtained from each sampling.
+
+Step 5: Calculate the perplexity of models under different numbers of topics by using the remaining $(1 - \beta) \times n$ documents obtained from each test set sampling.
+
+Step 6: Calculate the topic superiority index under different numbers of topics by using the stability, coincidence, isolation, and perplexity obtained from Steps 3 to 5.
+
+Step 7: Repeat Steps 2 to 6 to obtain the topic superiority index of the $\tau$ test and test models, and calculate the average topic superiority index under different numbers of topics.
+
+Step 8: The number of topics corresponding to the smallest average topic superiority index is taken as the optimal number of topics.
+
+Entropy 2021, 23, 1301
+
+12 of 45
+
+# 4. Experimental Analysis and Comparison
+
+# 4.1. Data Source
+
+This section uses three datasets, 20news_groups [21], WOS_46985 [22], and AG_news [23], to compare and validate our proposed topic number selection method. The original 20news_groups dataset contains a total of 18,846 texts on 20 topics, and these texts have been divided into training and testing sets in a 6:4 ratio. The WOS_46985 dataset collects abstract information from articles published on the Web of Science with a total of 46,985 texts across seven original topics.
+
+The original WOS_46985 dataset was not divided into training and test sets, so we first randomly sampled the training and test set texts in a 6:4 ratio under the seven original topics. The AG_news dataset consists of four original topics, consisting of 127,600 news articles collected from more than 2000 news sources, and it has been divided into 120,000 training texts and 7600 test texts in a roughly 6:4 ratio.
+
+# 4.2. LDA Model Training
+
+We use the same data pre-processing approach for different datasets. Before training the LDA model on the documents, the text information of all documents is firstly processed for word splitting and stop word removal. We used the Lemminflect package [24] in Python for word formation reduction during the word separation. The stop word list was used to remove stop words from Google's 2014 stop word list. In addition, we also removed words with a frequency of less than 20. The original dataset is divided into $60\%$ training set and $40\%$ test set.
+
+In order to verify the effectiveness of our proposed optimal topic number selection method, we use the original $60\%$ training set for model training and topic number selection and then use the remaining $40\%$ test set for validation. Before training, we first randomly sampled $80\%$ of the original $60\%$ sample as the training set and the remaining $20\%$ of the original training set as the model test set. By this process, we sampled a total of 30 times.
+
+In this study, we use the Gensim package [25] in Python for LDA model training. The training parameters must be set before training. The first is the number of topics to be trained, which is denoted by $k$ . The number of topics trained for the 20 new groups dataset ranges from five to 30. The number of topics trained for the WOS_46986 dataset ranges from two to 20. The number of topics trained for the AG_news dataset ranges from two to 20.
+
+The hyperparameter $\alpha$ indicates the sparsity of topics in the document, that is, the set of topics in which the document is expected to contain most of the topics; the larger the $\alpha$ , the greater the number of topics that can be contained in the document. $\beta$ indicates the sparsity of words in the topics, the smaller $\beta$ indicates the non-uniform distribution of words within the topics. According to Hagen (2018), when the number of topics is not very large, different initializations do not have a significant impact on topic variation [26].
+
+This study finally set both $\alpha$ and $\beta$ in all LDA training models as dynamic variables related to the number of topics, which is $\frac{1}{k}$ . The number of iterations was set to 400.
+
+When calculating the stability of the model, the first step is to select the number of words that represent each topic. According to the formula for calculating the stability, it is known that the lower ranked words have less influence on the final calculation result, but the more words there are, the larger the calculation volume is, so it is not necessary to include all the topic words in the calculation. Existing studies have not reached a consensus on how many words should be selected to represent a topic [11].
+
+Take the 20news_groups dataset as an example; the first $t$ words with the highest probability of each topic were selected to represent that topic, and the values of $t$ were taken as 20, 50, 80, and 100. Table 5 shows the correlation coefficients of the average stability of the model with different number of words.
+
+Entropy 2021, 23, 1301
+
+13 of 45
+
+Table 5. The correlation coefficients of the average stability of the model with different number of words.
+
+![](image)c9c1cf3.jpg)
+
+<table><tr><td></td><td>sim20</td><td>sim50</td><td>sim80</td><td>sim100</td><td>Mean</td></tr><tr><td>sim20</td><td>-</td><td>0.9949</td><td>0.9917</td><td>0.9901</td><td>0.9922</td></tr><tr><td>sim50</td><td>0.9949</td><td>-</td><td>0.999</td><td>0.9982</td><td>0.9974</td></tr><tr><td>sim80</td><td>0.9917</td><td>0.999</td><td>-</td><td>0.9998</td><td>0.996833</td></tr><tr><td>sim100</td><td>0.9901</td><td>0.9982</td><td>0.9998</td><td>-</td><td>0.9960</td></tr></table>
+
+As can be seen from Table 5, the stability of the model under different numbers of topic words is highly correlated, and the highest average Pearson is reached when the number of topic words is 50, indicating that the first 50 words of each topic are most capable of covering the meaning of the topic under the remaining number of words. Therefore, this study finally uses the first 50 words with the highest probability of each topic to represent that topic.
+
+# 4.3. Comparison of Experimental Results
+
+In this section, we compare the optimal topic number selection method proposed in this paper with the several commonly used topic number selection methods such as perplexity, JS divergence, coherence, and HDP (Hierarchical Dirichlet Process) by using three different datasets, which are 20news_groups, WOS_46986, and AG_news. Among these methods, the smaller the value of both the optimal topic score and the perplexity score we propose, the better the classification of the topic model.
+
+In contrast, the larger the JS divergence and coherence scores, the better the classification of the topic model. Teh et al. (2006), on the other hand, improved the original LDA model by proposing Markov chain Monte Carlo algorithms for posterior inference in hierarchical Dirichlet process mixtures and describe applications to problems in information retrieval and text modeling [27].
+
+In addition, we use an LDA model based on the word-embedding approach to further validate the applicability of our proposed method. Regarding the processing of the LDA model for the word-embedding approach, we use the word-embedding data provided by Pennington et al. (2014), which are named GloVe [28]. For computational reasons, we use the word-embedding data, glove.6B.50d.txt, where each word is represented by 50 dimensions. GloVe is an unsupervised learning algorithm for obtaining vector representations for words.
+
+Training is performed on aggregated global word-word co-occurrence statistics from a corpus. The advantage is that by representing words as vectors with multiple dimensions, it enables similar words to have similar vector representations and can improve the accuracy of text analysis and recognition. Before word-embedding LDA model training, we first need to obtain a vector representation of each word in the dictionary. Take the 20news_groups dataset as an example, a 50-dimensional vector representation of the dictionary is found in glove.6B.50d.
+
+txt, and a total of $9503 \times 50$ -dimensional dictionaries for 9503 words are obtained. Second, calculate the word similarity. The cosine similarity is calculated for each word in the dictionary with each word in glove.6B.50d.txt. For computational reasons and to avoid introducing too many dissimilar words, we extract the top 20 words with similarity as the synonymous related words of the original word and generate a $9503 \times 20$ -dimensional near-sense word dictionary.
+
+Third, the word expansion of the original 20news_groups documents based on the near-sense word dictionary will replace each word of each document with 20 words from the similar word dictionary. Due to the presence of a large number of short texts in 20news_groups, most of the words appear less frequently, resulting in the generated document feature matrix being too sparse. This leads to the difficulty for the original LDA model to cluster some documents with the same subject content but different word usage and low word frequency into the same class.
+
+However, the expansion of the original vocabulary with similar words by the word-embedding method can greatly reduce the sparsity of the original documents and improve the accuracy of LDA model classification. Since the data size of WOS_46986 and AG_news is large and
+
+Entropy 2021, 23, 1301
+
+14 of 45
+
+the concentration of the text is relatively high, we processed the word embedding of these two datasets by taking the top ten words with the highest similarity.
+
+# 4.3.1. The Experimental Results of 20News_Groups
+
+Comparison of Different Topics Number Selection Methods
+
+The JS divergence and coherence scores are between 0 and 1. Compared with them, the topic superiority score and perplexity scores have larger values. To better show the differences in topic number selection of different methods in the figure, we normalize the topic superiority score and perplexity scores. The results of different topic selection methods are shown in Figure 3.
+
+![](dt=2026-06-05/ht=13/b4c280d44f313a7b1a3225b5dd2a3093eb03fb96cd26f928988561390df556b8.jpg)
+
+As can be seen in Figure 3, the optimal number of topics for the 20news_groups training set derived from our proposed optimal topic number selection method is 13. In the range of five to 13 topics, the optimal topic score tends to decrease, while in the range of 13 to 30 topics, the optimal topic score tends to increase. It can be seen that the optimal number of topics selection method we propose exhibits an approximate U-shape in the range of topics from five to 30 topics. Since our approach is that the smaller the score of the model, the better the classification of the topics, based on this U-shaped result, we believe that it is possible to find the optimal value by applying our optimal topic number selection method within a certain range of topic numbers.
+
+The optimal number of topics selected by the perplexity method is 8. The model perplexity score tends to increase in the range of topics selected from eight to 15, and it again shows a significant downward trend between topics selected from 15 to 30. Although the optimal number of topics selected by the perplexity method is eight in the range of five to 30, the trend of a sharp decrease in the perplexity score as the number of topics rises cannot be ignored. Later, we will apply a real example of patent policy to test the perplexity method and find that the perplexity score decreases as the number of topics increases, which also proves this point.
+
+The JS divergence method shows an increasing and non-converging trend in the scores calculated in the interval from five to 30 topics, so the optimal number of topics chosen for this method in this interval is 30.
+
+The calculated score of the coherence method is relatively smooth in the interval from five to 30 topics, and the optimal number of topics selected is seven, but it also has a low peak at 15 topics.
+
+We used the Tomotopy package [29] in Python to perform the HDP selection method, with each parameter set to its default value, and ended up with an optimal number of 59 topics.
+
+Entropy 2021, 23, 1301
+
+15 of 45
+
+The optimal number of topics derived from our proposed method in the word-embedding LDA model is 25. In the range of topics from five to 25, the calculated scores show a significant decreasing trend.
+
+From the above analysis, it can be seen that the score curve obtained by our proposed optimal topic number selection method is closest to the U-shape, and therefore, the optimal value is most likely to exist. The optimal topic number obtained on the use of the word-embedding LDA model is closest to the original value. In contrast, other topic number selection methods may have the following problems.
+
+First, the perplexity method has the possibility that the calculated score decreases as the number of topics increases, leading to the final inability to select the optimal number of topics.
+
+Second, the scores obtained by the JS divergence method increase with the number of topics, which makes it difficult to converge, and it also suffers from the problem that the final number of selected topics is too large.
+
+Third, the score curve calculated by the coherence method is too smooth, and multiple optimal values may appear.
+
+Fourth, when selecting the number of topics for the 20news_groups dataset, we found that the number of topics selected by the HDP method was too large. However, the HDP method is an improvement of the original LDA training model by mapping the text vector to the topic feature space to obtain a three-layer model of document-topic-feature items, and then, the optimal topics can be trained automatically. We find that there are still two problems in the application of the HDP method.
+
+The features that a reasonable topic classification should satisfy are not fully considered, such as the four features mentioned in our method. This leads to the fact that the optimal number of topics derived from the HDP method may be very different from the actual number of topics. In addition, the HDP method is difficult to be applied to other improved LDA models or some other text classification models constructed based on word and topic distributions because it is an improvement of the training process of the original LDA model.
+
+According to the results of selecting the number of topics in the 20news_groups dataset, it can be seen that the number of topics selected by our proposed method is closest to the original 20 topics. If the number of topics selected is too large, it may lead to too much subdivision of topics and too much similarity between topics, while if the number of subjects selected is too small, it may lead to some topics that should be separated being merged.
+
+# Clustering Effect Comparison
+
+To further verify the effectiveness of our proposed optimal topic number selection method, this section uses the T-SNE package [30] in Python to visualize and compare the testset and training set document clustering effects under the LDA topic models selected by different methods.
+
+According to the LDA document generation formula, the generation probability of each word in each document is shown in Equation (11).
+
+$$
+p (w | d _ {m}) = \sum_ {z = 1} ^ {K} p (w | z) p (z | d _ {m}) = \sum_ {z = 1} ^ {K} \phi_ {m} \theta_ {m} \tag {11}
+$$
+
+where $\phi_{m} = p(w|z)$ denotes the probability of word $w$ in the topic $z$ . $\theta_{m} = p(z|d_{m})$ denotes the probability of topic $z$ in the $m$ th document $d_{m}$ . Therefore, the generation probability of a document containing $n$ word vectors $W$ is shown in Equation (12).
+
+$$
+p (W | d _ {m}) = \prod_ {i = 1} ^ {n} \sum_ {z = 1} ^ {K} p (w | z) p (z | d _ {m}) = \prod_ {i = 1} ^ {n} \sum_ {z = 1} ^ {K} \phi_ {m} \theta_ {m} \tag {12}
+$$
+
+After training the LDA model on the original test set of 20news_groups data in the previous section, we have obtained the "topic-word" probability distribution for these datasets with different number of topics $k$ , which is $\phi_{m}$ in Equation (12). For the test set, we
+
+Entropy 2021, 23, 1301
+
+16 of 45
+
+can calculate the "document-topic" probability distribution $\theta_{m}$ for each document based on the known "topic-word" probability distribution $\phi_{m}$ .
+
+In this paper, we use the Gibbs Sampling approach, which is commonly used in LDA models, to estimate the "document-topic" probability, as shown in Equation (13).
+
+$$
+\begin{array}{l} p (z _ {i} = k | \vec {z} _ {\neg i}, \vec {w}) \propto p (z _ {i} = k, w _ {i} = t | \vec {z} _ {\neg i}, \vec {w} _ {- i}) \\ = \mathrm {E} \left(\theta_ {m k}\right) \times \mathrm {E} \left(\phi_ {k t}\right) \\ = \hat {\theta} _ {m k} \times \hat {\phi} _ {k t} \tag {13} \\ = \frac {n _ {k , - i} ^ {(k)} + \alpha_ {k}}{\sum_ {k = 1} ^ {K} (n _ {k , - i} ^ {(k)} + \alpha_ {k})} \times \frac {n _ {k , - i} ^ {(t)} + \beta_ {t}}{\sum_ {k = 1} ^ {K} (n _ {k , - i} ^ {(t)} + \beta_ {t})} \\ \end{array}
+$$
+
+where $\hat{\theta}_{mk}$ and $\hat{\phi}_{kt}$ correspond to the "document-topic" probability estimation and "topic-word" posterior probability estimation in the LDA model. $\neg i$ means remove the word with subscript $i$ . $n_{k,\neg i}^{(k)}$ denotes the count of words belonging to topic $k$ in the $m$ th document after removing the words with subscript $i$ .
+
+For the test set, $\hat{\phi}_{kt}$ is stable and invariant, so only $\hat{\theta}_{mk} = \frac{n_{k,\neg i}^{(k)} + \alpha_k}{\sum_{k=1}^K (n_{k,\neg i}^{(k)} + \alpha_k)}$ is needed to be estimated, and then, we can obtain the posterior probability of the topic to which each word in document $m$ belongs. Finally, the "document-topic" probability of the test document can be calculated based on the statistics of the topics corresponding to each word after multiple sampling.
+
+The specific steps are as follows.
+
+Step1: Select one of the documents $m$ in the test set and assign a random topic number $z$ to each word $w$ in this document. Set the initial value of the hyperparameter $\alpha$ . In this paper, the initial value of $\alpha$ is set to $1 / k$ .
+
+Step2: The probability of each word corresponding to topic $z$ is estimated using the Gibbs Sampling method, and then, the topic number corresponding to each word is updated.
+
+Step2.1: Estimation of the current topic distribution of document m, which is $\hat{\theta}_{mk} = \frac{n_{k, - i}^{(k)} + \alpha_k}{\sum_{k = 1}^K(n_{k, - i}^{(k)} + \alpha_k)}$
+
+Step2.2: Calculate the probability that each word in document $m$ corresponds to the currently assigned topic, that is, $p(z_{i} = k|\vec{z}_{\neg i},\vec{w}) = \hat{\theta}_{mk}\times \hat{\phi}_{kt}$ , where $\hat{\theta}_{mk}$ is estimated from Step2.1, and the "document-topic" probability $\hat{\phi}_{kt}$ is derived from the training set.
+
+Step2.3: The topics to which each word belongs are reassigned according to the current topic probability $p(z_{i} = k \mid \vec{z}_{\neg i}, \vec{w})$ corresponding to each word.
+
+Step3: Repeat Step2 until Gibbs Sampling convergence reaches a steady state, that is, the estimate of $p(z_{i} = k\Big|\vec{z}_{\neg i},\vec{w})$ is stable, at which point we consider the assignment of topics to document m reasonable.
+
+Step4: The "document-topic" probability distribution of document $m$ is obtained by counting the frequency distribution of the topic to which each word in document $m$ belongs.
+
+Step5: Repeat Step1 to Step4 for each document in the test set to obtain the "document-topic" probability for each document.
+
+Each document in the training and test sets is represented by a k-dimensional "document-topic" probability distribution, which is used to draw a topic clustering map of the documents. To better compare the clustering effect of the documents in the training and test sets, we first use a binary variable to label the documents as training or test documents, respectively. Then, the documents in the training and test sets are clustered together based on the k-dimensional "document-topic" probability distribution of each document.
+
+Finally, the clustering graphs of the documents in the training set and test set are displayed separately according to the document IDs. This enables the borders of the clustering graphs of the training and test sets to be consistent, allowing us to distinguish the performance of the topic models in the training and test sets more clearly. This processing allows the
+
+Entropy 2021, 23, 1301
+
+17 of 45
+
+distribution of the clusters in the training and test sets to be consistent across the range, allowing us to analyze the performance of the topic models on both the training and test sets more clearly.
+
+Among the original topics in the 20news_groups dataset, some of them have widely different content (e.g., comp.sys.mac.hardware and rec.sport.hockey belong to the computer and sports domains, respectively), while others have more similar content (e.g., rec.sport.hockey and rec.sport.baseball belong to the same field of sports). In this section, we compare the clustering effect of documents with similar content and the clustering effect of documents with more different content.
+
+First, we select documents with large differences in topic content for clustering comparison, which are documents under the four original topics of alt atheism, comp.sys.mac.hardware, rec.sport.hockey, and sci.space.
+
+We compare the clustering of the training and test set documents under 13 topics (LDA) and 25 topics (word-embedding LDA) selected by our proposed optimal topic selection method, 8 topics selected by the perplexity method (the number of topics selected by the coherence method is seven, which is basically the same as the number of topics selected by the perplexity method, so we only use the LDA training model with eight topics for analysis), 30 topics selected by the JS divergence method, and 59 topics selected by the HDP method, as shown in Figures 4-7.
+
+Each dot in the figure represents a document, the color of the dot indicates the original topic it belongs to, and the elliptical box line indicates the clustering result of the LDA model under that number of topics.
+
+![](dt=2026-06-05/ht=13/c92e535e91f334facb668dd5b7e6855cbf7d7aa234aff2fa81843181f1f749e0.jpg)
+
+![](dt=2026-06-05/ht=13/914ec24bccac65ea344144a0c25f1109c5801a08855ee64c55257ee40c93b7d8.jpg)
+
+From Figure 4a, we can see that the LDA model with 13 topics selected by the optimal topic number selection method is able to classify well the documents originally belonging to the four topics of alt. atheism, comp.sys.mac.hardware, rec.sport.hockey, and sci.space in the original training set. As can be seen in Figure 4b, for the test documents not involved in the LDA model training, the LDA model under 13 topics is also able to reasonably classify their topics, and the clustering results are basically consistent with the results of the training set in Figure 4a.
+
+Entropy 2021, 23, 1301
+
+18 of 45
+
+![](dt=2026-06-05/ht=13/c44a5c18643457eac43dfd6a15d659df617dc25813ffc454be903ccf8863078d.jpg)
+
+![](dt=2026-06-05/ht=13/d9f2df21c25be612e788196f4776ab3e59384227eca32f85b2ec43d33680054a.jpg)
+
+![](dt=2026-06-05/ht=13/38168abd7a7035a8dad0ef5f7ce445b8fd33580441cc59961d48a34bdcebfb0f.jpg)
+
+![](dt=2026-06-05/ht=13/e38fc136e88cebe9432ddb8893cec53a884ca776ce5d15f31cbc60090c65cd34.jpg)
+
+![](dt=2026-06-05/ht=13/4037aa001523fe3efa138b51e8d61eb664a34b8adb939fef89628553a3fdb254.jpg)
+
+![](dt=2026-06-05/ht=13/e05bd4d749bf5ce111c4affb5347c707cf39d50397b26dcf591db44303c5cd75.jpg)
+
+Entropy 2021, 23, 1301
+
+19 of 45
+
+Figure 5a shows that the LDA model under eight topics selected by the perplexity method is able to classify well those documents that originally belong to the four topics of alt. atheism, comp.sys.mac.hardware, rec.sport.hockey, and sci.space in the original training set. As can be seen in Figure 5b, the LDA model with eight topics is also able to reasonably classify the topics for the test documents that did not participate in the LDA model training, and the clustering results are basically consistent with the results of the training set in Figure 5a.
+
+From Figure 6a, it can be seen that the LDA model under 30 topics selected by the JS divergence method can cluster the documents in the training set in a relatively reasonable way, but it appears that those documentsthat originally belong to the same topic are divided into multiple classes. Documents that originally belonged to the category comp.sys.mac.hardware were clustered into two categories, as shown in the orange elliptic boxed line. Documents that originally belonged to the category sci.space were clustered into two categories, as shown in the red elliptic boxed line.
+
+The LDA model under 30 topics shows more fuzzy regions when clustering document topics, as shown in the gray elliptic region in Figure 6a. The clustering of the test set documents in Figure 6b is generally consistent with the clustering performance of the training set in Figure 6a.
+
+From Figure 7a, we can see that the LDA model under 59 topics selected by the HDP method is able to perform some topic classification of the documents under the original training set. However, this classification suffers from the problem of dividing documents that originally belong to the same topic into multiple small clusters. This is due to the excessive number of topics selected by the HDP method, which results in documents that originally belong to one topic being divided into multiple topics.
+
+This excessive topic division can lead to a reduction in the ability of the LDA topic model to perform topic division for untrained documents. As shown in Figure 7b, when using the test documents that did not participate in the training for topic clustering, the clusters appear too scattered, and the boundaries between topics and themes are too blurred. In particular, the documents under the topic alt.
+
+theism still show some clustering effect in the training set, but the clustering effect in the test set is greatly reduced, and even some more fuzzy areas appear; see the gray elliptic area in Figure 7b.
+
+Then, we would like to further observe the clustering effect of the LDA model for documents with more similar topics under different topic number selection methods. We have selected the documents under the four original topics comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey. The documents under these four original classes were chosen because comp.sys.mac.hardware and comp.windows.x both belong to the computer domain, and rec.sport.baseball and rec.sport.hockey both belong to the sports domain, as shown in Figures 8-11.
+
+![](dt=2026-06-05/ht=13/819ae06b582a01b76793699656017268f778cc5ce789f74a10d5cc7bf99c328b.jpg)
+
+![](dt=2026-06-05/ht=13/b10e62399d22034de245af32b5590b478aaa252d858b82be162279a51e985bf0.jpg)
+
+Entropy 2021, 23, 1301
+
+20 of 45
+
+![](dt=2026-06-05/ht=13/73c6d6c6c9cc3ec520016b5f11568438f37db5c0fc8bead75aa335e6642acae6.jpg)
+
+![](dt=2026-06-05/ht=13/a6c936d7294b1859b7ade38167b0e0ce1f9c909789d81052aaf3e54a3e48c9c5.jpg)
+
+![](dt=2026-06-05/ht=13/766ca6472f9cba864897de593acd63c902cc36bbdae26e64df7a7a727e86cd29.jpg)
+
+![](dt=2026-06-05/ht=13/bf0ee0294d463ea89474ec94a35b80375d1ec71fba71f41aa48e38be3196af17.jpg)
+
+![](dt=2026-06-05/ht=13/144b829a316e74453e00e7f72ddea1a31e7fa38620fd84a0a0a38b27102c02c0.jpg)
+
+![](dt=2026-06-05/ht=13/77a24e8b2121c82f014d8b0401b0864239cdd6d83281553d4f0d07c1e963048d.jpg)
+
+Entropy 2021, 23, 1301
+
+21 of 45
+
+From Figure 8a, we can see that the LDA model with 13 topics selected by the optimal topic selection method clusters the documents belonging to the four topics of comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey under the original training set into three categories, where the categories comp.sys.mac.hardware and comp.windows.x can be better divided into two categories, while rec.sport.baseball and rec.sport.hockey are clustered into one category. The clustering results in Figure 8b for the test documents that were not involved in the LDA model training are consistent with the results of the training set in Figure 8a.
+
+From Figure 9a, we can see that the LDA model with eight topics selected by the perplexity method does not achieve good clustering for the documents belonging to the four original topics of comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey in the original training set. The demarcation of documents under the comp.sys.mac.hardware and comp.windows.x themes is blurred, and documents under the rec.sport.baseball and rec.sport.hockey themes are clustered into one category. The clustering results in Figure 9b for the test documents that were not involved in the LDA model training are consistent with the results of the training set in Figure 9a.
+
+From Figure 10a, we can see that the LDA model with 30 topics selected by the JS divergence method clusters the documents belonging to the four topics of comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey under the original training set into three categories, where the categories comp.sys.mac.hardware and comp.windows.x can be better divided into two categories, while rec.sport.baseball and rec.sport.hockey are clustered into one category. The clustering results in Figure 10b for the test documents that were not involved in the LDA model training are consistent with the results of the training set in Figure 10a.
+
+As can be seen in Figure 11a, the LDA model for the 59 topics selected by the HDP method clusters those training set documents belonging to the four original topics of comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey into roughly three categories. The documents belonging to the categories comp.sys.mac.hardware and comp.windows.x can be better divided into two categories, while the documents belonging to rec.sport.baseball and rec.sport.hockey are clustered into one category.
+
+While this result is consistent with the LDA training model with 13 topics and 30 topics, the LDA model with 59 topics clearly clusters each topic into more subclasses. As can be seen from Figure 11b, the clustering effect for the test documents that did not participate in the training is basically the same as the training set, but the original training model divides too many topics, resulting in the clustering effect of the test set documents under the number of 59 topics not being as clear as the boundaries of the clusters with 13 topics and 30 topics.
+
+Finally, the performance of our proposed optimal topic number selection method on the word-embedding LDA model will be verified. In addition to choosing documents from the same original categories as before for comparison, we added a categorical comparison of documents from four topics: comp.graphics, comp.sys.mac.hardware, rec.autos, and sci.space.
+
+From Figure 12a, we can see that the word-embedding LDA model with 25 topics selected by the optimal topic number selection method is able to classify the documents originally belonging to the four topics of alt. atheism, comp.sys.mac.hardware, rec.sport.hockey, and sci.space in the original training set well. As can be seen in Figure 12b, the word-embedding LDA model under 25 topics is also able to reasonably classify the topics for the test documents that did not participate in the word-embedding LDA model training, and the clustering results are generally consistent with those of the training set in Figure 12a. This result is consistent with the results of the original LDA model with a topic number of 13 selected by our method.
+
+Entropy 2021, 23, 1301
+
+22 of 45
+
+![](dt=2026-06-05/ht=13/caecf3d2059a6b031583a21573a42b9559ca9fd17968b9f1016f2db8603b968a.jpg)
+
+![](dt=2026-06-05/ht=13/1b87f4506f63ccd40bc9b31f8387cfdc594af2758e226acecc32cb955814c257.jpg)
+
+From Figure 13a, we can see that the word-embedding LDA model with 25 topics selected by the optimal topic selection method clustered the documents belonging to the four topics of comp.sys.mac.hardware, comp.windows.x, rec.sport.baseball, and rec.sport.hockey in the original training set into three categories. The categories comp.sys.mac.hardware and comp.windows.x were able to be better divided into two categories, while rec.sport.baseball and rec.sport.hockey were clustered into one category. As can be seen from Figure 13b, the clustering effect for the test documents that did not participate in the training is consistent with the training set. This result is consistent with the results of the original LDA model with a topic number of 13 selected by our method.
+
+![](dt=2026-06-05/ht=13/30b7ca3629950755c336cc728071a9da4a84a1a56b264a61821c2541af9b7675.jpg)
+
+![](dt=2026-06-05/ht=13/8b22ace8035b93127e17a8d14decc0ef508686081f6e3e5dcda9fea820c1eccf.jpg)
+
+As can be seen from Figure 14a, the document contents of the four original topics, comp.graphics, comp.sys.mac.hardware, rec.autos, and sci.space, are not identical, but the LDA models under the 13 topics selected by the optimal topic selection method are not clearly clustered for the original training set. The clustering effect on the test set is the same as that on the training set.
+
+Entropy 2021, 23, 1301
+
+23 of 45
+
+![](image)-05/ht=13//1b2eddfc1a705cfd98cf18c0b3b3fb41e6c205b3e8c91311d7e3f7cdcf9918e5.jpg)
+
+![](dt=2026-06-05/ht=13/6cde4b61e1fcf999dd8adeddfabed84f69bbdf0db76555de52f7268c865ab6de.jpg)
+
+From Figure 15a, it can be seen that the word-embedding LDA model under 25 topics selected by the optimal number of topics selection method is able to classify documents originally belonging to the four topics of comp.graphics, comp.sys.mac.hardware, rec.autos, and sci.space under the original training set with better results than the original LDA model under LDA models with 13 topics, as shown in Figure 14a. As can be seen in Figure 15b, for the test documents that did not participate in the word-embedding LDA model training, the word-embedding LDA model under 25 topics is also able to classify their topics reasonably well, and the clustering results are basically consistent with those of the training set in Figure 15a.
+
+![](dt=2026-06-05/ht=13/bfbfb834d881a84fbd81eaf77e25a3af341c9b861be925a6636d64f3ae7daa5a.jpg)
+
+![](dt=2026-06-05/ht=13/88e73e59242290fa157d0be02a4b0c8d8cd7ee2e2bc862832d8eed608f6f98dd.jpg)
+
+# 4.3.2. The Experimental Results of WOS_46986
+
+Comparison of Different Topics Number Selection Methods
+
+In this section, we use the WOS_46986 dataset to compare the optimal topic number selection method proposed in this paper with several commonly used methods: the perplexity selection method, JS divergence selection method, and coherence selection method. We also include the results of the optimal topic number selection method applied to the
+
+Entropy 2021, 23, 1301
+
+24 of 45
+
+word-embedding LDA model for the comparison. The topic model scores of different topic selection methods are shown in Figure 16.
+
+![](dt=2026-06-05/ht=13/da14f0afa1b913447871aa72fa609cf5ba65976396e86fbc8e721abd865bee5e.jpg)
+
+As can be seen in Figure 16, the optimal topic number selection method proposed in this paper selects the number of topics in the LDA model as seven and selects the number of topics in the word-embedding LDA model as five. The optimal number of topics selected by the perplexity method is nine, the JS divergence method is 20, and the coherence selection method is five. The trends of the score curves calculated by the optimal topic number selection method, the perplexity selection method, the JS divergence method, and the coherence selection method in the WOS_46986 and 20new_groups datasets are generally consistent.
+
+However, in the application of the word-embedding LDA model, the trend of the score curves calculated by the optimal topic number selection method in the WOS_46986 dataset is slightly different from that in the 20news_groups dataset. In the 20news_groups dataset, the score curve shows a clear downward trend in the range of five to 25 topics. In the WOS_46986 dataset, the score curve shows a decreasing trend in the range of two to five topics, an increasing trend in the range of five to 10 topics, and a decreasing trend again after the number of topics is greater than 10.
+
+There are two possible reasons for this discrepancy. First, the documents in the WOS_46986 dataset have relatively concentrated word expressions. Second, the original WOS_46986 dataset has further divided each topic into multiple subdomains under the seven main categories. The word-embedding method allows the words of each document to form more associative relationships on the subdomains, thus enabling further segmentation of the subdomains when the number of topics is further increased.
+
+# Clustering Effect Comparison
+
+Among the original topics of the WOS_46986 dataset, there are some topics with large differences in document content, such as documents under the original topics of ECE, Psychology, and Biochemistry. There are also some topics with some overlap in document content, such as documents under the original topics Medical and Biochemistry, and documents under the original topics ECE (Electrical and Computer Engineering) and CS (Computer Science).
+
+First, we selected three topics with large differences in content for clustering comparison, which are documents under the original topics of ECE (Electrical and Computer Engineering), Psychology, and Biochemistry. We compare the clustering of the training and test set documents under seven topics (LDA) and five topics (word-embedding LDA) selected by our proposed optimal topic selection method, and 20 topics selected by the
+
+Entropy 2021, 23, 1301
+
+25 of 45
+
+JS divergence method. The number of topics selected by the perplexity method is nine, which is basically the same as the number of topics selected by the optimal topic selection method, so we only use the LDA training model with seven topics for analysis, as shown in Figures 17-22. Each dot in the figure represents a document, the color of the dot indicates the original topic it belongs to, and the elliptical box line indicates the clustering result of the LDA model under that number of topics.
+
+![](dt=2026-06-05/ht=13/b5fac0a7193983241ea6d8f866091bd58fa1dabc374ac130496aa0b8995069f0.jpg)
+
+![](dt=2026-06-05/ht=13/679bdfd14931a231d260d56b598a198ad4b5df6fe8210021defc8eebe6a70cdd.jpg)
+
+From Figure 17a, we can see that the LDA model with seven topics selected by the optimal topic number selection method is able to classify well the documents originally belonging to the three topics of ECE, Psychology, and Biochemistry in the original training set. As can be seen in Figure 17b, for the test documents not involved in the LDA model training, the LDA model under seven topics is also able to reasonably classify their topics, and the clustering results are basically consistent with the results of the training set in Figure 17a.
+
+![](dt=2026-06-05/ht=13/2cd5eb61a4ec3034bd728a53e397b414643f97cbad91b840dc7ab26ac3ab1e3a.jpg)
+
+![](dt=2026-06-05/ht=13/b2455b30954a4953f149d8984259205bd6c6040d5cce11baea0c67f69cbf97a3.jpg)
+
+Entropy 2021, 23, 1301
+
+26 of 45
+
+![](dt=2026-06-05/ht=13/4ab8c80375ae997068f6c16221a6fe86137c0a1aa5c48dc57eb05907193965fa.jpg)
+
+![](dt=2026-06-05/ht=13/47263a54cc15de0c1ff3c16c9f871eb6e49a66dec88629300b019af7ca883c66.jpg)
+
+![](dt=2026-06-05/ht=13/9e8c546b45ed64c26dce0b4f311a6103e3949e96394a25e87092a1e24a2ff809.jpg)
+
+![](dt=2026-06-05/ht=13/86bf32dbf0b77b09281cb729ea031ccca5c122efcb86d13e395e586dc4bab484.jpg)
+
+![](dt=2026-06-05/ht=13/36efcf568061f94a494489dd8bdf2c338435adc0b507c7d17d39ad0345d33aaf.jpg)
+
+![](dt=2026-06-05/ht=13/2619a065c864933a695399e3c8c1ef508f4a090127606d430f927237f8ecda29.jpg)
+
+Entropy 2021, 23, 1301
+
+27 of 45
+
+![](dt=2026-06-05/ht=13/9529345f9182c0e2c7f40b5ad91467b60fb8b90575bc17fa04ae59d5c36eca07.jpg)
+
+![](dt=2026-06-05/ht=13/b344bbab378e10a07353df470ceb9088ea9ce682a4ddf89e973464f078e82db6.jpg)
+
+From Figure 18a, it can be seen that the LDA model with 20 topics selected by the JS divergence method is able to properly classify the documents originally belonging to the three topics of ECE, psychology, and biochemistry in the original training set. However, compared with the LDA model with seven topics, the clustering boundary under the LDA model with 20 topics is more blurred. As can be seen in Figure 18b, the clustering results of the LDA model under 20 topics for the test documents that did not participate in the training of the LDA model are generally consistent with the results of the training set in Figure 18a.
+
+From Figure 19a, it can be seen that the word-embedding LDA model under five topics selected by the optimal topic number selection method is able to classify those documents originally belonging to the three topics of ECE, Psychology, and Biochemistry under the original training set well. As can be seen in Figure 19b, the word-embedding LDA model under five topics can also reasonably classify the topics for the test documents that did not participate in the training, and the clustering results are basically consistent with the results of the training set in Figure 19a.
+
+Next, we further observe the classification effect of the LDA model for documents with more similar topic content under different numbers of topics. We selected documents under the original categories of CS, ECE, Medical, and Biochemistry. Among them, there are many documents with overlapping contents in CS and ECE topics, and some documents with overlapping contents in Medical and Biochemistry topics.
+
+From Figure 20a, we can see that the LDA model with seven topics selected by the optimal topic number selection method divides the documents originally belonging to the four categories of CS (Computer Science), ECE (Electrical and Computer Engineering), Medical, and Biochemistry into three clusters. The documents under Medical and Biochemistry have some overlap, but therespective clusters can be roughly seen, while the documents originally belonging to the CS and ECE categories have more overlap. As can be seen in Figure 20b, the clustering results for the test documents that were not involved in the LDA model training are basically the same as the results of the training set in Figure 20a.
+
+From Figure 21a, it can be seen that compared to the LDA model under seven topics, the LDA model with 20 topics has fuzzier clustering boundaries for the documents belonging to the four original categories of CS, ECE, Medical, and Biochemistry in the training set. As can be seen in Figure 4b, the clustering results of the LDA model with 20 topics for the test documents that did not participate in the training are generally consistent with the results of the training set in Figure 21a.
+
+Entropy 2021, 23, 1301
+
+28 of 45
+
+From Figure 22a, we can see that the LDA model with five topics selected by the optimal topic number selection method clusters the documents originally belonging to the four categories CS, ECE, Medical, and Biochemistry into four categories roughly. Although there is some overlap between the documents originally belonging to Medical and Biochemistry and the documents originally belonging to CS and ECE, the clustering effect of these categories is better than that of the LDA model with seven topics. As can be seen in Figure 22b, the clustering results for the test documents that were not involved in the training of the word-embedding LDA model are generally consistent with the results of the training set in Figure 22a.
+
+# 4.3.3. The Experimental Results of AG_News
+
+Comparison of Different Topics Number Selection Methods
+
+In this section, we use the AG_news dataset to compare the optimal topic number selection method proposed in this paper with several commonly used methods: the perplexity selection method, JS divergence selection method, and coherence selection method. We also include the results of the optimal topic number selection method applied to the word-embedding LDA model for the comparison. The topic model scores of different topic selection methods are shown in Figure 23.
+
+![](dt=2026-06-05/ht=13/e81d73f72958c3cc3d4d82193f2c062f07358608cd4316c0c6c219205f696b5a.jpg)
+
+As can be seen in Figure 23, the optimal topic number selection method proposed in this paper selects the number of topics in the LDA model as four and selects the number of topics in the word-embedding LDA model as 11. The optimal number of topics selected by the perplexity method is 10, the JS divergence method is 20, and the coherence selection method is three.
+
+Entropy 2021, 23, 1301
+
+29 of 45
+
+Clustering Effect Comparison
+
+The AG_news dataset includes four original themes: world, sports, business, and sci/tech. These four topics cover a wide range of content. Even for documents under the same topic, the content varies greatly. In this section, we compare the clustering effects of the LDA model with four topics and the word-embedding LDA model with 11 topics selected by the optimal topic number selection method, as well as the clustering effects of the LDA model with 10 topics selected by the perplexity method.
+
+The number of topics selected by the coherence method is three, which is basically the same as the number of topics selected by the optimal topic selection method, so we only use the LDA training model with four topics for analysis. The JS divergence method still suffers from the problem that the number of selected topics is too large, so its clustering effect is similar to that of the 20 new groups and WOS_46986 datasets, and we do not repeat the demonstration in this section.
+
+Combining Figures 24 and 25, it can be seen that the LDA model with four topics selected by the optimal topic number selection method can classify the documents under the three classes of Sci/Tech, Sports, and World in AG_news well. However, the clustering of documents under the original category of Business is not effective.
+
+![](dt=2026-06-05/ht=13/8190300353557cd8899d52761a89775cd4c76dab9f5e05e7c3231d9b80ee321b.jpg)
+
+![](dt=2026-06-05/ht=13/f01985f9ecc601106f2709488501948e234397fa2d93925bc86b6a05b69e4f9f.jpg)
+
+![](dt=2026-06-05/ht=13/b68bd607935d40ad5fbc4ea1e170413049e1d7962ce3832c102d0747cff940ab.jpg)
+
+![](dt=2026-06-05/ht=13/d6b2ec04cb38dc457f94862993944d0269b8d70725aec0c2d2645cc3368866c7.jpg)
+
+Entropy 2021, 23, 1301
+
+30 of 45
+
+Combining Figures 26 and 27, it can be seen that the LDA model with 10 topics selected by the perplexity method can roughly classify the documents belonging to AG_news under the three classes of Sci/Tech, Sports and World, but the effect is not as good as that of the LDA model with four topics. At the same time, the clustering of documents belonging to the original category of business does not perform well.
+
+![](dt=2026-06-05/ht=13/a3f0a019dc140b1b9143182098221d5ea6c664be450a252a039eb781740c91b4.jpg)
+
+![](dt=2026-06-05/ht=13/3ffb5c775d30096f50a0a19b4dd3e01e01a04dd50614fd6a6ec4cb0be2d1410c.jpg)
+
+![](dt=2026-06-05/ht=13/83f1994a75491aff895b2f1bc34d74aed8535f1de75e0d6a6707c724db03e2de.jpg)
+
+![](dt=2026-06-05/ht=13/a6d728d2aecf635e966564c3d7033b2bac1ef494e4e7b300c8bcc3b2ac709838.jpg)
+
+Combining Figures 28 and 29, it can be seen that the word-embedding LDA model with 10 topics selected by the optimal number of topics selection method performs better than the two LDA models mentioned above. The word-embedding LDA model is not only able to classify the documents under the three categories of Sci/Tech, Sports, and World in AG_news but also to perform some clustering of the documents under business topics.
+
+Entropy 2021, 23, 1301
+
+31 of 45
+
+![](dt=2026-06-05/ht=13/6c6faae05bfddfc9dc812aa81eaa7832b0e1631a054f441e85cbd05b4b077e11.jpg)
+
+![](dt=2026-06-05/ht=13/3a171d90ae80719abe76d240374301e9532bd59016043631d776e8631092da4b.jpg)
+
+![](dt=2026-06-05/ht=13/0ccc2fcd13697f1b8844c7fa1feaa6066527cdca204c2c95d26bcfbdcadac91e.jpg)
+
+![](dt=2026-06-05/ht=13/645a80ffd347ea8f9ce866c115e9d8ad987b4309cfcb7c37821c5d8246523088.jpg)
+
+# 4.4. Comparison of Time Consumption
+
+The experimental environment is a computer with Windows 10 Home Edition operating system, Intel (R) Core (TM) i7-11700 CPU, 2.50GHz, and 16GB RAM. We use different data sizes to compare the time consumption of different methods. The different data sizes are shown in Table 6.
+
+Table 6. Characteristics and differences of data size.
+
+![](dt=2026-06-05/ht=13/09fd74ddf41c4694fb304478d5ff868f7efc3659e2847bdc6db8d50079f3aa1a.jpg)
+
+<table><tr><td>Dataset</td><td colspan="4">20news_groups</td><td colspan="4">WOS_46986</td><td colspan="4">AG_news</td></tr><tr><td>Model</td><td colspan="2">LDA</td><td colspan="2">word_embedding</td><td colspan="2">LDA</td><td colspan="2">word_embedding</td><td colspan="2">LDA</td><td colspan="2">word_embedding</td></tr><tr><td>Data size</td><td>100%</td><td>80%</td><td>100%</td><td>80%</td><td>100%</td><td>80%</td><td>100%</td><td>80%</td><td>100%</td><td>80%</td><td>100%</td><td>80%</td></tr><tr><td>Dictionary length</td><td>10,455</td><td>10,455</td><td>52,842</td><td>52,842</td><td>17,465</td><td>17,465</td><td>37,441</td><td>37,441</td><td>19,529</td><td>19,529</td><td>40,461</td><td>40,461</td></tr><tr><td>Number of texts</td><td>11314</td><td>9051</td><td>11314</td><td>9051</td><td>28,190</td><td>22,552</td><td>28,190</td><td>22,552</td><td>120,000</td><td>96,000</td><td>120,000</td><td>96,000</td></tr><tr><td>Bag of Words</td><td>1,006,011</td><td>803,520</td><td>19,494,540</td><td>15,752,120</td><td>2,836,169</td><td>2,428,971</td><td>23,948,780</td><td>19,199,000</td><td>2,448,795</td><td>1,960,293</td><td>21,291,360</td><td>17,042,060</td></tr><tr><td>Average text length</td><td>88.92</td><td>88.78</td><td>1723.05</td><td>1740.37</td><td>100.61</td><td>107.71</td><td>849.55</td><td>851.32</td><td>20.41</td><td>20.42</td><td>177.43</td><td>177.52</td></tr></table>
+
+Entropy 2021, 23, 1301
+
+32 of 45
+
+As shown in Table 6, under the same dataset, the same amount of text is used for training the LDA model or the word-embedding LDA model. However, since the texts used for the word-embedding LDA model are processed for word expansion, the dictionary length, total word count, and average text length of these texts are larger than those used for LDA model training.
+
+In terms of dictionary length and the number of texts trained under the LDA model, the AG_news dataset has the longest dictionary and the largest number of texts, the WOS_46986 dataset is the next longest, and the 20news_groups dataset is the smallest. In terms of the size of the bag-of-words trained by the LDA model, the WOS_46986 dataset has the largest number of words, the AG_news dataset is the next largest, and the 20news_groups dataset is the smallest.
+
+In terms of the average text length under the LDA model, the WOS_46986 datasethas the longest average text length, the 20news_groups dataset has the second longest, and the AG_news dataset has the shortest. In the word-embedding LDA model, since the words in the 20news_groups dataset undergo a twenty times expansion process, while the WOS_46986 dataset and AG_news dataset are both ten times expanded, the dictionary length, word pocket size, and average text length of the expanded 20new_groups dataset are the largest.
+
+It can be seen that although the AG_news dataset has the largest number of texts, the dictionary of this dataset is long and the text content is short, resulting in most of the text content within the dataset being sparse. In contrast, the text content of the WOS_46986 dataset is more focused. The different text sizes of the datasets will result in different time consumption for model training and topic number selection, as shown in Figure 16.
+
+The training speed of the LDA model is related to several factors. First, the larger the number of topics trained, the more time it takes. As shown in Figure 30, the time consumption of each data set increases with the X-axis coordinate. Second, the longer the average text length, the more time it takes. For example, although the word-embedding LDA model for the AG_news dataset has a larger bag-of-words size than the word-embedding dataset of 20news_groups and has the largest number of documents, its training time consumption is relatively small.
+
+Third, the larger the bag-of-words size, the more time consuming in the training, as can be seen from the comparison results of the red and black lines in Figure 30. Fourth, when the bag-of-words sizes are similar, the number of texts has a higher impact on the training time than the text length. For example, the $80\%$ WOS_46986 dataset contains 19,199,000 words in the bag-of-words of the word-embedded text, and the $100\%$ 20news_groups dataset contains 19,494,540 words in the bag-of-words of the word-embedded text, which are similar to each other.
+
+The average text length of the WOS_46986 dataset is 849.55 words smaller than the 1723.05 words of the 20news_groups dataset, but the WOS_46986 dataset contains 28,190 texts higher than the 11,314 texts of the 20news_groups dataset. Ultimately, the WOS_46986 dataset takes more time to train than the 20news_groups dataset, and this phenomenon becomes more apparent as the number of training topics increases.
+
+![](dt=2026-06-05/ht=13/1e0d784b81c2a46fdb281acae55652e8d9b5a8315e2e99be61274b9ff906950e.jpg)
+
+![](dt=2026-06-05/ht=13/4d3c9cd50f7a678d9b7b030b289ffdec63daed4e05cb8e05e1fc5bf1beed66d5.jpg)
+
+![](dt=2026-06-05/ht=13/63411b5a2b9f896e61c0f6469b3f69ac618f34eb078acfa0c986226e20b1d6b6.jpg)
+
+Entropy 2021, 23, 1301
+
+33 of 45
+
+The next discussion is the computational time consumption of different topic number selection methods for different data sizes. First, the computation time of the four dimensions of our proposed optimal topic number selection method is shown in Figure 31.
+
+![](dt=2026-06-05/ht=13/098b0e55ca9b304d9114af6977b984de1ee363d53b642644d6c60e028822e5e7.jpg)
+
+![](dt=2026-06-05/ht=13/dc4bfd81967cc40069575f1837bfd8b2ffdf1f247c0a8c249b03ab2368df4483.jpg)
+
+It can be seen from Figure 31 that the computation time of the optimal topic number selection method on the word-embedding LDA model is higher than that on the ordinary LDA model. The time difference is the largest for the perplexity index, which is due to the fact that the perplexity calculation is related to the length of the text. It can also be seen from Figure 31 that the computation time of the optimal topic number selection method increases significantly as the number of topics increases. Figure 32 shows the computational time consumption of different topic selection methods for different dataset sizes.
+
+![](dt=2026-06-05/ht=13/4aa70b0d548dc96aa9328c16b592a95e23c1500495c17b6c1ae4eb15bb2f048c.jpg)
+
+![](dt=2026-06-05/ht=13/d061e45ad21fdccef8c87863047ea0079b044ddc5b4b8ce9caa2144a28498f02.jpg)
+
+Entropy 2021, 23, 1301
+
+34 of 45
+
+The time consumptions shown in Figure 32 are all for one sample training. From Figure 32, it can be seen that the computational time consumed by different topic number selection methods on both LDA models increases as the number of topics increases. Overall, the JS divergence method has the shortest computational time consumption on both LDA models. As seen in Figure 32a, the optimal topic number selection method takes less time than the perplexity and coherence methods for the topic number selection of the original LDA model.
+
+As seen in Figure 32b, the optimal topic number selection method takes less computational time than the perplexity method for the selection of topic numbers for the word-embedding LDA model. At the same time, when the number of trained topics is less than 15, the optimal topic selection method takes less time than the coherence method. When the number of trained topics is greater than 15, the optimal topic selection method takes more time than the coherence method. Figure 33 shows the computational time consumption of the optimal topic number selection method on different size datasets.
+
+![](dt=2026-06-05/ht=13/434a864c43836fb93d29208f56bdff444fff3d544f8adc541213a8516e19ae74.jpg)
+
+As can be seen from Figure 33, the overall computation time of the optimal topic selection method increases as the number of trained topics and the size of the data increases. In terms of data size differences, when the dictionary length and bag-of-words size are close (as shown by the lines in red and blue), the number of texts has a greater impact on computational time consumption than the text length. Relatively speaking, the bag-of-words size has the greatest impact on computational time consumption.
+
+For example, except for the smaller size of the bag-of-words, the data shown in the red line are larger in dictionary length, number of texts, and average text length than those in the black line. The result is that the data in the black line take more time to compute than the data in the red line. In addition, the effect of average text length on computational time consumption is greater when the number of trained topics is higher. For example, the purple and yellow lines are about the same size in terms of dictionary length and bag-of-words size.
+
+When the number of trained topics is less than 12, the data in the yellow line take more time to train than the purple line due to the higher number of texts. However, when the number of trained topics is greater than 12, the training time for the purple line exceeds that of the yellow line due to the longer average text length.
+
+From the above, it is clear that although our proposed method is constructed to consider reasonable topic selection from four indicators, while several other methods consider only one aspect of topic classification, the time consumed of our proposed method is in the middle level in terms of the time consumed for one-time computation. In addition, it
+
+Entropy 2021, 23, 1301
+
+35 of 45
+
+should be noted that if we want to obtain a more reliable optimal number of topic selection, we also need to perform multiple sampling, which will increase the computational time consumption of the optimal topic selection method.
+
+In summary, our proposed optimal topic number selection method has several advantages. First, in terms of the number of topics selected, the optimal topic number selection method can better select the appropriate number of topics for the LDA model. Compared with several other topic number selection methods, the optimal number of topics derived from our method is closest to the real number of topics. In our example, the number of topics selected by the perplexity method and the coherence method is much smaller than the real number of topics.
+
+The optimal number of topics selected by the JS divergence method is at the maximum boundary of the topic selection interval, which makes us skeptical about whether this selected number of topics is optimal. The optimal number of topics selected by the HDP method is much larger than the true number of topics.
+
+Second, from the score curves, the score curve of the number of topics derived from our proposed optimal topic number selection method is closest to a U-shaped curve, which makes it possible to find the optimal extreme value point in the score curve. On the one hand, the score curve derived from the perplexity method has an optimal point at the position where the number of topics is small.
+
+However, when the number of topics exceeds a certain threshold, the perplexity value decreases sharply with the increase in the number of topics, so the perplexity method may have the problem that the larger the number of topics selected, the lower the perplexity value, and the curve is difficult to converge. The topic number score curve derived from the coherence method presents a smooth fluctuating state, and the state of this curve is less reliable than the U-shaped curve obtained by the optimal topic number selection method in finding the optimal value.
+
+The curves derived from the JS divergence method, on the other hand, exhibit the problem of failure to converge as the number of topics increases.
+
+Third, from the clustering graphs under different topic numbers, the optimal topic number selection method and the perplexity method are able to classify documents with large differences in content clearly. The optimal number of topics selected by the JS divergence method is large, and there is the problem of overclassifying content that is originally the same topic.
+
+The HDP method selects the largest number of topics, which leads it to divide the original same topic content into multiple subclasses, similar to the state of model overfitting in the training set, which leads the model to fail to perform good classification in the test set instead.
+
+For documents with small differences in content, the LDA topic model selected by the optimal number of topics selection method and the JS divergence method can classify those documents that are similar in content but still have some differences better, but it is difficult to achieve good classification for documents with too similar content. In the example of this paper, the number of topics selected by the perplexity method is too small, making it impossible to classify documents with similar content.
+
+Although the number of topics selected by the HDP method is larger, it is still unable to effectively divide documents with similar topics and suffers from the problem of topic over division. In addition, the HDP method is difficult to apply to other topic classification models since it is an improvement of the LDA model.
+
+Fourth, although the number of topics selected by our proposed optimal topic number selection method cannot be exactly equal to the real number of topics, and there is the problem of difficulty in classifying topics for documents with similar content, this problem is in fact due to the original defect of the LDA model. The purpose of our proposed method is to evaluate LDA training models with different numbers of topics and to select the optimal one from them. It has been demonstrated by the above examples that this method can do this.
+
+However, our optimal topic number selection method does not change the defects of the original LDA topic model. If the original LDA model is unable to classify similar documents in any case, then our optimal topic number selection method is unable to do so, either. We use an improved word-embedding LDA model to further validate the applicability of our proposed method. It turns out that our proposed method
+
+Entropy 2021, 23, 1301
+
+36 of 45
+
+is also applicable to this improved LDA model. Since the word-embedding method can compensate for the problem that the original document word expressions are too sparse to be clustered, it makes the final selected word-embedding LDA model have better clustering effect than the original LDA model.
+
+In the subsequent sections, we will also use Chinese patent policy texts as real cases for LDA topic classification, and use our proposed optimal topic number selection method for topic division and calculation as further validation.
+
+# 5. Experiment and Analysis for Real Data
+
+# 5.1. Data and Pre-Processing
+
+The policy texts involved in this study are obtained from the Wolters Kluwer Information Database and Peking University Law Database. The scope of collection is patent policy texts from all provinces and cities in China (excluding Hong Kong, Macau and Taiwan).
+
+Since some patent policies are included in other policy texts, in order to collect patent policies as extensively as possible, this study retrieved all policy texts with one of the following keywords in the title: patent, intellectual property, science and technology, innovation, and all policy texts with the word patent in the full text in the two databases. After removing duplicate texts and texts with less than 20 words of content, there were 9286 valid patent policy texts remaining, ranging from 1982 to 2018.
+
+As shown in Figure 34, the number of total patent policies in China is low between 1980 and 1999 (start-up period), shows a faster growth from 2000 to 2008 (growth period), and fluctuates somewhat from 2009 to 2018 (fluctuation period).
+
+![](dt=2026-06-05/ht=13/05d413de1c628ca2e2c05abb2a2ce483e43dc1cf4644a7967533c51ffbd3da6a.jpg)
+
+Before conducting text analysis, the 9286 policy texts are first pre-processed. The steps are as follows:
+
+Step 1: Split words. Use Python's Jieba package [31] to split all the text into words.
+
+Step 2: Merge synonyms. For example, the names of universities are combined into universities; the names of banks are combined into banks; award rankings and grades are combined into award grades; technology parks with regional names are unified, etc.
+
+Step 3: Remove stop words. Punctuation, graphics, non-Chinese characters, auxiliary words, and words with a word frequency less than or equal to 10 are removed. Due to the wide range of policies collected in this study, some policies also contain topics that are not related to patents or technologies. In order to avoid producing unnecessary topics during LDA model training, this study also removes this part of irrelevant words. The final number of valid words obtained is 13,309.
+
+Entropy 2021, 23, 1301
+
+37 of 45
+
+# 5.2. LDA Model Training
+
+The specific training process is consistent with that described in Section 4. First, the cleaned 9286 patent policy texts are trained to generate LDA models under different topic numbers $k$ . Then, the ratio of the training set and test set is set as 8:2, where $80\%$ of the documents from all policy texts are randomly selected as the training set and the remaining $20\%$ are selected as the test set for 30 times. In this part, the first $t$ words with the highest probability of each topic were selected to represent that topic, and the values of $t$ were taken as 20, 50, 80, and 100. Table 7 shows the correlation coefficients of the average stability of the model with different numbers of words.
+
+Table 7. The correlation coefficients of the average stability of the model with different numbers of words.
+
+![](dt=2026-06-05/ht=13/07b6cdb94a9dcd19fd44821f450f62bafd66cd2179920d465afb60b8d8d33a40.jpg)
+
+<table><tr><td></td><td>sim20</td><td>sim50</td><td>sim80</td><td>sim100</td><td>Mean</td></tr><tr><td>sim20</td><td>-</td><td>0.9697</td><td>0.9362</td><td>0.9195</td><td>0.9418</td></tr><tr><td>sim50</td><td>0.9697</td><td>-</td><td>0.9917</td><td>0.9839</td><td>0.981767</td></tr><tr><td>sim80</td><td>0.9362</td><td>0.9917</td><td>-</td><td>0.9986</td><td>0.9755</td></tr><tr><td>sim100</td><td>0.9195</td><td>0.9839</td><td>0.9986</td><td>-</td><td>0.967333</td></tr></table>
+
+As can be seen from Table 7, the stability of the model under different numbers of topic words is highly correlated, and the highest average Pearson is reached when the number of topic words is 50, indicating that first 50 words of each topic are most capable of covering the meaning of the topic under the remaining number of words. Therefore, this study finally uses the first 50 words with the highest probability of each topic to represent that topic.
+
+Finally, the perplexity, isolation, stability, and coincidence of the model are calculated according to the steps in Section 3.
+
+# 5.3. Experimental Results and Comparative Analysis
+
+# 5.3.1. Comparison of Optimal Number of Topics
+
+The values calculated by the different topic selection methods are normalized as shown in Figure 20. The optimal topic number selection method proposed in this paper selects the number of topics in the LDA model as 54, while the perplexity and JS divergence method are both 70.
+
+As can be seen from Figure 35, the optimal number of topics obtained by the perplexity and JS divergence method are both maximum values in the topic number interval.
+
+![](dt=2026-06-05/ht=13/e10bb42512d1497c9792879adaa11bb3a0bc2dd07b848ea7570d941a3372cc04.jpg)
+
+Entropy 2021, 23, 1301
+
+38 of 45
+
+# 5.3.2. Comparison of Experimental Results
+
+The results of the optimal number of topics based on isolation, perplexity, and the method proposed in this study are compared as shown in Tables 8 and 9.
+
+Table 8. Partial topic terms and probabilities from first five topics when the optimal number of topics is 54 (Topic Superiority Index).
+
+![](dt=2026-06-05/ht=13/2fa1870e3178ac5061bc8a5004eeb0bd177423b3d38fb9189c7eda8651d2af5d.jpg)
+
+<table><tr><td>Topic</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td rowspan="3">0</td><td>enterprise</td><td>0.1175</td><td>center</td><td>0.0885</td><td>technology</td><td>0.0669</td><td>recognition</td><td>0.0199</td><td>R&amp;D</td><td>0.0194</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>research</td><td>0.0191</td><td>engineering</td><td>0.0177</td><td>evaluation</td><td>0.0139</td><td>technology innovation</td><td>0.0135</td><td>development</td><td>0.0127</td></tr><tr><td rowspan="4">1</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>activity</td><td>0.1292</td><td>propaganda</td><td>0.0388</td><td>popularization of science</td><td>0.0372</td><td>organization</td><td>0.0296</td><td>science</td><td>0.0253</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>innovation</td><td>0.0212</td><td>hold</td><td>0.0201</td><td>unit</td><td>0.0169</td><td>junior</td><td>0.0145</td><td>science</td><td>0.0131</td></tr><tr><td rowspan="4">2</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>project</td><td>0.0910</td><td>capital</td><td>0.0774</td><td>special funds</td><td>0.0316</td><td>management</td><td>0.0298</td><td>use</td><td>0.0269</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>unit</td><td>0.0226</td><td>method</td><td>0.0183</td><td>subsidy</td><td>0.0165</td><td>finance</td><td>0.0129</td><td>funds</td><td>0.0123</td></tr><tr><td rowspan="4">3</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>enterprise</td><td>0.1126</td><td>reward</td><td>0.0503</td><td>science</td><td>0.0315</td><td>subsidy</td><td>0.0279</td><td>exceed</td><td>0.0259</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>support</td><td>0.0241</td><td>highest</td><td>0.0202</td><td>capital</td><td>0.0195</td><td>subsidy</td><td>0.0194</td><td>disposable</td><td>0.0191</td></tr><tr><td rowspan="4">4</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>export</td><td>0.0786</td><td>trade</td><td>0.0634</td><td>product</td><td>0.0447</td><td>technology</td><td>0.0403</td><td>machining</td><td>0.0347</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>enterprise</td><td>0.0306</td><td>identify</td><td>0.0292</td><td>international</td><td>0.0252</td><td>cooperation</td><td>0.0203</td><td>introduce</td><td>0.0181</td></tr></table>
+
+Table 9. Partial topic terms and probabilities from first 10 topics when the optimal number of topics is 70 (perplexity and JS method).
+
+![](dt=2026-06-05/ht=13/3b007f2013968bc6935708bdc778ca6e2859357a45c665ad8223993c7555ae3e.jpg)
+
+<table><tr><td>Topic</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td rowspan="3">0</td><td>enterprise</td><td>0.0982</td><td>privately operated</td><td>0.0893</td><td>science</td><td>0.0338</td><td>institution</td><td>0.0300</td><td>regulation</td><td>0.0228</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>management</td><td>0.0198</td><td>private technology</td><td>0.0159</td><td>science staff</td><td>0.0140</td><td>operation</td><td>0.0136</td><td>technology</td><td>0.0117</td></tr><tr><td rowspan="4">1</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>goal achievement</td><td>0.1685</td><td>announcement</td><td>0.1332</td><td>project department</td><td>0.0467</td><td>industrialization and urbanization</td><td>0.0000</td><td>expand</td><td>0.0000</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>profession</td><td>0.0000</td><td>specialization</td><td>0.0000</td><td>patent</td><td>0.0000</td><td>patent technology</td><td>0.0000</td><td>patent application</td><td>0.0000</td></tr><tr><td rowspan="4">2</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>science</td><td>0.0596</td><td>innovation</td><td>0.0531</td><td>technology</td><td>0.0260</td><td>enterprise</td><td>0.0250</td><td>autonomy</td><td>0.0169</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>highlights</td><td>0.0168</td><td>high technology</td><td>0.0151</td><td>innovation ability</td><td>0.0120</td><td>research</td><td>0.0118</td><td>major</td><td>0.0115</td></tr><tr><td rowspan="4">3</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>handle</td><td>0.0339</td><td>management</td><td>0.0305</td><td>request</td><td>0.0278</td><td>dispute</td><td>0.0274</td><td>office</td><td>0.0183</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>party</td><td>0.0174</td><td>complaint</td><td>0.0153</td><td>secrecy</td><td>0.0152</td><td>license</td><td>0.0143</td><td>regulation</td><td>0.0139</td></tr><tr><td rowspan="4">4</td><td>word1</td><td>prob1</td><td>word2</td><td>prob2</td><td>word3</td><td>prob3</td><td>word4</td><td>prob4</td><td>word5</td><td>prob5</td></tr><tr><td>patent</td><td>0.4377</td><td>implementation</td><td>0.0343</td><td>patent technology</td><td>0.0304</td><td>institution</td><td>0.0278</td><td>agent</td><td>0.0268</td></tr><tr><td>word6</td><td>prob6</td><td>word7</td><td>prob7</td><td>word8</td><td>prob8</td><td>word9</td><td>prob9</td><td>word10</td><td>prob10</td></tr><tr><td>patent application</td><td>0.0240</td><td>patent right</td><td>0.0224</td><td>management</td><td>0.0209</td><td>invention</td><td>0.0126</td><td>proxy</td><td>0.0092</td></tr></table>
+
+Entropy 2021, 23, 1301
+
+39 of 45
+
+The optimal numbers of topics selected in terms of perplexity and JS divergence are both 70, and the words and probabilities under each topic are shown in Table 9. It can be seen that the higher the number of topics, the more detailed the classification, but certain abnormal topics with particularly low probability will appear. For example, for topic 1 in Table 9, the probability of most topic words is almost 0, which indicates that this theme has almost no possibility to appear in the policy. In fact, it is difficult to get the optimal number of topics based on the perplexity.
+
+The optimal value increases with the increase of the number of topics, so it tends to cause the number of selected topics to be too high, and abnormal topics appear. However, the optimal number of topics selected by the model proposed in this study is 54. As can be seen from Table 8, the discrimination of each topic is high with this number of topics, and there are no abnormal topics.
+
+In order to better verify the accuracy of the model proposed in this study, we invited 20 experts to classify the patent policy topics, which were finally divided into five major types of patent creation policies, patent utilization policies, patent protection policies, patent management policies, and patent service policies, including 19 sub-categories and 55 policy topics.
+
+Entropy 2021, 23, 1301
+
+40 of 45
+
+sulting. Promoting the formation of an industrial chain covering the whole process of patent creation, utilization, protection, and management in a competitive market environment is the main policy objective of patent service policy.
+
+The topic contents obtained by the three methods were refined, summarized, and divided into 55 subclasses under five major categories. Then, the accuracy rates under different topics number selection methods were calculated according to the classification results, as shown in Tables 10 and 11.
+
+Table 10. Comparison of different topics number selection methods (55 subclasses).
+
+![](dt=2026-06-05/ht=13/e374435104db25ea96e164c96e0a35e7c20e41e6618764b1e4269ffb8cff1491.jpg)
+
+<table><tr><td>Optimal topic Number 
+Selection Method</td><td>Textract</td><td>Tcorrect</td><td>Tstandard</td><td>Twrong</td><td>Number of 
+Fuzzy Topics</td><td>Precision (P)</td><td>Recall (R)</td><td>F-Value</td><td>Fuzzy Rate</td></tr><tr><td>JS divergence</td><td>70</td><td>52</td><td>55</td><td>1</td><td>17</td><td>74.29%</td><td>94.55%</td><td>83.20%</td><td>24.29%</td></tr><tr><td>Perplexity</td><td>70</td><td>52</td><td>55</td><td>1</td><td>17</td><td>74.29%</td><td>94.55%</td><td>83.20%</td><td>24.29%</td></tr><tr><td>Topic superiority index</td><td>54</td><td>49</td><td>55</td><td>0</td><td>5</td><td>90.74%</td><td>89.09%</td><td>89.91%</td><td>9.26%</td></tr></table>
+
+(Note: $T_{extract}$ represents the optimal number of topics selected by each method, $T_{correct}$ represents the number of topics that can determine the subclasses to which they belong, and $T_{standard}$ represents the number of subclasses predetermined by experts.)
+
+Table 11. Comparison of different topics number selection methods (five major categories).
+
+![](dt=2026-06-05/ht=13/1062a3145ed8dc95e089689e133b2b9c9377bffa4d5a63d6c13492e0423d4fe4.jpg)
+
+<table><tr><td>Optimal Topic Number Selection Method</td><td>\(T_{extract}\)</td><td>\(T_{correct}\)</td><td>\(T_{standard}\)</td><td>Number of Patent Creation Policies</td><td>Number of Patent Utilization Policies</td><td>Number of Patent Protection Policies</td><td>Number of Patent Management Policies</td><td>Number of Patent Service Policies</td><td>Precision (P)</td><td>Recall (R)</td><td>F-Value</td></tr><tr><td>JS divergence</td><td>13</td><td>5</td><td>5</td><td>16</td><td>4</td><td>8</td><td>18</td><td>16</td><td>38.46%</td><td>100.00%</td><td>55.56%</td></tr><tr><td>Perplexity</td><td>13</td><td>5</td><td>5</td><td>16</td><td>4</td><td>8</td><td>18</td><td>16</td><td>38.46%</td><td>100.00%</td><td>55.56%</td></tr><tr><td>Topic superiority index</td><td>5</td><td>5</td><td>5</td><td>14</td><td>4</td><td>6</td><td>17</td><td>13</td><td>100.00%</td><td>100.00%</td><td>100.00%</td></tr></table>
+
+Table 10 shows the accuracy of the topic results obtained by each optimal topic number selection method compared with the 55 subclasses obtained by experts. As can be seen from Table 9, the optimal numbers of topics selected by perplexity and JS divergence both reach 70.
+
+Although the topics selected by these two methods can cover 52 of the 55 standard topics listed by experts, resulting in the recall reaching $94.55\%$ , there is a higher probability of having invalid topics in the topics selected by this method, which have duplicate connotations or have contents that are difficult to distinguish, specifically including one wrong topic and 17 fuzzy topics that are difficult to classify, thus leading to a decrease in precision and an increase in fuzzy rate.
+
+However, based on the topic superiority index proposed in this study, the selected topics have fewer interference topics, higher indicators, and better effect. It is important to note that this study strictly processed all the patent texts, eliminated most of the interfering words and useless words, and combined a large number of synonyms with more important meanings (e.g., combining the names of various banks into banks), so that the final content of the wrong topics was greatly reduced.
+
+Without strict treatment of stop words, the presence of a large number of invalid words would lead to an increase in the number of invalid topics obtained in the end. However, as can be seen from Table 10, despite the strict elimination of stop words in this study, invalid topics and some fuzzy topics still appear when the number of topics is too large.
+
+Table 11 shows the results of the experts' classification of the topics selected under different methods into five major categories of patent policies. As can be seen from Table 9, the 70 topics selected by perplexity and JS divergence can be classified by experts to get the valid five categories, but there are seven topics that cannot be judged, which leads to a high recall, but precision is only $38.46\%$ . Furthermore, all 54 topics selected by the Topic Superiority Index can be reasonably classified into five major categories.
+
+However, only 49 topics in the subclasses can be extracted accurately. By comparing the specific topic contents with the 55 topics listed by experts, it is found that the remaining five fuzzy topics cannot be reasonably corresponded under the subclass of technology innovation subsidies in various fields in the patent creation policies. The reason for this is that experts mostly classify the technology innovation subsidies in various fields according
+
+Entropy 2021, 23, 1301
+
+41 of 45
+
+to state-supported fields or high-tech fields, such as electronic information, biological and new medicine, aerospace, new materials, high-tech services, new energy and energy conservation, resources and environment, advanced manufacturing and automation, etc. In contrast, the LDA model used in this study yielded topics in which only pharmaceuticals, information, and energy conservation and environmental protection categories could be distinguished.
+
+The rest of the categories may be due to fewer policies with relevant classifications or the existence of combined categories in the policies, resulting in some categories being combined into key technologies, high technologies, etc. The specific policy classification of the 54 topics obtained by the model proposed in this study is shown in Table 12.
+
+Table 12. Classification of the 54 topics obtained by the model proposed in this study.
+
+![](dt=2026-06-05/ht=13/7a5696f4e396229efa6d7ebb0f7ef6b993648fdc23da8c50a0b0fd35180cc4bc.jpg)
+
+<table><tr><td>Patent Policy Category</td><td>Subclass</td><td>Topic</td></tr><tr><td rowspan="4">Patent creation policies</td><td>Reward and subsidy</td><td>Topic 3 Technology awards and subsidies; Topic 16 Patent application funding</td></tr><tr><td>Encouraging technology R&amp;D</td><td>Topic 9 Encouraging innovation investment; Topic 12 Encouraging technology R&amp;D; Topic 17 Encouraging autonomy innovation</td></tr><tr><td>Subsidies for technological innovation in various fields</td><td>Topic 6 Declaration for medical projects; Topic 24 Innovation of agroforestry; Topic 28 High-performance technology creation; Topic 29 Development of key technologies in various fields; Topic 46 Industrial information technology upgrading; Topic 51 Energy-saving and environmental protection projects; Topic 53 Development of high-tech industry</td></tr><tr><td>Competition awards</td><td>Topic 35 Publicity of awards for projects of various organizations; Topic 37 Innovation competition</td></tr><tr><td rowspan="4">Patent utilization policies</td><td>Trade</td><td>Topic 4 Import and export trade</td></tr><tr><td>Tax reduction</td><td>Topic 7 Tax reduction for the utilization of technical products</td></tr><tr><td>Technology utilization</td><td>Topic 23 Technology utilization and promotion</td></tr><tr><td>Achievement transformation</td><td>Topic 31 Awards for transformation of scientific and technological achievements</td></tr><tr><td rowspan="2">Patent protection policies</td><td>Contract guarantee</td><td>Topic 14 Technology transfer contract; Topic 22 Technology trade contract</td></tr><tr><td>Infringement dispute</td><td>Topic 43 Patent related disputes; Topic 44 Infringement and anti-counterfeiting; Topic 47 IP protection action; Topic 48 Administrative law enforcement</td></tr><tr><td rowspan="5">Patent management policies</td><td>Special management</td><td>Topic 0 Technology identification and evaluation management; Topic 2 Management of the special fund</td></tr><tr><td>Project management</td><td>Topic 8 Project acceptance management; Topic 10 Project planning; Topic 32 Project declaration management; Topic 33 Project award management</td></tr><tr><td>Title management</td><td>Topic 5 Achievement identification of technical title; Topic 18 Technical personnel qualification audit management</td></tr><tr><td>System management</td><td>Topic 21 System reform and management; Topic 27 Economic performance appraisal management; Topic 8 Management of administrative units; Topic 42 System reform and economic performance</td></tr><tr><td>Enterprise management</td><td>Topic 19 High-tech declaration management; Topic 25 Standardization management; Topic 30 Improvement of comprehensive capability of IP; Topic 45 Model enterprise of IP management; Topic 49 Technology management of private enterprises</td></tr><tr><td rowspan="4">Patent service policies</td><td>Science education and talent</td><td>Topic 1 Popular science propaganda; Topic 26 Technology services; Topic 34 Education training; Topic 38 Introduction of technical talents</td></tr><tr><td>Service industry</td><td>Topic 11 Capacity improvement of service industry; Topic 41 Agent institute; Topic 52 Finance services</td></tr><tr><td>Platform service</td><td>Topic 13 Technology transformation platform; Topic 15 Product exhibition; Topic 36 Information platform; Topic 39 Industrial integration platform</td></tr><tr><td>Incubation base</td><td>Topic 20 Entrepreneurship and innovation incubation base; Topic 50 Technology development zone</td></tr></table>
+
+Entropy 2021, 23, 1301
+
+42 of 45
+
+# 6. Conclusions and Discussion
+
+In this study, we propose the coincidence index based on the perplexity, isolation, and stability, and construct a method for optimal topic number selection of the LDA model. The method is a comprehensive evaluation of the optimal number of topics based on four aspects: the topic model has high predictiveness, there are no duplicate topics among individual topics, the model has repeatability, and each topic has high explanatory power, which is more accurate than the existing methods of judging the optimal number of topics by perplexity or isolation. It can help analysts perform effective and accurate topic extraction in a large amount of text.
+
+To better verify the feasibility of the method proposed in this study, our proposed optimal topic selection method is compared with several commonly used methods using three generic datasets, 20news_groups, WOS_46986, and AG_news, in the empirical part. It is found that our proposed optimal topic selection method has better topics selection results. In addition, we use the real data of the patent policies of each province and city in China (excluding Hong Kong, Macao, and Taiwan) for further verification and analysis.
+
+According to the method proposed in this study, 54 topics are finally obtained. Compared with the results of the experts' classification of patent policies into 5 major categories, 19 sub-categories and 55 subclasses, 49 topics of the 54 topics selected in this study can correspond to the experts' classification, and the remaining five for the corresponding topics can also match with the sub-categories. Although the topic selection method in this study is applied to the LDA model, the principle can be extended to other topic models.
+
+The method proposed in this study to determine the optimal number of topics for LDA has some practicality; especially when dealing with a large number of texts and a large number of topic classifications, the method has high accuracy and reliability. However, there are still some limitations in this study. First, during the experiment, we found that the deletion of stop words will have an impact on the distribution of words under each topic, and different researchers may have different treatments on the stop words, resulting in subjective bias, which can be improved and studied in the future.
+
+Second, some lexical information was not considered in this study for text processing and topic generation, but this information may affect the connotation of the topics, so lexicality and word-associated meanings can also be considered in future studies. Third, due to the natural drawback of the original LDA topicmodel, it cannot divide well for topics that are too similar. This leads to the fact that even though we were able to pick a relatively optimal number of topics, we did not achieve a result that is consistent with the true number of topics.
+
+Therefore, we also validate the use of our proposed method on the word-embedding LDA model, and it turns out that the optimal topic number selection method is also applicable. Since the word-embedding LDA model is better for topic classification, our final selected model is also able to better classify documents by topics. We also found through the literature collection that many works have been done by scholars in improving the accuracy of LDA topic models: for example, the Gaussian LDA model proposed by Das et al.
+
+based on the word-embedding technique [32] and the Biterm Topic Model proposed by Pan et al. for sparse matrices such as short texts [33]. Due to time and effort limitations, we do not validate all text classification models in this paper, but since our proposed method is discriminative based on topic features after the text models are trained, it can be applied to these improved topic classification models.
+
+We can foresee that if these topic classification models can achieve more accurate text classification results, then the optimal number of topics can also be better selected by using our method, and we will further verify this in our subsequent studies.
+
+Author Contributions: Conceptualization, J.G.; Methodology, J.G.; Software, J.G.; Validation, J.G.; Formal Analysis, J.G.; Investigation, J.G.; Writing—Original Draft Preparation, J.G.; Writing—Review and Editing, J.G., Y.Q.; Supervision, Y.Q.; Funding Acquisition, Y.Q. All authors have read and agreed to the published version of the manuscript.
+
+Entropy 2021, 23, 1301
+
+43 of 45
+
+Funding: This research was funded by the National Natural Science Foundation of China (grant number 71673135 and 71974096).
+
+Institutional Review Board Statement: Not applicable.
+
+Informed Consent Statement: Informed consent was obtained from all subjects involved in the study.
+
+Data Availability Statement: Not applicable.
+
+Conflicts of Interest: The authors declare no conflict of interest.
+
+# References
+
+Entropy 2021, 23, 1301
+
+44 of 45
+
+Entropy 2021, 23, 1301
+
+45 of 45

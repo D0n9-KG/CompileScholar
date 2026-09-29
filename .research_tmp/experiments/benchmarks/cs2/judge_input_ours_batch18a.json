@@ -1,0 +1,1222 @@
+[
+ {
+  "qid": "15dec998cf77887f870ebf9a",
+  "question": "How effective are language models at automatically generating textual descriptions of scientific concepts?",
+  "sections": [
+   {
+    "title": "Scope of Application",
+    "text": "Large language models are currently being utilized for scientific synthesis, inference, and explanation [2]. These systems are also being evaluated for their capacity to unlock novel scientific research ideas [1]. Furthermore, they are applied to advancing the scientific method.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [],
+      "title": "can large language models unlock novel scientific research ideas?",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [],
+      "title": "large language models for scientific synthesis, inference and explanation",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2310.07984",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluation Frameworks",
+    "text": "A benchmark named SciCUEval is referenced in the context of assessing these capabilities. The discussion also includes a reference to arxiv paper 2201.01819 [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [],
+      "title": "Formal Analysis of Art: Proxy Learning of Visual Concepts from Style Through Language Models",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.01819",
+       "authors": [
+        "Diana Kim",
+        "Ahmed Elgammal",
+        "Marian Mazzone"
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 5,
+   "n_claims_usable": 5,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C3",
+     "sentence": "Furthermore, they are applied to advancing the scientific method ."
+    },
+    {
+     "cid": "C4",
+     "sentence": "A benchmark named SciCUEval is referenced in the context of assessing these capabilities ."
+    }
+   ],
+   "title_only_citations": 3,
+   "word_count": 63,
+   "n_sections": 2,
+   "n_citations": 3,
+   "record_level": 0,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "3b46ec4e348c2a317d20f992",
+  "question": "How does the tree covering technique differ in its application to ordinal trees versus binary trees?",
+  "sections": [
+   {
+    "title": "Structural Distinctions",
+    "text": "The application of tree covering techniques relies on fundamental differences in how ordinal and binary trees are defined. An ordinal tree is characterized as a rooted ordered tree where nodes possess an ordered sequence of children, which may be empty, allowing for arbitrary node degrees [1]. In contrast, a binary tree is also a rooted ordered tree, but each node is strictly limited to having a left and a right child, each of which can be empty [1]. A critical distinction arises in the treatment of nodes with a single child; unlike in ordinal trees, a node with a single left child is explicitly distinguished from a node with a single right child in binary trees [1]. These structural definitions underpin the specific representations and properties analyzed in the research, which define the BP representations for both ordinal and binary trees [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Here, we define the BP representations of ordinal trees and binary trees [9, 21, 23] and present some properties of the representations.",
+       "Note that, unlike ordinal trees, a node with a single left child and a node with a single right child are distinguished when",
+       "A binary tree is a rooted ordered tree whose nodes have a left and right child, each of which can be empty.",
+       "An ordinal tree is a rooted ordered tree whose nodes have an ordered sequence of children, which can be possibly empty."
+      ],
+      "title": "a simple representation of tree covering utilizing balanced parentheses and efficient implementation of average-case optimal rmqs",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Tree Covering Algorithm",
+    "text": "The tree covering technique, referred to as TC, is presented as a specific approach to represent ordinal trees [2]. Geary et al. proposed an algorithm designed to cover a given ordinal tree containing n nodes into O(n/M) mini-trees, where each mini-tree has a size of O(M) for a given parameter M [2]. This decomposition process ensures that any two resulting mini-trees are either disjoint or joined at a common root. The algorithm's focus on ordinal trees highlights the specific utility of the covering technique for structures with ordered sequences of children, distinct from the binary constraints described earlier.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Geary et al. [20] proposed an algorithm to cover a given ordinal tree on $n$ nodes into $O(n / M)$ mini-trees, each of size $O(M)$ , for a given parameter $M$ .",
+       "Another approach to represent ordinal trees is based on a tree covering algorithm (TC)."
+      ],
+      "title": "succinct representations of ordinal trees",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 7,
+   "n_claims_usable": 7,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C6",
+     "sentence": "This decomposition process ensures that any two resulting mini-trees are either disjoint or joined at a common root ."
+    }
+   ],
+   "word_count": 240,
+   "n_sections": 2,
+   "n_citations": 2,
+   "record_level": 2,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "1f384c4d3942c46b676b5bfc",
+  "question": "How good are LLMs at solving traditional tabular ML datasets using ICL?",
+  "sections": [
+   {
+    "title": "Methodological Frameworks",
+    "text": "In natural language processing, in-context learning (ICL) involves formatting labeled examples as textual demonstrations to provide context to a language model, enabling label prediction without parameter updates [4]. This paradigm has been extended to tabular data by serializing table rows into text or sentences [4]. While some research explores LLMs as universal function approximators on small tabular datasets for classification, regression, and clustering via ICL without explicit fine-tuning [3], other state-of-the-art models approach tabular ICL by tuning LLMs specifically on tabular tasks [1]. Notable examples of this tuning approach include TabLLM, LIFT, and TabuLa-8B [1]. All state-of-the-art tabular ICL models share a similar task construction procedure during pre-training, where a dataset is selected or created, and a column is used as the target with a subset of remaining columns as features [2]. Inference for these tabular foundation models typically involves using frozen pre-trained weights, where labeled examples from the evaluation dataset serve as context to predict unlabeled instances [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Several works approach tabular ICL by tuning LLMs on tabular tasks, e.g. TabLLM [16], LIFT [6], or TabuLa-8B [12].",
+       "In the following, we will focus solely on TabPFNv2 and refer to it simply as TabPFN.",
+       "In particular, the works by Gardner et al. [12] are note-worthy for curating the T4 dataset, containing roughly 3 M tables extracted and processed from the TabLib collection [8] and for its excellent results in the very low data-regime."
+      ],
+      "title": "contexttab: a semantics-aware tabular in-context learner",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "All state-of-the-art tabular ICL models of which we are aware [6, 7, 9, 12, 4, 13] share a similar task construction procedure during pre-training: a dataset is either selected or created, a column of this dataset is used as the target, and a subset of the remaining columns is used as features."
+      ],
+      "title": "generalization can emerge in tabular foundation models from a single table",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "This paper explores the use of LLMs as function approximators on small tabular datasets across classification, regression and clustering tasks, using ICL without explicit fine-tuning.",
+       "Our results suggest that LLMs can offer competitive performance in classification tasks, in some cases approaching the accuracy of traditional ML models and tabular foundation models, demonstrating their potential as zero-training baselines for discrete prediction problems in settings where rapid prototyping or minimal setup is desired."
+      ],
+      "title": "large language models as universal predictors? an empirical study on small tabular datasets",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "More recently, efforts have extended ICL to tabular data by serializing table rows into text or sentences (Hegselmann et al., 2023).",
+       "For example, in text classification, labeled examples are formatted as textual demonstrations and provided as context to a language model, enabling it to predict the label of a new instance without any parameter updates or fine-tuning (Radford et al., 2019; Brown et al., 2020).",
+       "However, since LLMs are not pretrained to model the complex structural relationships inherent in tabular data—such as interactions between rows and columns—their pe"
+      ],
+      "title": "towards fair in-context learning with tabular foundation models",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance and Limitations",
+    "text": "LLMs can offer competitive performance in classification tasks, sometimes approaching the accuracy of traditional machine learning models and tabular foundation models [3]. This capability demonstrates their potential as zero-training baselines for discrete prediction, particularly when rapid prototyping or minimal setup is desired [3]. However, a significant limitation exists because LLMs are not pretrained to model the complex structural relationships inherent in tabular data, such as interactions between rows and columns [4]. Despite this, specific models have achieved notable improvements. For instance, LiFT achieves a 4.1% to 34.9% lift in AUC score and a 3.7% lift in online CTR over existing state-of-the-art models [5]. Additionally, the model achieves a specific metric value of a=4.1% [5]. In the very low data-regime, the works by Gardner et al. are noteworthy for curating the T4 dataset, which contains roughly 3 M tables extracted and processed from the TabLib collection, and for achieving excellent results [1]. Recent analyses, such as the ContextTab paper, focus solely on TabPFNv2, referred to simply as TabPFN, to evaluate these capabilities [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Several works approach tabular ICL by tuning LLMs on tabular tasks, e.g. TabLLM [16], LIFT [6], or TabuLa-8B [12].",
+       "In the following, we will focus solely on TabPFNv2 and refer to it simply as TabPFN.",
+       "In particular, the works by Gardner et al. [12] are note-worthy for curating the T4 dataset, containing roughly 3 M tables extracted and processed from the TabLib collection [8] and for its excellent results in the very low data-regime."
+      ],
+      "title": "contexttab: a semantics-aware tabular in-context learner",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Experimental results demonstrate that with the unified representation, our model achieves remarkable improvement (e.g., 4.1% ~ 34.9% lift by AUC score and 3.7% lift by online CTR) over existing state-of-the-art models."
+      ],
+      "title": "Deep Unified Representation for Heterogeneous Recommendation",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.05861",
+       "authors": [
+        "Chengqiang Lu",
+        "Mingyang Yin",
+        "Shuheng Shen",
+        "Luo Ji"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "More recently, efforts have extended ICL to tabular data by serializing table rows into text or sentences (Hegselmann et al., 2023).",
+       "For example, in text classification, labeled examples are formatted as textual demonstrations and provided as context to a language model, enabling it to predict the label of a new instance without any parameter updates or fine-tuning (Radford et al., 2019; Brown et al., 2020).",
+       "However, since LLMs are not pretrained to model the complex structural relationships inherent in tabular data—such as interactions between rows and columns—their pe"
+      ],
+      "title": "towards fair in-context learning with tabular foundation models",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "This paper explores the use of LLMs as function approximators on small tabular datasets across classification, regression and clustering tasks, using ICL without explicit fine-tuning.",
+       "Our results suggest that LLMs can offer competitive performance in classification tasks, in some cases approaching the accuracy of traditional ML models and tabular foundation models, demonstrating their potential as zero-training baselines for discrete prediction problems in settings where rapid prototyping or minimal setup is desired."
+      ],
+      "title": "large language models as universal predictors? an empirical study on small tabular datasets",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 14,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 331,
+   "n_sections": 2,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "ba4b2561ecf64f1c1cc1e16e",
+  "question": "How does multiplexing enhance data transmission efficiency in communication networks?",
+  "sections": [
+   {
+    "title": "Fundamental Principles and Efficiency",
+    "text": "Multiplexing serves as an indispensable technique in modern communication systems, primarily aimed at improving the spectral efficiency of the channel [4]. The core objective is to simultaneously transmit multiple signals over the same communication channel, thereby increasing overall channel utilization [4]. This method allows multiple signal carriers to share a transmission medium, which is particularly useful when the data volume exceeds the capacity of the medium [3]. By combining many signals into one channel, multiplexing has been a standard method in the classical telecommunication industry for increasing transmission rates [2]. The technology is widely employed because it enhances information transmission by allowing several signals to share a medium, while also reducing system costs [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Multiplexing is widely employed due to its capability to increase transmission capacity and to reduce system costs [2].",
+       "There are three basic types of multiplexing technique in communication systems; time division multiplexing (TDM) [4-6], frequency or wavelength division multiplexing (FDM) [3, 7] or (WDM) [8- 10], and code division multiplexing (CDM) [11-15]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Another way of increasing the transmission rate has been a standard in the classical telecommunication industry for quite some time, namely multiplexing.",
+       "In the quantum regime, multiplexing can be used to overcome the timing limitations imposed by the timing precision and dead time in the detection module, and hence significantly increase the secure key rate<sup>13</sup>."
+      ],
+      "title": "simultaneous transmission of hyper-entanglement in three degrees of freedom through a multicore fiber",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Whenever this happens, it may be possible to make multiple signal carriers share a transmiss"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "The primary goal of multiplexing is to simultaneously transmit multiple signals over the same communication channel, thereby increasing the channel utilization.",
+       "To address this challenge, multiplexing has become an indispensable technique in modern communication systems for improving the spectral efficiency of the channel."
+      ],
+      "title": "deep spread multiplexing and study of training methods for dnn-based encoder and decoder",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Core Multiplexing Techniques",
+    "text": "There are three basic types of multiplexing techniques: time division multiplexing (TDM), frequency or wavelength division multiplexing (FDM/WDM), and code division multiplexing [1]. Wavelength division multiplexing (WDM) increases the information capacity of optical fibers by simultaneously transmitting two or more different signals at different wavelengths on the same channel [6]. This technique requires a separate source for each desired wavelength and specific multiplexing devices to couple all signals into the fiber and separate them at the other end [6]. A significant advantage of WDM is that, because the transmitted signals are completely independent, information with different formats and data rates can be transmitted on the same fiber waveguide without requiring any synchronization between the channels [6]. WDM with low crosstalk has gained great success in offering broad operation bandwidth and increasing channel capacity [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Wavelength division multiplexing (WDM) [1], [2] with low crosstalk has already gained great success in offering broad operation bandwidth and increasing the channel capacity."
+      ],
+      "title": "ultra-compact broadband in-line mode converter based on a width-modulated silicon waveguide",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Since the transmitted signals are completely independent, information with different formats and data rates can be transmitted on the same fiber waveguide without requiring any synchronization between the channels.",
+       "The technique requires a separate source for each desired wavelength and multiplexing devices to couple all the signals into the fiber and to separate them at the other end of the fiber.",
+       "Multiplexing increases the information capacity of optical fibers by simultaneously transmitting two or more different signals at different wavelengths on the same channel."
+      ],
+      "title": "high speed data transmission at the superconducting super collider",
+      "metadata": {
+       "year": 1990,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Multiplexing is widely employed due to its capability to increase transmission capacity and to reduce system costs [2].",
+       "There are three basic types of multiplexing technique in communication systems; time division multiplexing (TDM) [4-6], frequency or wavelength division multiplexing (FDM) [3, 7] or (WDM) [8- 10], and code division multiplexing (CDM) [11-15]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "High-Speed Optical and Wireless Applications",
+    "text": "As the demand for bandwidth in optical networks continues to increase rapidly, spectral and temporal techniques for multiplexing are employed to increase data transmission capacity beyond terabit-per-second rates [8]. High-speed data transmission using optical fiber multiplexing was demonstrated as early as 1990 [6]. In the wireless domain, Orthogonal Frequency Division Multiplexing (OFDM) is a multi-carrier modulation technique widely employed for high-speed data transmission environments [7]. Recent advancements include deep spread multiplexing, a 2023 development utilizing a DNN-based encoder and decoder for spread multiplexing [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "The primary goal of multiplexing is to simultaneously transmit multiple signals over the same communication channel, thereby increasing the channel utilization.",
+       "To address this challenge, multiplexing has become an indispensable technique in modern communication systems for improving the spectral efficiency of the channel."
+      ],
+      "title": "deep spread multiplexing and study of training methods for dnn-based encoder and decoder",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Orthogonal Frequency Division Multiplexing (OFDM) is a multi-carrier modulation technique widely employed in the field of wireless communication, particularly in high-speed data transmission environments."
+      ],
+      "title": "secure device-to-device communication in iot: fuzzy identity from wireless channel state information for identity-based encryption",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Since the transmitted signals are completely independent, information with different formats and data rates can be transmitted on the same fiber waveguide without requiring any synchronization between the channels.",
+       "The technique requires a separate source for each desired wavelength and multiplexing devices to couple all the signals into the fiber and to separate them at the other end of the fiber.",
+       "Multiplexing increases the information capacity of optical fibers by simultaneously transmitting two or more different signals at different wavelengths on the same channel."
+      ],
+      "title": "high speed data transmission at the superconducting super collider",
+      "metadata": {
+       "year": 1990,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "As the demand for bandwidth of optical networks continues to increase rapidly, spectral and temporal techniques for multiplexing are employed to increase data transmission capacity beyond terabit-per-second rates [1]."
+      ],
+      "title": "wavelength multicasting in silicon photonic nanowires",
+      "metadata": {
+       "year": 2010,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Network Layer Management",
+    "text": "The link layer is responsible for the multiplexing of data streams, data frame detection, medium access control, and error control [11]. This layer undertakes the task of arbitrating among users who compete for the same network resources, such as time, frequency, space, and wavelength, in order to prevent frame collisions [10]. Additionally, the data-link layer is responsible for making frames, flow control, error control, error correction, and re-transmission, with the re-transmission of a frame considered a failure [9].",
+    "citations": [
+     {
+      "id": "[9]",
+      "snippets": [
+       "This layer is responsible for making frames, flow control, error control error correction and re-transmission of the frame is considered a failure."
+      ],
+      "title": "detection of tapping via wifi",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "Regardless of users ultimate destination, data link layer undertakes the task of arbitrating among the users, who compete for the same network resources such as time, frequency, space, wavelength, etc., in order to prevent frame collisions and specify protocols to detect and recover from such collisions."
+      ],
+      "title": "underwater optical wireless communications, networking, and localization: a survey",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1803.02442",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[11]",
+      "snippets": [
+       "The link layer is responsible for multiplexing of data streams, data frame detection, medium access control, and error control [1]."
+      ],
+      "title": "wireless sensor networks (current status and future trends) || security in wireless sensor networks",
+      "metadata": {
+       "year": 2012,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Quantum and Emerging Domains",
+    "text": "In the quantum regime, multiplexing can be used to overcome the timing limitations imposed by the timing precision and dead time in the detection module, which significantly increases the secure key rate [2]. Beyond traditional optics, the concept of multiplexing is interesting for new approaches to data processing, such as the field of magnonics, which is proposed as an alternative to CMOS technology [12]. In magnonic logic networks, frequency division multiplexing utilizes caustic-like structures [12]. In this context, spin waves are used to transport data, and the information can be encoded in their amplitude or phase [12].",
+    "citations": [
+     {
+      "id": "[12]",
+      "snippets": [
+       "In this case, spin waves (SW) are used to transport data[15-17] and the information can be encoded in their amplitude or phase.",
+       "In view of the different challenges nowadays CMOS technology is facing,[7] the concept of multiplexing is also very interesting for new approaches of data processing like, e.g., the field of magnonics.[8-14]"
+      ],
+      "title": "frequency‐division multiplexing in magnonic logic networks based on caustic‐like spin‐wave beams",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1906.04993",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Another way of increasing the transmission rate has been a standard in the classical telecommunication industry for quite some time, namely multiplexing.",
+       "In the quantum regime, multiplexing can be used to overcome the timing limitations imposed by the timing precision and dead time in the detection module, and hence significantly increase the secure key rate<sup>13</sup>."
+      ],
+      "title": "simultaneous transmission of hyper-entanglement in three degrees of freedom through a multicore fiber",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 22,
+   "n_claims_usable": 22,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 507,
+   "n_sections": 5,
+   "n_citations": 12,
+   "record_level": 12,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "5480ba91951fc42e9beb989e",
+  "question": "How does the addition of XAI techniques such as SHAP or LIME impact model interpretability in complex machine learning models ?",
+  "sections": [
+   {
+    "title": "Methodological Foundations",
+    "text": "LIME and SHAP are prominent post-hoc techniques used to enhance the interpretability of complex machine learning models [5] [6]. LIME operates by building locally linear models around the predictions of opaque systems [3]. It achieves this by perturbing the input to observe how predictions change [3]. For image classification, LIME creates perturbed instances by dividing the input image into contiguous superpixels [3]. A simple linear model then learns on this locally weighted data [3]. Finally, LIME presents the superpixels with the highest positive weights as the explanation [3]. In text analysis, LIME uses an intermediate binary representation, such as the existence of specific words or image patches [4]. SHAP, conversely, is built on the Shapley value framework for efficient estimation. It calculates an additive feature importance score for each particular prediction, possessing desirable properties like local accuracy, missingness, and consistency that its antecedents lacked [3]. The main distinction between LIME and SHAP lies in the selection of the functions Ω and πx [2]. Deep SHAP extends this by decomposing deep learning predictions into feature contributions. Additionally, a manifold-based Shapley method projects high-dimensional features into low-dimensional manifold features to obtain Fusion-Shap, addressing issues of erroneous attribution [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This study introduces a manifold-based Shapley method by projecting high-dimensional features into low-dimensional manifold features and subsequently obtaining Fusion-Shap, which aims at (1) addressing the issue of erroneous explanations encountered by traditional Shap; (2) resolving the challenge of interpretability that traditional Shap faces in complex scenarios."
+      ],
+      "title": "Manifold-based Shapley for SAR Recognization Network Explanation",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.03128",
+       "authors": [
+        "Xuran Hu",
+        "Mingzhe Zhu",
+        "Yuanjing Liu",
+        "Zhenpeng Feng and LJubisa\n  Stankovic"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The main distinction between LIME and SHAP is in the selection of the functions Ω and πx ."
+      ],
+      "title": "A Survey of Privacy-Preserving Model Explanations: Privacy Risks, Attacks, and Countermeasures",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2404.00673",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2.2. Interpretable Surrogates",
+         "chunk_id": "arxiv_2404.00673#c9",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Its authors presented a method to calculate an additive feature importance score for each particular prediction with a set of desirable properties (local accuracy, missingness and consistency) that its antecedents lacked.",
+       "At the end of the process, LIME presents the superpixels with highest positive weights as an explanation (see Figure 9 ).",
+       "A simple linear model learns on this data set, which is locally weighted.",
+       "In image classification, LIME creates a set of perturbed instances by dividing the input image into interpretable components (contiguous superpixels ), and runs each perturbed instance through the model to get a probability.",
+       "LIME perturbs the input and sees how the predictions change.",
+       "LIME builds locally linear models around the predictions of an opaque model to explain it.",
+       "XAI techniques such as SHAP [ 224 ] could be used to generate counterfactual outcomes explaining the decisions of a ML model when fed with protected and unprotected variables.",
+       "There lies the rationale of why KNN has also been adopted widely in contexts in which model interpretability is a requirement"
+      ],
+      "title": "Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1910.10045",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4.1 Model-agnostic Techniques for Post-hoc Explainability",
+         "chunk_id": "hub_W2981731882#c22",
+         "char_start": 69956
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "LIME introduces an intermediate representation 𝒙 ′ ∈ { 0 , 1 } d ′ (e.g., the existence of certain image patches or words)."
+      ],
+      "title": "A Survey on Neural Network Interpretability",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.14261",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "III-C 1 Passive, Attribution as Explanation, (Semi-)local",
+         "chunk_id": "arxiv_2012.14261#c21",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "By conducting a detailed analysis of the SHAP and LIME explanations, we demonstrate the effectiveness of these techniques in improving the interpretability of the models' decision-making processes.",
+       "Specifically, we employ two prominent XAI methods, Shapley Additive Explanations (SHAP) and Local Interpretable Model-Agnostic Explanations (LIME), to shed light on the black-box nature of four machine learning models used for file fragment classification.",
+       "Our analysis reveals that these XAI techniques effectively identify key features influencing each model's predictions."
+      ],
+      "title": "interpretability and transparency of machine learning in file fragment analysis with explainable artificial intelligence",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "In this paper, we demonstrate two techniques, LIME and SHAP, used to improv",
+       "By offering transparency into how these models make judgements, XAI enables researchers and users to uncover potential biases, admit limits, and eventually enhance the fairness and dependability of AI systems."
+      ],
+      "title": "unlocking machine learning model decisions: a comparative analysis of lime and shap for enhanced interpretability",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Effectiveness and Limitations",
+    "text": "These techniques effectively identify key features influencing model predictions [5]. By conducting detailed analyses, researchers have demonstrated the effectiveness of SHAP and LIME in improving the interpretability of decision-making processes [5]. Specifically, SHAP and LIME have been employed to shed light on the black-box nature of four machine learning models [5]. SHAP can also generate counterfactual outcomes to explain decisions when models are fed with protected and unprotected variables [3]. However, these methods are not without flaws. SHAP and LIME suffer from high instability due to random sampling [10]. LIME’s explanations often consist of highly-weighted words but provide no further information on why a text is classified in a specific manner, such as abusive [9]. Furthermore, creating local surrogate models adds an extra layer that requires interpretation for global understanding [8]. To mitigate instability, brute-force sub-sampling can be used to minimise differences in SHAP values. LIME is also combined with other methods, such as partial dependence plots, to interpret seasonal precipitation predictions made by random forest models for the western United States [7].",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "the LIME method, together with other explanation methods like partial dependence plots, is used to interpret seasonal precipitation prediction made by a random forest model for the western United States"
+      ],
+      "title": "Interpretable Machine Learning for Weather and Climate Prediction: A Survey",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2403.18864",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4.1.1 LIME Explanation",
+         "chunk_id": "arxiv_2403.18864#c12",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "It is somewhat surprising that in other XAI papers well-cited research, LIME and SHAP, are relatively invisible in the selected articles. One reason can be that they, in creating local surrogate models (f.x. linear), adds an extra layer that needs to be interpreted to get global understanding."
+      ],
+      "title": "Mapping Knowledge Representations to Concepts: A Review and New Perspectives",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2301.00189",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Discussion",
+         "chunk_id": "arxiv_2301.00189#c10",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "LIME’s explanations consist of words highly-weighted by the model, but no further information is provided on why a text is classified as abusive (?)."
+      ],
+      "title": "Confronting Abusive Language Online: A Survey from the Ethical and Human Rights Perspective",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.12305",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "3.3.2 Interpretability and Explainability",
+         "chunk_id": "arxiv_2012.12305#c20",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "However, popular methods for scoring input variables such as SHAP and LIME suffer from high instability due to random sampling."
+      ],
+      "title": "Provably Stable Feature Rankings with SHAP and LIME",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.15800",
+       "authors": [
+        "Jeremy Goldwasser and Giles Hooker"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Its authors presented a method to calculate an additive feature importance score for each particular prediction with a set of desirable properties (local accuracy, missingness and consistency) that its antecedents lacked.",
+       "At the end of the process, LIME presents the superpixels with highest positive weights as an explanation (see Figure 9 ).",
+       "A simple linear model learns on this data set, which is locally weighted.",
+       "In image classification, LIME creates a set of perturbed instances by dividing the input image into interpretable components (contiguous superpixels ), and runs each perturbed instance through the model to get a probability.",
+       "LIME perturbs the input and sees how the predictions change.",
+       "LIME builds locally linear models around the predictions of an opaque model to explain it.",
+       "XAI techniques such as SHAP [ 224 ] could be used to generate counterfactual outcomes explaining the decisions of a ML model when fed with protected and unprotected variables.",
+       "There lies the rationale of why KNN has also been adopted widely in contexts in which model interpretability is a requirement"
+      ],
+      "title": "Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1910.10045",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4.1 Model-agnostic Techniques for Post-hoc Explainability",
+         "chunk_id": "hub_W2981731882#c22",
+         "char_start": 69956
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "By conducting a detailed analysis of the SHAP and LIME explanations, we demonstrate the effectiveness of these techniques in improving the interpretability of the models' decision-making processes.",
+       "Specifically, we employ two prominent XAI methods, Shapley Additive Explanations (SHAP) and Local Interpretable Model-Agnostic Explanations (LIME), to shed light on the black-box nature of four machine learning models used for file fragment classification.",
+       "Our analysis reveals that these XAI techniques effectively identify key features influencing each model's predictions."
+      ],
+      "title": "interpretability and transparency of machine learning in file fragment analysis with explainable artificial intelligence",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Contextual Challenges and Future Directions",
+    "text": "There is an inherent trade-off between model interpretability and performance in complex tasks [15]. In financial markets, LSTM models face fundamental challenges in interpreting unexpected feedback dynamics [14]. Caution is required when relying solely on LSTM models for stock price prediction, as their lack of interpretability makes it difficult to understand the underlying factors driving price movements [14]. Results demonstrate that adding a feature correlated with oil stocks does not improve the interpretability of LSTM models [14]. In generative modeling, while both Neural Network (NN)-based and Bayesian Network (BN)-based models are good under loose interpretability constraints, BN-based models perform better under strict interpretability constraints [13]. KNN is widely adopted in contexts where interpretability is required because its prediction process resembles human decision-making [3]. By offering transparency, XAI enables researchers to uncover potential biases, admit limits, and enhance the fairness and dependability of AI systems [6]. Future research should focus on developing more interpretable models that are easily understood by human operators and provide clear explanations of reasoning [12]. Additionally, improving the interpretability of ML and DL models is required to ensure their trustworthiness and effective utilization in mental health contexts [11].",
+    "citations": [
+     {
+      "id": "[11]",
+      "snippets": [
+       "Future research is required to improve the interpretability of these models to ensure their trustworthiness and effective utilization in mental health contexts [ 128 ] ."
+      ],
+      "title": "Measuring Non-Typical Emotions for Mental Health: A Survey of Computational Approaches",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2403.08824",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "(whole-text)",
+         "chunk_id": "arxiv_2403.08824#gap",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[12]",
+      "snippets": [
+       "Future research should focus on developing more interpretable models that are easily understood by human operators and provide a clear explanation of the reasoning behind their predictions."
+      ],
+      "title": "Information Cascade Prediction under Public Emergencies: A Survey",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2404.01319",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "(whole-text)",
+         "chunk_id": "arxiv_2404.01319#gap",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "In this paper, we demonstrate two techniques, LIME and SHAP, used to improv",
+       "By offering transparency into how these models make judgements, XAI enables researchers and users to uncover potential biases, admit limits, and eventually enhance the fairness and dependability of AI systems."
+      ],
+      "title": "unlocking machine learning model decisions: a comparative analysis of lime and shap for enhanced interpretability",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Its authors presented a method to calculate an additive feature importance score for each particular prediction with a set of desirable properties (local accuracy, missingness and consistency) that its antecedents lacked.",
+       "At the end of the process, LIME presents the superpixels with highest positive weights as an explanation (see Figure 9 ).",
+       "A simple linear model learns on this data set, which is locally weighted.",
+       "In image classification, LIME creates a set of perturbed instances by dividing the input image into interpretable components (contiguous superpixels ), and runs each perturbed instance through the model to get a probability.",
+       "LIME perturbs the input and sees how the predictions change.",
+       "LIME builds locally linear models around the predictions of an opaque model to explain it.",
+       "XAI techniques such as SHAP [ 224 ] could be used to generate counterfactual outcomes explaining the decisions of a ML model when fed with protected and unprotected variables.",
+       "There lies the rationale of why KNN has also been adopted widely in contexts in which model interpretability is a requirement"
+      ],
+      "title": "Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1910.10045",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4.1 Model-agnostic Techniques for Post-hoc Explainability",
+         "chunk_id": "hub_W2981731882#c22",
+         "char_start": 69956
+        }
+       ]
+      }
+     },
+     {
+      "id": "[13]",
+      "snippets": [
+       "Our investigation supports that, while both Neural Network(NN)-based and Bayesian Network(BN)-based generative models are both good to complete synthetic training task under loose model interpretability constrain, the BN-based generative models is better than NN-based when synthetic training fraud detection model under strict model interpretability constrain."
+      ],
+      "title": "Downstream Task-Oriented Generative Model Selections on Synthetic Data Training for Fraud Detection Models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.00974",
+       "authors": [
+        "Yinan Cheng",
+        "Chi-Hua Wang",
+        "Vamsi K. Potluru",
+        "Tucker Balch"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[14]",
+      "snippets": [
+       "The results demonstrate that adding a feature correlated with oil stocks does not improve the interpretability of LSTM models.",
+       "Caution should be exercised when relying solely on LSTM models for stock price prediction as their lack of interpretability may make it difficult to fully understand the underlying factors driving stock price movements.",
+       "One of the fundamental challenges faced in utilizing LSTM models for financial markets lies in interpreting the unexpected feedback dynamics within them."
+      ],
+      "title": "The Interpretability of LSTM Models for Predicting Oil Company Stocks: Impact of Correlated Features",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.00350",
+       "authors": [
+        "Javad T. Firouzjaee and Pouriya Khaliliyan"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[15]",
+      "snippets": [
+       "There is an inherent trade-off between model interpretability and performance in complex tasks, and many methods have been developed to obtain post-hoc explanations of a model's predictions [25]."
+      ],
+      "title": "explainability of cnn based classification models for acoustic signal",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 33,
+   "n_claims_usable": 33,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C18",
+     "sentence": "Deep SHAP extends this by decomposing deep learning predictions into feature contributions ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "SHAP, conversely, is built on the Shapley value framework for efficient estimation ."
+    },
+    {
+     "cid": "C21",
+     "sentence": "To mitigate instability, brute-force sub-sampling can be used to minimise differences in SHAP values ."
+    }
+   ],
+   "word_count": 560,
+   "n_sections": 3,
+   "n_citations": 15,
+   "record_level": 15,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

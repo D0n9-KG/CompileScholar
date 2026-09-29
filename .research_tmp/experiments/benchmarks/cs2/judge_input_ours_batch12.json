@@ -1,0 +1,961 @@
+[
+ {
+  "qid": "2bb40aa93ac3a6a673c839bd",
+  "question": "Have specialized approaches been developed for providing LLM assistance when people author SQL queries?",
+  "sections": [
+   {
+    "title": "Standardization of Specialized Agents",
+    "text": "The development of specialized approaches for Large Language Model (LLM) assistance in SQL authoring has reached a mature stage, with specialized SQL agents now recognized as a standard technique for generating SQL queries [1]. This standardization reflects a broader shift in how AI interacts with database systems, moving from general-purpose text generation to domain-specific optimization. The field encompasses a wide range of methodologies, including pre-processing, in-context learning (ICL), and fine-tuning (FT) techniques, all of which are covered in comprehensive surveys of the text-to-SQL landscape. Furthermore, novel model architectures and fine-tuning-based methods have been specifically developed to address the unique challenges inherent in SQL generation tasks, ensuring that the tools are robust and effective for professional use.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "More recently, specialized SQL agents have become one of the standard techniques for generating SQL queries."
+      ],
+      "title": "hi-sql: optimizing text-to-sql systems through dynamic hint integration",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Industry-Scale Automixting and Latency Challenges",
+    "text": "At the industry scale, the focus of AI-assisted SQL authoring has shifted toward 'automixting' SQL queries as authors type them out, rather than relying solely on natural language inputs [3]. This approach presents distinct technical hurdles compared to traditional natural language querying. First, the LLM must be trained on a large number of SQL queries directly, rather than on text-SQL pairs, to effectively support this real-time assistance [3]. Second, the latency constraints for an automixtional tool are significantly tighter than those for natural language querying, requiring near-instantaneous response times to maintain user flow [3]. The generation of SQL queries is inherently slower than traditional language modeling, which poses a significant challenge for developing efficient, localized natural language interfaces to databases (NLIDB) [2]. These latency issues are particularly pronounced in LLM-based text-to-SQL systems, where the computational cost of generating complex SQL structures can disrupt the user experience if not properly managed [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB).",
+       "RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation [31].",
+       "To address this, Consistency large language models (CLLMs) has been developed with an enhanced model architecture, providing a solution to reduce latency and speed up SQL query generation [79]."
+      ],
+      "title": "from natural language to sql: review of llm-based text-to-sql systems",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "(b) the latency constraints are much tighter for an automixtional tool compared to natural language querying,",
+       "For instance, (a) for automixting SQL queries, the LLM must be trained on a large number of SQL queries instead of text-sql pairs,",
+       "whereas the focus of this work is on automixting SQL queries as authors type them out."
+      ],
+      "title": "ai-assisted sql authoring at industry scale",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Architectural and Retrieval-Based Solutions",
+    "text": "To mitigate the latency and efficiency challenges associated with SQL generation, several specialized architectural and retrieval-based solutions have been proposed. Consistency Large Language Models (CLLMs) have been developed with enhanced model architectures specifically designed to reduce latency and speed up SQL query generation, offering a direct solution to the performance bottlenecks identified in standard LLMs [2]. Additionally, Retrieval-Augmented Generation (RAG)-based text-to-SQL systems have emerged as a powerful approach, integrating dynamic retrieval abilities with generative models to improve the accuracy and efficiency of SQL query generation [2]. These systems leverage external knowledge bases to guide the generation process, thereby reducing the reliance on the model's internal parameters for factual database schema information. The combination of architectural enhancements and retrieval mechanisms represents a dual-pronged strategy to make LLM-based SQL assistance both fast and accurate.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB).",
+       "RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation [31].",
+       "To address this, Consistency large language models (CLLMs) has been developed with an enhanced model architecture, providing a solution to reduce latency and speed up SQL query generation [79]."
+      ],
+      "title": "from natural language to sql: review of llm-based text-to-sql systems",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Schema Linking and Prompt Engineering",
+    "text": "Effective SQL generation also depends on accurate schema linking and sophisticated prompt design. SchemaGraphSQL has been introduced as a method for efficient schema linking, utilizing pathfinding graph algorithms to handle text-to-SQL tasks on large-scale databases [4]. This approach demonstrates superior schema linking performance when compared to fine-tuned and specialized methods, highlighting the importance of structural graph analysis in understanding database relationships [4]. In parallel, various meticulously crafted prompt designs have been proposed for text-to-SQL tasks, which are classified into categories such as Supplementary Knowledge Incorporation. These prompt engineering techniques are crucial for guiding the LLM to produce syntactically correct and semantically accurate SQL queries, especially when the model is not fine-tuned on specific database schemas. The integration of graph-based schema linking with advanced prompt strategies provides a robust framework for handling complex database structures.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "ations, demonstrating superior schema linking performance compared to fine-tuned and specialized methods.",
+       "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases"
+      ],
+      "title": "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "User Interaction and Ambiguity Resolution",
+    "text": "Beyond technical generation, the interaction model between the user and the AI system is critical for handling the inherent ambiguities in natural language queries. When dealing with single-shot query execution, irresolvable ambiguities should be handled through mixed-initiative specification, which involves cooperatively engaging the user to resolve uncertainties rather than failing or guessing [5]. This approach ensures that the system does not produce incorrect results due to vague user intent. A key challenge in this domain lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation [5]. Striking this balance is essential for maintaining both efficiency and accuracy, as excessive automation can lead to errors, while excessive consultation can hinder productivity. The goal is to create a seamless collaborative environment where the AI assists the user without overstepping its bounds or underutilizing its capabilities.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "A key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation.",
+       "While we have focused on single-shot query execution, irresolvable ambiguities should be handled through mixed-initiative specification [11, 1], cooperatively engaging the user to resolve ambiguities rather than fail or guess."
+      ],
+      "title": "are we asking the right questions? on ambiguity in natural language queries for tabular data analysis",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Integration into Development Environments",
+    "text": "The practical application of these specialized LLM approaches is evident in their integration into mainstream development environments. Copilot, introduced in 2021, supports SQL and T-SQL among many other languages within Integrated Development Environments (IDEs) such as VS Code, Visual Studio, Neovim, and JetBrains IDE. This widespread adoption underscores the utility of AI-assisted SQL authoring in real-world software development workflows. By embedding these capabilities directly into the tools that developers use daily, the friction associated with writing complex SQL queries is significantly reduced. The availability of such tools in popular IDEs ensures that developers have immediate access to AI assistance, facilitating faster development cycles and reducing the cognitive load associated with database interaction. This integration marks a significant milestone in the practical deployment of specialized LLM techniques for SQL authoring.",
+    "citations": []
+   }
+  ],
+  "diag": {
+   "n_claims_input": 15,
+   "n_claims_usable": 15,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 4,
+   "word_count": 802,
+   "n_sections": 6,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "3d1ff2a80239a37908a6f4c4",
+  "question": "How are user demonstrations represented in domain-specific-language programs and used for automation tasks?",
+  "sections": [
+   {
+    "title": "Foundations of Programming by Demonstration",
+    "text": "The field of programming by demonstration (PbD) has evolved to allow users to create software by describing requirements in natural language, addressing challenges across software engineering, programming languages, and artificial intelligence. Early research often treated code generation as a semantic parsing task, aiming to streamline routine tasks through automation and empower non-programmers to obtain solutions tailored to their specific intentions. A key distinction in this area is the difference between input-output examples and natural language specifications; while input-output examples are more accessible, they are often incomplete, whereas a natural language specification is sufficient to describe the underlying logic of a program. The scope of PbD extends to the programming of graphical user interfaces, graphics and text editors, and robots, where users interact via input devices or control panels [2]. In these contexts, the concept of demonstration is interpreted broadly; for instance, in image creation domains like Picbreeder, a user might demonstrate their preference by painting a portion of an image red to signal the search algorithm [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Demonstration is meant broadly, i.e., if the domain involves creating images as in Picbreeder [18], the user might demonstrate their preference by painting a portion of an image red, signaling to the search algorithm that it shou"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Such domains are the programming of graphical user interfaces as well as graphics and text editors where the user interacts with the editor program by using keyboard, mouse, pen, or other input devices. Another important domain is the programming of robots, appliances, and other machines where the user moves and manipulates the device by provided control panels."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "DSL Syntax and Action Representation",
+    "text": "Domain-specific languages (DSLs) provide the structural framework for representing these user interactions. Within such a DSL, executable actions are described by verbal expressions and are parameterized by phrases [4]. A specific example of this structure is the sensor-based action called shove, which takes a noun phrase and a prepositional phrase as parameters [4]. This syntactic approach allows for the precise definition of operations within the language. Furthermore, in the context of neuro-symbolic systems, synthesized programs expressed in a DSL comprised of both logical operators and pre-trained neural networks can perform fine-grained edits, where different actions can be selectively applied to different parts of an image [3]. This combination of logical structure and neural components enables the system to handle complex, multi-part operations effectively.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Because these programs are expressed in a neuro-symbolic domain-specific language (DSL) comprised of both logical operators and (pre-trained) neural networks, they can be used to perform fine-grained edits where different actions can be selectively applied to different parts of the image."
+      ],
+      "title": "imageeye: batch image processing using program synthesis",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2304.03253",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "For instance, the DSL provides a sensor-based action shove, which takes a noun phrase and a prepositional phrase as parameter.",
+       "In the DSL, executable actions are described by verbal expressions, and parameterized by phrases."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "GUI-Based Automation and Mobile Applications",
+    "text": "To support programming for tasks in diverse domains, systems often leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium [5]. In this approach, procedural actions are represented as sequences of GUI operations, while declarative concepts can be represented through references to GUI contents [5]. This method allows end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming techniques [5]. By utilizing the existing interfaces of mobile applications, the system can facilitate automation across various domains without requiring users to learn a new, abstract programming interface.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "In this paper, we address the research challenge of enabling end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming and programming by demonstration (PBD).",
+       "To support programming for tasks in diverse domains, we leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium, where procedural actions are represented as sequences of GUI operations, and declarative concepts can be represented through references to GUI contents."
+      ],
+      "title": "interactive task and concept learning from natural language instructions and gui demonstrations",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1909.00031",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Interpreting User Intent and Learning",
+    "text": "The focus in program synthesis has shifted from relying on complete formal specifications to interpreting ambiguous, high-level user intents [3]. This shift is particularly relevant in robotics, where high-capacity models have shown promise toward being trained on large collections of diverse and task-agnostic datasets of video demonstrations [7]. These models can learn from broad demonstration data to perform specific tasks. Additionally, the test cases of LogicAsker can be used to design demonstration examples for in-context learning, which effectively improves the logical reasoning ability of large language models, such as GPT-4, by approximately 10% [6]. This demonstrates that structured demonstration data can enhance the reasoning capabilities of AI models, bridging the gap between raw user input and executable logic.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "In addition, the test cases of LogicAsker can be further used to design demonstration examples for in-context learning, which effectively improves the logical reasoning ability of LLMs, e.g., 10\\% for GPT-4."
+      ],
+      "title": "A & B == B & A: Triggering Logical Reasoning Failures in Large Language Models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.00757",
+       "authors": [
+        "Yuxuan Wan",
+        "Wenxuan Wang",
+        "Yiliu Yang",
+        "Youliang Yuan"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "However, recent work on high-capacity models in robotics has shown promise toward being trained on large collections of diverse and task-agnostic datasets of video demonstrations."
+      ],
+      "title": "General-purpose foundation models for increased autonomy in robot-assisted surgery",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.00678",
+       "authors": [
+        "Samuel Schmidgall",
+        "Ji Woong Kim",
+        "Alan Kuntz",
+        "Ahmed Ezzat Ghazi"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Because these programs are expressed in a neuro-symbolic domain-specific language (DSL) comprised of both logical operators and (pre-trained) neural networks, they can be used to perform fine-grained edits where different actions can be selectively applied to different parts of the image."
+      ],
+      "title": "imageeye: batch image processing using program synthesis",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2304.03253",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Distinguishing Relevant Demonstration Frames",
+    "text": "A critical challenge in utilizing demonstrations is identifying which parts of the user's input are relevant to the task. The system R2RISE has been shown to successfully distinguish important frames from the demonstrations [8]. This capability is essential for filtering out noise and focusing on the specific actions that define the user's intent. By accurately identifying these key frames, the system can more effectively synthesize programs that match the user's desired outcome, whether in graphical editing, mobile automation, or robotic control.",
+    "citations": [
+     {
+      "id": "[8]",
+      "snippets": [
+       "The result shows that R2RISE successfully distinguishes important frames from the demonstrations."
+      ],
+      "title": "Explaining Imitation Learning through Frames",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2301.01088",
+       "authors": [
+        "Boyuan Zheng",
+        "Jianlong Zhou",
+        "Chunjie Liu",
+        "Yiqiao Li and Fang Chen"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 25,
+   "n_claims_usable": 15,
+   "claims_dropped_noref": 10,
+   "claims_invalidated": 0,
+   "orphan_markers": 3,
+   "word_count": 590,
+   "n_sections": 5,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "99fd4c1b54e1367bcd3cb3b2",
+  "question": "How can the integration of GIS spatial analysis techniques with economic modeling improve the accuracy and effectiveness of environmental policy ?",
+  "sections": [
+   {
+    "title": "Enhancing Regional Economic Analysis",
+    "text": "The integration of spatial statistical analysis with Geographic Information Systems (GIS) offers a more sophisticated framework for conducting regional economic analyses [1]. This technological synergy allows researchers to move beyond static assessments by facilitating the adjustment of research area levels, such as transitioning from small geographical units to larger administrative regions [1]. This flexibility is particularly advantageous for capturing the influence that a larger region exerts on one of its specific components, thereby providing a more nuanced understanding of spatial dependencies in economic data [1]. By leveraging these capabilities, analysts can better account for the spatial heterogeneity that often complicates traditional economic modeling approaches.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "GIS is well suited for the change of research area in level, like moving from small level geographical units to larger units, and it is convenient to capture the effect of a larger region on one of its components too.",
+       "Nowadays, the integration of spatial statistical analysis with GIS provides a more sophisticate"
+      ],
+      "title": "application of integration of spatial statistical analysis with gis to regional economic analysis",
+      "metadata": {
+       "year": 2004,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Integration Methodologies and System Dynamics",
+    "text": "Environmental modeling activities stand to benefit significantly from the adoption of GIS technology [3]. The integration of environmental models with GIS functionalities can be achieved through either loosely or tightly coupled approaches, offering flexibility in how data and processes are managed [3]. In the realm of complex systems, System Dynamics (SD) theory has long been utilized to model complex non-linear interrelationships [2]. However, the application of SD modeling to support the practical implementation of environmental sustainability policies has not been common [2]. A primary reason for this limited adoption is that the challenge of effectively including spatial data within SD models has not yet been adequately addressed [2]. Despite these historical gaps, the potential for adopting SD and GIS methods in combination has been exemplified in recent studies, suggesting a path forward for more robust policy analysis [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Potential for adoption of SD and GIS methods in combination is exemplified with",
+       "This is largely because the challenge of including spatial data has not yet been well met.",
+       "so far it has not been common to do the kind of modeling in support of bringing environmental sustainability policies to practice",
+       "System dynamics (SD) theory has long been deployed in modeling complex non-linear interrelationships"
+      ],
+      "title": "interrelations between socio-economic development and environmental quality: a simulation integrating system dynamics models with gis",
+      "metadata": {
+       "year": 2005,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Integrating environmental models with GIS functionalities is conceivable through either a loosely or tightly coupled approach.",
+       "Environmental modeling activities can tremendously benefit from geographic information system (GIS) technology."
+      ],
+      "title": "on tightly coupling models with visualizations: the package for analysis and visualization of environmental data",
+      "metadata": {
+       "year": 1997,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Case Study: Climate Change and Ice Sheet Dynamics",
+    "text": "One specific application of these integrated methods involves the combination of an economic model of climate change with a small structural model of the Greenland ice sheet, referred to here as GIS [4]. This integration provides a methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses [4]. The findings from this specific model indicate that adding the Greenland ice sheet component has only a small effect on the social cost of carbon (SCC) [4]. This limited impact is attributed to the slow rate of melting and the fact that the associated damages are projected to occur far in the future [4]. This case illustrates how spatially explicit environmental models can be embedded within economic frameworks to refine the assessment of long-term climate risks.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "It finds that adding the GIS has only a small effect on the social cost of carbon (SCC) because melting is slow and damages are far in the future.",
+       "As such, it provides a methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses.",
+       "This study integrates an economic model of climate change with a small structural model of the Greenland ice sheet (GIS)."
+      ],
+      "title": "economics of the disintegration of the greenland ice sheet",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluating Land Use Policy Impacts",
+    "text": "Beyond climate modeling, the linkage of GIS with environmental and economic models has been applied to evaluate the environmental consequences of hypothetical land use changes [5]. Specifically, this approach has been used to assess the impacts driven by the Common Agricultural Policy (CAP) Reform [5]. The evaluation process involves a two-step procedure that connects the spatial data capabilities of GIS with the predictive power of environmental and economic models [5]. This methodological framework demonstrates the effectiveness of integrating spatial analysis with economic modeling to predict the outcomes of policy interventions related to land management and agricultural practices.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "The environmental consequences of hypothetical changes in land use driven by the CAP Reform have been evaluated by linking a geographical information system (GIS) with environmental and economic models in a two-step procedure (Fig. 1)."
+      ],
+      "title": "simulating impacts of agricultural policy on nitrogen losses from a watershed in northern italy",
+      "metadata": {
+       "year": 1995,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 13,
+   "n_claims_usable": 13,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 467,
+   "n_sections": 4,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "00bdd80debc8549198001289",
+  "question": "How can I use an hybridization of ontology and machine learning for text summarization ?",
+  "sections": [
+   {
+    "title": "System Architecture and Core Components",
+    "text": "The OATS system represents a novel automatic text summarization framework that integrates ontology-based approaches with machine learning techniques [1]. Its architecture, detailed in Section 3 of the source material, relies on a specific configuration that includes an ontology component utilizing concept graphs to represent knowledge derived from unstructured text [1]. To enhance semantic understanding, the system incorporates a pre-trained word embeddings model that maps words to low-dimensional vectors with real numbers, thereby capturing semantic relations and syntactic similarities [1]. The training process involves specific datasets and a train-test split to ensure model robustness [1]. This hybrid approach allows the system to leverage structured knowledge from ontologies while utilizing the statistical power of deep learning models for text processing [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a pre-trained word embeddings model, which captures semantic relations and syntactic similarities between words by mapping words to low-dimensional vectors with real numbers",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "All of the above approaches focused on the generation of summaries from multiple documents simultaneously; the question answering technique was used to guide the selection of sentences or paragraphs for general topics.",
+       "BioBERT outperforms BERT in a variety of biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain.",
+       "the NER and SR models used for concept and relation extraction in the proposed system were trained existing NLP tools currently do not recognize \"COVID-19\" or its associated synonyms (i.e., the terms did not exist when the NLP models were trained)",
+       "However, the performance on the individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model. Incorrect text extracted by the QA model can still lead to inclusion of useful sentences in the summary produced by the OATS model.",
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Ontology-Driven Document Selection",
+    "text": "A critical function of the OATS system is the identification of relevant documents through a dedicated matching algorithm [1]. This process is informed by ontology partitioning, a technique applicable to ontology alignment, merging, and text summarization [1]. In a related biomedical application, Schwemmer et al. (2019) manually extracted 'gold standard' concept graphs from approximately 2,000 Clinical Quality Measure (CQM) descriptions [1]. These manually annotated graphs, derived according to the CQM ontology, were used to guide the selection of relevant measure concepts from biomedical literature [1]. Furthermore, Schwemmer et al. (2019) developed a matching algorithm to determine the relevancy of each document to a specific CQM by utilizing these 'gold standard graphs' [1]. This demonstrates how structured ontology representations can be used to filter and prioritize source documents before summarization begins [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a pre-trained word embeddings model, which captures semantic relations and syntactic similarities between words by mapping words to low-dimensional vectors with real numbers",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "All of the above approaches focused on the generation of summaries from multiple documents simultaneously; the question answering technique was used to guide the selection of sentences or paragraphs for general topics.",
+       "BioBERT outperforms BERT in a variety of biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain.",
+       "the NER and SR models used for concept and relation extraction in the proposed system were trained existing NLP tools currently do not recognize \"COVID-19\" or its associated synonyms (i.e., the terms did not exist when the NLP models were trained)",
+       "However, the performance on the individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model. Incorrect text extracted by the QA model can still lead to inclusion of useful sentences in the summary produced by the OATS model.",
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Question-Answering Guided Summarization",
+    "text": "The system generates user-focused summaries by exploiting answers from a question-answering (QA) model based on user-specified questions [1]. This approach differs from previous methods that focused on generating summaries from multiple documents simultaneously for general topics, where QA techniques were used to guide the selection of sentences or paragraphs [1]. Arumae & Liu (2019) developed a supervised deep learning framework that utilizes human-annotated question-answering data, highlighting the trend toward using QA to drive summarization processes. By allowing users to specify questions, the OATS system can tailor the output to specific information needs rather than producing a generic overview [1]. This user-centric design requires the ontology summarization techniques to be sufficiently flexible to allow users and applications to tune the model for different requirements or inputs [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a pre-trained word embeddings model, which captures semantic relations and syntactic similarities between words by mapping words to low-dimensional vectors with real numbers",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "All of the above approaches focused on the generation of summaries from multiple documents simultaneously; the question answering technique was used to guide the selection of sentences or paragraphs for general topics.",
+       "BioBERT outperforms BERT in a variety of biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain.",
+       "the NER and SR models used for concept and relation extraction in the proposed system were trained existing NLP tools currently do not recognize \"COVID-19\" or its associated synonyms (i.e., the terms did not exist when the NLP models were trained)",
+       "However, the performance on the individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model. Incorrect text extracted by the QA model can still lead to inclusion of useful sentences in the summary produced by the OATS model.",
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Domain-Specific Embeddings and Limitations",
+    "text": "The choice of embedding model significantly impacts performance in specialized domains. For instance, BioBERT outperforms standard BERT in various biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain [1]. However, existing NLP tools face challenges with emerging terminology; for example, Named Entity Recognition (NER) and Semantic Role (SR) models trained on existing data do not recognize 'COVID-19' or its associated synonyms because these terms did not exist when the models were originally trained [1]. Additionally, the accuracy of QA extraction is sensitive to the specific wording of the question, particularly when information is presented slightly differently across various documents. These limitations highlight the need for robust, domain-adapted models that can handle both established and novel terminology effectively [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a pre-trained word embeddings model, which captures semantic relations and syntactic similarities between words by mapping words to low-dimensional vectors with real numbers",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "All of the above approaches focused on the generation of summaries from multiple documents simultaneously; the question answering technique was used to guide the selection of sentences or paragraphs for general topics.",
+       "BioBERT outperforms BERT in a variety of biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain.",
+       "the NER and SR models used for concept and relation extraction in the proposed system were trained existing NLP tools currently do not recognize \"COVID-19\" or its associated synonyms (i.e., the terms did not exist when the NLP models were trained)",
+       "However, the performance on the individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model. Incorrect text extracted by the QA model can still lead to inclusion of useful sentences in the summary produced by the OATS model.",
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance Metrics and Quality Assessment",
+    "text": "Evaluating the quality of the generated summaries presents unique challenges. The performance on individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model [1]. There can be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers to a standardized set of questions [1]. Conversely, incorrect text extracted by the QA model can still lead to the inclusion of useful sentences in the final output [1]. This suggests that while QA metrics are important, they do not fully capture the utility of the final summary, and alternative evaluation methods may be necessary to assess the holistic quality of the generated text [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a pre-trained word embeddings model, which captures semantic relations and syntactic similarities between words by mapping words to low-dimensional vectors with real numbers",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "All of the above approaches focused on the generation of summaries from multiple documents simultaneously; the question answering technique was used to guide the selection of sentences or paragraphs for general topics.",
+       "BioBERT outperforms BERT in a variety of biomedical text mining tasks because it provides a more representative word distribution for the biomedical domain.",
+       "the NER and SR models used for concept and relation extraction in the proposed system were trained existing NLP tools currently do not recognize \"COVID-19\" or its associated synonyms (i.e., the terms did not exist when the NLP models were trained)",
+       "However, the performance on the individual questions is not directly reflected in the quality of the overall text summary produced by the OATS model. Incorrect text extracted by the QA model can still lead to inclusion of useful sentences in the summary produced by the OATS model.",
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": []
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 20,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "title_only_citations": 1,
+   "orphan_markers": 2,
+   "word_count": 631,
+   "n_sections": 5,
+   "n_citations": 1,
+   "record_level": 1,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "fb607bc177d2efb926cb3dff",
+  "question": "How can question generation be used to mitigate hallucination in LLMs?",
+  "sections": [
+   {
+    "title": "Theoretical Basis for Question Generation",
+    "text": "The primary mechanism by which question generation (QG) mitigates hallucination is the elimination of the generative step, which is the source of factual errors in Large Language Models (LLMs). While LLMs are proficient at producing human-like text, the act of generation inherently introduces the risk of hallucination, where the model creates plausible but factually incorrect answers [1]. To address this, the Question-to-Question (Q2Q) framework proposes a retrieval mechanism that precisely identifies relevant text, thereby removing the generation step entirely [1]. This approach is considered practical and useful, particularly in the context of Wikipedia, where the goal is hallucination-free knowledge access [1]. By shifting the paradigm from generating answers to retrieving existing facts, the system avoids the creation of novel, potentially false information [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We argue that a retrieval mechanism that can precisely identify the relevant text and thereby removing the generation step to mitigate hallucination is a practical and useful approach in the context of Wikipedia.",
+       "Furthermore, while LLMs excel at generating human-like text, the generation step itself introduces the risk of hallucination, where LLMs may create plausible but factually incorrect answers.",
+       "Our method achieves high cosine similarity \\( (>0.9\\) ) for relevant question pairs, enabling highly precise retrieval.",
+       "Comparing questions with questions leads to highly accurate results with very high cosine similarity scores.",
+       "This approach offers several advantages including computational efficiency, rapid response times, and increased scalability.",
+       "The system focuses on direct fact retrieval (extractive). Answering more complex questions that require multi-hop reasoning, aggregation, or synthesis might require further advancements.",
+       "We demonstrate its effectiveness on Wikipedia and Wikidata, including multimedia content through structured fact retrieval from Wikidata, opening up new pathways for multimodal question answering.",
+       "Addressing this challenge requires strategies like question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching.",
+       "So, \"question-to-passage\" vector comparison can make it hard to reliably retrieve the most appropriate content, potentially diminishing the overall performance of the QA system."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodology and Retrieval Precision",
+    "text": "The Q2Q method relies on comparing questions with other questions rather than comparing questions to passages, a strategy that yields highly accurate results with minimal noise [1]. This approach achieves high cosine similarity scores, specifically exceeding 0.9, for relevant question pairs, which enables highly precise retrieval [1]. The methodology involves using an LLM to generate all possible questions corresponding to a specific Wikidata statement, such as converting knowledge into queries like \"Who was Obama's running mate in the 2008 presidential election?\". The system's configuration includes specific parameters for the hashing function, similarity metric, embedding model, embedding dimensionality, knowledge bases, and context granularity refinement. By leveraging these structured comparisons, the system can identify the most relevant content without the ambiguity often associated with traditional vector search methods [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We argue that a retrieval mechanism that can precisely identify the relevant text and thereby removing the generation step to mitigate hallucination is a practical and useful approach in the context of Wikipedia.",
+       "Furthermore, while LLMs excel at generating human-like text, the generation step itself introduces the risk of hallucination, where LLMs may create plausible but factually incorrect answers.",
+       "Our method achieves high cosine similarity \\( (>0.9\\) ) for relevant question pairs, enabling highly precise retrieval.",
+       "Comparing questions with questions leads to highly accurate results with very high cosine similarity scores.",
+       "This approach offers several advantages including computational efficiency, rapid response times, and increased scalability.",
+       "The system focuses on direct fact retrieval (extractive). Answering more complex questions that require multi-hop reasoning, aggregation, or synthesis might require further advancements.",
+       "We demonstrate its effectiveness on Wikipedia and Wikidata, including multimedia content through structured fact retrieval from Wikidata, opening up new pathways for multimodal question answering.",
+       "Addressing this challenge requires strategies like question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching.",
+       "So, \"question-to-passage\" vector comparison can make it hard to reliably retrieve the most appropriate content, potentially diminishing the overall performance of the QA system."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Quality Assurance and Verification",
+    "text": "To ensure the integrity of the generated questions, a rigorous quality verification process is employed. A disjoint group of workers is trained to verify the generated questions, where each question is annotated by two workers. The verifiers either mark a question as unanswerable or select the correct answer, and only questions verified by at least one worker who answered correctly are retained for use. This filtering process is significant, as it removes 15% of the generated questions, thereby reducing the inclusion of invalid or hallucinated queries. Additionally, self-verification serves as another method to mitigate hallucinations, often involving the decomposition of generated content into multiple fact checkpoints to validate accuracy [3]. These verification steps are crucial because hallucinations in the QG process can lead to questions that introduce information not present in the source context or violate the constraints specified in the prompt [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "In our work, hallucinations may lead to generated questions that introduce information not present in the source context or violate the constraints specified in the prompt."
+      ],
+      "title": "testing question answering software with context-driven question generation",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Another method to mitigate hallucinations is through self-verification. This often involves decomposing the generated content into multiple fact checkpoints."
+      ],
+      "title": "advancing the scientific method with large language models: from hypothesis to discovery",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "System Performance and Efficiency",
+    "text": "The Q2Q approach offers several operational advantages, including computational efficiency, rapid response times, and increased scalability [1]. The system demonstrates effectiveness on both Wikipedia and Wikidata, extending its capabilities to multimedia content through structured fact retrieval from Wikidata [1]. This opens up new pathways for multimodal question answering, allowing the system to handle diverse data types while maintaining precision [1]. The focus on direct fact retrieval, or extractive answering, allows the system to provide reliable responses for straightforward queries [1]. By avoiding the complex synthesis required for generative models, the system maintains high performance metrics in terms of speed and resource usage [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We argue that a retrieval mechanism that can precisely identify the relevant text and thereby removing the generation step to mitigate hallucination is a practical and useful approach in the context of Wikipedia.",
+       "Furthermore, while LLMs excel at generating human-like text, the generation step itself introduces the risk of hallucination, where LLMs may create plausible but factually incorrect answers.",
+       "Our method achieves high cosine similarity \\( (>0.9\\) ) for relevant question pairs, enabling highly precise retrieval.",
+       "Comparing questions with questions leads to highly accurate results with very high cosine similarity scores.",
+       "This approach offers several advantages including computational efficiency, rapid response times, and increased scalability.",
+       "The system focuses on direct fact retrieval (extractive). Answering more complex questions that require multi-hop reasoning, aggregation, or synthesis might require further advancements.",
+       "We demonstrate its effectiveness on Wikipedia and Wikidata, including multimedia content through structured fact retrieval from Wikidata, opening up new pathways for multimodal question answering.",
+       "Addressing this challenge requires strategies like question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching.",
+       "So, \"question-to-passage\" vector comparison can make it hard to reliably retrieve the most appropriate content, potentially diminishing the overall performance of the QA system."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Limitations and Challenges",
+    "text": "Despite its advantages, the Q2Q system faces several limitations. It may fall short for questions that require more than a single paragraph or fact, as the diversity of generated questions, while high, may not fully cover the complexity of multi-faceted queries. The system focuses on direct fact retrieval, meaning it might struggle with questions requiring multi-hop reasoning, aggregation, or synthesis, which could require further advancements [1]. Furthermore, LLMs are efficient in only a small set of languages, whereas Wikipedia exists in over 300 languages, limiting the system's global applicability. Critics argue that question-to-passage vector comparison can make it difficult to reliably retrieve the most appropriate content, potentially diminishing the overall performance of the QA system [1]. Addressing these challenges may require strategies such as question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We argue that a retrieval mechanism that can precisely identify the relevant text and thereby removing the generation step to mitigate hallucination is a practical and useful approach in the context of Wikipedia.",
+       "Furthermore, while LLMs excel at generating human-like text, the generation step itself introduces the risk of hallucination, where LLMs may create plausible but factually incorrect answers.",
+       "Our method achieves high cosine similarity \\( (>0.9\\) ) for relevant question pairs, enabling highly precise retrieval.",
+       "Comparing questions with questions leads to highly accurate results with very high cosine similarity scores.",
+       "This approach offers several advantages including computational efficiency, rapid response times, and increased scalability.",
+       "The system focuses on direct fact retrieval (extractive). Answering more complex questions that require multi-hop reasoning, aggregation, or synthesis might require further advancements.",
+       "We demonstrate its effectiveness on Wikipedia and Wikidata, including multimedia content through structured fact retrieval from Wikidata, opening up new pathways for multimodal question answering.",
+       "Addressing this challenge requires strategies like question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching.",
+       "So, \"question-to-passage\" vector comparison can make it hard to reliably retrieve the most appropriate content, potentially diminishing the overall performance of the QA system."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Alternative Mitigation Strategies",
+    "text": "Beyond the Q2Q framework, other methods exist to mitigate hallucination. One set of works explicitly identifies contradictions among responses rather than estimating similarity, as detecting a self-contradiction is guaranteed to reveal an invalid claim. Mündler et al. (2024) posit that removing detected conflicting information will increase the validity of a generated response. These approaches complement the Q2Q method by providing additional layers of validation. While Q2Q focuses on retrieval precision and the removal of the generation step, contradiction detection and self-verification offer alternative pathways to ensure factual accuracy in LLM outputs [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Another method to mitigate hallucinations is through self-verification. This often involves decomposing the generated content into multiple fact checkpoints."
+      ],
+      "title": "advancing the scientific method with large language models: from hypothesis to discovery",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 18,
+   "n_claims_usable": 18,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 10,
+   "word_count": 727,
+   "n_sections": 6,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

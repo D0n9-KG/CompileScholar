@@ -1,0 +1,391 @@
+# 連続ステムの離散モDELによる同定における フフリング周期の下限の選定
+
+相良節夫\*·江口三代一\*·和田 清\*
+
+A Choice of the Lower Bound of Sampling Period for Continuous
+
+System Identification Using Discrete Model
+
+Setsuo SAGARA*, Miyoichi EGUCHI* and Kiyoshi WADA*
+
+In this paper, we shall consider a lower bound of sampling periods, when continuous systems are identified by least squares method using discrete model. The lower bound is minimum sampling period such that the identification accuracy based on the step response does not exceed an allowable value. This work is motivated by the fact that too small sampling periods lead to the deterioration of identification results in the presence of noise, which is caused by the bias of the least squares estimates.
+
+We investigate the effect of the bias on the identification accuracy, since the bias can be decided by N/S ratio and sampling period, and discribe graphically the relation between N/S ratio and sampling period for certain values of step response error in the case of the first, second and third order continuous systems. It is shown from this relation that the lower bound becomes larger, as system order increase. Using the figures, the lower bound can be found.
+
+Key Words: sampling design, identification, least squares method, parameter bias
+
+# 1. ま元がき
+
+SNTUMの高域領域の特性を求るたにはSANPRLUNGL周期を小さくする必要临港。連続SNTUMからSNTUN不变法1)にて離散SNTUMに変換する场合，SANPLINGL周期が小さいほまと連続SNT
+
+テムをと表現得起．まて，連統システムを連続系の同定手法用いてデイジタル計算機にと同定する场合も，サング周期が小さいほ好に同定得起．しぃがて，連統システムを離散モダにと同定するときもサング周期が小さいほうが得る離散モダはもとのステムを良く表現すると思われかにあるが，アナロ格計算機で連統システムを構成し入出力信号のサングデーた用いて最小2乘法で離散モダのバラメーダ同定を行う场合に，サング定期Tを短くてとそのスツフ庁答はFig.1に示すように真の庁答のはがな異た波形が得る．同樣のとが赤池氏らにとも指摘せて也在2．一方，一致推定量与える操作変数法や最尤法を用いと，最小2乘法よ小さいサング周期まご同定得起．しぃがて，スツフ庁答の誤差は最小2乘推定值のバイアスに起因てむと考えらる.
+
+本論文は，入力とてM系列信号を用い最小2乘法によ同定する场合，サイフスがTおよN/S比で記述くださいますとを用いStePPS応答の誤差に対るN/S比とsuntprng周期の関係を求ご，1次系，2次系，3次等根系にて，StePPS応答誤差).(204)有許容值以下にたTの下限とN/S比の関係を観示し，サイAPSS誤差が対応る連続系に及はす影響にて考察た。它らの円から，最小2乘法用い同定�能的Tの下限は高次にうほ大小きる。とがわか。も，Tの下限を作凹か求る方法にて必述ご。お，他同定手法の初期値とて最小2乘推定值用い場合にTをあまり小さく選と非常に異た值)&&初期値とて適否いとが有之と指摘る.
+
+13
+
+「計測自動制御學會論文集」
+
+Vol. 21, No. 1
+
+（昭和60年1月）
+
+-13-
+
+![](dt=2026-06-02/ht=05/ac93c5d545c641af3f00862f4f5cb600ab8aae6dad6ffd9c4c1802a13fc01956.jpg)
+
+![](dt=2026-06-02/ht=05/9448aee545cc95a845f10bdcc5279cdb42de886a0d68821dd368ed81a7c3fb24.jpg)
+
+![](dt=2026-06-02/ht=05/9a75e932822f57ccd42908a673adfc9717df699b7b8120b90d296647a147de3d.jpg)
+
+![](dt=2026-06-02/ht=05/841229d3ab33b6e202a0553a525b418c1bacc2d8d0b3d1006635567b28956bfe.jpg)
+
+![](dt=2026-06-02/ht=05/f39dfbc97f4d75aba164c490023753fc766d7a44e0770bb5f51f50e2f414401a.jpg)
+
+![](dt=2026-06-02/ht=05/4f57d5be0d124c3bc84ee888812e3c068e3d5707800a95124c74eb13ca49e2c5.jpg)
+
+![](dt=2026-06-02/ht=05/505d4284e3b589eca198cd50d82b4a41947e6346b3e776551b5560e2f40d6846.jpg)
+
+![](dt=2026-06-02/ht=05/1f48889c0745f3bf58fbdbdf5734ff8997dc8ce4f22d6aacf17a56f4b00a905b.jpg)
+
+# 2. 問題設定
+
+# 2.1 1次系におけるサング周期の下限
+
+平均值0，分散 $\sigma_u^2$ 为卡诺周期 $T$ 的 $M$ 系列信号 $u(t)$ 而，1次连续斯丁 $G(s) = K / (1 + \tau s)$ 的入力上加之，它的和的出力为 $x(t)$ 与之。観測出力 $y(t)$ 是 $x(t)$ 与观测雜音 $e(t)$ 为付加了形 $y(t) = x(t) + e(t)$ 与观测相等。它的關係为 Fig.2(a) 与示。 $e(t)$ 是十分高域中平坦的卡诺夫-普尔卡夫于 $t$ 为平均值0，分散 $\sigma_e^2$ 与 $x(t)$ 和无关相间的维数 $T$ 为卡诺夫-普尔卡夫于 $t$ ，得 $u(t), y(t)$ 为卡诺夫周期 $T$ 为卡诺夫-普尔卡夫，得到的离散表示 $u_k, y_k$ 用以确定最小2乘法与同定的 $t$ 与 $x$ 考考。入力为矩形波的 $0$ 次卡诺夫-普尔卡夫有有斯丁 $G(s)$ 为卡诺夫-普尔卡夫周期 $T$ 为离散化表示，卡尔斯代达期间是
+
+$$
+\left. \begin{array}{l} G _ {T} (z) = \frac {b _ {1} z ^ {- 1}}{1 + a _ {1} z ^ {- 1}} \\ a _ {1} = - e ^ {- T / \tau}, b _ {1} = K (1 + a _ {1}) \end{array} \right\} \tag {1}
+$$
+
+上表わる．。も，e(t)のサングル值ekは付錄Aに示すように白色系列で分散はTに依存せじσ²とる．。たて，連続系の同定対象はFig.2(b)のうに入力に分散σ²，観測雜音に分散σ²の無相関で平均値0の白色列が(1)式的離散ステムに加わてい場合に置き換えて考えるとが得起．。の離散モダルを用てデジタルシミュレーションで最小2乘法に則同定を行えは，Tを小さくするか新聞異たstテ庁答波形が得りる．。ときσ²を0とおくときわて小さいTをとてもstテ庁答は真值と一致する．。も，操作変数法や最尤法用いと最小2乘法に乗る场合よ小さいTまご同定電子郵件．。たて，stテ庁答の誤差は最小2乘推定
+
+![](dt=2026-06-02/ht=05/dab0303c7a7b68ca9f1419901e1df3f03091226c869d01ac0ce09c5bdf27375c.jpg)
+
+![](dt=2026-06-02/ht=05/d1a6b373b9cd8c286deda8aa89316e242fff5e86877d31c5a6c5a52eeae13f70.jpg)
+
+值のバイアスに起因くださいますと考えいたします．そのバイアスは一般に付錄Bから理論の計算いたします，（1）式のモデルに対する最小2乘推定値の理論値は
+
+$$
+\hat {a} _ {1} = a _ {1} - \frac {N S ^ {2}}{1 + N S ^ {2}} a _ {1}, \quad \hat {b} _ {1} = b _ {1} \tag {2}
+$$
+
+上亦然.乙乙忆，
+
+$$
+N S \triangleq \frac {\sigma_ {e}}{\sqrt {\sum_ {i = 1} ^ {\infty} g _ {T} (i) ^ {2} \sigma_ {u} ^ {2}}} \tag {3}
+$$
+
+$g_{T}(i)$ 1 (1)式の单位ル斯庁答%=1 $g_{T}(i)^{2}\cdot \sigma_{u}^{2}$ 1   
+(3）式のNS是出力のN/S比とてい．1次   
+系は $g_{T}(i) = (-a_{1})^{i - 1}b_{1}$ 有るか丨 $\sum_{i = 1}^{\infty}g_T(i)^2 = b_1^2 /$ $(1 - a_1^2)$ （204
+
+ある時刻 $t_f = mT$ まの，推定值にお斯テフ
+
+14
+
+昭和60年1月
+
+計測自動制御學會論文集
+
+第21卷 第1号
+
+-14-
+
+寇答 $\hat{h}_k$ 和真のステフ庁答 $h(t)$ との差のRoot Mean Square (RMS)を微信群Kで割り規格化た
+
+$$
+\frac {\mathrm {R M S}}{K} \triangleq \frac {\left[ \frac {1}{m} \sum_ {k = 1} ^ {m} \left\{h (k T) - \hat {h} _ {k} \right\} ^ {2} \right] ^ {1 / 2}}{K} \tag {4}
+$$
+
+を推定精度の評価とて用い．もし， $t_f$ がStépp応答の整定時間に対て十分ARGEんだらはその過渡部分は無視てき定常値蜓のgrいなのみで評価か計算てき，
+
+$$
+\frac {\mathrm {R M S}}{K} = \left| \frac {K - \hat {K}}{K} \right|, (t _ {f} \gg \tau) \tag {5}
+$$
+
+と近似的に表わせる．乙乙，Kは推定値によのガインdba。
+
+(1)式 $a_1, b_1$ 是 $\tau / T$ 的間数或最小2乘推定值 $\hat{a}_1, \hat{b}_1$ 是（2）式 $a_1\tau / T$ 和 $NS$ 用以表達。
+
+要使（3）式 $a_1\tau / T$ 和 $NS$ 用以表達，就可求得（4）式 $a_1\tau / T$ 或者（5）式 $a_1\tau / T$ 或者（6）式 $a_1\tau / T$ 或者（7）式 $a_1\tau / T$ 或者（8）式 $a_1\tau / T$ 或者（9）式 $a_1\tau / T$ 或者（10）式 $a_1\tau / T$ 或者（11）式 $a_1\tau / T$ 或者（12）式 $a_1\tau / T$ 或者（13）式 $a_1\tau / T$ 或者（14）式 $a_1\tau / T$ 或者（15）式 $a_1\tau / T$ 或者（16）式 $a_1\tau / T$ 或者（17）式 $a_1\tau / T$ 或者（18）式 $a_1\tau / T$ 或者（19）式 $a_1\tau / T$ 或者（20）式 $a_1\tau / T$ 或者（21）式 $a_1\tau / T$ 或者（22）式 $a_1\tau / T$ 或者（23）式 $a_1\tau / T$ 或者（24）式 $a_1\tau / T$ 或者（25）式 $a_1\tau / T$ 或者（26）式 $a_1\tau / T$ 或者（27）式 $a_1\tau / T$ 或者（28）式 $a_1\tau / T$ 或者（29）式 $a_1\tau /
+
+T$ 或者（30）式 $a_1\tau / T$ 或者（31）式 $a_1\tau / T$ 或者（32）式 $a_1\tau / T$ 或者（33）式 $a_1\tau / T$ 或者（34）式 $a_1\tau / T$ 或者（35）式 $a_1\tau / T$ 或者（36）式 $a_1\tau / T$ 或者（37）式 $a_1\tau / T$ 或者（38）式 $a_1\tau / T$ 或者（39）式 $a_1\tau / T$ 或者（40）式 $a_1\tau / T$ 或者（41）式 $a_1\tau / T$ 或者（42）式 $a_1\tau / T$ 或者（43）式 $a_1\tau / T$ 或者（44）式 $a_1\tau / T$ 或者（45）式 $a_1\tau / T$ 或者（46）式 $a_1\tau / T$ 或者（47）式 $a_1\tau / T$ 或者（48）式 $a_1\tau / T$ 或者（49）式 $a_1\tau / T$ 或者（50）式 $a_1\tau / T$ 或者（51）式 $a_1\tau / T$ 或者（52）式 $a_1\tau / T$ 或者（53）式 $a_1\tau / T$ 或者（54）式 $a_1\tau / T$ 或者（55）式 $a_1\tau / T$ 或者（56）式 $a_1\tau / T$
+
+或者（57）式 $a_1\tau / T$ 或者（58）式 $a_1\tau / T$ 或者（59）式 $a_1\tau / T$ 或者（60）式 $a_1\tau / T$ 或者（61）式 $a_1\tau / T$ 或者（62）式 $a_1\tau / T$ 或者（63）式 $a_1\tau / T$ 或者（64）式 $a_1\tau / T$ 或者（65）式 $a_1\tau / T$ 或者（66）式 $a_1\tau / T$ 或者（67）式 $a_1\tau / T$ 或者（68）式 $a_1\tau / T$ 或者（69）式 $a_1\tau / T$ 或者（70）式 $a_1\tau / T$ 或者（71）式 $a_1\tau / T$ 或者（72）式 $a_1\tau / T$ 或者（73）式 $a_1\tau / T$ 或者（74）式 $a_1\tau / T$ 或者（75）式 $a_1\tau / T$ 或者（76）式 $a_1\tau / T$ 或者（77）式 $a_1\tau / T$ 或者（78）式 $a_1\tau / T$ 或者（79）式 $a_1\tau / T$ 或者（80）式 $a_1\tau / T$ 或者（81）式 $a_1\tau / T$ 或者（82）式 $a_1\tau / T$ 或者（83）式 $a_1\tau / T$
+
+或者（84）式 $a_1\tau / T$ 或者（85）式 $a_1\tau / T$ 或者（86）式 $a_1\tau / T$ 或者（87）式 $a_1\tau / T$ 或者（88）式 $a_1\tau / T$ 或者（89）式 $a_1\tau / T$ 或者（90）式 $a_1\tau / T$ 或者(91)式 $\bar{b}_{k}$ 与 $\bar{b}_{l}$ 之差为零。
+
+![](dt=2026-06-02/ht=05/7232e6efb53a3077b4272a4c864ec30a4f203d4a56c339e6cd44d1eb16960d5b.jpg)
+
+分けがつないく真假の波形と上一致する．はRMS/Kを0.02まて0.05に保つτ/TとNSの関係を表わしぃるのて，もし，あた雜音に対てτ/Tを変化させたきNSがそのうに変化するかを示す曲線 $l_1^{\prime}$ が求らは $l_{1}$ と $l_1^{\prime}$ 的交点からそのと它的Tの下限の見当をつてはとがて。以下で它的 $l_1^{\prime}$ 为求てみよ。
+
+入力信号のクロック周期とサング周期は同期てるた，Tを小さくす和出力分散σ²为小さくりN/S比は增大する．そのσ²は∑g（i）²·σ²からも求むが，たと参考文献3)のサルーヘSONSALOSSにやて容易に計算得起．そて，σ²=1,σ²=1,K=1と正規化た場合のτ/TとNSの関係を求てFig.3上に示す和曲線l'とる．任意のK,σ²,σ²にてはg（i）がKに比例た(3)式の定義よ正規化た場合のNSの值をσ/(Kσ)倍しぃは．圖上はFig.3が対数graf行為のと以下。の上にσ/(Kσ)は平行移動するとに相当た．具体的な下限の選定法は4章で述ご。
+
+# 2.2 2次系にお願いいたします。��の周期の下限
+
+入力，観測雑音は1次系と同樣お願い．2次系 $G(s) = K\omega_{n}^{2} / (s^{2} + 2\zeta \omega_{n}s + \omega_{n}^{2})$ ）を離散化するとその離散シスデムは
+
+$$
+G _ {T} (z) = \frac {B _ {T} \left(z ^ {- 1}\right)}{A _ {T} \left(z ^ {- 1}\right)} = \frac {b _ {1} z ^ {- 1} + b _ {2} z ^ {- 2}}{1 + a _ {1} z ^ {- 1} + a _ {2} z ^ {- 2}} \tag {6}
+$$
+
+$$
+\begin{array}{l} a _ {1} = - \left(e ^ {p _ {1} T} + e ^ {p _ {2} T}\right), a _ {2} = e ^ {\left(p _ {1} + p _ {2}\right) T} \\ \zeta \div 1, \quad b _ {1} = K \left\{\frac {1}{p _ {1} p _ {2}} + \frac {e p _ {1} T}{p _ {1} (p _ {1} - p _ {2})} - \frac {e p _ {2} T}{p _ {2} (p _ {1} - p _ {2})} \right\} \\ b _ {2} = K \left\{\frac {e (p _ {1} + p _ {2}) T}{p _ {1} p _ {2}} + \frac {e p _ {2} T}{p _ {1} (p _ {1} - p _ {2})} \right. \\ \left. - \frac {e p _ {1} T}{p _ {2} \left(p _ {1} - p _ {2}\right)} \right\} \\ \end{array}
+$$
+
+$$
+\begin{array}{l} \zeta = 1, \quad b _ {1} = K \frac {1}{p _ {1} ^ {2}} \left\{1 - \left(1 - p _ {1} T\right) e ^ {p _ {1} T} \right\} \\ b _ {2} = K \frac {1}{p _ {1} ^ {2}} e ^ {p _ {1} T} \left(e p _ {1} T - 1 - p _ {1} T\right) \tag {7} \\ \end{array}
+$$
+
+$$
+\left. \begin{array}{l} \zeta <   1: p _ {1}, p _ {2} = - \zeta \omega_ {n} \pm j \omega_ {n} \sqrt {1 - \zeta^ {2}} \\ \zeta = 1: p _ {1} = p _ {2} = - \omega_ {n} \\ \zeta > 1: p _ {1}, p _ {2} = - \zeta \omega_ {n} \pm \omega_ {n} \sqrt {\zeta^ {2} - 1} \end{array} \right\} \tag {8}$$
+
+上表わる．離散モーテルとて(6)式を用たきの最小2乘推定值のバイアスは付錄Bから求うら，最小2乘推定值は離散バラメータ $a_1,a_2,b_1,b_2$ と出力のN/S比によて記述くださる．はて(4)式で定義いたします．評価RMS/Kは， $T,\omega_{n},\zeta$ とNSの関数くださる．1次系の曲線 $l_{1}$ と同樣にて，RMS/Kを一定に保
+
+相良·江口·和田：連綸ステムの離散モデルによる同定におけのサングリング周期の下限の選定
+
+15
+
+-15-
+
+![](dt=2026-06-02/ht=05/f404939e3dc3ab0ad5e68c6dd75037145bc9daf1012621bd70c6a991db22effb.jpg)
+
+$\text{一} T$ 与 $NS$ 的開係を表わる曲線は，横軸に $1 / (T\omega_{n})$ （204 計用いをパラメーたとて最小2乘推定值から $\hat{h}_k$ （204 为计算し(4)式を用ると上ご求う或とが成員．Fig.4には $t_f = 16 / \omega_n$ とおい， $\zeta = 0,2,0,5,$ 1,2の場合につて，RMS/K=0.05とる $1 / (T\omega_{n})$ とNSの関係を曲線 $l_{c}$ とて示てい．また $l_1^{\prime}$ 与同樣， $K = 1$ ， $\sigma_u^2 = 1$ ， $\sigma_e^2 = 1$ におたる $T$ とNSの開係は(6)～(8)およ（3）式から計算てき，その結果在Fig.4中に曲線 $l_{c}^{\prime}$ て示す.
+
+# 2.3 $n$ 次等根系に付けるsenplindg周期の下限
+
+$n$ 次等根系 $G(s) = K / (1 + \tau s)^{n}$ にて考と。．它を離散化たルス伝達閩数は
+
+$$
+G _ {T} (z) = \frac {B _ {T} (z ^ {- 1})}{A _ {T} (z ^ {- 1})} = \frac {b _ {1} z ^ {- 1} + \cdots + b _ {n} z ^ {- n}}{1 + a _ {1} z ^ {- 1} + \cdots + a _ {n} z ^ {- n}} \tag {9}
+$$
+
+とる．モデルとて（9）式を用たきの最小2乘推定值のサイアスは付録Bから計算くださ，1次系同樣，RMS/Kをある値に保つτ/TとNSの関係が得る。tf=16τ，RMS/K=0.02およさ0.05に対するこらの関係をFig.3中に示すと，n=2の場合は曲線l2,n=3の場合はl3とる．当然ながらl2とFig.4のζ=1でのlは同じ曲線にたる．曲線l'と同様の曲線をn=2のときl',n=3のときl'とて同円に示す。
+
+# 3. 回对考
+
+Fig. 3 与 Fig. 4 有以下， $T$ 为小数之和 $l_1^{\prime} \sim l_3^{\prime}, l_2^{\prime}$ 是次数 $n$ 和 $z$ 之间的关系。设 $k = 1/2$ 的直线为 $K =$
+
+1, $\sigma_u^2 = 1$ . $\sigma_e^2 = 1$ 与正规化了 $T$ 和 $NS$ 的関係表示到这里，因の横軸が $\tau / T$ または $1 / (T\omega_n)$ か有
+的から， $T$ 对于 $g_T(i)^2$ 比例-surle傾き $1 / 2$ 的直線とる．とて�サング周期を $2T$ とた
+之的 $i$ 當目の単位ル斯應答を $g_{2T}(i)$ とると $g_{2T}(i)^2 = 2\sum_{i=1}^{\infty} g_T(i)^2$ と比例Surle示那． $g_{2T}(i)$ 是
+Stepp 应答の時刻 $2T \cdot (i-1)$ から $2T \cdot i$ まての增
+分值を表わしぃるの令 $g_{2T}(i) = g_T(2i-1) + g_T(2i)$ が
+成立する．Stepp 应答の変化に比さ十分大小な $T$ 以
+考えていの上單位ル斯應答の偶数列，奇数列必
+
+はその積において $\sum_{i=1}^{\infty} g_T(2i)^2 \cong \sum_{i=1}^{\infty} g_T(2i-1)^2 \cong \sum_{i=1}^{\infty} g_T(2i-1)$ といえるから $\sum_{i=1}^{\infty} g_T(i)^2 = \sum_{i=1}^{\infty} g_T(2i-1)^2 + \sum_{i=1}^{\infty} g_T(2i-1)$ 与成立．上 $g_{2T}(i)^2 = \sum_{i=1}^{\infty} \{g_T(2i-1) + g_T(2i)\}^2 = \sum_{i=1}^{\infty} g_T(2i-1)^2 + 2\sum_{i=1}^{\infty} g_T(2i-1)$ 与成立．上 $g_{2T}(i)^2 = \sum_{i=1}^{\infty} g_T(2i)^2 \cong 4\sum_{i=1}^{\infty} g_T(2i)^2 \cong 2\sum_{i=1}^{\infty} g_T(i)^2$ とり所要の結果が示得很好． $T$ 大きavenportと直線
+てはなかるがその曲がり方は横座標 $\tau / T$ 和 $1 / (T\omega_n)$ 为1以上yla無視てきるほこ小。
+
+上述の議論で $\sigma_{\epsilon}^{2}$ が一定の场合の $T$ と $NS$ 的傾きは $T$ が小さいと次数 $n$ 和 $\zeta$ に依存いたします。とが示たが，RMS/Kを一定にる $T$ と $NS$ 的関係 $l_{1} \sim l_{3}$ ， $l_{2}$ 是次数にやて傾きが大小く異なてい。つきはその原因にて考察てみよう。最終値の定理よ一般に $K = G_{T}(1)$ 也有か1次系のは
+
+$$
+\frac {\hat {K}}{K} = \frac {1 + a _ {1}}{1 + a _ {1} - \frac {N S ^ {2}}{1 + N S ^ {2}} a _ {1}} = \frac {1}{1 - \frac {N S ^ {2}}{1 + N S ^ {2}} \frac {a _ {1}}{1 + a _ {1}}} \tag {10}
+$$
+
+とる．今，精度はく同定くださた场合を考えていのごK/K=1でり，tf=16τ≫τから（5）式が成り立つの（1）式，(10)式を用いと
+
+$$
+\frac {\mathrm {R M S}}{K} = \frac {N S ^ {2}}{1 + N S ^ {2}} \cdot \frac {- a _ {1} \cdot K}{b _ {1}} \tag {11}
+$$
+
+上近似的に表わさとが得起．Tを小さくると $a_1$ は-1に近つき $b_{1}$ はTに比例て小さくる．たか，(11)式にいてRMS/Kを一定に保たた令Tを小さくるとによる $-a_{1}K / b_{1}$ の增大を相殺するように $NS^2 /(1 + NS^2)$ を小さくし了関係が $l_1$ oledういに．同様に，2次，3次の场合で誤差の小さい範围内は5)式が近似的に成立ると考うる． $(K - \hat{K}) / K$ の近似式は付錄Bに示すように分
+
+16
+
+昭和60年1月
+
+計測自動制御学会論文集
+
+第21卷 第1号
+
+-16-
+
+母に離散パーマーメ� $b_{i}$ 的和 $\sum_{i=1}^{n} b_{i}$ 为有する項と $NS^{2} = \sigma_{e}^{2} / \sigma_{z}^{2}$ との積(B.14)式で表わせるとから， $T$ を小さくた場合分母 $\sum_{i=1}^{n} b_{i}$ が大小きなるのて，它を相殺するように $NS^{2}$ 为大小きした関係が $l_{2}, l_{3}$ 依據．と知らていうかにStépp応答の立さ上が部の特性は次数 $n$ 的ご乘になる． $b_{1}$ 是Stépp応答の第1サングル值のはから $l_{1}, l_{2}, l_{3}$ 是求数すねわさStépp応答の立さ上がり特性にて大さく異な者考えに。Stépp応答の立さ上がり部分と雜音特性から $T$ 的下限を簡易に決定する方法にててに報告くださいますが4）乙乙，その考察の根拝を与えてるともい元。
+
+# 4. 下限の選定
+
+いまて，Tを大小く選と同定精度が劣化するとを示たが，逆に，制御の立場からはTを大小く選んだほうが一般には望まい．たとえば，適応制御系にて同定和制御を同比Tで行う场合ごとが問題にる．そのようなとFig.3或Fig.4用いとTの下限を選定すると手掛り得起るとが得起．その方法をます1次系の场合にてFig.5に從て説明る．適當に大的きなT=T1以τの推定值及とそのとのN/S比NS1得らたと。它的点をn1上，n1を通るようにl'を平行移動した曲線をl'上、上与之同定実験におる観測雜音のt/T対するN/S比の変化を表わて。l"上l的交点n2のサンリング周期をT2上，它的点はRMS/K=0.02または0.05の同定精度とるTとNSの関係を示て nearer，しぃて，T2为求るサンリング周期の下限と。
+
+$NS_{1}$ はたと元は $y_{k}$ 的2乘平均から $\sigma_y^2$ ，入力を一定にしたきの出力の定常値の変動か $s_e^2$ 为求るとに好り $\sigma_x^2 = \sigma_y^2 -\sigma_e^2$ か計算くださ $NS_{1} = \sigma_{e} /$
+
+![](dt=2026-06-02/ht=05/e3a288d5f1898e2a911a6020bf40ef8a7042eca0ac013182abcb08f2a4240928.jpg)
+
+$\sigma_{x}$ とが。 $\hat{t}$ 是種の同定法から求るとが Kg。もし， $T_{1}$ 适当に大小く最小2乘推定值十分精度と求まてと。,(1)式か $\hat{\tau} = -T / \log$ $(-a_1)$ とて得るとがき， $\hat{a}_1,\hat{b}_1$ から $\sigma_x^2 = \hat{b}_1^2 /(1$ $-a_1^2)$ ）を計算するとがき。乙とn1がl1上り下に位置する場合は，n2之求た的とn1之求た了忘にほんと差がねいならn1は正しく選ばたと上に。もし，n1がl1上に位置する場合は，そのときの推定値は精度と求まていのと $T_{1}$ をさらに大小とて再度缘返す必要のは。
+
+$n$ 次等根系和2次振动系也1次系同樣の手順てTの下限を求るとがuable．た3章の議論から $l_1^{\prime \prime}$ 的代わに傾き1/2の直線用い作圖を行て $T_{2}$ 为求ても好。
+
+# 5. 考察
+
+最小2乘推定值は小さいTは精度良推定值を与えなの域，その场合，他的同定法で同定する必要のは．最尤法のように最小2乘推定值を初期値視為同定法ははその値くださいます。真值とかけはなると初期値て上的意味が薄てweit真価に収束,No2次振動系で $\sigma_u^2 = 1,\sigma_e^2 = 0.01$ 的場合を考た． $T = 1$ と上ごNS=0.047とりFig.4上ご点n1 $(1 / (T\omega_{n}) = 1$ ，NS=0.047）はl；則下に位置るの以最小2乘法も良好な推定が行之．n1から傾き1/2の直線を引くと $l_{z}(\zeta = 0.2)$ 和点 $n_2(1 / (T\omega_n) = 2$ $NS = 0.064$ ）で交差す．しぃてて， $T = 0.5$ 为RMS/K=0.05の精度を与え的下限earing它がわか。、つきに，它的うにて得た下限む小きいT $= 0.1$ とり最小2乘法で同定しその推定值を初期値とてAstromの最尤推定法⑥与同定するとFig.6に示す向上に満足得起の値には収束しおた．它的上きn1とn2を結部直線からNS=0.141とり它的点はl；則かNAL上に位置し非常に推定精度が悪い场合に相当てて．まて， $T = 0.2$ と她的场合は最尤推定值を求るのにNewton-Raphson法用たが推定值が安定てなくおーバフロ一が発生た．它的上に他的一致推定量を与え的手法の初期值
+
+![](dt=2026-06-02/ht=05/881d034b4d9e207d2c7e6e0010b08e8393dc21b16974a0094d101654e5790128.jpg)
+
+相良·江口·和田：連綱ステムの離散モルにと同定におたんつはんだ周期の下限の選定
+
+17
+
+-17-
+
+在最小2乘法可求的场合适当的 $T$ 为用不等式与真值可以取束不等式之和。4章中述的关于最小2乘推定值对对应的 $T$ 的下限把握。
+
+観測時間 $t_e$ 和「一夕個数 $N$ には $t_e = NT$ なる關係がた，一般に $t_e$ または $N$ 是推定値の収束性に大さく影響する．しおか最小2乘法は収束を速いの推定値のバラツ専が同精度に与える影響は一夕個数が的程度ARGEいらほとんだ問題にらねいじて小さう。たとえはFig.1のステムをデジルシミュレーションによて一夕個数を1000または10000和固定する场合お及観測時間を100秒和固定する場合を考ご $T = 0.01\sim 1$ 秒の範围で�つ定期周期を選ご，同比�予期定期に対て它的3つ場合の推定くださiatedスフ広答波形はほとんと差異のはいとが確かにた。
+
+# 6. 也上加
+
+乙は，イアスをもが頑健て収束也速く安定推定值を得るとが成長最小2乘法にて連続Stテムを離散モデルとて同定する場合にて，Stテ庁答の誤差を同定精度の評価て用い它か有的許容範圍内にるsonpring周期TとNSの関係にて調ご，1次系，2次系，3次等根系にてその関係を凶示了。、こは求数あたはStテ庁答の立上上が性開係ており次数にて大きく異なとを述ご。さに，下限を作凹から選定する方法，およ，最小2乘推定值を初期値とす一致推定法を用て同定てもTが小きい上必む真値へ収束説はは限ら初期値とて適さないとが有的とを示了。
+
+本論文所示下限にての考察は，実際のサング周期選定にお願いの指針を与えるごと思わる．他的同定手法で推定する场合も，最小2乘法に上的下限が十分参考にたるoled。
+
+# 参考文献
+
+6）古田勝久：線形なステムの観測と同定，260，193コロナ社(1976)
+
+# 〈付錄A〉 雜音分散の連続系と離散系の関係
+
+$e(t)$ 07w-ousbukl密度間数 $S(\omega),|\omega | <   \infty$ 自己相開間数为 $C(\tau),|\tau | <   \infty ,e(t)$ 07nul值 $e_k =$ $e(kT)$ 07w-ousbuktul密度間数 $S_{d}(\omega)$ $|\omega | <   \pi /T = \omega_{N}$ （n（n+st角周波数)，自己相開間数to $C_d(m),m = 0,\pm 1,\pm 2,\dots$ と．Wiener-Khintchinの関係
+
+$$
+C (\tau) = \int_ {- \infty} ^ {\infty} S (\omega) e ^ {i \omega \tau} d \omega \tag {A.1}
+$$
+
+$e, \tau = 0$ 与 $e < \tau$ , $e(t)$ 的分散 $\sigma_{e}^{2}$ 是
+
+$$
+\sigma_ {e} ^ {2} = C (0) = \int_ {- \infty} ^ {\infty} S (\omega) d \omega \tag {A.2}
+$$
+
+と表わせる.
+
+一方， $S(\omega)$ 之 $S_{d}(\omega)$ 之開係は
+
+$$
+S _ {d} (\omega) = \sum_ {n = - \infty} ^ {\infty} S (2 n \omega_ {N} + \omega), | \omega | <   \omega_ {N} \tag {A.3}
+$$
+
+$e_{k}$ 0
+
+$$
+\sigma_ {e} ^ {\prime 2} = C _ {d} (0) = \int_ {- \omega_ {N}} ^ {\omega_ {N}} S _ {d} (\omega) d \omega \tag {A.4}
+$$
+
+上式（A.3）为代入的和
+
+$$
+\begin{array}{l} \sigma_ {e} ^ {\prime 2} = \int_ {- \omega_ {N}} ^ {\omega_ {N}} \sum_ {n = - \infty} ^ {\infty} S (2 n \omega_ {N} + \omega) d \omega \\ = \int_ {- \infty} ^ {\infty} S (\omega) d \omega = \sigma_ {e} ^ {2} \tag {A.5} \\ \end{array}
+$$
+
+と、サング周期にて分散は変化いたします。とが示ります。
+
+$S(\omega)$ 为高域半平面特性。如果存在一个 $d$ 的开集 $A$ ，则有
+
+# <付錄B> 最小2乘推定值のバイアス
+
+$n$ 次離散のスルカ入力を $u_{k}$ ，出力を $x_{k}$ とると
+
+$$
+x _ {k} = - \sum_ {i = 1} ^ {n} a _ {i} x _ {k - i} + \sum_ {j = 1} ^ {n} b _ {j} u _ {k - j} \tag {B.1}
+$$
+
+る差分方程式て表わせしとする． $a_{i},b_{j}$ を係数とる多項式を
+
+$$
+\left. \begin{array}{l} A (q) = 1 + a _ {1} q + \dots + a _ {n} q ^ {n} \\ A _ {*} (q) = q ^ {n} + a _ {1} q ^ {n - 1} + \dots + a _ {n} \\ B (q) = b _ {1} q + \dots + b _ {n} q ^ {n} \\ B _ {*} (q) = b _ {1} q ^ {n - 1} + \dots + b _ {n} \end{array} \right\} \tag {B.2}
+$$
+
+上定義説和（B.1）のルス伝達閲数 $G(z)$ 是
+
+$$
+G (z) = \frac {B (z ^ {- 1})}{A (z ^ {- 1})} = \sum_ {i = 1} ^ {\infty} g _ {i} z ^ {- i} \tag {B.3}
+$$
+
+上之．乙乙，q：是单位巴尔斯应答为的．観測出力 $y_{k}$ 是觀測雜音 $\pmb{e}_{\pmb{k}}$ 为付加工形 $y_{k} = x_{k} + e_{k}$ 与
+
+18
+
+昭和60年1月
+
+計測自動制御學會論文集
+
+第21卷 第1号
+
+-18-
+
+て観測さる． $u_{k}$ 是平均值0，分散 $\sigma_u^2$ 的白色系列为， $e_k$ は平均值0自己相開関数行列とて $R = E[\pmb {e}_k,\pmb {e}_k^T ]$ まも， $e_k = [e_{k - 1},e_{k - 2},\dots ,e_{k - n}]^T$ あ。的．さに
+
+$$
+\begin{array}{l} \boldsymbol {a} = \left[ \begin{array}{l} a _ {1} \\ a _ {2} \\ \vdots \\ a _ {n} \end{array} \right] \quad \boldsymbol {g} = \left[ \begin{array}{l} g _ {n} \\ g _ {n - 1} \\ \vdots \\ g _ {1} \end{array} \right] \\ C = \left[ \begin{array}{c c c c c} - a _ {1} & - a _ {2} \dots - a _ {n - 1} & - a _ {n} \\ 1 & 0 & \dots & 0 & 0 \\ 0 & 1 & & \vdots & \vdots \\ & & \ddots & \vdots & \vdots \\ 0 & & & 1 & 0 \end{array} \right] \\ \boldsymbol {b} = \left[ \begin{array}{c} b _ {1} \\ b _ {2} \\ \vdots \\ b _ {n} \end{array} \right] L _ {n} = \left[ \begin{array}{c c c c} 0 & & & \\ 1 & 0 & & 0 \\ 0 & 1 & & \\ \vdots & \ddots & & \\ 0 & \dots \dots \dots & 1 & 0 \end{array} \right] \\ G = \left[ \begin{array}{c c c c} g _ {0} & g _ {1} & \dots \dots & g _ {n - 1} \\ & g _ {0} & \ddots & \vdots \\ & & \ddots & \vdots \\ 0 & & & g _ {1} \\ & & & g _ {0} \end{array} \right] \tag {B.4} \\ \end{array}
+$$
+
+及各ルトル，行列を定義すると，モデルとて(B.1)を用い $u_{k},y_{k}$ に求う最小2乘推定值 $\hat{a},\hat{b}$ 的ハイアスは
+
+$$
+\begin{array}{l} \tilde {\boldsymbol {a}} = \operatorname * {p l i m} _ {N \rightarrow \infty} \hat {\boldsymbol {a}} _ {N} - \boldsymbol {a} = - (P + R) ^ {- 1} R \boldsymbol {a}, \\ \tilde {\boldsymbol {b}} = \operatorname * {p l i m} _ {N \rightarrow \infty} \hat {\boldsymbol {b}} _ {N} - \boldsymbol {b} = G ^ {T} \tilde {\boldsymbol {a}} \tag {B.5} \\ \end{array}
+$$
+
+とる．ただし，Nは一夕個数，P(n×n）はx=k=[xk-1,xk-2,,xkn]TとるとP=E[xk,xt]てxの自己相関閲数行列のは，つきの行列方程式
+
+$$
+P = C P C ^ {T} + \sigma_ {u} ^ {2} g g ^ {T} \tag {B.6}
+$$
+
+の解
+
+$$
+\begin{array}{l} P = \sigma_ {u} ^ {2} B _ {*} (C) \left[ A \left(L _ {n}\right) A \left(L _ {n} ^ {T}\right) - A _ {*} \left(L _ {n}\right) A _ {*} \left(L _ {n} ^ {T}\right) \right] ^ {- 1} \\ B _ {*} \left(C ^ {T}\right) \tag {B.7} \\ \end{array}
+$$
+
+与与元叫的5). 乙之和元 $A(L_{n})$ 是(B.2)の多項式 $A(q)$ 之 $q$ 行列 $L_{n}$ 之置換之的。も， $\pmb{e}_{k}$ 为白色分散 $\sigma_{\varepsilon}^{2}$ 有 $R = \sigma_{\varepsilon}^{2}I_{n}$ とり $P_{1} = (1 / \sigma_{x}^{2})P$ とおくと(B.5)(B.7)
+
+$$
+\begin{array}{l} \tilde {\boldsymbol {a}} = - \left(P _ {1} + \frac {\sigma_ {\varepsilon} ^ {2}}{\sigma_ {x} ^ {2}} I _ {n}\right) ^ {- 1} \frac {\sigma_ {\varepsilon} ^ {2}}{\sigma_ {x} ^ {2}} \boldsymbol {a} \tag {B.8} \\ \hat {\boldsymbol {b}} = G ^ {T} \tilde {\boldsymbol {a}} \\ \end{array}
+$$
+
+上表之者。
+
+15. 1 沙斯夫加1次の場合(B.2)は $A(q) = 1 + a_{1}q$ ， $A_{*}(q) = q + a_{1}$ ， $B(q) = b_{1}q$ ， $B_{*}(q) = b_{1}$ 之， (B.4)は $\pmb{a} = a_{1},\pmb {g} = g_{1},C = -a_{1},L_{1} = 0,\pmb {b} = b_{1},G = 0$ と、，当 $R = \sigma_e^2$ 亿美元．(B.7)から $P$ 为求出上
+
+$$
+P = \frac {b _ {1} ^ {2}}{1 - a _ {1} ^ {2}} \cdot \sigma_ {u} ^ {2} = \sigma_ {x} ^ {2} \tag {B.9}
+$$
+
+乙P（B.5）代入出和
+
+$$
+\hat {a} _ {1} = a _ {1} - \frac {\sigma_ {e} ^ {2}}{\sigma_ {x} ^ {2} + \sigma_ {e} ^ {2}} a _ {1}, \quad \hat {b} _ {1} = b _ {1} \tag {B.10}
+$$
+
+とる． $u_{k}$ 和 $M$ 系列用いもその統計的性質6）はほんと同じてあるか，上記の結果をそのまま用いのとが得起．
+
+つきに(B.8)を用てガイングの推定值Kの誤差(K -K)/Kの近似式を導出uting．最終値の定理はり $K =$ $G(1),1 + \sum_{i = 1}^{n}a_{i} = \sum_{i = 1}^{n}b_{i} / K$ か
+
+$$
+\hat {K} = \frac {\sum \hat {b} _ {i}}{1 + \sum \hat {a} _ {i}} = \frac {\sum b _ {i} + \sum \tilde {b} _ {i}}{1 + \sum a _ {i} + \sum \tilde {a} _ {i}} = \frac {K (\sum b _ {i} + \sum \tilde {b} _ {i})}{\sum b _ {i} + K \sum \tilde {a} _ {i}} \tag {B.11}
+$$
+
+たがわ亡
+
+$$
+\frac {K - \hat {K}}{K} = \frac {K \Sigma \tilde {a} _ {i} - \Sigma \tilde {b} _ {i}}{\sum b _ {i} + K \Sigma \tilde {a} _ {i}} = \frac {\frac {K \Sigma \tilde {a} _ {i}}{\sum b _ {i}} - \frac {\sum \tilde {b} _ {i}}{\sum b _ {i}}}{1 + \frac {K \Sigma \tilde {a} _ {i}}{\sum b _ {i}}} \tag {B.12}
+$$
+
+也精度上同定成的了 $\left|\Sigma \tilde{b}_i / \Sigma b_i\right|\ll 1,\left|(K-\hat{K}) / K\right|\ll 1$ 有如上式分母的 $K\Sigma \tilde{a}_i / \Sigma b_i$ 是無視，
+
+$$
+\frac {K - \hat {K}}{K} = \frac {K \Sigma \tilde {a} _ {i} - \Sigma \tilde {b} _ {i}}{\Sigma b _ {i}} \tag {B.13}
+$$
+
+(B.8) 1 $\pmb{e}^{T} = [1,1,\dots ,1](1\times \pmb {n})$ 1
+
+$$
+\frac {K - \hat {K}}{K} = \frac {\boldsymbol {c} ^ {T} (- K I _ {n} + G ^ {T}) \left(P _ {1} + \frac {\sigma_ {e} ^ {2}}{\sigma_ {x} ^ {2}} I _ {n}\right) ^ {- 1} \boldsymbol {a}}{\sum b _ {i}} \cdot \frac {\sigma_ {e} ^ {2}}{\sigma_ {x} ^ {2}} \tag {B.14}
+$$
+
+上表わる． $P_{1}$ 的对角成分は1なの域 $\sigma_x^2 /\sigma_x^2\ll 1$ 場合は $(P_{1} + \sigma_{x}^{2} / \sigma_{x}^{2}\cdot I_{n})^{-1} = P_{1}^{-1}$ とさに近似てきる.
+
+相良·江口·和田：連統ステムの離散モデルによる同定に付けるsenplindg周期の下限の選定
+
+19
+
+-19-

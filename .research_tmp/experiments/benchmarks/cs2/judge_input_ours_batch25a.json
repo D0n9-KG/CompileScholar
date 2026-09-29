@@ -1,0 +1,1181 @@
+[
+ {
+  "qid": "e55f39332cdc48743ea977d0",
+  "question": "What are the latest techniques for ensuring the reliability of a P2P storage system?",
+  "sections": [
+   {
+    "title": "Fundamental Challenges in Peer-to-Peer Storage",
+    "text": "To function as safe storage platforms, peer-to-peer (P2P) systems must effectively protect data against temporary unavailability and the disruptive effects of churn [2]. A primary driver of this instability is the high prevalence of peer departures, which necessitates that P2P storage systems constantly generate new replicas to maintain high durability levels [1]. This continuous requirement for replica generation creates a significant operational challenge, as the system must balance the need for redundancy against the dynamic nature of the network environment [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Due to the prevalence of peer departures, P2P storage systems need to constantly generate replicas for high durability.",
+       "However, few existing systems are able to select the right replication rate that balances replication cost and durability, e.g., minimizing replication cost without threatening the durability target.",
+       "In this paper, we propose a method called AutoProc to"
+      ],
+      "title": "autoproc: an automatic proactive replication scheme for p2p storage",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "P2P storage systems must protect data against temporary unavailability and the effects of churn in order to become platforms for safe storage.",
+       "This paper evaluates and compares redundancy techniques for P2P storage according to availability, accessibility, and maintainability"
+      ],
+      "title": "redundancy management for p2p storage",
+      "metadata": {
+       "year": 2007,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "The Replication Rate Dilemma",
+    "text": "A critical aspect of ensuring reliability is the selection of an appropriate replication rate. Ideally, this rate should balance replication cost and durability, specifically by minimizing the cost of replication without threatening the established durability target [1]. However, few existing systems are currently capable of selecting the right replication rate that achieves this balance [1]. This gap in existing methodologies highlights the difficulty in optimizing resource usage while maintaining the necessary data protection standards in volatile P2P environments [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Due to the prevalence of peer departures, P2P storage systems need to constantly generate replicas for high durability.",
+       "However, few existing systems are able to select the right replication rate that balances replication cost and durability, e.g., minimizing replication cost without threatening the durability target.",
+       "In this paper, we propose a method called AutoProc to"
+      ],
+      "title": "autoproc: an automatic proactive replication scheme for p2p storage",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Advanced Techniques and Evaluation Metrics",
+    "text": "To address these challenges, recent research has proposed methods such as AutoProc, which is designed to select the right replication rate by balancing replication cost and durability [1]. This approach aims to overcome the limitations of systems that fail to optimize this trade-off [1]. Furthermore, the evaluation of such redundancy techniques is increasingly conducted according to specific criteria, including availability, accessibility, and maintainability [2]. By comparing techniques based on these metrics, researchers can better assess the effectiveness of various strategies in ensuring the overall reliability of P2P storage systems [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "P2P storage systems must protect data against temporary unavailability and the effects of churn in order to become platforms for safe storage.",
+       "This paper evaluates and compares redundancy techniques for P2P storage according to availability, accessibility, and maintainability"
+      ],
+      "title": "redundancy management for p2p storage",
+      "metadata": {
+       "year": 2007,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Due to the prevalence of peer departures, P2P storage systems need to constantly generate replicas for high durability.",
+       "However, few existing systems are able to select the right replication rate that balances replication cost and durability, e.g., minimizing replication cost without threatening the durability target.",
+       "In this paper, we propose a method called AutoProc to"
+      ],
+      "title": "autoproc: an automatic proactive replication scheme for p2p storage",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 5,
+   "n_claims_usable": 5,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 250,
+   "n_sections": 3,
+   "n_citations": 2,
+   "record_level": 2,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "3d8c315aed4cc104f2ad61f4",
+  "question": "What are the leading techniques for person-following robot navigation (which must track the person and potentially re-identify if occluded)?",
+  "sections": [
+   {
+    "title": "Task Decomposition and Core Objectives",
+    "text": "The operational framework for person-following robots is fundamentally structured around two distinct but interconnected challenges: robot navigation and person tracking [2]. These two components constitute the core behavior required for the system to function effectively in real-world scenarios [2]. To execute this behavior successfully, the robot follower must perform a specific set of tasks that ensure continuous and safe interaction with the human target [1]. The primary objectives include locating the specified individual, maintaining a following trajectory, and avoiding obstacles [1]. Additionally, the system is required to resume tracking after any period of occlusion, ensuring that the loss of visual contact does not result in a permanent failure of the following task [1]. This comprehensive set of duties highlights the complexity of the system, which must balance precise navigation with robust perception capabilities [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "According to Ref. [45], a robot follower should perform the following tasks: find the specified person, follow the person, avoid obstacles, and resume tracking after occlusion."
+      ],
+      "title": "facilitating human-mobile robot communication via haptic feedback and gesture teleoperation",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Two challenging tasks constitute the person-following behavior, namely robot navigation and person tracking."
+      ],
+      "title": "comparison of interaction modalities for mobile indoor robot guidance: direct physical interaction, person following, and pointing control",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Navigation Strategies Under Clear Visibility",
+    "text": "When the environment provides unobstructed visibility of the target, the navigation strategy relies on maintaining a specific spatial relationship with the person [3]. In the absence of occlusion, the robot navigates to a predefined person-following position, which is typically a fixed location situated behind the target [3]. To achieve this precise positioning, the system utilizes a model predictive controller, often referred to as MPC [3]. This control method enables the robot to perform simultaneous person-following and navigation tasks effectively [3]. The use of MPC allows for the optimization of the robot's path to maintain the desired distance and angle relative to the human subject [3]. This approach ensures that the robot can smoothly track the person while adhering to the predefined geometric constraints of the following behavior [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "If no occlusion occurs, the robot navigates to a predefined person-following position—typically a fixed location behind the target—using a model predictive controller (MPC) [25], enabling simultaneous person-following and obstacle avoidance.",
+       "In the event of occlusion, the robot instead leverages the aforementioned perception information to locate and navigate to the best position for re-finding the target person in unknown and dynamic environments."
+      ],
+      "title": "rpf-search: field-based search for robot person following in unknown dynamic environments",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Handling Occlusion and Re-identification",
+    "text": "In dynamic environments, occlusion events are inevitable, requiring the robot to adapt its navigation strategy to recover the target [3]. When occlusion occurs, the robot cannot simply maintain its previous trajectory or position [3]. Instead, it leverages available perception information to determine the optimal location for re-finding the target person [3]. The system navigates to this best position to maximize the likelihood of re-establishing visual contact in unknown and dynamic environments [3]. This process involves analyzing the surrounding context to identify vantage points that offer the clearest line of sight to the previously tracked individual [3]. By actively seeking out these superior positions, the robot ensures that it can resume tracking efficiently after the occlusion is resolved [3]. This adaptive behavior is critical for maintaining the continuity of the person-following task in complex real-world settings [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "If no occlusion occurs, the robot navigates to a predefined person-following position—typically a fixed location behind the target—using a model predictive controller (MPC) [25], enabling simultaneous person-following and obstacle avoidance.",
+       "In the event of occlusion, the robot instead leverages the aforementioned perception information to locate and navigate to the best position for re-finding the target person in unknown and dynamic environments."
+      ],
+      "title": "rpf-search: field-based search for robot person following in unknown dynamic environments",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 4,
+   "n_claims_usable": 4,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 398,
+   "n_sections": 3,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "be5c0337461175e55f2a8fa9",
+  "question": "What are the leading approaches for anomoly detection in process mining?",
+  "sections": [
+   {
+    "title": "Foundations and Taxonomy",
+    "text": "Anomaly detection within the domain of process mining is primarily concerned with identifying outlying process behaviors that exist within the traces of an event log [2]. The landscape of these detection methods is generally categorized into three distinct families: statistical approaches, process mining techniques, and machine learning methods [3]. A significant portion of the literature relies on the statistical premise that anomalous behavior is inherently infrequent, leading many approaches to identify anomalies by detecting statistical outliers [2]. However, this frequency-based assumption is not universally accepted. Semantic anomaly detection offers a contrasting perspective by focusing on process behaviors that lack logical coherence rather than mere rarity [2]. This semantic approach explicitly challenges the notion that infrequent behavior is necessarily anomalous, emphasizing instead that regular occurrences do not always constitute proper process behavior [2]. These analytical solutions, derived from the intersection of process mining and data mining, are frequently applied in contexts such as fraud detection [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Analysis in the domain of process mining and data mining provides solutions for anomaly detection, which can be used for fraud detection.",
+       "In this research, several process mining methods were applied, such as conformance checker, dotted-chart analysis, social network miner, originator by task matrix and others, to investigate event logs of business processes [7-9]."
+      ],
+      "title": "anomaly detection in business processes using process mining and fuzzy association rule learning",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "It challenges the assumption that infrequent behavior is necessarily anomalous and emphasizes that regular occurrences do not always constitute proper process behavior.",
+       "In contrast, semantic anomaly detection [1] focuses on identifying process behaviors that lack logical coherence.",
+       "Many approaches achieve this by detecting statistical outliers [11], based on the premise that infrequent behavior is anomalous.",
+       "Anomaly detection in process mining focuses on identifying outlying process behaviors within the traces of an event log [10]."
+      ],
+      "title": "on the potential of large language models to solve semantics-aware process mining tasks",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The business process anomaly detection approaches can be classified into statistical, process mining and ML approaches.",
+       "This technique can detect the deviation between the process model and process executions [8-13].",
+       "It is common in the field of process mining [7] to employ discovery methods to construct process models from event logs, followed by conformance checking to find an anomalous trace."
+      ],
+      "title": "deep reinforcement learning for data-efficient weakly supervised business process anomaly detection",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Process Mining and Conformance Techniques",
+    "text": "A common methodology in the field involves employing discovery methods to construct process models directly from event logs, which are then subjected to conformance checking to identify anomalous traces [3]. Conformance checking serves as a critical technique for detecting deviations between the established process model and the actual process executions [3]. Beyond standard conformance, several specific process mining methods have been applied to investigate event logs of business processes to uncover irregularities [1]. These specific analytical tools include dotted-chart analysis [1], social network miner [1], and the originator by task matrix [1]. The application of these diverse methods allows for a multi-faceted investigation of process behavior, complementing the primary conformance checking mechanisms.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Analysis in the domain of process mining and data mining provides solutions for anomaly detection, which can be used for fraud detection.",
+       "In this research, several process mining methods were applied, such as conformance checker, dotted-chart analysis, social network miner, originator by task matrix and others, to investigate event logs of business processes [7-9]."
+      ],
+      "title": "anomaly detection in business processes using process mining and fuzzy association rule learning",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The business process anomaly detection approaches can be classified into statistical, process mining and ML approaches.",
+       "This technique can detect the deviation between the process model and process executions [8-13].",
+       "It is common in the field of process mining [7] to employ discovery methods to construct process models from event logs, followed by conformance checking to find an anomalous trace."
+      ],
+      "title": "deep reinforcement learning for data-efficient weakly supervised business process anomaly detection",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Machine Learning and Rule-Based Approaches",
+    "text": "Machine learning techniques are also integral to anomaly detection, with Support Vector Machine (SVM) techniques being applied to mine rules that must be strictly met by a process to avoid being classified as anomalous [4]. An alternative machine learning strategy focuses on detecting rules which, when met, identify anomalous behavior; this is achieved by applying explorative process mining to generate a labeled training set [4]. Furthermore, some advanced approaches incorporate ontologies to gain additional knowledge about the processes under analysis, thereby enhancing the detection capabilities [4]. These rule-based and learning-based methods provide a flexible framework for defining what constitutes an anomaly, moving beyond simple deviation from a static model.",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "The approach in [35] includes ontologies to gain additional knowledge about the processes under analysis.",
+       "These work focuses more on detecting rules which, when met, identify anomalous behavior. For this, explorative process mining is applied by experts to generate a labeled training set.",
+       "For example, Support Vector Machine techniques are applied in [32] to mine rules which must be strictly met by a processes to not be considered as anomalous."
+      ],
+      "title": "title:anomaly detection in business process runtime behavior -- challenges and limitations",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Operational Constraints and Limitations",
+    "text": "Despite the variety of available techniques, significant operational constraints exist. The majority of proposed methods for anomaly detection in process mining rely on a clean dataset to function correctly [6]. Additionally, most existing unsupervised anomaly detection techniques are situated in offline settings or focus on the case-level [5]. This implies that these methods typically take as input a batch event log that contains a set of completed cases, rather than processing streaming data in real-time [5]. These limitations highlight the gap between current offline, batch-oriented methodologies and the potential need for real-time, robust detection systems that can handle noisy or incomplete data.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Most existing unsupervised anomaly detection techniques focus on the case-level or are situated in offline settings [5], i.e., they take as input of a batch event log that contains a set of completed cases."
+      ],
+      "title": "the analysis of online event streams: predicting the next activity for anomaly detection",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2203.09619",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "The bigger part of these methods relies on a clean dataset to work correctly."
+      ],
+      "title": "analyzing business process anomalies using autoencoders",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1803.01092",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 17,
+   "n_claims_usable": 17,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 478,
+   "n_sections": 4,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "95a152ddae491933ef75c797",
+  "question": "What are the key differences between participatory design and co-design?",
+  "sections": [
+   {
+    "title": "Conceptual Origins and Hierarchy",
+    "text": "The relationship between co-design and participatory design is fundamentally hierarchical, with co-design emerging from the broader tradition of participatory design [3]. Within the overarching concept of participatory design, both co-creation and co-design exist as distinct sub-concepts, differentiated by subtle nuances in their definitions [2]. Co-design is specifically described as a participatory design approach that focuses on bringing stakeholders together. It is characterized as a specific instance of co-creation that applies collective creativity to the design process. In a broader sense, co-design involves the combined creativity of designers and other participants. Conversely, participatory design is defined as the practice of collective creativity itself. This lineage suggests that co-design is not a separate discipline but a specific mode of operating within the participatory design framework [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Co-design thus has a specific role that end-users can have within participatory design.",
+       "according to DeSmet and colleagues (2016), participatory design represents stakeholder involvement as informants (where they give input and feedback) or as co-designers (where they are equal partners).",
+       "However, according to our definition, participatory design and codeign differ from each other, since co-design puts less weight on the emphasis of user empowerment, as is the case in participatory design [2]."
+      ],
+      "title": "personalization in game design for healthcare: a literature review on its definitions and effects",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Within the concept of participatory design, there is co-creation and co-design, distinguished by subtle differences between their definitions (Sanders and Stappers 2008)."
+      ],
+      "title": "customization of e-textile sensory tools for people with dementia",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Co-design (or collaborative design) [26] is rooted in participatory design (PD).",
+       "The designer acts as facilitator, and supports participants in idea generation and other activities by supplying different tools for expression [25]."
+      ],
+      "title": "human-computer interaction – interact 2019",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Definitional Distinctions and Roles",
+    "text": "The primary distinction between the two approaches lies in how they conceptualize the role of users. Participatory design views users not merely as subjects of study but as active partners in the process [7]. In contrast, co-design places less emphasis on the specific empowerment of users compared to the strong focus found in participatory design [1]. Sanders and Stappers (2008) clarified this by defining co-design as co-creation, whereas participation is defined as the involvement of stakeholders in discussion [6]. This implies that co-design refers to hands-on co-creation, while participation relates to a situation where stakeholders are invited to discuss [5]. DeSmet and colleagues (2016) further elaborated that participatory design represents stakeholder involvement in two ways: as informants who provide input and feedback, or as co-designers who act as equal partners [1]. Co-design, therefore, occupies a specific role within participatory design where end-users are positioned as co-designers [1]. Additionally, the difference between participatory design and co-creation is that co-creation does not assume that any single stakeholder holds a more important role in the participatory process [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "The difference between participatory design and co-creation lies in that co-creation doesn’t assume that any stakeholder has a more important role to play in the participatory design process."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Co-design thus has a specific role that end-users can have within participatory design.",
+       "according to DeSmet and colleagues (2016), participatory design represents stakeholder involvement as informants (where they give input and feedback) or as co-designers (where they are equal partners).",
+       "However, according to our definition, participatory design and codeign differ from each other, since co-design puts less weight on the emphasis of user empowerment, as is the case in participatory design [2]."
+      ],
+      "title": "personalization in game design for healthcare: a literature review on its definitions and effects",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The slight distinction in the terms 'participatory design' and 'co-design' was discussed by Sanders and Stappers, where participation relates somewhat to a situation where related stakeholders are invited to the discussion board, while co-design instead refers to hands-on 'co-creation' [13]."
+      ],
+      "title": "colreg: the tokenised cross-species multicentred regenerative region co-creation",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Sanders and Stappers (2008) explained the difference between co-design and participatory design as follows: co-design is co-creation while participation is the involvement of stakeholders in discussion.",
+       "This flexible boundary is this reason that design is no longer reduced to the proposal of a physical object.",
+       "However, there is a very penetrable boundary between the two.",
+       "Szebeco and Tan (2010) freely mixed the two in their examples of co-design."
+      ],
+      "title": "systemic approach to architectural performance",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "To distinguish participatory design from co-design, the main difference is that participatory design sees users not as subjects but as partners (Sanders & Stappe"
+      ],
+      "title": "investigation into how each stakeholder plays a role at different levels of granularity to realise a long-term service design project",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Designer Facilitation and Process Dynamics",
+    "text": "The operational dynamics of these methods differ regarding the designer's function. In participatory design, the designer acts as a facilitator, supporting participants in idea generation and other activities by supplying various tools for expression [3]. This facilitative role supports the broader goal of collective creativity inherent in the practice. The distinction between co-design and participatory design is also reflected in the nature of the engagement; while participation involves stakeholders in discussion, co-design is framed as a collaborative act of creation [6]. This shift from discussion to creation highlights the hands-on nature of co-design [5]. The specific role of end-users in co-design is thus defined by their active contribution to the creative output rather than just their input as informants [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Co-design thus has a specific role that end-users can have within participatory design.",
+       "according to DeSmet and colleagues (2016), participatory design represents stakeholder involvement as informants (where they give input and feedback) or as co-designers (where they are equal partners).",
+       "However, according to our definition, participatory design and codeign differ from each other, since co-design puts less weight on the emphasis of user empowerment, as is the case in participatory design [2]."
+      ],
+      "title": "personalization in game design for healthcare: a literature review on its definitions and effects",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The slight distinction in the terms 'participatory design' and 'co-design' was discussed by Sanders and Stappers, where participation relates somewhat to a situation where related stakeholders are invited to the discussion board, while co-design instead refers to hands-on 'co-creation' [13]."
+      ],
+      "title": "colreg: the tokenised cross-species multicentred regenerative region co-creation",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Sanders and Stappers (2008) explained the difference between co-design and participatory design as follows: co-design is co-creation while participation is the involvement of stakeholders in discussion.",
+       "This flexible boundary is this reason that design is no longer reduced to the proposal of a physical object.",
+       "However, there is a very penetrable boundary between the two.",
+       "Szebeco and Tan (2010) freely mixed the two in their examples of co-design."
+      ],
+      "title": "systemic approach to architectural performance",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Co-design (or collaborative design) [26] is rooted in participatory design (PD).",
+       "The designer acts as facilitator, and supports participants in idea generation and other activities by supplying different tools for expression [25]."
+      ],
+      "title": "human-computer interaction – interact 2019",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Boundary Permeability and Terminological Overlap",
+    "text": "Despite the definitional differences, the boundary between co-design and participatory design is highly penetrable [6]. This flexibility in the boundary is the reason that design is no longer reduced to the mere proposal of a physical object [6]. The permeability of the boundary is evident in academic literature, where authors such as Szebeco and Tan (2010) freely mixed the terms co-design and participatory design in their examples [6]. This interchangeability suggests that in practice, the distinction may be less rigid than in theoretical definitions [6]. The flexible boundary allows for a broader interpretation of design activities, moving beyond physical artifacts to include process and interaction [6]. Consequently, the terms are often used in close proximity, with co-design sometimes referred to as co-creation within the participatory design context.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Sanders and Stappers (2008) explained the difference between co-design and participatory design as follows: co-design is co-creation while participation is the involvement of stakeholders in discussion.",
+       "This flexible boundary is this reason that design is no longer reduced to the proposal of a physical object.",
+       "However, there is a very penetrable boundary between the two.",
+       "Szebeco and Tan (2010) freely mixed the two in their examples of co-design."
+      ],
+      "title": "systemic approach to architectural performance",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Extensions and Distributed Models",
+    "text": "The concepts of participatory design and co-design have also been extended into distributed contexts. Distributed participatory design has been proposed as a way to extend the principles of participatory design to remote or geographically dispersed stakeholders. This extension maintains the core principle of treating users as partners rather than subjects [7]. The distributed model allows for the facilitation of idea generation and the supply of expression tools across different locations [3]. By integrating these distributed elements, the practice of collective creativity can be sustained even when participants are not physically co-located. The specific role of end-users as co-designers remains central in these distributed frameworks, ensuring that the emphasis on user empowerment is preserved [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Co-design thus has a specific role that end-users can have within participatory design.",
+       "according to DeSmet and colleagues (2016), participatory design represents stakeholder involvement as informants (where they give input and feedback) or as co-designers (where they are equal partners).",
+       "However, according to our definition, participatory design and codeign differ from each other, since co-design puts less weight on the emphasis of user empowerment, as is the case in participatory design [2]."
+      ],
+      "title": "personalization in game design for healthcare: a literature review on its definitions and effects",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Co-design (or collaborative design) [26] is rooted in participatory design (PD).",
+       "The designer acts as facilitator, and supports participants in idea generation and other activities by supplying different tools for expression [25]."
+      ],
+      "title": "human-computer interaction – interact 2019",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "To distinguish participatory design from co-design, the main difference is that participatory design sees users not as subjects but as partners (Sanders & Stappe"
+      ],
+      "title": "investigation into how each stakeholder plays a role at different levels of granularity to realise a long-term service design project",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 19,
+   "n_claims_usable": 19,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C15",
+     "sentence": "Conversely, participatory design is defined as the practice of collective creativity itself ."
+    },
+    {
+     "cid": "C14",
+     "sentence": "In a broader sense, co-design involves the combined creativity of designers and other participants ."
+    },
+    {
+     "cid": "C13",
+     "sentence": "It is characterized as a specific instance of co-creation that applies collective creativity to the design process ."
+    },
+    {
+     "cid": "C12",
+     "sentence": "Co-design is specifically described as a participatory design approach that focuses on bringing stakeholders together ."
+    },
+    {
+     "cid": "C15",
+     "sentence": "This facilitative role supports the broader goal of collective creativity inherent in the practice ."
+    },
+    {
+     "cid": "C12",
+     "sentence": "Consequently, the terms are often used in close proximity, with co-design sometimes referred to as co-creation within the participatory design context ."
+    },
+    {
+     "cid": "C15",
+     "sentence": "By integrating these distributed elements, the practice of collective creativity can be sustained even when participants are not physically co-located ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "Distributed participatory design has been proposed as a way to extend the principles of participatory design to remote or geographically dispersed stakeholders ."
+    }
+   ],
+   "word_count": 660,
+   "n_sections": 5,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "aab38dd1282ff3387cc8bf9b",
+  "question": "What are the leading approaches to automatic scientific paper review generation and what are their strengths and weaknesses?",
+  "sections": [
+   {
+    "title": "Historical Context and Data Constraints",
+    "text": "The field of automatic scientific paper review generation emerged from a notable gap in the literature, as no method for this specific task had been proposed prior to recent developments [2]. Early research highlighted significant challenges in applying standard text generation techniques to this domain. Commonly used methods, such as Artificial Neural Networks (ANN), typically require a very large amount of data to build an effective generative model [1]. Applying these methods in the context of scientific review generation is difficult due to the scarcity of high-quality training data [1]. To address this, a 2016 proposal introduced a method that constructs a review tailored to a specific paper, with a specified recommendation, based solely on the paper text and a corpus of human-written reviews for other papers [1]. A key aspect of this early proposal was that it built upon a relatively small knowledge base, consisting of only some tens of reviews [1]. This approach demonstrated that effective review generation could be achieved without the massive datasets required by traditional neural network architectures.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "A key aspect of our proposal is that it builds upon a relatively small knowledge base (some tens of reviews)",
+       "Our proposed method constructs a review tailored to a specific paper, with a specified recommendation, based solely on the paper text and a corpus of reviews written by humans for other papers.",
+       "Applying those methods in the context of scientific review generation is difficult because of the difficulty i",
+       "while commonly used methods for text generation, such as Artificial Neural Networks (ANN), typically require a very large amount of data in order to build an effective generative model."
+      ],
+      "title": "your paper has been accepted, rejected, or whatever: automatic generation of scientific paper reviews",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "To the best of our knowledge, no method for the automatic generation of reviews of scientific papers has been proposed before."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Motivation: Reviewer Burden and Quality Concerns",
+    "text": "The drive to automate review processes is strongly motivated by the increasing volume of academic submissions. With an ever-increasing number of scientific papers published each year, it becomes more difficult for researchers to explore a field that they are not closely familiar with already [4]. Furthermore, not all areas and sub-areas have a current review, creating gaps in synthesized knowledge [4]. In the context of peer review, the increase of submissions for top venues in machine learning and NLP has caused a problem of excessive burden on reviewers [3]. This overload has often caused concerns regarding how this may not only overload reviewers, but also affect the quality of the reviews [3]. The review process is essential to ensure the quality of publications, yet the current human-centric system is under strain [3]. These factors have created a pressing need for automated systems that can assist in both the generation of comprehensive literature reviews and the evaluation of individual submissions.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "The review process is essential to ensure the quality of publications.",
+       "Recently, the increase of submissions for top venues in machine learning and NLP has caused a problem of excessive burden on reviewers and has often caused concerns regarding how this may not only overload reviewers, but also may affect the quality of the reviews."
+      ],
+      "title": "generating summaries for scientific paper review",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2109.14059",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "However, not all areas and sub-areas have a current review.",
+       "With an ever-increasing number of scientific papers published each year, it becomes more difficult for researchers to explore a field that they are not closely familiar with already.",
+       "In this paper, we present a method for the automatic generation of a review paper corresponding to a user-defined query."
+      ],
+      "title": "automatic generation of reviews of scientific papers",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2010.04147",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Query-Driven Review Generation",
+    "text": "Beyond evaluating single papers, researchers have developed systems capable of generating comprehensive review papers. A 2020 method presented a technique for the automatic generation of a review paper corresponding to a user-defined query [4]. This approach addresses the challenge of synthesizing information across multiple sources to create a coherent narrative for a specific topic. By allowing users to define the scope of the review, these systems can help researchers navigate complex fields more efficiently. This capability is distinct from single-paper evaluation, as it requires the aggregation and synthesis of diverse literature to produce a high-level overview, thereby addressing the difficulty researchers face when exploring unfamiliar areas [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "However, not all areas and sub-areas have a current review.",
+       "With an ever-increasing number of scientific papers published each year, it becomes more difficult for researchers to explore a field that they are not closely familiar with already.",
+       "In this paper, we present a method for the automatic generation of a review paper corresponding to a user-defined query."
+      ],
+      "title": "automatic generation of reviews of scientific papers",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2010.04147",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Retrieval-Augmented and Outline-Guided Systems",
+    "text": "Recent advancements have focused on retrieval-augmented generation to improve the accuracy and structure of generated reviews. SciRAG, introduced in 2025, is an adaptive, citation-aware, and outline-guided retrieval and synthesis system for scientific literature [5]. This system employs adaptive retrieval strategies, including both sequential and parallel approaches, to gather relevant information. It utilizes citation-aware symbolic reasoning to ensure that claims are properly attributed and that the synthesis is verifiable. The outline-guided synthesis component addresses the issue of fragmented or hard-to-verify syntheses often produced by less structured methods. By integrating these elements, SciRAG aims to produce coherent and reliable reviews that maintain a clear logical structure throughout the generation process.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "scirag: adaptive, citation-aware, and outline-guided retrieval and synthesis for scientific literature"
+      ],
+      "title": "scirag: adaptive, citation-aware, and outline-guided retrieval and synthesis for scientific literature",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Multi-Agent and Tool-Integrated Frameworks",
+    "text": "To address the limitations of single-model generation, multi-agent frameworks have been developed. ReviewGrounder, proposed in 2026, is a rubric-guided, tool-integrated multi-agent framework that decomposes the reviewing process into drafting and grounding stages. This system uses the Phi-4-14B model as a drafter to generate initial review content. The primary goal of this architecture is to address the issues of superficial and formulaic reviews often generated by large language models. By separating the drafting and grounding stages, the system ensures that the generated review is not only well-written but also factually grounded and aligned with specific evaluation rubrics. This approach leverages the strengths of multiple agents to produce more robust and detailed assessments.",
+    "citations": []
+   },
+   {
+    "title": "Reinforcement Learning and Reward Optimization",
+    "text": "Reinforcement learning (RL) has been applied to fine-tune review generation models for specific quality metrics. ReviewRL, a 2025 framework, combines ArXiv-MCP retrieval-augmented context, supervised fine-tuning (SFT), and RL with a composite reward. This system is designed to address factual accuracy, rating consistency, and analytical depth in reviews. It was tested on ICLR 2025 papers to evaluate its effectiveness in realistic scenarios. Similarly, REMOR, also from 2025, utilizes a reasoning LLM, specifically DeepSeek-R1-Distill-Qwen-7B, combined with multi-objective RL using the GRPO algorithm. REMOR employs a multi-aspect reward function that considers criticisms, novelty, and relevance. The model undergoes SFT on the PeerRT dataset to establish a baseline before RL optimization. This approach aims to address the tendency of AI reviews to be shallow or overpraising by incentivizing more critical and nuanced evaluations.",
+    "citations": []
+   },
+   {
+    "title": "Instruction Optimization and Baseline Comparisons",
+    "text": "The performance of these systems is often evaluated against various baselines, including instruction optimization techniques. APE (Automatic Prompt Engineer) improves upon prior LLM baselines by compressing demonstrations into a single instruction [6]. This optimization pipeline greatly outperforms the prior LLM baseline by a large margin in zero/few-shot learning and zero-shot Chain-of-Thought (CoT) settings [6]. Furthermore, APE achieves better or comparable performance to the instructions generated by human annotators on 24/24 Instruction Induction tasks and 17/21 curated Big-Bench tasks [6]. These results suggest that automated instruction generation can be a powerful tool for enhancing the performance of review generation models, potentially reducing the need for extensive manual annotation of prompts.",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Moreover, APE achieves better or comparable performance to the instructions generated by human annotators on 24/24 Instruction Induction tasks and 17/21 curated Big-Bench ( Suzgun et al., 2023 ) tasks.",
+       "Such an optimization pipeline is equivalent to compressing the demonstrations into a single instruction, which greatly outperforms the prior LLM baseline by a large margin in zero/few-shot learning and zero-shot CoT settings."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "3.1.1. Sampling-based methods",
+         "chunk_id": "arxiv_2404.01077#c10",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Critical Shortcomings and Novelty Assessment",
+    "text": "Despite these advancements, significant challenges remain in the quality of automated reviews. An evaluation of the Sakana AI Scientist in 2025 found that the literature reviews produced by the system had poor novelty assessments. Critical shortcomings were identified in the system's ability to accurately judge the originality of research contributions. This highlights a persistent weakness in current automated review systems, which may struggle to distinguish between incremental improvements and truly novel contributions. Addressing these shortcomings is crucial for the widespread adoption of automated review tools in high-stakes academic environments where the assessment of novelty is a key component of peer review.",
+    "citations": []
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 20,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C19",
+     "sentence": "The outline-guided synthesis component addresses the issue of fragmented or hard-to-verify syntheses often produced by less structured methods ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "It utilizes citation-aware symbolic reasoning to ensure that claims are properly attributed and that the synthesis is verifiable ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "This system employs adaptive retrieval strategies, including both sequential and parallel approaches, to gather relevant information ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "The primary goal of this architecture is to address the issues of superficial and formulaic reviews often generated by large language models ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "This system uses the Phi-4-14B model as a drafter to generate initial review content ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "ReviewGrounder, proposed in 2026, is a rubric-guided, tool-integrated multi-agent framework that decomposes the reviewing process into drafting and grounding stages ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "This approach aims to address the tendency of AI reviews to be shallow or overpraising by incentivizing more critical and nuanced evaluations ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "The model undergoes SFT on the PeerRT dataset to establish a baseline before RL optimization ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "REMOR employs a multi-aspect reward function that considers criticisms, novelty, and relevance ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "Similarly, REMOR, also from 2025, utilizes a reasoning LLM, specifically DeepSeek-R1-Distill-Qwen-7B, combined with multi-objective RL using the GRPO algorithm ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "It was tested on ICLR 2025 papers to evaluate its effectiveness in realistic scenarios ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "This system is designed to address factual accuracy, rating consistency, and analytical depth in reviews ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "ReviewRL, a 2025 framework, combines ArXiv-MCP retrieval-augmented context, supervised fine-tuning (SFT), and RL with a composite reward ."
+    },
+    {
+     "cid": "C20",
+     "sentence": "Critical shortcomings were identified in the system's ability to accurately judge the originality of research contributions ."
+    },
+    {
+     "cid": "C20",
+     "sentence": "An evaluation of the Sakana AI Scientist in 2025 found that the literature reviews produced by the system had poor novelty assessments ."
+    }
+   ],
+   "word_count": 997,
+   "n_sections": 8,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[3]",
+    "[4]"
+   ]
+  }
+ }
+]

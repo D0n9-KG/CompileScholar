@@ -39,7 +39,7 @@ def _load_records_with_deep():
 
 def adapt_batch(b: int) -> str:
     from report_adapter import (EvidenceStore, assemble, narrative_compile,
-                                parse_notes)
+                                normalize_notes, parse_notes)
     records = _load_records_with_deep()
     manifest = json.load(open(BASE / "manifest_all.json", encoding="utf-8"))
     # FULLCHAIN-AUDIT C1：texts_dir 接线（批11 chunk 锚修复是死代码——
@@ -64,6 +64,18 @@ def adapt_batch(b: int) -> str:
                              "notes_chars": 0})
             continue
         claims = parse_notes(row["notes_final"])
+        # FULLCHAIN-AUDIT C3 根本解法：确定性解析产出可用主张过少时
+        # （自由形态笔记第四次实锤——b15b 00bdd80d 有 29 个真实 record
+        # id 回指但 0 行 N 形态），LLM 规范化后再解析一次
+        if sum(1 for c in claims if c["text"] and c["refs"]) < 3:
+            norm = normalize_notes(row["notes_final"])
+            if norm != row["notes_final"]:
+                claims2 = parse_notes(norm)
+                if sum(1 for c in claims2 if c["text"] and c["refs"]) > \
+                        sum(1 for c in claims if c["text"] and c["refs"]):
+                    claims = claims2
+                    print(f"[b{b}] {row['id'][:14]}: notes normalized "
+                          f"({len(claims)} claims)", flush=True)
         try:
             draft = narrative_compile(row["question"], claims, store)
             report, diag = assemble(draft, claims, store)
@@ -107,5 +119,6 @@ def adapt_batch(b: int) -> str:
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    for b in [int(x) for x in sys.argv[1:]] or [5, 6, 7, 8, 9]:
+    # 批号支持字母后缀（批15 双样本=15a/15b——文件名后缀即 tag）
+    for b in sys.argv[1:] or ["5", "6", "7", "8", "9"]:
         adapt_batch(b)

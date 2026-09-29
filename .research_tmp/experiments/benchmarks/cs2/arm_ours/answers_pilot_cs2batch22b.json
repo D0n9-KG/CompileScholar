@@ -1,0 +1,3179 @@
+[
+ {
+  "id": "eef3ee38231d9fa5ffabbec7",
+  "type": "aggregation",
+  "question": "What are good benchmarks and evaluation strategies for comparing obstacle avoidance strategies in mobile robots?",
+  "gold_hint": "",
+  "answer": "Obstacle avoidance is a fundamental task in robotics, defined by the goal of reaching a destination without collision . While the specific quantitative benchmarks and detailed evaluation strategies for comparing these strategies are not explicitly detailed in the consulted records, the available literature highlights several key dimensions of performance and methodological approaches used in the field.\n\n**Performance Metrics and Evaluation Criteria**\nThe primary evaluation metrics developed to measure the performance of different obstacle avoidance strategies focus on real-time performance, accuracy, and stability . For instance, an obstacle avoidance strategy based on wireless sensor networks was specifically proposed to improve these three aspects . Performance evaluations in the literature indicate that proposed approaches are generally assessed for their accuracy and efficiency . Furthermore, in the context of Unmanned Aerial Vehicles (UAVs) with limited fields of view, the implementation of specific avoidance strategies is evaluated based on its ability to significantly improve robustness and safety .\n\n**Evaluation Strategies and Methodologies**\nRegarding evaluation strategies, computer simulations are frequently conducted to validate the performance of proposed methods . The literature notes that obstacle avoidance can serve as a benchmark for testing learning capabilities . Historically, obstacle avoidance was used in one of the earliest works of evaluative adaptation with Genetic Algorithms on real robots .\n\n**Experimental Setups and System Configurations**\nExperimental setups vary significantly based on the environment and robot type. Global obstacle avoidance strategies require full knowledge of the static environment to search for paths . In contrast, for cleaning robots, there are generally two types of motion planning approaches: off-line (static) and on-line (dynamic) . Obstacle avoidance can be implemented with different numbers of robots and typically requires basic sensors and actuators . Multiple mobile robot systems provide an incentive for research due to their distributed nature . In terms of sensing hardware, LiDAR with a range of up to 200 meters is often used for collision avoidance [svy_708713eefe3a].\n\n**Comparison of Strategies**\nSeveral algorithms have been proposed for obstacle avoidance, each having distinct drawbacks and benefits . Path planning algorithms for mobile robots generally focus on maneuvering the robot from a start point to a goal . Rapidly-exploring Random Tree (RRT) algorithms have been applied successfully to challenging robot motion planning . Novel hybrid navigation strategies for collision-free movement in dynamic environments have also been proposed . One such proposed method combines global path planning with reactive methods to guarantee safe navigation .\n\n**Gaps in Consulted Records**\nThe consulted records did not surface specific numerical benchmark values, detailed experimental configurations beyond general sensor types, or specific findings on which strategies work best in comparative studies. Additionally, the records did not detail specific limitations of current evaluation approaches beyond the general acknowledgment that different algorithms have drawbacks.",
+  "arm": "main",
+  "steps": 16,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 19,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity:obstacle avoidance*] Question asks for benchmarks + evaluation strategies for comparing ",
+     "N2. [entity:motion planning*] Related entity in corpus.",
+     "N3. [entity:mobile robots*] Related entity."
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "obstacle avoidance"
+    },
+    "intent": "Get cross-paper evidence dossier for obstacle avoidance entity",
+    "obs_chars": 1264,
+    "notes_chars": 8961
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "mobile robots"
+    },
+    "intent": "Get cross-paper evidence dossier for mobile robots entity",
+    "obs_chars": 970,
+    "notes_chars": 8961
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "evaluation and benchmarking"
+    },
+    "intent": "Get cross-paper evidence dossier for evaluation and benchmarking entity",
+    "obs_chars": 537,
+    "notes_chars": 8961
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "experiment design"
+    },
+    "intent": "Get cross-paper evidence dossier for experiment design entity",
+    "obs_chars": 377,
+    "notes_chars": 8961
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "recommendation",
+     "contains": "benchmark|evaluation metric|performance measure|success rate|collision rate"
+    },
+    "intent": "Find specific benchmark/evaluation metric recommendations for obstacle avoidance",
+    "obs_chars": 1706,
+    "notes_chars": 2013
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "observation",
+     "contains": "simulation|real-world|test|experiment|evaluate|compare"
+    },
+    "intent": "Find observation records about how obstacle avoidance is evaluated/tested",
+    "obs_chars": 1603,
+    "notes_chars": 2013
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "motion planning",
+     "claim_type": "recommendation",
+     "contains": "benchmark|evaluation|metric|performance|compare"
+    },
+    "intent": "Find benchmark/evaluation recommendations from motion planning papers",
+    "obs_chars": 473,
+    "notes_chars": 2013
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "mobile robots",
+     "claim_type": "recommendation",
+     "contains": "benchmark|evaluation|metric|performance|compare|test"
+    },
+    "intent": "Find evaluation recommendations from mobile robot papers",
+    "obs_chars": 244,
+    "notes_chars": 2013
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "observation|recommendation|mechanism"
+    },
+    "intent": "Get specific findings from the reactive obstacle avoidance paper on wheeled mobile robots",
+    "obs_chars": 267,
+    "notes_chars": 3300
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "observation|recommendation|mechanism"
+    },
+    "intent": "Get specific findings from the control strategies paper on mobile robot obstacle avoidance",
+    "obs_chars": 267,
+    "notes_chars": 3300
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "claim_type": "observation|recommendation|mechanism"
+    },
+    "intent": "Get specific findings from the real-time obstacle avoidance algorithms paper",
+    "obs_chars": 267,
+    "notes_chars": 3300
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks",
+     "claim_type": "observation|recommendation|mechanism"
+    },
+    "intent": "Get specific findings from the wireless sensor networks obstacle avoidance paper",
+    "obs_chars": 267,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "evaluation|benchmark|metric|limitation|weakness|gap",
+     "entity": "obstacle avoidance"
+    },
+    "intent": "Find limitations/criticisms about evaluation approaches for obstacle avoidance",
+    "obs_chars": 244,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "evaluation|benchmark|metric|limitation|weakness|gap",
+     "entity": "motion planning"
+    },
+    "intent": "Find limitations/criticisms about evaluation approaches for motion planning",
+    "obs_chars": 473,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "evaluation|benchmark|metric|limitation|weakness|gap",
+     "entity": "mobile robots"
+    },
+    "intent": "Find limitations/criticisms about evaluation approaches for mobile robots",
+    "obs_chars": 244,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "benchmark|metric|evaluation|performance|success rate|collision",
+     "entity": "obstacle avoidance"
+    },
+    "intent": "Find definitions of benchmarks/metrics used for obstacle avoidance",
+    "obs_chars": 1981,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "benchmark|metric|evaluation|performance|success rate|collision",
+     "entity": "motion planning"
+    },
+    "intent": "Find definitions of benchmarks/metrics used for motion planning",
+    "obs_chars": 948,
+    "notes_chars": 3300
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "benchmark|metric|evaluation|performance|success rate|collision",
+     "entity": "mobile robots"
+    },
+    "intent": "Find definitions of benchmarks/metrics used for mobile robots",
+    "obs_chars": 615,
+    "notes_chars": 3300
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "motion planning"
+    },
+    "intent": "Get cross-paper evidence dossier for motion planning entity",
+    "obs_chars": 1093,
+    "notes_chars": 3563
+   },
+   {
+    "step": 6,
+    "tool": "find_gap",
+    "args": {
+     "entity": "obstacle avoidance"
+    },
+    "intent": "Find what corpus papers state they did NOT do / what is missing in obstacle avoidance evaluation",
+    "obs_chars": 120,
+    "notes_chars": 3563
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "observation|mechanism|definition",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation"
+    },
+    "intent": "Get specific evaluation metrics and experimental details from the reactive obstacle avoidance paper",
+    "obs_chars": 263,
+    "notes_chars": 4267
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "observation|mechanism|definition",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance"
+    },
+    "intent": "Get specific evaluation metrics and experimental details from the control strategies paper",
+    "obs_chars": 263,
+    "notes_chars": 4267
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "claim_type": "observation|mechanism|definition",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark"
+    },
+    "intent": "Get specific evaluation metrics and experimental details from the real-time obstacle avoidance paper",
+    "obs_chars": 263,
+    "notes_chars": 4267
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks",
+     "claim_type": "observation|mechanism|definition",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|accuracy|stability"
+    },
+    "intent": "Get specific evaluation metrics and experimental details from the WSN-based obstacle avoidance paper",
+    "obs_chars": 263,
+    "notes_chars": 4267
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance",
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia"
+    },
+    "intent": "Get observation findings from reactive obstacle avoidance paper",
+    "obs_chars": 244,
+    "notes_chars": 4267
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark",
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance"
+    },
+    "intent": "Get observation findings from control strategies paper",
+    "obs_chars": 244,
+    "notes_chars": 4267
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|accuracy|stability",
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks"
+    },
+    "intent": "Get observation findings from WSN obstacle avoidance paper",
+    "obs_chars": 1101,
+    "notes_chars": 4267
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark",
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles"
+    },
+    "intent": "Get observation findings from real-time obstacle avoidance paper",
+    "obs_chars": 1413,
+    "notes_chars": 4267
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "observation|mechanism|definition"
+    },
+    "intent": "Get all findings from the reactive obstacle avoidance paper (2021)",
+    "obs_chars": 263,
+    "notes_chars": 3987
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "observation|mechanism|definition"
+    },
+    "intent": "Get all findings from the control strategies paper (2013)",
+    "obs_chars": 263,
+    "notes_chars": 3987
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance",
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance"
+    },
+    "intent": "Get specific evaluation metrics and results from the control strategies paper",
+    "obs_chars": 244,
+    "notes_chars": 3987
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark",
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks"
+    },
+    "intent": "Get specific evaluation metrics and results from the WSN-based obstacle avoidance paper",
+    "obs_chars": 1101,
+    "notes_chars": 3987
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "limitation|weakness|challenge|future work|not addressed|gap"
+    },
+    "intent": "Find limitations/criticisms about obstacle avoidance evaluation approaches",
+    "obs_chars": 2230,
+    "notes_chars": 3987
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "observation|mechanism|definition|recommendation"
+    },
+    "intent": "Get all findings from the reactive obstacle avoidance paper to identify specific metrics and evaluation strategies",
+    "obs_chars": 271,
+    "notes_chars": 3987
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "observation|mechanism|definition|recommendation"
+    },
+    "intent": "Get all findings from the control strategies paper to identify specific metrics and evaluation strategies",
+    "obs_chars": 271,
+    "notes_chars": 3987
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "claim_type": "observation|mechanism|definition|recommendation"
+    },
+    "intent": "Get all findings from the real-time obstacle avoidance paper to identify specific metrics and evaluation strategies",
+    "obs_chars": 271,
+    "notes_chars": 3987
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks",
+     "claim_type": "observation|mechanism|definition|recommendation"
+    },
+    "intent": "Get all findings from the wireless sensor networks obstacle avoidance paper to identify specific metrics and evaluation ",
+    "obs_chars": 271,
+    "notes_chars": 3987
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark",
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia"
+    },
+    "intent": "Get specific evaluation metrics and results from the reactive obstacle avoidance paper",
+    "obs_chars": 244,
+    "notes_chars": 3987
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 16,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:373ae400b01a] Several evaluation metrics developed to measure performance of different obstacle avoidance strategies | anchor:\"Several evaluation metrics were developed to measure the performance of different obstacle avoidance\"\nN2. [coarse:ed99cac7f5fa] Obstacle avoidance can serve as a benchmark for testing learning | anchor:\"Thus, it can serve as a benchmark for testing learning\" | epistemic:stated\nN3. [coarse:d261d9dac11f] Obstacle avoidance used in earliest works of evaluative adaptation with Genetic Algorithms on real robots | anchor:\"Obstacle avoidance was used in one of the earliest works of evaluative adaptation with Gen\" | epistemic:stated\nN4. [coarse:6466db9b6649] Performance evaluation results indicate proposed approach is accurate, efficient | anchor:\"The obtained results from performance evaluation indicate that the proposed approach is accurate, ef\"\nN5. [coarse:34c26a252bcb] Obstacle avoidance strategy based on wireless sensor networks proposed to improve real time performance, accuracy and stability | anchor:\"In order to improve the real time performance, accuracy and stability, an obstacle avoidan\"\nN6. [coarse:afba92ff951b] Obstacle avoidance is important task in robotics: goal is to reach destination without collision | anchor:\"Obstacle avoidance is an important task in the field of robotics, since the goal of autono\" | epistemic:stated\nN7. [svy_708713eefe3a] LiDAR range up to 200m often used for collision avoidance | anchor:\"LiDAR, with a range of up to 200 meters often used for collision avoidance.\" | epistemic:survey-claimed\nN8. [coarse:3781e02cc5aa] Several algorithms proposed for obstacle avoidance, each with drawbacks and benefits | anchor:\"Several algorithms have been proposed for obstacle avoidance, each having drawbacks and benefits\"\nN9. [coarse:902d481d16ac] Global obstacle avoidance requires full knowledge of static environment | anchor:\"A global type of obstacle avoidance requires full knowledge of the static environment to search the\"\nN10. [coarse:7fbe0149f066] Implementation could improve robustness/safety of UAVs with limited FOV | anchor:\"The implementation could significantly improve the robustness and safety of UAVs with limited FOV\"\nN11. [coarse:08154889e428] Multiple mobile robots systems provide incentive to researchers due to distributed nature | anchor:\"Multiple mobile robots system provides an unchallenged incentive to researchers due to their distrib\"\nN12. [coarse:6a195eaa9435] Path planning algorithms for mobile robots focus on maneuvering from start to goal | anchor:\"Path planning algorithms implemented for most mobile robots focus on maneuvering the robot from a st\"\nN13. [coarse:29712cddd66c] Obstacle avoidance can be implemented with different number of robots, requires basic sensors | anchor:\"Obstacle avoidance can be implemented with different number of robots, requires basic sensors and ac\"\nN14. [coarse:9e7e01dc7d8d] RRT algorithms have been applied successfully to challenging robot motion planning | anchor:\"Rapidly-exploring Random Tree (RRT) algorithms have been applied successfully to challenging robot m\"\nN15. [coarse:f7c60e548182] Two types of motion planning approaches for cleaning robot: off-line (static) and on-line (dynamic) | anchor:\"There are generally two types of motion planning approaches for a cleaning robot: off-line (or stati\"\nN16. [coarse:f23cc988e409] Novel hybrid navigation for collision-free movement in dynamic environment proposed | anchor:\"In this section, a novel hybrid navigation for collision-free movement in a dynamic enviro\"\nN17. [coarse:b4c62a2e641b] Proposed method combines global path planning with reactive methods to guarantee safe navigation | anchor:\"The proposed method combines global path planning with reactive methods to guarantee safe \"\nN18. [coarse:baf3b4cd9e32] Computer simulations are conducted to validate the performance of the method | anchor:\"Computer simulations are conducted to validate the performance of th\"",
+  "gaps_final": "G1. What specific benchmarks/metrics are used in corpus papers for obstacle avoidance?\nG2. What evaluation strategies are described?\nG3. What experimental setups/configurations are used?\nG4. Key findings about which strategies work best?\nG5. Limitations and gaps in current evaluation approaches?",
+  "queried": [
+   "card|{\"entity\": \"obstacle avoidance\"}",
+   "card|{\"entity\": \"mobile robots\"}",
+   "card|{\"entity\": \"evaluation and benchmarking\"}",
+   "card|{\"entity\": \"experiment design\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"benchmark|evaluation metric|performance measure|success rate|collision rate\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"simulation|real-world|test|experiment|evaluate|compare\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"benchmark|evaluation|metric|performance|compare\", \"entity\": \"motion planning\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"benchmark|evaluation|metric|performance|compare|test\", \"entity\": \"mobile robots\"}",
+   "findings|{\"claim_type\": \"observation|recommendation|mechanism\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"claim_type\": \"observation|recommendation|mechanism\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "findings|{\"claim_type\": \"observation|recommendation|mechanism\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles\"}",
+   "findings|{\"claim_type\": \"observation|recommendation|mechanism\", \"paper_id\": \"sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"evaluation|benchmark|metric|limitation|weakness|gap\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"evaluation|benchmark|metric|limitation|weakness|gap\", \"entity\": \"motion planning\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"evaluation|benchmark|metric|limitation|weakness|gap\", \"entity\": \"mobile robots\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"benchmark|metric|evaluation|performance|success rate|collision\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"benchmark|metric|evaluation|performance|success rate|collision\", \"entity\": \"motion planning\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"benchmark|metric|evaluation|performance|success rate|collision\", \"entity\": \"mobile robots\"}",
+   "card|{\"entity\": \"motion planning\"}",
+   "find_gap|{\"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_sy",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance\", \"paper_id\": \"sciverse_control_strategies",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark\", \"paper_id\": \"sciverse_real_tim",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|accuracy|stability\", \"paper_id\": \"sciverse",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark\", \"paper_id\": \"sciverse_control_strategies_for_mobile",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|accuracy|stability\", \"paper_id\": \"sciverse_obstacle_avoidance_s",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_wit",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark\", \"paper_id\": \"sciverse_obstacle_avoidance_strategy_o",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"limitation|weakness|challenge|future work|not addressed|gap\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition|recommendation\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition|recommendation\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition|recommendation\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|definition|recommendation\", \"paper_id\": \"sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"metric|success|collision|time|distance|path|evaluation|test|experiment|simulation|performance|benchmark\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_s"
+  ],
+  "gate": {
+   "note_rejects": 19,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 90,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 19
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 19,
+   "merge_total_lines": 100,
+   "relaxed_writes": 1,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 17,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [svy_708713eefe3a] has a range of up to=200 | src:findings@step1 | epi:survey-claimed"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "de3b24bf31962c6107002d48",
+  "type": "aggregation",
+  "question": "What are existing methods to elicit user intents when an automation encounters ambiguity, especially in failure cases?",
+  "gold_hint": "",
+  "answer": "The literature on eliciting user intents when automation encounters ambiguity—particularly in failure cases—spans several distinct methodological families. Below is a synthesis organized by approach, with attention to how each handles the failure/ambiguity boundary.\n\n**1. Mixed-Initiative Clarification (Follow-Up Questions)**\n\nThe most widely studied approach is the mixed-initiative paradigm, in which the system pauses automation and asks the user targeted clarifying questions. In natural-language database interfaces, both MISP and DialSQL employ mixed-initiative approaches that ask follow-up questions to clarify user intent when a query is ambiguous [sciverse_natural_language_interfaces_for_databases_what_do_users_think_]. A 2025 paper on ambiguity in natural-language queries argues that irresolvable ambiguities in single-shot query execution should be handled through mixed-initiative specification rather than failing or guessing, and identifies the key challenge as detecting and balancing when to automate grounding decisions versus requiring explicit user consultation [sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t]. The same database-interface literature notes that users can become frustrated if the conversation becomes repetitive or fails to address the core error, and that interactive methods help establish \"common ground\" between user and AI [sciverse_natural_language_interfaces_for_databases_what_do_users_think_].\n\n**2. Discriminative Clarifying Questions (Rule-Based / Retrieval-Based)**\n\nA 2020 system for resolving intent ambiguities generates discriminative clarifying questions by retrieving questions that distinguish between candidate intents. The approach is rule-based, requires no annotated clarification data, and is extensible to multiple intents [9e7a87753ec94bed1d9aa40cd12e3d6dcbb44b7d664da9c11bdf2d7c350fc84d]. This contrasts with generative approaches by grounding clarification in a pre-existing question bank.\n\n**3. Reinforcement-Learning-Based Clarification**\n\nAn RL-based dialogue system (2020) formulates clarification as a sequential decision problem: the model learns when and how to ask clarifying questions by suggesting refinements to ambiguous user queries. It uses a collection-partitioning formulation to select labels that distinguish unambiguous intents, then lists the chosen labels as intent phrases for user confirmation [external: interactive question clarification in dialogue via RL, 2020]. A 2021 follow-up on multi-stage clarification in conversational AI shows that without multi-stage clarification, systems either give a direct (potentially non-relevant) answer or a generic fallback message, both of which degrade user experience [external: multi-stage clarification in conversational AI, 2021].\n\n**4. Structured Multi-Interpretation Responses (No Clarification Questions)**\n\nA 2025 approach to \"reasoning about intent for ambiguous requests\" takes a different tack: rather than asking clarification questions, the system generates a structured response that enumerates all valid interpretations of an ambiguous request, each with its corresponding answer. The model is trained with reinforcement learning using a dual reward (recall on ambiguous inputs, precision on unambiguous ones), and the paper argues that LLMs implicitly commit to one interpretation when they should instead surface the ambiguity [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1]. A companion 2025 paper benchmarks \"Intent-First\" versus \"Direct Response Generation\" paradigms for service assistants, challenging the necessity of explicit intent modelling altogether [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81].\n\n**5. Programming-by-Demonstration with Continuous Intent Refinement**\n\nDiLogics (2023) is a programming-by-demonstration system for web automation that uses NLP and program synthesis to record user actions [338fb579c6b53f][3336785ec7eede]. It addresses the problem that specifying intents to cover every case can be tedious and that users may not know all cases in advance [coarse:c2cf2635126e][coarse:48ca830308c8]. Instead, it allows users to refine their intent continuously during automation by coordinating with the system [coarse:285527797f2f]. In its error-handling evaluation, 9 out of 10 users edited the input data table to rephrase segmented steps to the appropriate level of detail, and error-repair techniques were used at every stage of the process [sciverse_dilogics_creating_web_automation_programs_with_diverse_logics].\n\n**6. End-User Programmable Agents with Error Recovery and Backtracking**\n\nPumice is an end-user programmable agent implementing multi-modal interaction for task automation [2472372c003255]. The paper emphasizes that error recovery and backtracking are crucial for interactive end-user development systems, and that end users often use unclear, ambiguous, or vague concepts when naturally describing tasks [9e7def1947b68f][sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui]. It also notes that existing systems have limited support for letting users teach agents new concepts, and that existing natural-language programming systems are not adequate for supporting end-user task automation [2126de54413e63][733f8f05193069].\n\n**7. LLM-Based Assistants: Failure Modes and Follow-Up Debugging**\n\nAutoCopilot (2025), a \"do it for me / do it with me\" system, generates concise textual responses and facilitates users' follow-up debugging questions when automation encounters problems [coarse:3970b5d91322]. It occasionally encounters incorrect full automation when it fails to identify a single automation function from multiple intents in a user's query for complex tasks, or when it cannot accurately map multiple entities to the appropriate automation function [coarse:a02240192cac][coarse:faa8d2f260c9]. A 2024 study on why and when LLM-based assistants go wrong finds it unclear how integrating context of feature-rich applications can help novice end-users seek accurate assistance, and calls for more insights on where and how users struggle with LLMs [coarse:621c617a78b2][coarse:848b46531c9d].\n\n**8. Robotic Process Automation (RPA) Exception Handling**\n\nIn the RPA domain, a 2018 paper on implementing robust and low-maintenance RPA solutions in large organisations focuses on exception handling, work-queue management, and data-management strategies to increase robot robustness while interacting with external applications and environment instabilities [external: implementing robust and low-maintenance RPA solutions, 2018]. A 2023 systematic literature review of RPA implementation studies analyzed process selection and criteria across six electronic repositories [coarse:44345127a943][coarse:706eb475cb84], though its findings on failure-case intent elicitation specifically were limited to methodological descriptions in the records available. A broader 2018 literature review on understanding and resolving failures in human-robot interaction surveyed 52 studies on communicating failures and their causes, the influence of failures on HRI, and mitigating failures, noting that robots in unstructured environments are challenged by frequent failures and that little research on these topics exists within the HRI community [external: understanding and resolving failures in HRI, 2018].\n\n**9. Task-and-Motion Planning (TAMP) Error Recovery**\n\nIn robotics, a 2024 TAMP framework proposes robust policies critical to prevent and recover from errors in unstructured environments, accounting for potential failures in the planning process [arxiv_2404.02817]. While not directly about user-intent elicitation, it represents the failure-recovery side of the automation loop.\n\n**10. Presupposition-Failure Responses**\n\nOne system provides responses based on presupposition failure, i.e., when the user's request contains an implicit assumption that does not hold [coarse:6335571]. This is a narrower form of ambiguity handling that detects and addresses failed presuppositions rather than open-ended ambiguity.\n\n**11. General Observation on Control in Failure**\n\nA survey-level observation notes that \"deep neural networks do not provide an option for making sure we are still in control when unexpected failures are inevitable\" [svy_58e934064f50], highlighting a gap in current ML-based automation systems regarding user control during failure.\n\n**Summary of Gaps and Limitations**\n\nThe corpus does not contain a single unified taxonomy of intent-elicitation methods for failure cases. The methods above cluster into: (a) asking clarifying questions (mixed-initiative, discriminative, RL-based), (b) presenting multiple interpretations without asking (structured multi-answer), (c) continuous refinement during execution (programming-by-demonstration, interactive EUD), (d) exception-handling and work-queue strategies (RPA), and (e) robust planning with failure recovery (TAMP). The specific intersection of \"failure case\" + \"intent elicitation\" is underrepresented: most clarification methods target pre-execution ambiguity, while failure-case methods (RPA exception handling, TAMP recovery) focus on robustness rather than re-eliciting user intent. The 2025 mixed-initiative database paper and the DiLogics/Pumice interactive systems come closest to bridging this gap by combining ambiguity detection with in-the-loop user consultation during or after failure.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: methods to elicit user intents when automation encounters ambiguity, especial"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "ambiguity|clarification|intent elicitation|disambiguation|user intent",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find corpus records on ambiguity/intent-elicitation mechanisms",
+    "obs_chars": 2331,
+    "notes_chars": 849
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "ambiguity|clarification|failure|recovery|fallback",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find corpus recommendations on handling ambiguity/failure",
+    "obs_chars": 2080,
+    "notes_chars": 849
+   },
+   {
+    "step": 1,
+    "tool": "gap_search",
+    "args": {
+     "query": "methods to elicit user intent when automation encounters ambiguity or failure"
+    },
+    "intent": "Knowledge-model-driven external search for gap-filling papers on intent elicitation in ambiguous/failure automation",
+    "obs_chars": 212,
+    "notes_chars": 849
+   },
+   {
+    "step": 1,
+    "tool": "search_papers",
+    "args": {
+     "query": "eliciting user intent clarification questions ambiguous automation failure recovery",
+     "k": 10
+    },
+    "intent": "External literature search for intent-elicitation methods in ambiguous/failure automation",
+    "obs_chars": 2590,
+    "notes_chars": 849
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N3. [external] search_papers found: (a) \"interactive question clarification in dialogue via reinforc",
+     "N4. [external] gap_search returned 8 candidates (truncated, no details shown)."
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "Existing methods"
+    },
+    "intent": "Check if the 'existing methods' entity dossier covers ambiguity/intent elicitation methods",
+    "obs_chars": 3834,
+    "notes_chars": 1679
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "contains": "ambiguity|clarification|intent|disambiguation|user"
+    },
+    "intent": "Get findings from the ambiguity-in-NL-queries paper",
+    "obs_chars": 1070,
+    "notes_chars": 1679
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "ambiguity|failure|clarification|intent|error|recovery"
+    },
+    "intent": "Get findings from the LLM assistants going wrong paper",
+    "obs_chars": 244,
+    "notes_chars": 1679
+   },
+   {
+    "step": 2,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "clarification question generation disambiguation voice assistant intent elicitation human-in-the-loop automation exception handling"
+    },
+    "intent": "Find more external papers on clarification/disambiguation methods in automation and assistants",
+    "obs_chars": 2549,
+    "notes_chars": 1679
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N3. [external] \"reasoning about intent for ambiguous requests\" (2025): LLMs implicitly commit to one",
+     "N4. [external] \"do LLMs need intent? revisiting response generation strategies for service assistant"
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "contains": "ambiguity|intent|clarification|control|failure|error|user"
+    },
+    "intent": "Probe the do-it-for-me vs do-it-with-me paper for intent elicitation and ambiguity handling",
+    "obs_chars": 1621,
+    "notes_chars": 2260
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "ambiguity|intent|clarification|failure|error|recovery|user|misunderstanding"
+    },
+    "intent": "Probe the LLM assistants going wrong paper for failure handling and intent elicitation",
+    "obs_chars": 1079,
+    "notes_chars": 2260
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "contains": "ambiguity|intent|clarification|failure|error|user|exception"
+    },
+    "intent": "Probe the DiLogics web automation paper for ambiguity and failure handling",
+    "obs_chars": 2390,
+    "notes_chars": 2260
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "contains": "ambiguity|intent|clarification|failure|error|exception|user|recovery"
+    },
+    "intent": "Probe the RPA framework paper for exception handling and user intent",
+    "obs_chars": 244,
+    "notes_chars": 2260
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_",
+     "contains": "ambiguity|intent|clarification|failure|error|user|query"
+    },
+    "intent": "What the NL interfaces for databases paper says about user intent and ambiguity",
+    "obs_chars": 1828,
+    "notes_chars": 3752
+   },
+   {
+    "step": 4,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "clarification question generation ambiguous user intent voice assistant disambiguation human-in-the-loop"
+    },
+    "intent": "Find external papers on clarification question generation and disambiguation methods",
+    "obs_chars": 2537,
+    "notes_chars": 3752
+   },
+   {
+    "step": 4,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "robotic process automation exception handling failure recovery user intent clarification fallback"
+    },
+    "intent": "Find external papers on RPA exception handling and failure recovery",
+    "obs_chars": 2941,
+    "notes_chars": 3752
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "contains": "exception|failure|error|user|intent|clarification|ambiguity|recovery|fallback"
+    },
+    "intent": "RPA framework paper: exception handling and user intent in failure cases",
+    "obs_chars": 244,
+    "notes_chars": 4621
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from RPA framework paper to understand its exception handling / intent elicitation approach",
+    "obs_chars": 1386,
+    "notes_chars": 4621
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from LLM assistant failure paper to understand how failures are handled and user intent recovered",
+    "obs_chars": 1079,
+    "notes_chars": 4621
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "human-in-the-loop clarification when automated system fails exception handling user confirmation intent recovery"
+    },
+    "intent": "Find external papers on human-in-the-loop intent recovery specifically in failure/exception scenarios",
+    "obs_chars": 1910,
+    "notes_chars": 4621
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from the ambiguity-in-NL-queries paper for concrete methods to handle ambiguity",
+    "obs_chars": 1070,
+    "notes_chars": 4621
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the ambiguity paper to understand specific methods proposed",
+    "obs_chars": 1070,
+    "notes_chars": 5063
+   },
+   {
+    "step": 7,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "clarification question generation ambiguous intent disambiguation dialogue system mixed-initiative"
+    },
+    "intent": "Find more external papers on clarification question generation and mixed-initiative disambiguation",
+    "obs_chars": 2567,
+    "notes_chars": 5063
+   },
+   {
+    "step": 7,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "exception handling agent systems failure recovery user confirmation intent elicitation automation"
+    },
+    "intent": "Find papers on exception handling in agent/automation systems with user intent recovery",
+    "obs_chars": 1645,
+    "notes_chars": 5063
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from NL database interfaces paper on how clarification is done",
+    "obs_chars": 1388,
+    "notes_chars": 5063
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_a_framework_to_support_robotic_process_automation"
+    },
+    "intent": "Get full dossier on RPA framework paper to find exception handling / failure content",
+    "obs_chars": 2452,
+    "notes_chars": 5063
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "query": "exception handling failure recovery user intent clarification automation",
+     "k": 12
+    },
+    "intent": "Search full texts of corpus papers for exception handling and failure recovery content",
+    "obs_chars": 2005,
+    "notes_chars": 5063
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from RPA framework paper about exception handling or failure cases",
+    "obs_chars": 1386,
+    "notes_chars": 5063
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "clarification question generation ambiguous intent disambiguation dialogue system mixed-initiative"
+    },
+    "intent": "Find more specific methods for clarification question generation and disambiguation in dialogue/automation systems",
+    "obs_chars": 2045,
+    "notes_chars": 5773
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "f28_auto_retrieval": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+    "at_step": 13,
+    "obs_chars": 2695
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the RPA framework paper's own critical/limitation statements about what it does NOT cover (exception handling, failu",
+    "obs_chars": 1386,
+    "notes_chars": 6277
+   },
+   {
+    "step": 15,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "exception handling robotic process automation failure recovery human intervention user intent clarification"
+    },
+    "intent": "Find external papers specifically on RPA exception handling and human-in-the-loop failure recovery",
+    "obs_chars": 2812,
+    "notes_chars": 6277
+   },
+   {
+    "step": 15,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get full dossier for the Pumice paper to understand its error recovery and intent elicitation mechanisms in detail",
+    "obs_chars": 3320,
+    "notes_chars": 6277
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 18,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "contains": "exception|failure|error|handling|recovery|user|intent|clarif"
+    },
+    "intent": "Get substantive findings from RPA framework paper about exception handling and user intent in failure cases",
+    "obs_chars": 244,
+    "notes_chars": 6952
+   },
+   {
+    "step": 19,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 20,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 21,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "f28_auto_retrieval": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+    "at_step": 20,
+    "obs_chars": 2389
+   },
+   {
+    "step": 22,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_framework_to_support_robotic_process_automation",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get RPA framework's recommendations on exception handling and user intent in failure cases",
+    "obs_chars": 1386,
+    "notes_chars": 6952
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 35
+   },
+   {
+    "step": 23,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "f28_auto_retrieval": "sciverse_a_framework_to_support_robotic_process_automation",
+    "at_step": 24,
+    "obs_chars": 1386
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 26,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "clarification question generation ambiguous user intent disambiguation dialogue system mixed-initiative"
+    },
+    "intent": "Find external papers on clarification question generation and disambiguation methods",
+    "obs_chars": 2566,
+    "notes_chars": 6952
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 28,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 29,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   },
+   {
+    "step": 30,
+    "type": "note_reject",
+    "n_bad": 8,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in fa",
+     "N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for a",
+     "N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisit"
+    ]
+   }
+  ],
+  "notes_final": "[unsourced] N1. [question] Methods to elicit user intents when automation encounters ambiguity, especially in failure cases.\nN2. [coarse:0b2d2d095f3d] \"are we asking the right questions? on ambiguity in NL queries\" (2025): irresolvable ambiguities in single-shot query execution should be handled through mixed-initiative specification rather than failing or guessing.\nN3. [coarse:96d6d9c14358] Same paper: key challenge = detecting and balancing when to automate grounding decisions vs. require explicit user consultation.\n[unsourced] N4. [f37e511e7f3f005c4bcbc23ec8f9c7a2c45c1fa422d18cab382561f8a7daeae1] \"reasoning about intent for ambiguous requests\" (2025): LLMs implicitly commit to one interpretation; proposes structured response enumerating all valid interpretations each with corresponding answer; trained with RL using dual reward (recall on ambiguous, precision on unambiguous); no clarification questions needed.\n[unsourced] N5. [8465d7dcfa8bef6810af8de93f1b245a58b1bc6a0787fab8ad2f4c992bcb3e81] \"do LLMs need intent? revisiting response generation strategies for service assistant\" (2025): benchmarks Intent-First vs Direct Response Generation paradigms; challenges necessity of explicit intent modelling.\n[unsourced] N6. [external] \"interactive question clarification in dialogue via RL\" (2020): RL model clarifies ambiguous questions by suggesting refinements; formulates collection partitioning to select labels distinguishing unambiguous intents; lists chosen labels as intent phrases for user confirmation.\n[unsourced] N7. [external] \"multi-stage clarification in conversational AI\" (2021): multi-stage clarification; without it systems give direct answer (potentially non-relevant) or generic fallback message; both degrade UX.\nN8. [svy_58e934064f50] \"Deep neural networks do not provide an option for making sure we are still in control when unexpected failures are inevitable.\"\nN9. [coarse:6335571] \"The proposed system provides responses based on presupposition failure.\"\nN10. [coarse:3970b5d91322] AutoCopilot (do it for me/with me, 2025): generates concise textual responses and facilitates users' follow-up debugging questions.\nN11. [coarse:a02240192cac] AutoCopilot occasionally encounters incorrect full automation when it fails to identify a single automation function from multiple intents in a user's query for complex tasks.\nN12. [coarse:faa8d2f260c9] AutoCopilot occasionally encounters incorrect full automation when it cannot accurately map multiple entities from a user's query to the appropriate automation function.\nN13. [coarse:621c617a78b2] \"why and when LLM-based assistants can go wrong\" (2024): unclear how integrating context of feature-rich applications can help novice end-users in seeking accurate and relevant assistance from LLMs.\nN14. [coarse:848b46531c9d] Same paper: more insights needed on where and how users struggle with LLMs to harness their full potential for seeking help for software tasks.\nN15. [coarse:c2cf2635126e] DiLogics (2023): specifying intents to cover every case can be tedious.\nN16. [coarse:48ca830308c8] DiLogics: users may not know all the cases in the first place.\nN17. [coarse:285527797f2f] DiLogics addresses intent specification by parsing input data and allowing users to refine their intent continuously during automation by coordinating with the system.\nN18. [338fb579c6b53f] DiLogics is a programming-by-demonstration system that utilizes NLP.\nN19. [1cb492997599ca] DiLogics: by recording user demonstrations for each step, generalizes to handle diverse cases.\nN20. [3336785ec7eede] DiLogics employs program synthesis techniques to record the user's actions.\nN21. [19bde22d83e521] DiLogics: users can successfully create automation programs that satisfy diverse intents.\nN22. [coarse:daadaa71b5cd] NL interfaces for databases (2025): MISP uses mixed-initiative approach, asking follow-up questions to clarify user intent.\nN23. [coarse:c9663d526dac] Same paper: DialSQL uses mixed-initiative approach, asking follow-up questions to clarify user intent.\nN24. [coarse:463c2cba7d43] Same paper: users can become frustrated if the conversation becomes repetitive or fails to address the core error.\nN25. [coarse:fa87561f27e0] Same paper: interactive methods help establish \"common ground\" between user and AI.\n[unsourced] N26. [9e7a87753ec94bed1d9aa40cd12e3d6dcbb44b7d664da9c11bdf2d7c350fc84d] \"resolving intent ambiguities by retrieving discriminative clarifying questions\" (2020): rule-based system generates discriminative questions to disambiguate between two intents; no annotated clarification data needed; extensible to multiple intents.\nN27. [coarse:44345127a943] RPA framework (2023): systematic literature review analyzing RPA implementation studies regarding process selection and criteria.\nN28. [coarse:706eb475cb84] RPA framework: utilized six electronic repositories (IEEE, ACM, SCHOLAR, SpringerLink, Web of Science, Scopus) with search string combining RPA terms with selection or criteria.\nN29. [coarse:a14d51f5db89] RPA framework: only English publications considered.\nN30. [sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui] Pumice: error recovery and backtracking is crucial for interactive EUD systems; concepts like \"hot\" reused at three levels (same, different threshold, different value query).\nN31. [sciverse_dilogics_creating_web_automation_programs_with_diverse_logics] DiLogics error handling: 9/10 users edited input data table to rephrase segmented steps to appropriate detail; error repair techniques used at every stage.\nN32. [arxiv_2404.02817] TAMP error recovery: robust policies critical to prevent and recover from errors in unstructured environments; Pan et al. propose TAMP framework accounting for potential failures.\nN33. [9e7def1947b68f] Pumice paper: end users often use unclear, ambiguous or vague concepts when naturally describing tasks.\nN34. [2126de54413e63] Pumice paper: existing systems have limited support for letting the user teach agents new concepts.\nN35. [2472372c003255] Pumice: end-user programmable agent implementing multi-modal interaction for task automation.\nN36. [733f8f05193069] Pumice paper: existing natural language programming systems are not adequate for supporting end-user task automation.\n[unsourced] N37. [external] \"implementing robust and low-maintenance RPA solutions in large organisations\" (2018): focuses on exception handling, work queue and data management strategies to increase robustness of robots while they interact with external applications and environment instabilities.\n[unsourced] N38. [external] \"understanding and resolving failures in human-robot interaction: literature review and model development\" (2018): 52 studies on communicating failures and their causes, influence of failures on HRI, and mitigating failures; robots in unstructured environments challenged by frequent failures; little research on these topics within HRI community.",
+  "gaps_final": "G1. RPA framework paper: what does it say about exception handling / user intent in failure cases? (findings returned only methodology, not substantive content on failure handling)\nG2. More external methods: clarification question generation, disambiguation in voice assistants, RPA exception handling, human-in-the-loop intent recovery.\nG3. Specific failure-case handling: what happens when automation fails - clarification, fallback, escalation patterns.\nG4. The \"exception handling in agent systems\" (1999) paper from external search - potentially highly relevant to failure-case intent elicitation.",
+  "queried": [
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"ambiguity|clarification|intent elicitation|disambiguation|user intent\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"ambiguity|clarification|failure|recovery|fallback\"}",
+   "gap_search|{\"query\": \"methods to elicit user intent when automation encounters ambiguity or failure\"}",
+   "search_papers|{\"k\": 10, \"query\": \"eliciting user intent clarification questions ambiguous automation failure recovery\"}",
+   "card|{\"entity\": \"existing methods\"}",
+   "findings|{\"contains\": \"ambiguity|clarification|intent|disambiguation|user\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"contains\": \"ambiguity|failure|clarification|intent|error|recovery\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "search_papers|{\"k\": 10, \"query\": \"clarification question generation disambiguation voice assistant intent elicitation human-in-the-loop automation exception handling\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarification|control|failure|error|user\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarification|failure|error|recovery|user|misunderstanding\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarification|failure|error|user|exception\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarification|failure|error|exception|user|recovery\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarification|failure|error|user|query\", \"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "search_papers|{\"k\": 10, \"query\": \"clarification question generation ambiguous user intent voice assistant disambiguation human-in-the-loop\"}",
+   "search_papers|{\"k\": 10, \"query\": \"robotic process automation exception handling failure recovery user intent clarification fallback\"}",
+   "findings|{\"contains\": \"exception|failure|error|user|intent|clarification|ambiguity|recovery|fallback\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "search_papers|{\"k\": 10, \"query\": \"human-in-the-loop clarification when automated system fails exception handling user confirmation intent recovery\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "search_papers|{\"k\": 10, \"query\": \"clarification question generation ambiguous intent disambiguation dialogue system mixed-initiative\"}",
+   "search_papers|{\"k\": 10, \"query\": \"exception handling agent systems failure recovery user confirmation intent elicitation automation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "card|{\"entity\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "search_text|{\"k\": 12, \"query\": \"exception handling failure recovery user intent clarification automation\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "search_text|{\"k\": 12, \"query\": \"clarification question generation ambiguous intent disambiguation dialogue system mixed-initiative\"}",
+   "findings|{\"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "search_papers|{\"k\": 10, \"query\": \"exception handling robotic process automation failure recovery human intervention user intent clarification\"}",
+   "card|{\"entity\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"contains\": \"exception|failure|error|handling|recovery|user|intent|clarif\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "findings|{\"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "findings|{\"paper_id\": \"sciverse_a_framework_to_support_robotic_process_automation\"}",
+   "search_papers|{\"k\": 10, \"query\": \"clarification question generation ambiguous user intent disambiguation dialogue system mixed-initiative\"}"
+  ],
+  "gate": {
+   "note_rejects": 202,
+   "numeric_fail": {
+    "missing_nums": [
+     "52"
+    ],
+    "unsourced": [],
+    "altered_titles": []
+   },
+   "repair": 1,
+   "gate_passed": false,
+   "a_rows": 15,
+   "a_chars": 1229,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 202
+   },
+   "_consec_full_reject": 2,
+   "merge_downgraded_lines": 205,
+   "merge_total_lines": 940,
+   "relaxed_writes": 30,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:7060ead8ce51] methods by a factor of at least=10 | src:card@step1",
+   "A2. [be534c22028af4] ppo Prompts per customer=6.01 | src:card@step8 | epi:stated",
+   "A3. [0df30912aa16e6] KL reward coefficient is around=0.01 | src:card@step8",
+   "A4. [71db39534160da] ppo Prompts per customer=31.55 | src:card@step8 | epi:stated",
+   "A5. [10489744047440] ppo Mean prompt length=166 | src:card@step8 | epi:stated",
+   "A6. [f1977226ba124e] ppo Mean prompt length=186 | src:card@step8 | epi:stated",
+   "A7. [3af5660472955e] ppo train customer size=31,144 | src:card@step8",
+   "A8. [d2fbcfe3abf165] ppo valid customer size=16,185 | src:card@step8",
+   "A9. [079d3e845ed608] ppo init model training configuration=two epochs, with 10% pretraini | src:card@step8",
+   "A10. [d4f927b4c9dd72] ppo learning rate=2.55e-6 to 2.55e-5 | src:card@step8",
+   "A11. [423e27f7674552] ppo learning rate=2.55e-6 and 3.74e-06 | src:card@step8",
+   "A12. [c0be8ac8bfd8bb] act forgetting frequency=500 steps | src:card@step14",
+   "A13. [28fcf7e881e197] act embedding matrix scheduling=independently across the 500 s | src:card@step14",
+   "A14. [290d6a89d34d57] act scheduler for the body=cosine scheduler | src:card@step14",
+   "A15. [045110fd5b94de] act checkpoint selection=checkpoint with the lowest val | src:card@step14"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "948b6cb986a5d7732722975d",
+  "type": "aggregation",
+  "question": "What are leading approaches for evaluating complex scientific question answering systems in NLP?",
+  "gold_hint": "",
+  "answer": "Evaluating complex scientific question answering (QA) systems in Natural Language Processing (NLP) involves a diverse array of approaches, ranging from comprehensive datasets designed to test scientific context understanding to frameworks that prioritize reproducibility and fairness. A leading approach in this domain is the use of specialized datasets that assess the depth of scientific knowledge and context comprehension. For instance, SciCUEval is described as a comprehensive dataset specifically developed for evaluating scientific context understanding in Large Language Models (LLMs) . Similarly, the SF-QA framework offers a \"simple and fair\" evaluation methodology for open-domain QA, which modularizes the pipeline to enhance accessibility and reproducibility for researchers . These datasets and frameworks address the specific needs of scientific QA by moving beyond general language tasks to focus on domain-specific accuracy and structural integrity.\n\nIn addition to domain-specific datasets, evaluation methodologies often incorporate rigorous human assessment protocols, particularly when dealing with novel scientific research ideas. The consulted records indicate that for such evaluations, the evaluator must be a domain expert with at least five years of experience and a publication record of five or more papers in the relevant topic . This high threshold for human evaluators underscores the complexity of scientific QA, where automated metrics may not fully capture the validity of the generated answers.\n\nHowever, the reliance on LLMs for both generating and evaluating QA content introduces significant challenges regarding reliability. The notes highlight that LLM-generated QA suffers from output variability and hallucinations, which threaten the overall reliability of the evaluation process . Specifically, hallucinations may introduce information that is not present in the source context or violate specific prompt constraints, thereby compromising the integrity of the evaluation . To mitigate these issues, some approaches leverage LLM text generation to create questions based on given context and answers, a method used in testing QA software .\n\nWhile the primary focus is on scientific QA, general QA evaluation metrics and benchmarks provide foundational context. For example, the DROP dataset, which contains 9,536 examples, utilizes a few-shot setting with four passages and employs the F1 score as its primary evaluation metric . In the realm of chart-based QA, which can be relevant for scientific data visualization, the ChartQA benchmark uses a \"relaxed accuracy\" metric, a standard also applied in other chart QA benchmarks such as ChartCheck, Chocolate, ChartLlama, and ChartX . Furthermore, the evolution of QA systems has seen a shift from rule-based methods to modern approaches, with models like ELMo previously achieving state-of-the-art performance  [acd1ce4c320f5d]. However, a notable disconnect exists between QA performance and summary quality, suggesting that high scores on QA tasks do not necessarily translate to high-quality summarization capabilities [46a0c86e22d431].\n\nRegarding the specific dimensions of evaluation for complex scientific QA, the consulted records did not surface detailed metrics or specific methodological dimensions beyond the general descriptions of SciCUEval, SF-QA, and the human expert criteria. The notes indicate that existing work, such as CCSBench, primarily evaluates LLMs under single-constraint settings, such as formality, rather than complex multi-constraint scientific scenarios . Additionally, a novel \"question-to-question\" approach has been proposed for Knowledge Base QA, which may offer alternative evaluation pathways [85b792f94cb5f0]. The records also reference other relevant works, including deep learning approaches for improving QA systems in hepatocellular contexts and SciRAG, but specific details on their evaluation metrics were not provided in the available notes. Consequently, while the landscape includes comprehensive datasets like SciCUEval and frameworks like SF-QA, the specific granular metrics for evaluating complex scientific reasoning remain under-detailed in the consulted sources.",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "question answering"
+    },
+    "intent": "Get cross-paper evidence dossier on QA evaluation approaches",
+    "obs_chars": 2582,
+    "notes_chars": 1089
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Knowledge-based question answering"
+    },
+    "intent": "Get dossier on knowledge-based QA evaluation",
+    "obs_chars": 467,
+    "notes_chars": 1089
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "evaluation benchmark scientific question answering complex",
+     "k": 12
+    },
+    "intent": "Find papers discussing evaluation of scientific QA systems",
+    "obs_chars": 1749,
+    "notes_chars": 1089
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "question answering",
+     "claim_type": "definition",
+     "contains": "evaluation|benchmark|metric|assess"
+    },
+    "intent": "Find definition/evaluation records for QA systems",
+    "obs_chars": 537,
+    "notes_chars": 1089
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "SciCUEval"
+    },
+    "intent": "Get full dossier on SciCUEval - scientific context understanding evaluation dataset",
+    "obs_chars": 372,
+    "notes_chars": 1543
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "ccsbench"
+    },
+    "intent": "Get full dossier on CCSBench - compositional controllability in LLMs for scientific documents",
+    "obs_chars": 557,
+    "notes_chars": 1543
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "SF-QA"
+    },
+    "intent": "Get full dossier on SF-QA evaluation library for open-domain QA",
+    "obs_chars": 356,
+    "notes_chars": 1543
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition|recommendation|observation"
+    },
+    "intent": "Get findings from the SciCUEval paper on what it evaluates and how",
+    "obs_chars": 268,
+    "notes_chars": 1543
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:",
+     "N7. [card errors] SciCUEval, ccsbench, SF-QA are out-of-corpus names (no compiled dossiers). Use fin"
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "entity": "SciCUEval",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview of SciCUEval evaluation framework",
+    "obs_chars": 537,
+    "notes_chars": 1504
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "entity": "SF-QA",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview of SF-QA evaluation library",
+    "obs_chars": 496,
+    "notes_chars": 1504
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview of CCSBench evaluation",
+    "obs_chars": 545,
+    "notes_chars": 1504
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview of context-driven QA testing approach",
+    "obs_chars": 1555,
+    "notes_chars": 1504
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "observation|mechanism|recommendation"
+    },
+    "intent": "Get deeper findings on SciCUEval evaluation dimensions and metrics",
+    "obs_chars": 267,
+    "notes_chars": 1959
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "observation|mechanism|recommendation"
+    },
+    "intent": "Get deeper findings on CCSBench evaluation approach",
+    "obs_chars": 267,
+    "notes_chars": 1959
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "observation|mechanism|recommendation"
+    },
+    "intent": "Get deeper findings on SF-QA evaluation methodology",
+    "obs_chars": 267,
+    "notes_chars": 1959
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu",
+     "claim_type": "observation|mechanism|recommendation|definition"
+    },
+    "intent": "Get findings on scientific (hepatocellular) QA evaluation approaches",
+    "obs_chars": 271,
+    "notes_chars": 1959
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin"
+    },
+    "intent": "Get observation findings from SciCUEval paper",
+    "obs_chars": 1612,
+    "notes_chars": 1959
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen"
+    },
+    "intent": "Get mechanism findings from CCSBench paper",
+    "obs_chars": 545,
+    "notes_chars": 1959
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "arxiv_2101.01910"
+    },
+    "intent": "Get recommendation findings from SF-QA paper",
+    "obs_chars": 968,
+    "notes_chars": 1959
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "paper_id": "sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu"
+    },
+    "intent": "Get definition findings from hepatocellular QA paper",
+    "obs_chars": 2153,
+    "notes_chars": 1959
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "SciCUEval"
+    },
+    "intent": "Get full dossier on SciCUEval: configs, results, findings, lineage",
+    "obs_chars": 372,
+    "notes_chars": 1959
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "CCSBench"
+    },
+    "intent": "Get full dossier on CCSBench: configs, results, findings, lineage",
+    "obs_chars": 557,
+    "notes_chars": 1959
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition|observation|mechanism|recommendation"
+    },
+    "intent": "Get all finding records from SciCUEval paper for evaluation dimensions and metrics",
+    "obs_chars": 271,
+    "notes_chars": 1959
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition|observation|mechanism|recommendation"
+    },
+    "intent": "Get all finding records from CCSBench paper for evaluation approach details",
+    "obs_chars": 271,
+    "notes_chars": 1959
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "definition|observation|mechanism|recommendation"
+    },
+    "intent": "Get all finding records from SF-QA paper for evaluation framework details",
+    "obs_chars": 271,
+    "notes_chars": 1959
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu",
+     "claim_type": "definition|observation|mechanism|recommendation"
+    },
+    "intent": "Get findings from hepatocellular QA paper for domain-specific evaluation approaches",
+    "obs_chars": 271,
+    "notes_chars": 1959
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "query": "scientific question answering evaluation benchmark metrics",
+     "k": 12
+    },
+    "intent": "Find specific evaluation metrics and benchmarks for scientific QA",
+    "obs_chars": 1749,
+    "notes_chars": 1879
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "query": "complex reasoning evaluation LLM scientific domain",
+     "k": 12
+    },
+    "intent": "Find approaches for evaluating complex reasoning in scientific QA",
+    "obs_chars": 1867,
+    "notes_chars": 1879
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "question answering",
+     "claim_type": "definition|recommendation",
+     "contains": "evaluation|benchmark|metric|assess"
+    },
+    "intent": "Find evaluation-related findings about QA systems",
+    "obs_chars": 256,
+    "notes_chars": 1879
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat"
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "[unsourced] N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluation methods/benchmarks/datasets/metrics.\n[unsourced] N2. [plan] Key corpus papers: sciverse_scicueval, sciverse_ccsbench, arxiv_2101.01910 (SF-QA), sciverse_testing_question_answering_software, sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu, sciverse_scirag, sciverse_question_to_question_retrieval.\nN3. [card:question answering] General QA: CommonsenseQA [ff0bbe612d9c0d]; rule-based to modern [coarse:b6cbee82715d]; ELMo SOTA [acd1ce4c320f5d]; QA-performance vs summary-quality disconnect [46a0c86e22d431].\nN4. [card:KBQA] Novel \"question-to-question\" approach [85b792f94cb5f0].\nN5. [hub_W4226278401#153900] DROP: 9,536 examples, few-shot 4 passages, F1 metric | anchor:\"9,536 examples...Evaluation metric is the f1 score\"\nN6. [arxiv_2403.12027#39150] ChartQA: relaxed accuracy metric for factoid chart QA; multiple chart QA benchmarks (ChartCheck, Chocolate, ChartLlama, ChartX) | anchor:\"relaxed accuracy metric proposed in [4] is usually used\"\nN7. [coarse:7909620cb436] SciCUEval: comprehensive dataset for evaluating scientific context understanding in LLMs | epistemic:stated\nN8. [coarse:a2b4aa30e466] SF-QA: simple and fair evaluation framework for open-domain QA; modularizes pipeline for accessibility/reproducibility | epistemic:stated\nN9. [coarse:28a0ca625866] CCSBench: existing work primarily evaluates LLMs under single-constraint settings (e.g., formality) | epistemic:stated\nN10. [coarse:14c2ef8e5d03] Testing QA software: leverages LLM text generation to generate questions given context+answer | epistemic:stated\nN11. [coarse:714bebc1eefa] LLM-generated QA: output variability and hallucinations threaten reliability | epistemic:stated\nN12. [coarse:63866fc823f0] Hallucinations may introduce info not in source context or violate prompt constraints | epistemic:stated\nN13. [sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_#24300] Human evaluation for scientific work: evaluator must be domain expert, 5+ yrs experience, 5+ papers | anchor:\"the evaluator must be an expert in the domain and topic\"",
+  "gaps_final": "G1. Deeper details on SciCUEval, CCSBench, SF-QA evaluation approaches (metrics, dimensions)\nG2. What metrics are used to evaluate complex scientific QA?\nG3. Leading methodological approaches for evaluating these systems\nG4. Specific datasets for scientific QA evaluation",
+  "queried": [
+   "card|{\"entity\": \"question answering\"}",
+   "card|{\"entity\": \"knowledge-based question answering\"}",
+   "search_text|{\"k\": 12, \"query\": \"evaluation benchmark scientific question answering complex\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"evaluation|benchmark|metric|assess\", \"entity\": \"question answering\"}",
+   "card|{\"entity\": \"scicueval\"}",
+   "card|{\"entity\": \"ccsbench\"}",
+   "card|{\"entity\": \"SF-QA\"}",
+   "findings|{\"claim_type\": \"definition|recommendation|observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"SciCUEval\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"SF-QA\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|recommendation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|recommendation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|recommendation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "findings|{\"claim_type\": \"observation|mechanism|recommendation|definition\", \"paper_id\": \"sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu\"}",
+   "card|{\"entity\": \"SciCUEval\"}",
+   "card|{\"entity\": \"CCSBench\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism|recommendation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism|recommendation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism|recommendation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism|recommendation\", \"paper_id\": \"sciverse_deep_learning_approaches_for_improving_question_answering_systems_in_hepatocellu\"}",
+   "search_text|{\"k\": 12, \"query\": \"scientific question answering evaluation benchmark metrics\"}",
+   "search_text|{\"k\": 12, \"query\": \"complex reasoning evaluation LLM scientific domain\"}",
+   "findings|{\"claim_type\": \"definition|recommendation\", \"contains\": \"evaluation|benchmark|metric|assess\", \"entity\": \"question answering\"}"
+  ],
+  "gate": {
+   "note_rejects": 14,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 14
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 28,
+   "merge_total_lines": 140,
+   "relaxed_writes": 13,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 10,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "144eea4816fa6949029e53eb",
+  "type": "aggregation",
+  "question": "What are leading methods for generating hard examples of the boolean satisfiability problem, and what are their strengths and weaknesses?",
+  "gold_hint": "",
+  "answer": "The generation of hard examples for the Boolean Satisfiability Problem (SAT) is a critical area of research, driven by the need to develop fast and robust solvers for this well-known NP-hard problem, which involves determining whether truth values can be assigned to variables to satisfy a given formula [coarse:95dc868991b0] [coarse:7421acb673bb]. Models for generating random instances of such search problems have received significant attention from the AI community over the last two decades, with results for SAT and Constraint Programming (CP) having a major impact on solver development [coarse:249b8b37c8e0] [coarse:aafb95514e42].\n\nOne leading approach involves the proposal of new models for generating hard random Boolean formulas and disjunctive logic programs [coarse:ff9e79730bd5]. These models are designed to exhibit an \"easy-hard-easy\" pattern that aligns with the phase transition phenomenon observed in random k-SAT [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#1350]. Theoretically, the phase transition is bounded by ratios of clauses to variables ($m/n$); if $m/n < \\rho_l(k)$, the instance is almost surely satisfiable, and if $m/n > \\rho_u(k)$, it is almost surely unsatisfiable, though the conjecture that $\\rho_l = \\rho_u$ remains open [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#4050]. The primary strength of these new models is that the generated formulas and programs are significantly harder than those produced by standard k-CNF models or the Chen-Interian models [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#1350]. Furthermore, combining these models yields even harder instances [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#1350]. Specifically, under the constraint of fixing the number of existential variables to the same value, the hardest formulas within this model framework are identified, with the hardest formulas over 70 variables noted in the findings [6023058225659a] [9471e911e6f3f6]. Additionally, a multi-component model is described as generating random instances with few components that are several orders of magnitude harder than standard instances [0f60696c5122d7].\n\nAnother methodological avenue involves reweighted belief propagation and quiet planting for random k-SAT [coarse:5d5f8900e083]. This approach is linked to the Valiant-Vazirani theorem, which provides a randomized polynomial-time reduction from SAT to Unique SAT [coarse:b7d78ab2230e]. The PPSZ algorithm highlights a gap between k-SAT and unique k-SAT for $k=3,4$, suggesting that uniqueness constraints can alter the hardness landscape [coarse:d4d37767e8c2].\n\nThe literature also references other significant models, such as the work by Ansótegui, Bonet, and Levy on \"Towards industrial-like random SAT instances\" (IJCAI 2009) and D. Achlioptas's work on \"Random satisfiability\" [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#74250] [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#72900]. However, the consulted records did not surface specific details regarding the strengths and weaknesses of the adaptive evolutionary algorithm for the satisfiability problem (2000) or the meta theorem for hardness on the FCP problem (2025). Similarly, the records did not provide detailed numeric comparisons of hardness across different methods beyond the qualitative statement that the new models are \"significantly harder\" and \"several orders of magnitude\" harder than standard baselines [0f60696c5122d7]. The specific limitations or criticisms of the proposed new models, beyond the open conjecture regarding phase transition bounds, were not detailed in the available records.",
+  "arm": "main",
+  "steps": 9,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "boolean satisfiability"
+    },
+    "intent": "dossier on the main entity: methods, findings, results panorama",
+    "obs_chars": 1309,
+    "notes_chars": 664
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "contains": "hard|generate|random|formula|satisfiability|phase transition"
+    },
+    "intent": "findings from the directly on-topic 2018 paper",
+    "obs_chars": 1585,
+    "notes_chars": 664
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "generating hard random boolean formulas satisfiability instances",
+     "k": 12
+    },
+    "intent": "lexical+semantic sweep for hard-instance generation content",
+    "obs_chars": 2180,
+    "notes_chars": 664
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "sat",
+     "claim_type": "mechanism",
+     "contains": "hard|generate|random|instance|formula"
+    },
+    "intent": "mechanism records about generating hard SAT instances",
+    "obs_chars": 2085,
+    "notes_chars": 664
+   },
+   {
+    "step": 2,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "sections": [
+      "introduction",
+      "method",
+      "experiments",
+      "conclusion"
+     ]
+    },
+    "intent": "Extract the specific models proposed for generating hard SAT instances, their mechanisms, and any reported strengths/wea",
+    "obs_chars": 1985,
+    "notes_chars": 3204
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "criticism"
+    },
+    "intent": "Find self-limiting statements / weaknesses of the proposed methods",
+    "obs_chars": 527,
+    "notes_chars": 3204
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records explaining how the hard-instance generation works",
+    "obs_chars": 527,
+    "notes_chars": 3204
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "hard SAT instance generation phase transition planted satisfiability Achlioptas model strengths weaknesses",
+     "k": 12
+    },
+    "intent": "Find additional corpus content on hard SAT generation methods and their properties",
+    "obs_chars": 2187,
+    "notes_chars": 3204
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records (empirical findings about hardness) from the 2018 paper",
+    "obs_chars": 2715,
+    "notes_chars": 5103
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "sat"
+    },
+    "intent": "Get cross-paper evidence dossier for SAT entity to find other methods for generating hard instances",
+    "obs_chars": 348,
+    "notes_chars": 5103
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the 2000 evolutionary algorithm paper for SAT",
+    "obs_chars": 472,
+    "notes_chars": 5103
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of the specific models proposed (controlled model, multi-component model)",
+    "obs_chars": 3872,
+    "notes_chars": 4411
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_meta_theorem_for_hardness_on_fcp_problem",
+     "claim_type": "observation"
+    },
+    "intent": "What the meta theorem for hardness on FCP problem says about hard instance generation",
+    "obs_chars": 527,
+    "notes_chars": 4411
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem",
+     "claim_type": "observation"
+    },
+    "intent": "What the adaptive evolutionary algorithm paper contributes to hard SAT generation",
+    "obs_chars": 472,
+    "notes_chars": 4411
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "controlled model multi-component model hard SAT generation strengths weaknesses limitations"
+    },
+    "intent": "Find detailed descriptions of the controlled model and its strengths/weaknesses",
+    "obs_chars": 2185,
+    "notes_chars": 4411
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "contains": "limitation|weakness|not|cannot|difficult|problem|issue|drawback"
+    },
+    "intent": "Find criticism/limitation records for the 2018 paper's proposed models",
+    "obs_chars": 639,
+    "notes_chars": 2968
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "contains": "harder|easier|comparison|Chen-Interian|standard|k-CNF|performance|solver"
+    },
+    "intent": "Find observation records comparing hardness of different models",
+    "obs_chars": 2790,
+    "notes_chars": 2968
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "planted SAT Achlioptas model hard instance generation strengths weaknesses limitations"
+    },
+    "intent": "Search for external methods for generating hard SAT instances and their properties",
+    "obs_chars": 2183,
+    "notes_chars": 2968
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_meta_theorem_for_hardness_on_fcp_problem",
+     "contains": "hard|SAT|satisfiability|instance|generation"
+    },
+    "intent": "Find what the meta theorem paper says about hard SAT instances",
+    "obs_chars": 527,
+    "notes_chars": 2968
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "new models for generating hard random boolean formulas and disjunctive logic programs"
+    },
+    "intent": "Get full dossier for the main on-topic paper to see all findings, configs, results, and lineage",
+    "obs_chars": 583,
+    "notes_chars": 2968
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 9,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Question: leading methods for generating hard SAT examples + strengths/weaknesses.\nCorpus papers:\n- sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro (2018) — directly on-topic\n- sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem (2000)\n- sciverse_a_simple_and_efficient_boolean_solver_for_constraint_logic_programming (1996)\n- sciverse_meta_theorem_for_hardness_on_fcp_problem (2025)\n- sciverse_reweighted_belief_propagation_and_quiet_planting_for_random_k_sat\n- sciverse_uniquely_satisfiable_d_regular_k_s_sat_instances\n- sciverse_encyclopedia_of_algorithms\nN1. [coarse:ff9e79730bd5] Paper proposes new models for generating hard random boolean formulas and disjunctive logic programs | epistemic:stated\nN2. [coarse:249b8b37c8e0] Models for generating random instances of search problems have received much attention from AI community in last 20 years | epistemic:stated\nN3. [coarse:aafb95514e42] Results for SAT and CP have had major impact on development of fast and robust solvers | epistemic:stated\nN4. [coarse:95dc868991b0] SAT is a well-known NP-hard problem with relevant practical applications | epistemic:stated\nN5. [coarse:7421acb673bb] SAT = determine whether truth values can be assigned to variables | epistemic:stated\nN6. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#74250] References include Ansótegui, Bonet, Levy \"Towards industrial-like random SAT instances\" (IJCAI 2009)\nN7. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#72900] References include D. Achlioptas \"Random satisfiability\"\nN8. [coarse:5d5f8900e083] Reweighted belief propagation and quiet planting discussed for random k-SAT | epistemic:stated\nN9. [coarse:b7d78ab2230e] Valiant and Vazirani gave randomized polynomial time reduction from SAT to Unique SAT | epistemic:stated\nN10. [coarse:d4d37767e8c2] PPSZ algorithm: gap between k-SAT and unique k-SAT for k=3,4 | epistemic:stated\nN11. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#1350] Models show easy-hard-easy pattern aligned with phase transition; formulas/programs significantly harder than standard k-CNF and Chen-Interian models; combination yields even harder instances\nN12. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#4050] Phase transition bounds: if m/n < rho_l(k) almost surely SAT; if m/n > rho_u(k) almost surely UNSAT; conjecture rho_l=rho_u still open\nN13. [6023058225659a] Under constraint of fixing number of existential variables to same value, hardest formulas in [model]\nN14. [112c737b41ab9c] Since we consider disjunctions of t CNF formulas where t is fixed, probability of such a disjunction being [satisfiable/unsatisfiable]\nN15. [0f60696c5122d7] Multi-component model generates random instances with few components that are several orders of magnitude [harder]",
+  "gaps_final": "G1. Need more detail on controlled model specifics and its strengths/weaknesses\nG2. Strengths/weaknesses (criticism/limitation records) of the proposed methods\nG3. Numeric results comparing hardness of generated instances\nG4. What other methods (Achlioptas, planted SAT, phase transition) are referenced and their strengths/weaknesses\nG5. What does the adaptive evolutionary algorithm paper (2000) contribute?\nG6. What does the meta theorem for hardness on FCP problem (2025) say?\nG7. Need to check for external methods (planted SAT, Achlioptas model, etc.) via external search",
+  "queried": [
+   "card|{\"entity\": \"boolean satisfiability\"}",
+   "findings|{\"contains\": \"hard|generate|random|formula|satisfiability|phase transition\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "search_text|{\"k\": 12, \"query\": \"generating hard random boolean formulas satisfiability instances\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"hard|generate|random|instance|formula\", \"entity\": \"sat\"}",
+   "deep_read|{\"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\", \"sections\": [\"introduction\", \"method\", \"experiments\", \"conclusion\"]}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "search_text|{\"k\": 12, \"query\": \"hard SAT instance generation phase transition planted satisfiability Achlioptas model strengths weaknesses\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "card|{\"entity\": \"sat\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_meta_theorem_for_hardness_on_fcp_problem\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem\"}",
+   "search_text|{\"k\": 12, \"query\": \"controlled model multi-component model hard SAT generation strengths weaknesses limitations\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"limitation|weakness|not|cannot|difficult|problem|issue|drawback\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"harder|easier|comparison|Chen-Interian|standard|k-CNF|performance|solver\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_d",
+   "search_text|{\"k\": 12, \"query\": \"planted SAT Achlioptas model hard instance generation strengths weaknesses limitations\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"hard|SAT|satisfiability|instance|generation\", \"paper_id\": \"sciverse_meta_theorem_for_hardness_on_fcp_problem\"}",
+   "card|{\"entity\": \"new models for generating hard random boolean formulas and disjunctive logic programs\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 2,
+   "a_chars": 130,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 5,
+   "_consec_full_reject": 0,
+   "notes_truncated": 10766,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 19,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [bad6b0e7e1cfd5] is at least=3.52 | src:findings@step2",
+   "A2. [9471e911e6f3f6] The hardest formulas over=70 | src:findings@step4"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "6f526f72804ce3eb59feb704",
+  "type": "aggregation",
+  "question": "What are good practices for detecting AI-generated texts in situations where false positives are extremely expensive?",
+  "gold_hint": "",
+  "answer": "When false positives are extremely expensive—such as in academic integrity enforcement, legal document authentication, medical record verification, or content moderation where wrongly flagging a human author carries severe consequences—several good practices emerge from the current literature on AI-generated text detection:\n\n**1. Prioritize FPR control over AUROC**\n\nThe most fundamental practice is to evaluate and select detectors based on their false positive rate (FPR) rather than area under the ROC curve (AUROC). AUROC inherently favors threshold-dependent methods and is inadequate for practical FPR control [704524f84d3d18]. Only low-FPR systems are considered good and reliable for commercial applications, as they minimize harm to users [coarse:1d670f2453e3]. Detectors should be carefully evaluated using the FPR metric specifically for the operating point that matters in the deployment context [coarse:323a00146e97].\n\n**2. Use threshold-free or self-calibrating architectures**\n\nExternal threshold calibration introduces variability and inconsistent or suboptimal accuracy in real-world deployment [36f1c3aa8e292c]. Existing methods heavily depend on large annotated datasets and external threshold tuning, which restricts interpretability, adaptability, and zero-shot applicability [3bd526b96244e6]. A key practice is to adopt architectures that eliminate the need for external calibration datasets, which are often unavailable in practice [503c7c746c96a5]. Agent-X demonstrates a threshold-free aggregation strategy that eliminates dependency on external calibration [52b8221c6a89a1], providing a practical solution for real-world zero-shot scenarios [af3e1a97ca0eb0].\n\n**3. Employ multi-agent or ensemble architectures with confidence-aware aggregation**\n\nSingle-LLM approaches suffer from inherently skewed and poorly calibrated probability distributions [775d6824723d77], and uncalibrated LLM predictions are systematically over- or under-confident [c59580acec76e4]. A multi-agent framework that decomposes detection into specialized sub-tasks (e.g., semantic, stylistic, structural analysis) and aggregates via confidence-aware meta-aggregation inherently circumvents the calibration issues of single-LLM approaches [9d10b467f771bb]. Agent-X's architecture—comprising a router agent, guideline-specific base agents, and a meta agent—achieves interpretable, threshold-free classification [c9fda652b29db8] [2aeaa97572a101]. Domain-gated ensemble networks (DoGEN) similarly ensemble domain-expert detectors with domain classifier weights to improve robustness [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752].\n\n**4. Apply semantic-steering or explicit calibration techniques**\n\nWhen calibration is needed, semantic-steering calibration significantly reduces the gap between predicted confidence and actual accuracy [122ca99de619aa], resulting in better-aligned and more reliable confidence estimates [c017bb3306c342] [a6ef241fa1487f]. This is particularly important because prompt-based methods yield discrete predictions and uncalibrated confidence [2c1bb81202c8bc].\n\n**5. Require interpretability and explainability**\n\nDetection algorithms must clearly interpret and explain the critical factors leading to their classification decisions [coarse:ff9110af9ad1]. In high-stakes settings, a black-box flag without explanation is insufficient for due process. Agent-X's design, where each linguistic agent provides explicit reasoning for its assessment [f1b6c40ee73c93], exemplifies this practice.\n\n**6. Mandate human-in-the-loop review**\n\nEven high-performing detectors should not make definitive judgments autonomously. VietBinoculars explicitly states that labeling results should be regarded as reference guidance rather than definitive judgments, with final decisions made under careful human supervision [7d2e5ce68c8212]. This is especially critical given that current detectors struggle to differentiate degrees of AI involvement and may flag minimally polished human text as AI-generated [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb].\n\n**7. Account for domain and language generalization gaps**\n\nDetectors that perform well on one domain or language may generalize poorly to others. Fast-DetectGPT, for example, generalizes poorly to biomedical texts [6dcb23856ed045]. Vietnamese text exhibits lower TPR at low FPR and is more prone to mispredictions compared to well-represented languages [f3e9b41207f55a]. Cross-domain and cross-generator evaluations reveal substantial generalization gaps [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f]. Good practice therefore includes validating the detector on the specific domain and language of the deployment target, and using domain-adaptive or domain-gated architectures.\n\n**8. Use statistical (white-box) methods where model access is available**\n\nWhite-box methods that use model-internal metrics such as entropy, likelihood, and log-rank [coarse:931eb18f4efd] can achieve very low FPR. Binoculars, for instance, achieves over 90% accuracy detecting ChatGPT-generated English text at an FPR of 0.01% without being trained on ChatGPT data [8a1bfe363778ef], and demonstrates superior reliability compared to Ghostbuster on out-of-domain datasets [3bc2e497da2e6d]. VietBinoculars achieves at least 99% accuracy, F1, and AUC on out-of-domain data [183d0298ffa488], with its Closest Point threshold achieving the highest performance [0808a5d87c4f74]. However, black-box approaches like DetectGPT and NPR require multiple evaluations or generations, incurring high computational overhead [coarse:2dfc8f883fe3], which may be prohibitive in some settings.\n\n**9. Ensure cost-effectiveness and balanced detection**\n\nThe detection algorithm should be cost-effective and accurately detect both classes (AI-generated and human-written) [coarse:86d064c4569b]. In high-stakes settings, the cost of a false positive (wrongly accusing a human author) must be weighed against the cost of a false negative (missing AI-generated content), and the operating point should be set accordingly.\n\n**10. Be aware of the \"almost AI, almost human\" problem**\n\nRecent evaluations of 12 state-of-the-art detectors on the APT-Eval benchmark show that detectors flag minimally polished text as AI and struggle to differentiate degrees of AI involvement [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb]. EditLens addresses this by quantifying the degree of AI editing rather than making a binary human/AI judgment [83f2d2b74636cb311e853a107623fe9f9e6939449d4ebfd422daf0ed6d61b2ef]. In high-stakes settings, a graded assessment of AI involvement is preferable to a binary flag.\n\n**Summary of key practices:**\n- Select and evaluate detectors at the FPR operating point relevant to your deployment, not by AUROC alone\n- Prefer threshold-free or self-calibrating architectures to avoid external calibration fragility\n- Use multi-agent/ensemble designs with confidence-aware aggregation for robust, interpretable decisions\n- Apply explicit calibration (e.g., semantic-steering) when using LLM-based detectors\n- Require explainability: the system must articulate why it flagged a text\n- Always include human review as the final decision gate\n- Validate on the target domain and language; expect generalization gaps\n- Consider statistical white-box methods (Binoculars, Fast-DetectGPT) when model access permits very low FPR\n- Account for the spectrum of AI involvement rather than assuming a binary human/AI distinction\n- Ensure the system is cost-effective and balanced in its detection of both classes",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ai-generated text detection"
+    },
+    "intent": "Cross-paper evidence dossier for the main entity",
+    "obs_chars": 413,
+    "notes_chars": 644
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "recommendation"
+    },
+    "intent": "Recommendations from the threshold-free AI-generated text detection paper",
+    "obs_chars": 1474,
+    "notes_chars": 644
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "recommendation"
+    },
+    "intent": "Recommendations from the Vietnamese LLM-generated text detection paper",
+    "obs_chars": 1514,
+    "notes_chars": 644
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "recommendation"
+    },
+    "intent": "All recommendation-type findings tied to the entity",
+    "obs_chars": 537,
+    "notes_chars": 644
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "criticism"
+    },
+    "intent": "agent-x self-limitations/weaknesses re false positives",
+    "obs_chars": 1474,
+    "notes_chars": 1824
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "criticism"
+    },
+    "intent": "vietbinoculars self-limitations re false positives",
+    "obs_chars": 499,
+    "notes_chars": 1824
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "mechanism"
+    },
+    "intent": "how agent-x threshold-free mechanism controls false positives",
+    "obs_chars": 1474,
+    "notes_chars": 1824
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "mechanism"
+    },
+    "intent": "vietbinoculars mechanism + FPR handling",
+    "obs_chars": 499,
+    "notes_chars": 1824
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "false positive|FPR|threshold|reliability|practical"
+    },
+    "intent": "Find recommendation records about controlling false positives in AI-text detection",
+    "obs_chars": 3958,
+    "notes_chars": 1824
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "false positive|FPR|reliability|limitation|weakness"
+    },
+    "intent": "Find criticism/limitation records about false positive issues in AI-text detection",
+    "obs_chars": 3830,
+    "notes_chars": 1824
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "threshold|adaptive|guideline|expert network|zero-shot"
+    },
+    "intent": "Find mechanism records about how agent-x and vietbinoculars work",
+    "obs_chars": 2348,
+    "notes_chars": 1824
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "false positive|FPR|reliability|practical|commercial"
+    },
+    "intent": "Find observation records about false positive behavior in AI-text detection",
+    "obs_chars": 2235,
+    "notes_chars": 1824
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation records from agent-x paper to understand its approach and findings about threshold-free detection",
+    "obs_chars": 1474,
+    "notes_chars": 2008
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation records from vietbinoculars paper to understand its approach and findings",
+    "obs_chars": 963,
+    "notes_chars": 2008
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "false positive rate threshold AI generated text detection best practice",
+     "k": 12
+    },
+    "intent": "Search full texts for specific guidance on controlling false positives in AI text detection",
+    "obs_chars": 1890,
+    "notes_chars": 2008
+   },
+   {
+    "step": 5,
+    "tool": "find_gap",
+    "args": {
+     "entity": "ai-generated text detection"
+    },
+    "intent": "Check what the corpus records as absent/missing for AI text detection - what limitations or unaddressed aspects are note",
+    "obs_chars": 120,
+    "notes_chars": 2008
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "detection algorithm"
+    },
+    "intent": "Check if 'detection algorithm' (nearest to ai-generated text detection) has a dossier with relevant findings",
+    "obs_chars": 629,
+    "notes_chars": 2426
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "query": "best practices AI-generated text detection false positive rate threshold reliability",
+     "k": 8
+    },
+    "intent": "External search for papers on good practices in AI-text detection with emphasis on false positive control",
+    "obs_chars": 2434,
+    "notes_chars": 2426
+   },
+   {
+    "step": 6,
+    "tool": "lineage",
+    "args": {
+     "entity": "ai-generated text detection"
+    },
+    "intent": "Check lineage edges for AI-generated text detection to find related methods and their evolution",
+    "obs_chars": 74,
+    "notes_chars": 2426
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N11. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "sections": [
+      "method",
+      "experimental setup",
+      "conclusion"
+     ]
+    },
+    "intent": "Get specific mechanism details of Agent-X's threshold-free approach and any FPR-related findings",
+    "obs_chars": 2018,
+    "notes_chars": 3724
+   },
+   {
+    "step": 7,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "sections": [
+      "method",
+      "conclusion",
+      "discussion"
+     ]
+    },
+    "intent": "Get Vietbinoculars' specific recommendations and FPR control practices",
+    "obs_chars": 1609,
+    "notes_chars": 3724
+   },
+   {
+    "step": 7,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "calibrated AI text detection false positive control human-in-the-loop high-stakes NLP classification"
+    },
+    "intent": "Find external papers on calibrated detection, FPR control, and human-in-the-loop practices for high-stakes AI text detec",
+    "obs_chars": 2539,
+    "notes_chars": 3724
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N11. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N20. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): AIGT"
+    ]
+   },
+   {
+    "step": 8,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "high-stakes AI text detection false positive control calibrated confidence human review threshold setting"
+    },
+    "intent": "Find external papers specifically addressing FPR control in high-stakes AI text detection",
+    "obs_chars": 2514,
+    "notes_chars": 5913
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N11. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N20. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): AIGT"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "recommendation",
+     "contains": "false positive|FPR|threshold|calibrat|reliab|practical|commercial|human review"
+    },
+    "intent": "Get recommendation-type findings specifically about FPR control and practical deployment practices for AI text detection",
+    "obs_chars": 537,
+    "notes_chars": 6591
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "definition",
+     "contains": "false positive|FPR|threshold|calibrat|reliab|practical|commercial|human review"
+    },
+    "intent": "Get definition-type findings about FPR, calibration, and reliability in AI text detection context",
+    "obs_chars": 537,
+    "notes_chars": 6591
+   },
+   {
+    "step": 9,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "AI text detection false positive rate control high-stakes applications calibrated classifier human-in-the-loop review workflow"
+    },
+    "intent": "Find external papers specifically about FPR control and human-in-the-loop for high-stakes AI text detection",
+    "obs_chars": 2570,
+    "notes_chars": 6591
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "mechanism",
+     "contains": "guideline|expert|aggregation|threshold-free|calibrat|ensemble"
+    },
+    "intent": "Get mechanism findings about Agent-X's threshold-free aggregation and guideline-based expert network",
+    "obs_chars": 537,
+    "notes_chars": 6591
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N11. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N20. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): AIGT"
+    ]
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N11. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N20. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): AIGT"
+    ]
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "observation",
+     "contains": "guideline|expert|aggregation|threshold-free|calibrat|ensemble"
+    },
+    "intent": "Get Agent-X mechanism details from observation-type records",
+    "obs_chars": 1675,
+    "notes_chars": 6591
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "criticism",
+     "contains": "false positive|FPR|threshold|limitation|weakness|calibrat"
+    },
+    "intent": "Get Vietbinoculars self-limiting statements about FPR control",
+    "obs_chars": 244,
+    "notes_chars": 6591
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): AIGT",
+     "N21. [83f2d2b74636cb311e853a107623fe9f9e6939449d4ebfd422daf0ed6d61b2ef] EXTERNAL: EditLens (2025) - ",
+     "N22. [57930f4ec027309f8362c6011ce806a517999a07377e908964628bfd421e0ec9] EXTERNAL (2026): AI text det"
+    ]
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "aggregation|expert|guideline|vote|consensus|calibrat",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X mechanism details for threshold-free aggregation",
+    "obs_chars": 2398,
+    "notes_chars": 6657
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "FPR|false positive|threshold|calibrat|reliab|practical|commercial|human review",
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text"
+    },
+    "intent": "Get Vietbinoculars specific recommendations for FPR control",
+    "obs_chars": 1242,
+    "notes_chars": 6657
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom"
+    ]
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "false positive|FPR|threshold|limitation|weakness|calibrat",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X's own critical statements about limitations, false positives, calibration issues",
+    "obs_chars": 3388,
+    "notes_chars": 3470
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "false positive|FPR|threshold|calibrat|confidence|reliab",
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text"
+    },
+    "intent": "Get Vietbinoculars observations about FPR, calibration, confidence",
+    "obs_chars": 3346,
+    "notes_chars": 3470
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom"
+    ]
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "confidence|aggregation|meta|router|guideline|vote|consensus",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X mechanism details for threshold-free detection",
+    "obs_chars": 3888,
+    "notes_chars": 4910
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "FPR|false positive|threshold|calibrat|confidence|reliab|human",
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text"
+    },
+    "intent": "Get VietBinoculars observations on FPR control and reliability",
+    "obs_chars": 2331,
+    "notes_chars": 4910
+   },
+   {
+    "step": 14,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "AI-generated text detection false positive rate control high-stakes applications calibrated classifier human-in-the-loop review workflow"
+    },
+    "intent": "Find external papers specifically on FPR control and human-in-the-loop for AI text detection",
+    "obs_chars": 2549,
+    "notes_chars": 4910
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "FPR|false positive|threshold|calibrat|reliab|practical|commercial|human review",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X's own recommendations for practical deployment and FPR control",
+    "obs_chars": 539,
+    "notes_chars": 6002
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "threshold-free|aggregation|confidence|meta|vote|consensus|calibrat",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X mechanism details for threshold-free detection",
+    "obs_chars": 3705,
+    "notes_chars": 6182
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 18,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "threshold-free|aggregation|confidence|meta|vote|consensus|calibrat",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X's definition of threshold-free aggregation mechanism",
+    "obs_chars": 1145,
+    "notes_chars": 6182
+   },
+   {
+    "step": 19,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 20,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 20,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "FPR|false positive|threshold|calibrat|confidence|reliab",
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_te"
+    },
+    "intent": "Get VietBinoculars observations on FPR control and reliability",
+    "obs_chars": 244,
+    "notes_chars": 6477
+   },
+   {
+    "step": 21,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "aggregation|vote|consensus|meta|router|guideline",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X mechanism details for threshold-free aggregation",
+    "obs_chars": 3837,
+    "notes_chars": 6477
+   },
+   {
+    "step": 22,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 41
+   },
+   {
+    "step": 23,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "calibrated AI text detection false positive rate control high-stakes applications human review workflow threshold-free"
+    },
+    "intent": "Find external papers specifically on FPR control and calibrated detection for high-stakes AI text detection",
+    "obs_chars": 2570,
+    "notes_chars": 6477
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "observation",
+     "contains": "aggregation|confidence|meta|vote|consensus|threshold-free|calibrat"
+    },
+    "intent": "Get Agent-X's specific threshold-free aggregation mechanism details",
+    "obs_chars": 1696,
+    "notes_chars": 6990
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 25,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "aggregation|confidence|meta|vote|consensus|threshold-free|calibrat",
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_"
+    },
+    "intent": "Get Agent-X mechanism details for threshold-free aggregation",
+    "obs_chars": 3705,
+    "notes_chars": 6990
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "recommendation",
+     "contains": "threshold-free|aggregation|confidence|meta|vote|consensus|calibrat"
+    },
+    "intent": "Get Agent-X's own recommendations on threshold-free detection mechanisms",
+    "obs_chars": 539,
+    "notes_chars": 6989
+   },
+   {
+    "step": 28,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 29,
+    "type": "note_reject",
+    "n_bad": 6,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom",
+     "N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated "
+    ]
+   },
+   {
+    "step": 30,
+    "type": "note_reject",
+    "n_bad": 7,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N19. [7b31819be1a7f] Vietbinoculars: identified thresholds may not fully capture statistical charact",
+     "N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost",
+     "N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Dom"
+    ]
+   }
+  ],
+  "notes_final": "N1. [f1b6c40ee73c93] Agent-X organizes detection guidelines into semantic, stylistic, structural dimensions; each evaluated by specialized linguistic agents with explicit reasoning | epistemic:stated\nN2. [2aeaa97572a101] Agent-X meta agent integrates assessments via confidence-aware aggregation -> threshold-free, interpretable classification | epistemic:stated\nN3. [8fafbdfc5f5e93] Agent-X adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics | epistemic:stated\nN4. [a2628f0c511adb] VietBinoculars: can be applied as data-cleaning tool to filter AI-generated texts from training datasets | epistemic:stated\nN5. [7d2e5ce68c8212] VietBinoculars: labeling results should be regarded as reference guidance rather than definitive judgments; final decisions under careful human supervision | epistemic:stated\nN6. [coarse:323a00146e97] RECOMMENDATION: carefully evaluate detector effectiveness using FPR metric for practical applications | epistemic:stated\nN7. [coarse:1d670f2453e3] RECOMMENDATION: only low-FPR systems are good/reliable for commercial apps, minimizing harm to users | epistemic:stated\nN8. [coarse:86d064c4569b] RECOMMENDATION: detection algorithm should be cost-effective and accurately detect both classes | epistemic:stated\nN9. [coarse:ff9110af9ad1] RECOMMENDATION: detection algorithm must clearly interpret and explain critical factors leading to classification | epistemic:stated\nN10. [28146961cff26a] Agent-X: strong competitive performance across all datasets/LLMs under AUROC | epistemic:stated\nN11. [443e3f468b99c8] Agent-X: smaller LLMs may struggle to understand guidelines or perform agent tasks | epistemic:stated\nN12. [c59580acec76e4] Agent-X: uncalibrated LLM predictions systematically over/underconfident | epistemic:demonstrated\nN13. [2c1bb81202c8bc] Agent-X: prompt-based methods yield discrete predictions and uncalibrated confidence | epistemic:stated\nN14. [775d6824723d77] Agent-X: generative LLMs produce inherently skewed and poorly calibrated probability distributions | epistemic:stated\nN15. [3a9b99ce26dcab] Agent-X: existing methods rely on AUROC requiring optimal threshold selection | epistemic:stated\nN16. [503c7c746c96a5] Agent-X: external calibration datasets often unavailable, limiting applicability | epistemic:stated\nN17. [52b8221c6a89a1] Agent-X: threshold-free aggregation strategy eliminates dependency on external calibration | epistemic:stated\nN18. [183d0298ffa488] Vietbinoculars: >=99% accuracy, F1, AUC on out-of-domain | epistemic:stated\n[unsourced] N19. [7b31819be1a7f] Vietbinoculars: identified thresholds may not fully capture statistical characteristics of Vietnamese | epistemic:stated\n[unsourced] N20. [cf97a21032e9fe282368f396a03d24e0bc76b9d7ec01b95d705a10d3453d08fb] EXTERNAL: \"almost ai, almost human\" (2025) - 12 SOTA detectors on APT-Eval; detectors flag minimally polished text as AI, struggle to differentiate degrees of AI involvement | epistemic:stated\n[unsourced] N21. [e8e347b136b64d0bcfde5c130d5821f8e441119b1a7d53a68892cde7bc7fc752] EXTERNAL: DoGEN (2025) - Domain Gating Ensemble Networks; ensembles domain expert detectors with domain classifier weights | epistemic:stated\nN22. [coarse:2dfc8f883fe3] Black-box approaches (DetectGPT, NPR) need multiple evaluations/generations -> high computational overhead | epistemic:stated\nN23. [coarse:931eb18f4efd] White-box methods use model-internal metrics: entropy, likelihood, log-rank | epistemic:stated\nN24. [8a1bfe363778ef] Binoculars achieves >90% accuracy detecting ChatGPT English at FPR=0.01%, not trained on ChatGPT | epistemic:cited\nN25. [3bc2e497da2e6d] Binoculars demonstrates superior reliability vs Ghostbuster on out-of-domain datasets | epistemic:cited\nN26. [f3e9b41207f55a] Vietnamese text exhibits lower TPR at low FPR, more prone to mispredictions vs well-represented languages (Falcon-7B) | epistemic:cited\nN27. [f4d144aca9abc4] VietBinoculars: texts with scores below TPR@0.06%FPR threshold are highly likely AI-generated | epistemic:stated\nN28. [0808a5d87c4f74] VietBinoculars with Closest Point threshold achieves highest performance | epistemic:demonstrated\nN29. [1db70b55070c27] VietBinoculars Closest Point: prediction failures only for Qwen3-235B-A22B-FW, DeepSeek-V3, Claude-3.5-Sonnet, GPT-4o | epistemic:demonstrated\nN30. [3bd526b96244e6] Existing AI text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, zero-shot | epistemic:stated\nN31. [36f1c3aa8e292c] External threshold calibration introduces variability and inconsistent/suboptimal accuracy in real-world | epistemic:stated\nN32. [6dcb23856ed045] Fast-DetectGPT generalizes poorly to biomedical texts (PubMed) | epistemic:stated\nN33. [704524f84d3d18] AUROC metrics inherently favor threshold-dependent methods and are inadequate for practical FPR control | epistemic:stated\nN34. [122ca99de619aa] Agent-X: semantic-steering calibration significantly reduces gap between predicted confidence and actual accuracy | epistemic:stated\nN35. [c017bb3306c342] Agent-X: steer-based calibration results in better-aligned, more reliable confidence | epistemic:stated\nN36. [a6ef241fa1487f] Agent-X: semantic-steering calibration substantially enhances reliability and calibration | epistemic:stated\nN37. [9d10b467f771bb] Agent-X: multi-agent framework inherently circumvents calibration issues of single-LLM approaches | epistemic:stated\n[unsourced] N38. [ae8fbbf92fbeb90047c9375f23713836fb7d42a64224a29317dee078cc04a86f] EXTERNAL: \"Why AI-generated text detection fails\" (2026) - interpretable framework with 30 linguistic features; cross-domain/cross-generator eval reveals substantial generalization gaps | epistemic:stated\n[unsourced] N39. [83f2d2b74636cb311e853a107623fe9f9e6939449d4ebfd422daf0ed6d61b2ef] EXTERNAL: EditLens (2025) - quantifies degree of AI editing; binary and ternary (human/AI/mixed) classification | epistemic:stated\nN40. [af3e1a97ca0eb0] Agent-X provides practical, threshold-free solution, significantly advancing AI-generated text detection in real-world zero-shot scenarios | epistemic:stated\nN41. [c9fda652b29db8] Agent-X framework: router agent + guideline-specific base agents (semantic, stylistic, structural) + meta agent | epistemic:stated\nN42. [83925bda09b515] Fast-DetectGPT: optimized zero-shot detector replacing DetectGPT perturbation with efficient sampling | epistemic:cited\n[unsourced] N43. [dc33ed3a89edf7bbb1ef64bef7e243530549fde04025ac32ca39dba159ec4605] EXTERNAL survey (2025): summarizes SOTA AIGT detection (watermarking, statistical/stylistic analysis, ML classification); identifies salient factors affecting detectability | epistemic:stated\n[unsourced] N44. [bcf15e8ca5c8b437ff24b06cd974b85eadfc8860b4f6627948275bf9b0989af] EXTERNAL (2025): 788,984 AI-written peer reviews dataset (ICLR+NeurIPS, 8 years); benchmarks AI text detection in peer review context | epistemic:stated",
+  "gaps_final": "G1. What specific mechanisms does Agent-X use for threshold-free detection? (need findings with different angle)\nG2. What does Vietbinoculars specifically recommend for controlling false positives?\nG3. Are there more external papers on FPR control / calibrated detection / human-in-the-loop for AI text detection?",
+  "queried": [
+   "card|{\"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"false positive|FPR|threshold|reliability|practical\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"false positive|FPR|reliability|limitation|weakness\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"threshold|adaptive|guideline|expert network|zero-shot\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"false positive|FPR|reliability|practical|commercial\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\"}",
+   "search_text|{\"k\": 12, \"query\": \"false positive rate threshold AI generated text detection best practice\"}",
+   "find_gap|{\"entity\": \"ai-generated text detection\"}",
+   "card|{\"entity\": \"detection algorithm\"}",
+   "search_papers|{\"k\": 8, \"query\": \"best practices AI-generated text detection false positive rate threshold reliability\"}",
+   "lineage|{\"entity\": \"ai-generated text detection\"}",
+   "deep_read|{\"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\", \"sections\": [\"method\", \"experimental setup\", \"conclusion\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\", \"sections\": [\"method\", \"conclusion\", \"discussion\"]}",
+   "search_papers|{\"k\": 8, \"query\": \"calibrated AI text detection false positive control human-in-the-loop high-stakes NLP classification\"}",
+   "search_papers|{\"k\": 8, \"query\": \"high-stakes AI text detection false positive control calibrated confidence human review threshold setting\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"false positive|FPR|threshold|calibrat|reliab|practical|commercial|human review\", \"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"false positive|FPR|threshold|calibrat|reliab|practical|commercial|human review\", \"entity\": \"ai-generated text detection\"}",
+   "search_papers|{\"k\": 8, \"query\": \"AI text detection false positive rate control high-stakes applications calibrated classifier human-in-the-loop review workflow\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"guideline|expert|aggregation|threshold-free|calibrat|ensemble\", \"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"guideline|expert|aggregation|threshold-free|calibrat|ensemble\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_g",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"false positive|FPR|threshold|limitation|weakness|calibrat\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_te",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"aggregation|expert|guideline|vote|consensus|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"FPR|false positive|threshold|calibrat|reliab|practical|commercial|human review\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_v",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"false positive|FPR|threshold|limitation|weakness|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generat",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"false positive|FPR|threshold|calibrat|confidence|reliab\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_te",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"confidence|aggregation|meta|router|guideline|vote|consensus\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_gener",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"FPR|false positive|threshold|calibrat|confidence|reliab|human\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_genera",
+   "search_papers|{\"k\": 8, \"query\": \"AI-generated text detection false positive rate control high-stakes applications calibrated classifier human-in-the-loop review workflow\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"FPR|false positive|threshold|calibrat|reliab|practical|commercial|human review\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"threshold-free|aggregation|confidence|meta|vote|consensus|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_a",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"threshold-free|aggregation|confidence|meta|vote|consensus|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"FPR|false positive|threshold|calibrat|confidence|reliab\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_te",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"aggregation|vote|consensus|meta|router|guideline\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "search_papers|{\"k\": 8, \"query\": \"calibrated AI text detection false positive rate control high-stakes applications human review workflow threshold-free\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"aggregation|confidence|meta|vote|consensus|threshold-free|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"aggregation|confidence|meta|vote|consensus|threshold-free|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_a",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"threshold-free|aggregation|confidence|meta|vote|consensus|calibrat\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_f"
+  ],
+  "gate": {
+   "note_rejects": 113,
+   "numeric_fail": {
+    "missing_nums": [
+     "0.95",
+     "0.9734",
+     "90.4",
+     "94.7"
+    ],
+    "unsourced": [],
+    "altered_titles": []
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 2,
+   "a_chars": 181,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 2,
+   "reject_reasons": {
+    "bad_backref": 113
+   },
+   "merge_downgraded_lines": 119,
+   "merge_total_lines": 865,
+   "relaxed_writes": 24,
+   "f28_autos": 0,
+   "max_evidence_streak": 1,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:1c1b9fa29d63] d voltages if the assumption of=100% | src:findings@step3 | epi:stated",
+   "A2. [8a1bfe363778ef] Binoculars achieves over=90% | src:findings@step12 | epi:cited"
+  ],
+  "degenerate": false
+ }
+]

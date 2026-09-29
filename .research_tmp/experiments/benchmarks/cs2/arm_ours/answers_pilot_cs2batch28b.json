@@ -1,0 +1,2488 @@
+[
+ {
+  "id": "456d3c2c757f4b874abddb18",
+  "type": "aggregation",
+  "question": "What insights can be obtained about developer behavior from their GitHub commits and pull requests?",
+  "gold_hint": "",
+  "answer": "Research into developer behavior derived from GitHub commits and pull requests (PRs) reveals that these artifacts serve as critical information cues, or \"signals,\" that indicate attributes such as technical quality, which in turn may alter perceptions or bias judgments regarding a project or its contributors [coarse:300583ae1d36]. In the context of project management and analysis, both commit actions and pull requests are conceptualized as forms of developmental activity, a perspective central to Magnet and Sticky analyses of project characteristics [coarse:28c7bd09779d]. However, extracting accurate behavioral insights from these sources requires careful handling of data provenance; for instance, most accepted pull requests sent from fork repositories are absent from the histories of the original repositories, a fact attributed to Kalliamvakou et al. [coarse:cd8cd871e6e7]. Consequently, to obtain a complete picture of developer behavior, information must be mined from both original and fork repositories [coarse:c1b7bbca7a8f]. Furthermore, data integrity challenges exist within commit histories, as some commits in GitHub datasets lack developer logins, containing only names and emails from local Git settings [coarse:a5a497910ca7]. To address this, surrogate logins are created by concatenating local Git names and emails for commits that do not have associated GitHub logins [coarse:9a4f9080b517].\n\nThe analysis of these behavioral signals yields specific insights into project health and developer success. The success rate of pull requests for a project is stated to degrade when the project involves a large number of developers (specifically more than 4,000) or a large number of forked projects [coarse:c9dc89cc6bf9]. Conversely, extracting frequent technical topics and language or domain-specific insights from these interactions can assist developers in achieving successful pull requests [coarse:901483dcab77]. These extracted insights also serve a managerial function, aiding GitHub project administrators in making informed decisions regarding the management of pull requests, projects, and developers [coarse:ad8f03f783b5]. While previous studies on pull request review acceptance have primarily been conducted as post-factum statistical analyses of GitHub data [coarse:9efcc12359ec], the broader field of software engineering has empirically explored how GitHub functionality influences developer behavior and practices [coarse:a77cb37ac0d9]. Additionally, researchers have investigated using GitHub processes to recommend specific developer behaviors [coarse:c99af72d676f].\n\nBeyond static code and commit data, the comprehension of developer information is enhanced by leveraging various sources, including Git, CVS, archived communications, online forums, and collaborative question-answering sites [coarse:564fe9e62cf4]. Studying developer activities across these diverse sources can guide the development of tools designed to help developers find desired information [coarse:dc318a3e38b8]. In the realm of AI-assisted development, a study on GitHub Copilot indicates that developers' opinions on the tool are divided, with most having met the tool before the survey [coarse:cd82a90607d4]. The primary concerns regarding Copilot are stated to be caused by security issues associated with its use [coarse:c177ed4dc6b1]. However, the validity of such behavioral insights, particularly those derived from interviews, is threatened by faulty recollection and the inherent differences between direct observation of decision-making and self-reporting [coarse:6dac8f23fb19]. The consulted records did not surface specific details regarding what developers discuss in code comments, the specific project or developer characteristics measured in Magnet and Sticky analyses, or the specific insights derived from suggested changes and reviewer recommendation systems.",
+  "arm": "main",
+  "steps": 14,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "project and developer specific insights"
+    },
+    "intent": "Get cross-paper dossier on developer-specific insights from GitHub data",
+    "obs_chars": 513,
+    "notes_chars": 948
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "contains": "developer behavior|pull request|commit|insight"
+    },
+    "intent": "Findings from the 2014 PR insight paper",
+    "obs_chars": 1566,
+    "notes_chars": 948
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests",
+     "contains": "developer behavior|pull request|review|insight"
+    },
+    "intent": "Findings from the 2019 PR review behavior paper",
+    "obs_chars": 1083,
+    "notes_chars": 948
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel",
+     "contains": "developer|project characteristic|behavior|commit"
+    },
+    "intent": "Findings from the 2016 project characteristics paper",
+    "obs_chars": 1568,
+    "notes_chars": 948
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_what_do_developers_discuss_about_code_comments_",
+     "contains": "developer|comment|discussion|behavior|topic"
+    },
+    "intent": "What do developers discuss in code comments - insights about developer behavior",
+    "obs_chars": 1099,
+    "notes_chars": 2880
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_",
+     "contains": "developer|suggested change|recommendation|behavior|insight"
+    },
+    "intent": "Insights about developer behavior from suggested changes and recommendations",
+    "obs_chars": 1066,
+    "notes_chars": 2880
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp",
+     "contains": "developer|reviewer|behavior|recommendation|insight"
+    },
+    "intent": "Insights about developer/reviewer behavior from open source projects",
+    "obs_chars": 1046,
+    "notes_chars": 2880
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2301.04991",
+     "contains": "developer|behavior|Copilot|experience|insight"
+    },
+    "intent": "What the Copilot study reveals about developer behavior",
+    "obs_chars": 1632,
+    "notes_chars": 2880
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "contains": "developer|behavior|commit|pull request|insight|finding"
+    },
+    "intent": "Get specific findings from the 2014 PR insight paper",
+    "obs_chars": 1566,
+    "notes_chars": 4858
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests",
+     "contains": "developer|behavior|pull request|review|insight|finding"
+    },
+    "intent": "Get specific findings from the 2019 PR review paper",
+    "obs_chars": 1083,
+    "notes_chars": 4858
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel",
+     "contains": "developer|project characteristic|behavior|commit|insight"
+    },
+    "intent": "Get specific findings from the Magnet/Sticky paper",
+    "obs_chars": 1568,
+    "notes_chars": 4858
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_what_do_developers_discuss_about_code_comments_",
+     "contains": "developer|comment|discussion|behavior|topic|insight"
+    },
+    "intent": "Get specific findings from the code comments paper",
+    "obs_chars": 1099,
+    "notes_chars": 4858
+   },
+   {
+    "step": 4,
+    "tool": "card",
+    "args": {
+     "entity": "pull requests"
+    },
+    "intent": "Get cross-paper evidence dossier on pull requests to see what insights are compiled across papers",
+    "obs_chars": 1157,
+    "notes_chars": 4842
+   },
+   {
+    "step": 4,
+    "tool": "card",
+    "args": {
+     "entity": "github"
+    },
+    "intent": "Get cross-paper evidence dossier on github to see what developer behavior insights are compiled",
+    "obs_chars": 270,
+    "notes_chars": 4842
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_",
+     "contains": "suggested change|developer|behavior|recommendation|insight|finding"
+    },
+    "intent": "Get findings from the suggested changes paper about developer behavior insights",
+    "obs_chars": 1066,
+    "notes_chars": 4842
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp",
+     "contains": "developer|reviewer|behavior|recommendation|insight|finding"
+    },
+    "intent": "Get findings from the reviewer recommendation paper about developer behavior insights",
+    "obs_chars": 1046,
+    "notes_chars": 4842
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "contains": "developer|behavior|commit|pull request|insight|finding|observation"
+    },
+    "intent": "Get findings from the 2014 PR insight paper",
+    "obs_chars": 1566,
+    "notes_chars": 4842
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests",
+     "contains": "developer|behavior|pull request|review|insight|finding|observation"
+    },
+    "intent": "Get findings from the 2019 PR review paper",
+    "obs_chars": 1604,
+    "notes_chars": 4842
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel",
+     "contains": "developer|project characteristic|behavior|commit|insight|finding|observation"
+    },
+    "intent": "Get findings from the Magnet/Sticky paper",
+    "obs_chars": 1568,
+    "notes_chars": 4842
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_what_do_developers_discuss_about_code_comments_",
+     "contains": "developer|comment|discussion|behavior|topic|insight|finding|observation"
+    },
+    "intent": "Get findings from the code comments paper",
+    "obs_chars": 1099,
+    "notes_chars": 4842
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mining_threat_intelligence_about_open_source_projects_and_libraries_from_code_re",
+     "contains": "developer|behavior|commit|issue|insight|finding"
+    },
+    "intent": "Get findings from the threat intelligence paper",
+    "obs_chars": 244,
+    "notes_chars": 4842
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2014 PR insight paper",
+    "obs_chars": 579,
+    "notes_chars": 4842
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2019 PR review paper",
+    "obs_chars": 1041,
+    "notes_chars": 4842
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the Magnet/Sticky paper",
+    "obs_chars": 1543,
+    "notes_chars": 4842
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_what_do_developers_discuss_about_code_comments_",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the code comments paper",
+    "obs_chars": 574,
+    "notes_chars": 4842
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2301.04991",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific observations from the Copilot study about developer behavior",
+    "obs_chars": 2029,
+    "notes_chars": 4842
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific observations about suggested changes and developer behavior",
+    "obs_chars": 1066,
+    "notes_chars": 4842
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific observations about reviewer recommendation and developer behavior",
+    "obs_chars": 1046,
+    "notes_chars": 4842
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2014 PR insight paper",
+    "obs_chars": 187,
+    "notes_chars": 4842
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2019 PR review paper",
+    "obs_chars": 1041,
+    "notes_chars": 4842
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the Magnet/Sticky paper",
+    "obs_chars": 1059,
+    "notes_chars": 4842
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_what_do_developers_discuss_about_code_comments_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the code comments paper",
+    "obs_chars": 574,
+    "notes_chars": 4842
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_insight_into_the_pull_requests_of_github",
+     "contains": "developer|behavior|commit|pull request|insight|finding|observation|pattern"
+    },
+    "intent": "Get findings from the 2014 PR insight paper about developer behavior patterns",
+    "obs_chars": 1566,
+    "notes_chars": 5112
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 14,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: insights about developer behavior from GitHub commits and PRs.\nRelevant corpus papers:\n- sciverse_an_insight_into_the_pull_requests_of_github (2014)\n- sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests (2019)\n- sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel (2016)\n- sciverse_what_do_developers_discuss_about_code_comments_ (2021)\n- sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_ (2020)\n- sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp (2020)\n- arxiv_2301.04991 (Github Copilot study, 2023)\n- sciverse_mining_threat_intelligence_about_open_source_projects_and_libraries_from_code_re (2018)\nN1. [coarse:c9dc89cc6bf9] PR success rate degrades with large number of developers (>4000) or large number of forked projects | anchor:\"success rate of pull requests for a project degrades compar\" | epistemic:stated\nN2. [coarse:901483dcab77] Extracted frequent technical topics and language/domain-specific insights can help developers with successful PRs | anchor:\"While the extracted frequent technical topics and language or domain specific insights can\" | epistemic:stated\nN3. [coarse:ad8f03f783b5] Project and developer specific insights can aid GitHub project administrators with informed decision making in management of PRs, projects, and developers | anchor:\"While the extracted frequent technical topics and language or domain specific insights can\" | epistemic:stated\nN4. [coarse:9efcc12359ec] Previous studies of PR review acceptance have been carried out as statistical analysis of GitHub data (post factum) | anchor:\"However, previous studies of pull review acceptance have been carried out post factum, bas\" | epistemic:stated\nN5. [coarse:300583ae1d36] Signals in PRs are information cues indicating attributes such as technical quality, which may change perceptions or bias judgments about a project or contributor | anchor:\"More formally, these signals are information cues that can indicate attributes such as tec\" | epistemic:stated\nN6. [coarse:28c7bd09779d] Both commit actions and pull requests are viewed as developmental activity in Magnet and Sticky analyses | anchor:\"Both actions are viewed as developmental activity in our Magnet and Sticky analyses.\" | epistemic:stated\nN7. [coarse:c1b7bbca7a8f] Developer info mined from both original and fork repos because most accepted PRs from forks are absent in original repo histories | anchor:\"Therefore, we mine the developer information from both the original and fork repositories.\" | epistemic:stated\nN8. [coarse:cd8cd871e6e7] Most accepted PRs sent from fork repositories are absent in histories of original repositories | anchor:\"According to Kalliamvakou et al. [17], most of the accepted pull requests sent from fork r\" | epistemic:stated\nN9. [coarse:dc318a3e38b8] Studying developer activities from various sources can guide development of tools to help developers find desired information | anchor:\"Studying developer activities related to various development tasks from various sources ca\" | epistemic:stated\nN10. [coarse:564fe9e62cf4] Researchers leverage Git, CVS, archived communications, online forums, CQA sites to comprehend developer information | anchor:\"Therefore, researchers have recently focused on leveraging the useful content of these sou\" | epistemic:stated\nN11. [coarse:a77cb37ac0d9] Prior SE research has empirically explored GitHub functionality for influencing developer behavior and SE practices | anchor:\"Additionally, prior software engineering research has empirically explored GitHub function\" | epistemic:stated\nN12. [coarse:c99af72d676f] SE researchers have explored using GitHub processes to recommend developer behaviors | anchor:\"Software engineering researchers have also explored using GitHub processes to recommend de\" | epistemic:stated\nN13. [coarse:9a4f9080b517] Surrogate logins created by concatenating local Git names/emails for commits without GitHub logins | anchor:\"For the developers of commits without GitHub logits, we create surrogate logits by concate\" | epistemic:stated\nN14. [coarse:a5a497910ca7] Some commits in GitHub dataset lack developer logins, only having name/email from local Git settings | anchor:\"we have found that some commits of the GitHub data set do not contain logits of their deve\" | epistemic:stated\nN15. [coarse:cd82a90607d4] Developers' opinions on Copilot are divided; most had met the tool before the survey | anchor:\"The results of the research indicate that developers' opinions are divided. Most of them m\" | epistemic:stated\nN16. [coarse:c177ed4dc6b1] Concerns about Copilot are caused by security issues associated with its use | anchor:\"Concerns are caused by security issues associated with using of Github Copilot.\" | epistemic:stated\nN17. [coarse:6dac8f23fb19] Validity of interview results threatened by faulty recollection and difference between direct observation and self-report | anchor:\"Compared to the direct observation of the decision making, validity of the results obtaine\" | epistemic:stated",
+  "gaps_final": "G1. What specific insights about developer behavior are reported from commits/PRs? (need more findings from remaining papers)\nG2. What project/developer characteristics are measured? (card on key entities)\nG3. What do developers discuss in code comments / PRs? (findings from code comments paper)\nG4. What does the Copilot study reveal about developer behavior? (findings)\nG5. What insights from suggested changes / reviewer recommendation? (findings)",
+  "queried": [
+   "card|{\"entity\": \"project and developer specific insights\"}",
+   "findings|{\"contains\": \"developer behavior|pull request|commit|insight\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}",
+   "findings|{\"contains\": \"developer behavior|pull request|review|insight\", \"paper_id\": \"sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests\"}",
+   "findings|{\"contains\": \"developer|project characteristic|behavior|commit\", \"paper_id\": \"sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel\"}",
+   "findings|{\"contains\": \"developer|comment|discussion|behavior|topic\", \"paper_id\": \"sciverse_what_do_developers_discuss_about_code_comments_\"}",
+   "findings|{\"contains\": \"developer|suggested change|recommendation|behavior|insight\", \"paper_id\": \"sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_\"}",
+   "findings|{\"contains\": \"developer|reviewer|behavior|recommendation|insight\", \"paper_id\": \"sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp\"}",
+   "findings|{\"contains\": \"developer|behavior|Copilot|experience|insight\", \"paper_id\": \"arxiv_2301.04991\"}",
+   "findings|{\"contains\": \"developer|behavior|commit|pull request|insight|finding\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}",
+   "findings|{\"contains\": \"developer|behavior|pull request|review|insight|finding\", \"paper_id\": \"sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests\"}",
+   "findings|{\"contains\": \"developer|project characteristic|behavior|commit|insight\", \"paper_id\": \"sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel\"}",
+   "findings|{\"contains\": \"developer|comment|discussion|behavior|topic|insight\", \"paper_id\": \"sciverse_what_do_developers_discuss_about_code_comments_\"}",
+   "card|{\"entity\": \"pull requests\"}",
+   "card|{\"entity\": \"github\"}",
+   "findings|{\"contains\": \"suggested change|developer|behavior|recommendation|insight|finding\", \"paper_id\": \"sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_\"}",
+   "findings|{\"contains\": \"developer|reviewer|behavior|recommendation|insight|finding\", \"paper_id\": \"sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp\"}",
+   "findings|{\"contains\": \"developer|behavior|commit|pull request|insight|finding|observation\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}",
+   "findings|{\"contains\": \"developer|behavior|pull request|review|insight|finding|observation\", \"paper_id\": \"sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests\"}",
+   "findings|{\"contains\": \"developer|project characteristic|behavior|commit|insight|finding|observation\", \"paper_id\": \"sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel\"}",
+   "findings|{\"contains\": \"developer|comment|discussion|behavior|topic|insight|finding|observation\", \"paper_id\": \"sciverse_what_do_developers_discuss_about_code_comments_\"}",
+   "findings|{\"contains\": \"developer|behavior|commit|issue|insight|finding\", \"paper_id\": \"sciverse_mining_threat_intelligence_about_open_source_projects_and_libraries_from_code_re\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_what_do_developers_discuss_about_code_comments_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"arxiv_2301.04991\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_understanding_the_impact_of_github_suggested_changes_on_recommendations_between_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_expanding_the_number_of_reviewers_in_open_source_projects_by_recommending_approp\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_beyond_the_code_itself_how_programmers_really_look_at_pull_requests\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_magnet_or_sticky_measuring_project_characteristics_from_the_perspective_of_devel\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_what_do_developers_discuss_about_code_comments_\"}",
+   "findings|{\"contains\": \"developer|behavior|commit|pull request|insight|finding|observation|pattern\", \"paper_id\": \"sciverse_an_insight_into_the_pull_requests_of_github\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 17,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "7670af632f0932d5ed20c34e",
+  "type": "aggregation",
+  "question": "What interfaces have researchers developed for helping people optimize LLMs for a task, and what are the biggest remaining user problems?",
+  "gold_hint": "",
+  "answer": "Based on the evidence gathered from the knowledge base and external literature, here is a synthesis of the interfaces developed for helping people optimize LLMs for a task, and the biggest remaining user problems.\n\n## Interfaces and Tools Developed\n\n**1. Prompt Optimization and Engineering Tools**\n\n- **Automated prompt optimization methods** (OPRO, PromptAgent, EvoPrompt, RLPrompt, DSP, ProTeGi, PE2, PREFER) represent a family of LLM-driven approaches that automatically search for effective prompts, addressing the observation that \"designing natural language prompts is an art that demands a lot of time and experience\" [arxiv_2404.01077].\n- **DirectGPT** provides a direct manipulation interface on top of ChatGPT, transforming direct manipulation actions (drag, drop, select) into engineered prompts, reducing the cognitive burden of prompt construction [ext_directgpt].\n- **From Prompting to Partnering** designed a prototype with specific features: Reflective Prompting, Section Regeneration, Input-Output Mapping, and Confidence indicators, targeting the key user difficulties in constructing effective prompts, iteratively refining AI-generated responses, and assessing response reliability [ext_from_prompting_to_partnering].\n- **Abscribe** introduces \"AI Modifiers\" — buttons created from prompts, auto-labeled by the LLM, reusable across passages, and editable over time — offering a structured alternative to free-form conversational interfaces [ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_].\n- **Mapping the design space of human-AI interaction in text summarization** developed a collection of digital tools to support people writing summaries, exploring the interaction design space for LLM-assisted tasks [ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization].\n\n**2. Scaffolded and Guided Interfaces**\n\n- **Scaffolded interfaces** (2025) address the problem that complex LLM interfaces force users to \"rely heavily on external resources, such as video tutorials, forums\" to navigate, which disrupts workflow and hinders self-directed learning. A common mitigation strategy is to provide simplified alternatives such as dedicated beginner modes, novice apps, or AI-assisted guidance [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n- **AutoCopilot** generates concise textual responses and facilitates users' follow-up debugging questions, integrating LLM-based web search for up-to-date follow-up responses when existing documentation is insufficient [sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o].\n- **MISP and DialSQL** use a mixed-initiative approach, asking follow-up questions to clarify user intent, helping establish \"common ground\" between the user and the AI [sciverse_natural_language_interfaces_for_databases_what_do_users_think_].\n\n**3. Proactive and Agent-Based Interfaces**\n\n- **Codellaborator** is a proactive AI programming agent that goes beyond the prompt-only paradigm. It demonstrates that proactive agents increase efficiency but also incur workflow disruptions; presence indicators and interaction context help alleviate these disruptions [ext_codellaborator].\n- **Show me how** explores agent-augmented counterfactual explanations, where conversational AI agents provide step-by-step guidance. The paper notes that \"prompt engineering is the process of crafting effective instructions (or prompts) to guide\" LLMs, and identifies fine-tuning as one of the two most effective approaches to mitigate hallucination [sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio].\n\n**4. AutoML and Fine-Tuning Interfaces**\n\n- **UniAutoML** is a human-centered AutoML framework using LLMs to unify discriminative and generative AutoML, specifically addressing the \"lack of interpretability and user engagement during the training process\" and \"lack of transparency in final decision-making and limited user control\" in traditional AutoML [ext_uniautoml].\n- **Fine-tuning guides** (e.g., the Ultimate Guide to Fine-tuning LLMs) provide structured seven-stage pipelines spanning data preparation, model initialization, hyperparameter tuning, and model deployment, with parameter-efficient methods like LoRA and Half Fine-Tuning [ext_finetuning_guide].\n\n**5. Model Transparency and Design Support**\n\n- **Designerly understanding** investigates information needs for model transparency to support designers working with \"AI as a design material,\" including the complexity of the material itself [sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des].\n\n## Biggest Remaining User Problems\n\n**1. Prompt Construction and Refinement**\nUsers struggle with constructing effective prompts and iteratively refining AI-generated responses. The \"From Prompting to Partnering\" work identifies these as key difficulties, particularly in unfamiliar domains where users cannot easily assess response reliability [ext_from_prompting_to_partnering]. Prompt engineering in specific domains (e.g., SQL generation) \"commonly fail[s] to adapt well to changing data\" [cc9c7bea941a25c486].\n\n**2. Assessing Response Reliability and Trust**\nUsers have difficulty assessing whether LLM outputs are correct, especially in domains where they lack expertise. Conversational AI agents are \"prone towards hallucination\" [sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio], and confidence indicators remain an active design challenge [ext_from_prompting_to_partnering].\n\n**3. Workflow Disruption and Cognitive Overload**\nComplex LLM interfaces force users to rely on external resources (video tutorials, forums), which \"disrupts workflow, doesn't give contextually relevant help, and hinders self-directed learning\" [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess]. Proactive agents, while more efficient, \"incur workflow disruptions\" that require careful design mitigation [ext_codellaborator].\n\n**4. Interaction Style Mismatch**\nFree-form conversational UIs lead users to adopt a \"more polite and verbose style\" than is optimal for effective prompting, whereas button-based or structured actions can be more efficient [ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_].\n\n**5. Lack of Contextual Awareness**\nIt remains \"unclear how this current [approach] helps novice end-users seek accurate/relevant assistance\" when integrating context from feature-rich applications [sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o]. More insights are needed on \"where/how users struggle with LLMs to harness full potential for software tasks\" [sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o].\n\n**6. Repetitive and Unproductive Conversations**\nUsers \"can become frustrated if the conversation becomes repetitive or fails to address core error,\" even when mixed-initiative approaches are used for disambiguation [sciverse_natural_language_interfaces_for_databases_what_do_users_think_].\n\n**7. Limited User Control and Transparency in Training**\nTraditional AutoML and fine-tuning pipelines suffer from \"lack of interpretability and user engagement during the training process\" and \"lack of transparency in final decision-making and limited user control\" [ext_uniautoml]. Managing imbalanced datasets and hyperparameter tuning remain challenging for non-expert users [ext_finetuning_guide].\n\n**8. Multi-Intent and Complex Task Handling**\nTools like AutoCopilot \"occasionally encounter incorrect\" identification of a single automation function from multiple intents in complex tasks, reflecting a broader limitation in handling compound user goals [sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o].\n\n## Summary\n\nThe landscape of LLM optimization interfaces spans automated prompt search, direct manipulation, scaffolded guidance, proactive agents, structured AutoML pipelines, and model transparency tools. The biggest remaining user problems cluster around: (a) the difficulty of constructing and refining effective prompts, (b) assessing the reliability of LLM outputs in the face of hallucination, (c) workflow disruption from complex or proactive interfaces, (d) interaction style mismatches between natural conversation and effective prompting, (e) insufficient contextual awareness of the user's specific task environment, and (f) limited transparency and user control in the training/fine-tuning process. These problems are interrelated and suggest that future interfaces need to combine structured interaction patterns with contextual awareness, reliability signals, and graduated levels of user control.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "interface for optimizing LLM prompt engineering tool user",
+     "k": 12
+    },
+    "intent": "Find papers discussing interfaces/tools for LLM optimization",
+    "obs_chars": 1892,
+    "notes_chars": 1492
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "user problem|limitation|difficulty|challenge|struggle|confusion"
+    },
+    "intent": "Find criticism/limitation records about user problems with LLM optimization",
+    "obs_chars": 3849,
+    "notes_chars": 1492
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "scaffolded interface LLM tuning fine-tuning prompt design tool",
+     "k": 12
+    },
+    "intent": "Find papers about scaffolded interfaces and LLM tuning tools",
+    "obs_chars": 1748,
+    "notes_chars": 1492
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "llms and mm-llms"
+    },
+    "intent": "Get dossier on LLMs entity for cross-paper evidence",
+    "obs_chars": 396,
+    "notes_chars": 1492
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "contains": "interface|scaffold|user|problem|challenge|optimiz|prompt|tuning"
+    },
+    "intent": "Extract findings from the scaffolded interfaces paper for interface descriptions and user problems",
+    "obs_chars": 1149,
+    "notes_chars": 2128
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "contains": "interface|user|problem|challenge|perception|paradigm|optimiz|prompt"
+    },
+    "intent": "Extract findings from do-it-for-me vs do-it-with-me paper on user perceptions and problems",
+    "obs_chars": 1621,
+    "notes_chars": 2128
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "user|problem|challenge|failure|go wrong|interface|optimiz|prompt|limitation"
+    },
+    "intent": "Extract findings from why-and-when-LLM-assistants-go-wrong paper on user problems",
+    "obs_chars": 1079,
+    "notes_chars": 2128
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_elic",
+     "contains": "interface|user|problem|challenge|prompt|pattern|optimiz|tool"
+    },
+    "intent": "Extract findings from ChatGPT prompt patterns paper on interface/prompt optimization",
+    "obs_chars": 244,
+    "notes_chars": 2128
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N3. [ext_abscribe_rapid_exploration] AI Modifiers: buttons for specific actions; free-form conversat"
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations/design principles from scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 2706
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_elic"
+    },
+    "intent": "Get findings from chatgpt prompt patterns paper on interfaces for LLM optimization",
+    "obs_chars": 1610,
+    "notes_chars": 2706
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_"
+    },
+    "intent": "Get findings from natural language interfaces for databases paper on user problems",
+    "obs_chars": 1828,
+    "notes_chars": 2706
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "prompt engineering interface tool LLM optimization user experience",
+     "k": 12
+    },
+    "intent": "Broader search for LLM optimization interfaces in corpus",
+    "obs_chars": 1752,
+    "notes_chars": 2706
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess"
+    },
+    "intent": "Get full dossier on scaffolded interfaces paper",
+    "obs_chars": 319,
+    "notes_chars": 3067
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi"
+    },
+    "intent": "Get full dossier on do-it-for-me vs do-it-with-me paper",
+    "obs_chars": 307,
+    "notes_chars": 3067
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o"
+    },
+    "intent": "Get full dossier on LLM assistants going wrong paper",
+    "obs_chars": 307,
+    "notes_chars": 3067
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des"
+    },
+    "intent": "Get full dossier on designerly understanding / model transparency paper",
+    "obs_chars": 661,
+    "notes_chars": 3067
+   },
+   {
+    "f28_auto_retrieval": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+    "at_step": 7,
+    "obs_chars": 1149
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "claim_type": "observation"
+    },
+    "intent": "Get user perception findings from the do-it-for-me vs do-it-with-me paper",
+    "obs_chars": 2117,
+    "notes_chars": 3067
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "observation"
+    },
+    "intent": "Get findings on when LLM assistants fail from the go-wrong paper",
+    "obs_chars": 1079,
+    "notes_chars": 3067
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "claim_type": "observation"
+    },
+    "intent": "Get findings on model transparency information needs from designerly understanding paper",
+    "obs_chars": 593,
+    "notes_chars": 3067
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio",
+     "claim_type": "observation"
+    },
+    "intent": "Get findings on agent-augmented counterfactual explanations",
+    "obs_chars": 1460,
+    "notes_chars": 3067
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "scaffolded interface design LLM prompt optimization user workflow"
+    },
+    "intent": "Find scaffolded interface design details and LLM optimization interface descriptions",
+    "obs_chars": 2160,
+    "notes_chars": 4602
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "do it for me do it with me user perception LLM interaction paradigm"
+    },
+    "intent": "Find user perception findings on LLM interaction paradigms",
+    "obs_chars": 1867,
+    "notes_chars": 4602
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "LLM assistant go wrong effectiveness user problem challenge"
+    },
+    "intent": "Find findings on when LLM assistants fail and user problems",
+    "obs_chars": 1751,
+    "notes_chars": 4602
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "model transparency information needs designer UX LLM"
+    },
+    "intent": "Find model transparency and designer information needs",
+    "obs_chars": 1753,
+    "notes_chars": 4602
+   },
+   {
+    "step": 12,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "prompt engineering tool interface user LLM fine-tuning configuration RAG optimization workflow"
+    },
+    "intent": "Find papers about specific tools/interfaces for LLM optimization",
+    "obs_chars": 1752,
+    "notes_chars": 5379
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "claim_type": "criticism"
+    },
+    "intent": "Get user problems/limitations from do it for me vs do it with me paper",
+    "obs_chars": 2117,
+    "notes_chars": 5379
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "criticism"
+    },
+    "intent": "Get user problems from why and when LLM assistants go wrong paper",
+    "obs_chars": 1079,
+    "notes_chars": 5379
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "claim_type": "observation"
+    },
+    "intent": "Get scaffolded interfaces paper findings on specific interface designs",
+    "obs_chars": 1149,
+    "notes_chars": 5379
+   },
+   {
+    "f28_auto_retrieval": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+    "at_step": 16,
+    "obs_chars": 2117
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings on why/when LLM assistants go wrong",
+    "obs_chars": 1079,
+    "notes_chars": 5135
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get model transparency information needs and recommendations",
+    "obs_chars": 187,
+    "notes_chars": 5135
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get agent-augmented counterfactual explanation recommendations",
+    "obs_chars": 1031,
+    "notes_chars": 5135
+   },
+   {
+    "step": 20,
+    "tool": "card",
+    "args": {
+     "entity": "prompt engineering"
+    },
+    "intent": "Get cross-paper dossier on prompt engineering interfaces/tools",
+    "obs_chars": 1322,
+    "notes_chars": 4871
+   },
+   {
+    "step": 20,
+    "tool": "card",
+    "args": {
+     "entity": "large language model"
+    },
+    "intent": "Get cross-paper dossier on LLM-related interfaces and tools",
+    "obs_chars": 4515,
+    "notes_chars": 4871
+   },
+   {
+    "step": 20,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "interface tool for optimizing LLM task prompt fine-tuning RAG configuration user"
+    },
+    "intent": "Find papers about interfaces/tools for LLM optimization",
+    "obs_chars": 286,
+    "notes_chars": 4871
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get specific interface designs proposed in scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 5359
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 37
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "interface tool for optimizing LLM task prompt fine-tuning RAG configuration user",
+     "k": 10
+    },
+    "intent": "Find papers about interfaces/tools for LLM optimization",
+    "obs_chars": 2562,
+    "notes_chars": 5359
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "human-AI interaction LLM prompt engineering user interface design challenges",
+     "k": 10
+    },
+    "intent": "Find papers on human-AI interaction for LLM prompt engineering",
+    "obs_chars": 2647,
+    "notes_chars": 5359
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "LLM optimization workflow tool user experience fine-tuning RAG prompt",
+     "k": 10
+    },
+    "intent": "Find papers on LLM optimization workflow tools and UX",
+    "obs_chars": 2681,
+    "notes_chars": 5359
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "user problems challenges LLM prompt engineering interface usability",
+     "k": 10
+    },
+    "intent": "Find papers on user problems with LLM prompt engineering interfaces",
+    "obs_chars": 2485,
+    "notes_chars": 5359
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "f28_auto_retrieval": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+    "at_step": 26,
+    "obs_chars": 1079
+   },
+   {
+    "step": 28,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "step": 28,
+    "tool": "search_text",
+    "args": {
+     "query": "interface tool LLM optimization prompt fine-tuning RAG configuration user experience",
+     "k": 12
+    },
+    "intent": "Find more papers about LLM optimization interfaces in corpus",
+    "obs_chars": 286,
+    "notes_chars": 7400
+   },
+   {
+    "step": 29,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   },
+   {
+    "step": 30,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative +",
+     "N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct m",
+     "N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in construct"
+    ]
+   }
+  ],
+  "notes_final": "N1. [arxiv_2404.01077] LLM-driven prompt optimization methods: OPRO, PromptAgent, EvoPrompt, RLPrompt, DSP, ProTeGi, PE2, PREFER. | anchor:\"designing natural language prompts is an art that demands a lot of time and experience\" | epistemic:stated\nN2. [coarse:1a43454b15e8] Scaffolded interfaces: relying on external resources (video tutorials, forums) to navigate interfaces disrupts workflow, doesn't give contextually relevant help, hinders self-directed learning. | anchor:\"This forces users to rely heavily on external resources, such as video tutorials, forums\" | epistemic:stated\nN3. [coarse:697f952cfec3] Common mitigation: simplified alternatives (beginner modes, novice apps, AI-assisted). | anchor:\"One common strategy has been to provide simplified alternatives, such as dedicated beginne\" | epistemic:stated\nN4. [coarse:551ebacb0582] AutoCopilot: generates concise textual responses + facilitates follow-up debugging questions. | anchor:\"to generate a concise textual response and facilitate users' follow-up debugging questions\" | epistemic:stated\nN5. [coarse:a02240192cac] AutoCopilot integrates LLM-based web search for up-to-date follow-up responses when existing documentation is insufficient. | anchor:\"We integrated LLM-based web search for up-to-date follow-up responses when existing docume\" | epistemic:stated\nN6. [coarse:faa8d2f260c9] AutoCopilot limitation: fails to identify single automation function from multiple intents in complex tasks. | anchor:\"To mirror real-world automation performance, AutoCopilot occasionally encounters incorrect\" | epistemic:stated\nN7. [coarse:621c617a78b2] LLM assistants paper: unclear how integrating context of feature-rich applications helps novice end-users seek accurate/relevant assistance. | anchor:\"As many of these interfaces are still at a nascent stage, it is unclear how this current p\" | epistemic:stated\nN8. [coarse:848b46531c9d] More insights needed on where/how users struggle with LLMs to harness full potential for software tasks. | anchor:\"Furthermore, to harness the full potential of these LLM assistants for seeking help for th\" | epistemic:stated\nN9. [coarse:daadaa71b5cd] MISP uses mixed-initiative approach, asking follow-up questions to clarify user intent. | anchor:\"Systems like MISP [16] and DialSQL [17] use a mixed-initiative approach, asking follow-up\" | epistemic:stated\nN10. [coarse:463c2cba7d43] Users become frustrated if conversation becomes repetitive or fails to address core error. | anchor:\"While effective for simple disambiguation, users can become frustrated if the conversation\" | epistemic:stated\nN11. [coarse:fa87561f27e0] Interactive methods help establish \"common ground\" between user and AI. | anchor:\"These interactive methods help establish \\\"common ground\\\" between the user and the AI\" | epistemic:stated\nN12. [coarse:c7aa1a25c486] Designerly understanding: challenges for UX practitioners to work with \"AI as a design material,\" including complexity of the material itself. | anchor:\"Researchers have investigated the challenges for UX practitioners to work with \\\"AI as a de\" | epistemic:stated\nN13. [coarse:606674c865e6] Show me how: conversational AI agents are prone towards hallucination. | anchor:\"Despite the benefits of conversational AI agents, they are prone towards hallucination.\" | epistemic:stated\nN14. [coarse:796cbcdf723c] Show me how: prompt engineering = crafting effective instructions to guide LLM in generating desired outputs. | anchor:\"Prompt engineering is the process of crafting effective instructions (or prompts) to guide\" | epistemic:stated\nN15. [coarse:8e2a7b553e2f] Show me how: fine-tuning is one of two most effective approaches to mitigate hallucination. | anchor:\"The two most effective approaches proposed in the literature to mitigate the hallucination\" | epistemic:stated\nN16. [ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_] Abscribe: AI Modifiers - buttons created from prompts, auto-labeled by LLM, reusable across passages, editable over time. | anchor:\"The labels are generated using the LLM. As users experiment with newer variations using the AI, they create a set of custom AI Modifiers\" | epistemic:stated\nN17. [ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_] Abscribe: free-form conversational UIs lead users to adopt polite/verbose style vs. button-based actions. | anchor:\"in free-form conversational user interfaces, we saw a tendency for users to adopt a more polite and verbose style\" | epistemic:stated\nN18. [ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization] Mapping design space of human-AI interaction in text summarization: developed digital tools to support people writing summaries. | anchor:\"a collection of digital tools that we developed to support people to write summaries\" | epistemic:stated\nN19. [cc9c7bea941a50] Prompt engineering in SQL generation commonly fails to adapt well to changing data. | anchor:\"Current prompt engineering techniques in SQL generation commonly fail to adapt well to changing data\" | epistemic:stated\nN20. [coarse:8d378395fd4d] EA-LLMs (emotion-aware LLMs) instructed by prompt engineering techniques expected to emerge. | anchor:\"A new intelligent system is expected to emerge where EA-LLMs, instructed by prompt engineering techn\" | epistemic:stated\n[unsourced] N21. [ext_uniautoml] UniAutoML: human-centered AutoML framework using LLMs to unify discriminative + generative AutoML; addresses lack of interpretability, user engagement, transparency, and user control in traditional AutoML. | anchor:\"lack of interpretability and user engagement during the training process... lack of transparency in final decision-making and limited user control\" | epistemic:stated\n[unsourced] N22. [ext_directgpt] DirectGPT: direct manipulation interface on top of ChatGPT; transforms direct manipulation actions to engineered prompts. | anchor:\"participants were 50% faster and relied on 50% fewer and 72% shorter prompts\" | epistemic:stated\n[unsourced] N23. [ext_from_prompting_to_partnering] From Prompting to Partnering: user difficulties in constructing effective prompts, iteratively refining AI-generated responses, assessing response reliability in unfamiliar domains. Designed prototype with Reflective Prompting, Section Regeneration, Input-Output Mapping, Confidence indicators. | anchor:\"key user difficulties in constructing effective prompts, iteratively refining AI-generated responses, and assessing response reliability\" | epistemic:stated\n[unsourced] N24. [ext_codellaborator] Codellaborator: proactive AI programming agent; trade-offs between efficiency gains and workflow disruptions; presence indicators + interaction context alleviate disruptions. | anchor:\"proactive agents increase efficiency compared to prompt-only paradigm, but also incur workflow disruptions\" | epistemic:stated\n[unsourced] N25. [ext_finetuning_guide] Ultimate guide to fine-tuning LLMs: structured seven-stage pipeline (data prep, model init, hyperparameter tuning, deployment); parameter-efficient methods (LoRA, Half Fine-Tuning); challenges in managing imbalanced datasets. | anchor:\"structured seven-stage pipeline for fine-tuning LLMs, spanning data preparation, model initialization, hyperparameter tuning, and model deployment\" | epistemic:stated",
+  "gaps_final": "G1. Scaffolded interfaces paper: specific interface designs proposed (not yet retrieved)\nG2. \"Why and when LLM-based assistants can go wrong\" findings (not yet retrieved)\nG3. \"Designerly understanding\" paper on model transparency (not yet retrieved)\nG4. \"Show me how\" paper on agent-augmented counterfactual explanations (not yet retrieved)\nG5. Broader: other LLM optimization interfaces in corpus\nG6. More papers specifically about interfaces/tools for LLM optimization",
+  "queried": [
+   "search_text|{\"k\": 12, \"query\": \"interface for optimizing LLM prompt engineering tool user\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"user problem|limitation|difficulty|challenge|struggle|confusion\"}",
+   "search_text|{\"k\": 12, \"query\": \"scaffolded interface LLM tuning fine-tuning prompt design tool\"}",
+   "card|{\"entity\": \"llms and mm-llms\"}",
+   "findings|{\"contains\": \"interface|scaffold|user|problem|challenge|optimiz|prompt|tuning\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"contains\": \"interface|user|problem|challenge|perception|paradigm|optimiz|prompt\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"contains\": \"user|problem|challenge|failure|go wrong|interface|optimiz|prompt|limitation\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"contains\": \"interface|user|problem|challenge|prompt|pattern|optimiz|tool\", \"paper_id\": \"sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_elic\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"paper_id\": \"sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_elic\"}",
+   "findings|{\"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "search_text|{\"k\": 12, \"query\": \"prompt engineering interface tool LLM optimization user experience\"}",
+   "card|{\"entity\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "card|{\"entity\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "card|{\"entity\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "card|{\"entity\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio\"}",
+   "search_text|{\"k\": 12, \"query\": \"scaffolded interface design LLM prompt optimization user workflow\"}",
+   "search_text|{\"k\": 12, \"query\": \"do it for me do it with me user perception LLM interaction paradigm\"}",
+   "search_text|{\"k\": 12, \"query\": \"LLM assistant go wrong effectiveness user problem challenge\"}",
+   "search_text|{\"k\": 12, \"query\": \"model transparency information needs designer UX LLM\"}",
+   "search_text|{\"k\": 12, \"query\": \"prompt engineering tool interface user LLM fine-tuning configuration RAG optimization workflow\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_show_me_how_benefits_and_challenges_of_agent_augmented_counterfactual_explanatio\"}",
+   "card|{\"entity\": \"prompt engineering\"}",
+   "card|{\"entity\": \"LLM\"}",
+   "search_text|{\"k\": 12, \"query\": \"interface tool for optimizing LLM task prompt fine-tuning RAG configuration user\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "search_papers|{\"k\": 10, \"query\": \"interface tool for optimizing LLM task prompt fine-tuning RAG configuration user\"}",
+   "search_papers|{\"k\": 10, \"query\": \"human-AI interaction LLM prompt engineering user interface design challenges\"}",
+   "search_papers|{\"k\": 10, \"query\": \"LLM optimization workflow tool user experience fine-tuning RAG prompt\"}",
+   "search_papers|{\"k\": 10, \"query\": \"user problems challenges LLM prompt engineering interface usability\"}",
+   "findings|{\"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "search_text|{\"k\": 12, \"query\": \"interface tool LLM optimization prompt fine-tuning RAG configuration user experience\"}"
+  ],
+  "gate": {
+   "note_rejects": 36,
+   "numeric_fail": {
+    "missing_nums": [
+     "50",
+     "72"
+    ],
+    "unsourced": [],
+    "altered_titles": []
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 2,
+   "reject_reasons": {
+    "bad_backref": 36
+   },
+   "merge_downgraded_lines": 38,
+   "merge_total_lines": 186,
+   "relaxed_writes": 8,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "5acd0e1d36af3c52c3159b4b",
+  "type": "aggregation",
+  "question": "What interfaces have researchers developed to help people perform behavioral evaluation of ML models, and how do they accelerate annotation efforts?",
+  "gold_hint": "",
+  "answer": "Behavioral evaluation of machine learning (ML) models is defined as a process that goes beyond measuring aggregate metrics, such as accuracy or F1 score, to understand patterns of model output for subgroups, or slices, of input [4726f41f35b608]. This approach focuses on defining and testing the capabilities of an ML system against a specification of requirements [a00f4ad0a4aef6]. To facilitate this, researchers have developed several interfaces, with Zeno being a prominent framework designed to reduce the learning curve and encourage the reuse of analyses by allowing users to perform behavioral evaluations on most ML tasks within a single system . Zeno’s design was informed by formative interviews with 18 ML practitioners, from which four main design goals were derived, including supporting comparison over time and no-code analysis . The interface supports interactive transformations, such as sliders to reduce amplitude, and provides a direct way to add new instances, features suggested by users to enhance the evaluation process [e32e5da9428436]. Additionally, participants suggested that the system should automatically generate ZENO API functions and configuration files for common ML libraries to streamline technical integration [0d7711880c2d65]. The interface also addresses usability by noting that technical terms such as 'metadata' may be too niche for everyday users and could be renamed [07d6cca9104ddf]. Zeno is positioned within a landscape of related tools, including FairVis, a visual analytics system for slice-based analysis, and Errudite, a similar system for NLP models [5a81c0cfbffd73] [51d8b9c43aba84]. It also relates to metamorphic testing, a concept from software engineering, exemplified by Checklist, a tool for NLP models that perturbs inputs [71edf208fec2ed] [a09d6d3b0f52de]. These tools address the limitation that many behavioral evaluation tools, such as fairness toolkits, often do not support the types of models, data, and tasks required for comprehensive evaluation [ab4fff7850e779].\n\nRegarding the acceleration of annotation and evaluation efforts, several mechanisms and interfaces have been developed to reduce manual workload. The sciverse_docspiral system leverages pretrained models for initial annotation to significantly reduce the manual labeling workload . The annotated data are then used to train or fine-tune to obtain Progressive Models that better meet user requirements . In the domain of activity recognition, an annotation process was accelerated with two Novel Activity Detectors that diversified the labels in the training set by issuing informed annotation requests . Cooperative Machine Learning (CML) techniques have also been employed to reduce manual labelling efforts by combining the power of computational capabilities and human intelligence . For medical imaging, the TissueWand tool serves as a rapid histopathology annotation tool intended for early stages of dataset curation where no task-specific ML model yet exists to aid the effort  . Similarly, an interactive annotation-tool for semantic segmentation was developed to assist radiologists in labeling CT scans, a process evaluated by 6 radiologists [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97].\n\nInterfaces that support human-in-the-loop evaluation and decision-making also contribute to the efficiency of behavioral assessment. The UPI (Uncertainty-Performance Interface) couples confidence scores with outcome heat-maps so that decision makers can dynamically adjust their thresholds . This design is supported by findings that users build more accurate mental models when an AI system discloses its own error likelihood . In the context of learning from demonstrations (LfD), embedding LfD within a configurable user interface empowers the user to create customized primitives that the system can execute autonomously . Other tools allow users to use an API to deliver input and extract output in addition to using a web-based interface, providing flexibility in how evaluations are conducted . Domain experts and end-users judge outputs, supplying both task scores and subjective signals of trust, fairness, and usability, which are critical components of behavioral evaluation . While Zeno has demonstrated utility in identifying performance disparities, such as facial classification models performing significantly worse for darker-skinned women compared to lighter-skinned individuals , longer-term in-situ studies would provide more nuanced feedback for the utility of ZENO's model comparison features [ce3f7d9dc59e19]. The consulted records did not surface specific quantitative metrics detailing the degree of acceleration in annotation time or error rates for these interfaces, nor did they provide further details on the specific visualization features of Zeno beyond the interactive transformations and no-code analysis mentioned.",
+  "arm": "main",
+  "steps": 20,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. Question asks: (a) interfaces developed for behavioral evaluation of ML models, (b) how they acc",
+     "N2. Relevant entity candidates: \"behavioral models\", \"evaluation and benchmarking*\", \"Online Watch-A",
+     "N3. Paper candidates: sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "search",
+    "args": {
+     "query": "interface for behavioral evaluation of machine learning models annotation acceleration"
+    },
+    "intent": "Find corpus records about interfaces for behavioral evaluation and annotation acceleration",
+    "obs_chars": 1667,
+    "notes_chars": 696
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "behavioral models"
+    },
+    "intent": "Get cross-paper evidence dossier for behavioral models entity",
+    "obs_chars": 369,
+    "notes_chars": 696
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "interface|annotation|behavioral evaluation|watch-and-help"
+    },
+    "intent": "Find finding records about interfaces, annotation, and behavioral evaluation",
+    "obs_chars": 2516,
+    "notes_chars": 696
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "interface behavioral evaluation annotation tool ML model",
+     "k": 12
+    },
+    "intent": "Full-text search for papers discussing interfaces for behavioral evaluation and annotation",
+    "obs_chars": 1897,
+    "notes_chars": 696
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "Online Watch-And-Help"
+    },
+    "intent": "Get dossier for Online Watch-And-Help entity — likely a behavioral evaluation interface",
+    "obs_chars": 393,
+    "notes_chars": 2042
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "interface|annotation|behavioral|evaluation tool|watch",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about interfaces for behavioral evaluation and annotation acceleration",
+    "obs_chars": 2433,
+    "notes_chars": 2042
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "interface tool behavioral evaluation ML model annotation accelerate human-in-the-loop"
+    },
+    "intent": "Broader text search for behavioral evaluation interfaces and annotation acceleration",
+    "obs_chars": 1897,
+    "notes_chars": 2042
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess"
+    },
+    "intent": "Get findings from the scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 2042
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "watch-and-help interface behavioral evaluation machine learning model annotation"
+    },
+    "intent": "Find the Watch-And-Help paper and related behavioral evaluation interface papers",
+    "obs_chars": 2006,
+    "notes_chars": 2965
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "watch|help|behavioral|annotation tool|evaluation interface|human evaluation",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about behavioral evaluation interfaces and annotation tools",
+    "obs_chars": 2210,
+    "notes_chars": 2965
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "annotation tool interface accelerate labeling human-in-the-loop ML model evaluation"
+    },
+    "intent": "Find papers about annotation tools that accelerate labeling for ML evaluation",
+    "obs_chars": 1897,
+    "notes_chars": 2965
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "evaluation and benchmarking"
+    },
+    "intent": "Get dossier on evaluation and benchmarking entity for related papers",
+    "obs_chars": 537,
+    "notes_chars": 2965
+   },
+   {
+    "step": 5,
+    "tool": "search_papers",
+    "args": {
+     "query": "interface tool for behavioral evaluation of machine learning models human annotation",
+     "k": 10
+    },
+    "intent": "Find external papers specifically about interfaces for behavioral evaluation of ML models",
+    "obs_chars": 2533,
+    "notes_chars": 2965
+   },
+   {
+    "step": 5,
+    "tool": "search_papers",
+    "args": {
+     "query": "human-in-the-loop annotation interface accelerate labeling machine learning model evaluation",
+     "k": 10
+    },
+    "intent": "Find papers on how interfaces accelerate annotation for ML model evaluation",
+    "obs_chars": 2589,
+    "notes_chars": 2965
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "interface|annotation|behavioral|evaluation|watch|help|tool"
+    },
+    "intent": "Find recommendation-type findings about interfaces and annotation tools",
+    "obs_chars": 2506,
+    "notes_chars": 2965
+   },
+   {
+    "step": 6,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "watch-and-help interface behavioral evaluation machine learning model annotation"
+    },
+    "intent": "Find the Watch-And-Help paper and related behavioral evaluation interface papers",
+    "obs_chars": 2549,
+    "notes_chars": 2965
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [search_papers] Zeno (2023): \"general-purpose framework for visualizing and testing AI systems "
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "admit_paper",
+    "args": {
+     "title": "zeno: an interactive framework for behavioral evaluation of machine learning"
+    },
+    "intent": "Admit Zeno paper for deep reading to get concrete details on how it accelerates annotation",
+    "obs_chars": 468,
+    "notes_chars": 3385
+   },
+   {
+    "step": 7,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "interactive tool interface human annotation labeling machine learning model evaluation accelerate"
+    },
+    "intent": "Find more papers on annotation/evaluation interfaces for ML models",
+    "obs_chars": 2623,
+    "notes_chars": 3385
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_tissuewand_a_rapid_histopathology_annotation_tool",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from TissueWand annotation tool paper",
+    "obs_chars": 903,
+    "notes_chars": 3385
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_adanonymizer_interactively_navigating_and_balancing_the_duality_of_privacy_and_o",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from AdaAnonymizer interactive tool paper",
+    "obs_chars": 187,
+    "notes_chars": 3385
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 8,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "sections": [
+      "introduction",
+      "system design",
+      "evaluation"
+     ]
+    },
+    "intent": "Get Zeno's specific interface features, how it structures behavioral evaluation, and any annotation acceleration mechani",
+    "obs_chars": 1476,
+    "notes_chars": 4476
+   },
+   {
+    "step": 8,
+    "tool": "search_papers",
+    "args": {
+     "k": 10,
+     "query": "interactive interface tool behavioral evaluation machine learning model testing annotation active learning human-in-the-loop"
+    },
+    "intent": "Find more papers specifically about interfaces for behavioral evaluation of ML models",
+    "obs_chars": 2634,
+    "notes_chars": 4476
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get Zeno's mechanism records from deep_read to understand its interface features and how it accelerates behavioral evalu",
+    "obs_chars": 187,
+    "notes_chars": 5235
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "behavioral models",
+     "claim_type": "mechanism",
+     "contains": "interface|annotation|evaluation|tool|interactive"
+    },
+    "intent": "Find mechanism records about behavioral evaluation interfaces in the corpus",
+    "obs_chars": 244,
+    "notes_chars": 5235
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "query": "Zeno interactive framework behavioral evaluation machine learning interface features visualization testing",
+     "k": 12
+    },
+    "intent": "Search for more details on Zeno's interface features and how it accelerates evaluation",
+    "obs_chars": 2125,
+    "notes_chars": 5235
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 10,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "sections": [
+      "system design",
+      "evaluation",
+      "discussion"
+     ]
+    },
+    "intent": "Get Zeno's specific interface features, design goals, and how it accelerates behavioral evaluation",
+    "obs_chars": 205,
+    "notes_chars": 6018
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "annotation|labeling|speed|accelerate|reduce|effort|time",
+     "entity": "behavioral models"
+    },
+    "intent": "Find mechanism records about how interfaces accelerate annotation in behavioral evaluation context",
+    "obs_chars": 244,
+    "notes_chars": 6018
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "claim_type": "observation"
+    },
+    "intent": "Get Zeno's observation records from deep_read for interface features and evaluation workflow details",
+    "obs_chars": 566,
+    "notes_chars": 6018
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "annotation|labeling|speed|accelerate|reduce|effort|time",
+     "entity": "behavioral models"
+    },
+    "intent": "Find observation records about annotation acceleration mechanisms in behavioral models context",
+    "obs_chars": 244,
+    "notes_chars": 6018
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get Zeno's design recommendations and how the interface accelerates evaluation",
+    "obs_chars": 2081,
+    "notes_chars": 6018
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N18. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning",
+     "claim_type": "definition"
+    },
+    "intent": "Get Zeno's definition of behavioral evaluation and its interface components",
+    "obs_chars": 2699,
+    "notes_chars": 7146
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Zeno visualization testing interface features model comparison behavioral evaluation annotation"
+    },
+    "intent": "Find Zeno's specific interface features and how they accelerate evaluation",
+    "obs_chars": 286,
+    "notes_chars": 7146
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 18,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 19,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "step": 20,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Mac",
+     "N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (201"
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 20,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [4726f41f35b608] Zeno: \"Behavioral evaluation requires going beyond measuring aggregate metrics, such as accuracy or F1 score, and understanding patterns of model output for subgroups, or slices, of input\" | anchor:\"going beyond measuring aggregate metrics, such as accuracy or F1 score\" | epistemic:stated\nN2. [a00f4ad0a4aef6] Zeno: \"Behavioral evaluation focuses on defining and testing the capabilities of an ML system, its expected behavior on a specification of requirements\" | anchor:\"defining and testing the capabilities of an ML system\" | epistemic:stated\nN3. [51d8b9c43aba84] Zeno: \"The behavioral evaluation method most related to ZENO is subgroup, or slice-based, analysis, calculating metrics on subsets of a dataset\" | anchor:\"subgroup, or slice-based, analysis, calculating metrics on subsets\" | epistemic:stated\nN4. [5a81c0cfbffd73] Zeno: \"FairVis is a visual analytics system that allows users to compare subs...\" (slice-based analysis tool) | anchor:\"FairVis [9], a visual analytics system\" | epistemic:stated\nN5. [1968d4e6b65604] Zeno: \"Errudite is a similar system for NLP models with which users can creat...\" | anchor:\"Errudite [59] is a similar system for NLP models\" | epistemic:stated\nN6. [71edf208fec2ed] Zeno: \"Metamorphic testing is a concept from software engineering that involv...\" | anchor:\"metamorphic testing is a concept from software engineering\" | epistemic:stated\nN7. [a09d6d3b0f52de] Zeno: \"Checklist is a metamorphic testing tool for NLP models that perturbs t...\" | anchor:\"Checklist [49] is a metamorphic testing tool for NLP models\" | epistemic:stated\nN8. [ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning#22950] Zeno design: \"To reduce the learning curve and encourage the reuse of analyses, users should be able to use one framework to perform behavioral evaluations on most ML tasks\" | anchor:\"reduce the learning curve and encourage the reuse of analyses\"\nN9. [ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning#58050] Zeno: \"we conducted formative interviews with 18 ML practitioners. From the interview results we derived four main design goals for an evaluation system, including supporting comparison over time and no-code analysis\" | anchor:\"four main design goals... supporting comparison over time and no-code analysis\"\nN10. [e32e5da9428436] Zeno user feedback: \"a direct way to add new instances and more interactive transformations like a slider to reduce amplitude\" | anchor:\"a direct way to add new instances and more interactive transformations\" | epistemic:stated\nN11. [0d7711880c2d65] Zeno: participants suggested \"automatically generating ZENO API functions and configuration files for common ML libraries\" | anchor:\"automatically generating ZENO API functions and configuration files\" | epistemic:stated\nN12. [07d6cca9104ddf] Zeno: \"Technical terms such as 'metadata' may be too niche for everyday users and could be renamed\" | anchor:\"technical terms such as \\\"metadata\\\" may be too niche\" | epistemic:stated\nN13. [ce3f7d9dc59e19] Zeno: \"Longer-term, in-situ studies would provide more nuanced feedback for the utility of ZENO's model comparison features\" | anchor:\"in-situ studies would provide more nuanced feedback\" | epistemic:stated\nN14. [49c997f09f0f69] Zeno: \"Facial classification models performed significantly worse for darker-skinned women compared to lighter-skinne...\" | anchor:\"performed significantly worse for darker-skinned women\"\nN15. [ab4fff7850e779] Zeno: \"Many behavioral evaluation tools, such as fairness toolkits, often do not support the types of models, data, a...\" | anchor:\"Many behavioral evaluation tools, such as fairness toolkits, often do not support\" | epistemic:stated\nN16. [coarse:ad124b36c130] sciverse_docspiral: \"leverages pretrained models for initial annotation to significantly reduce the manual labeling workload\" | anchor:\"leverages pretrained models for initial annotation to significantly reduce the manual labeling workload\" | epistemic:stated\nN17. [coarse:52e87e2c8b02] sciverse_docspiral: \"Annotated data are then used to train or fine-tune to obtain Progressive Models that better meet user requirements\" | anchor:\"train or fine-tune to obtain Progressive Models\" | epistemic:stated\nN18. [coarse:38773973ce6a] [ieee 2015]: \"annotation process was accelerated with two Novel Activity Detectors that diversified the labels in the training set by issuing informed annotation requests\" | anchor:\"accelerated with two Novel Activity Detectors that diversified the labels\" | epistemic:stated\nN19. [arxiv_2403.04931#37800] UPI (Uncertainty-Performance Interface): \"couples confidence scores with outcome heat-maps so that decision makers can dynamically adjust their thresholds\" | anchor:\"couples confidence scores with outcome heat-maps\"\nN20. [arxiv_2403.04931#37800] Bansal et al.: \"users build more accurate mental models when an AI system discloses its own error likelihood\" | anchor:\"users build more accurate mental models when an AI system discloses its own error likelihood\"\nN21. [coarse:1dc99136890b] [ieee 2014]: \"Embedding LfD within a configurable user interface empowers the user to create customized primitives that the system can execute autonomously\" | anchor:\"Embedding LfD within a configurable user interface empowers the user\" | epistemic:stated\nN22. [coarse:c1662eec23b2] [ieee 2018]: \"The tool allows users to use an API to deliver input and extract output in addition to using a web-based interface\" | anchor:\"use an API to deliver input and extract output in addition to using a web-based interface\" | epistemic:stated\nN23. [arxiv_2403.04931#24300] HAI survey: \"Domain experts and end-users judge outputs, supplying both task scores and subjective signals of trust, fairness, and usability\" | anchor:\"Domain experts and end-users judge outputs, supplying both task scores and subjective signals\"\nN24. [coarse:6ce1dbc9ecc7] TissueWand: \"rapid histopathology annotation tool\" | anchor:\"The TissueWand tool shows promise to replace manual methods for early stages\" | epistemic:stated\nN25. [coarse:c846b6430fa8] TissueWand: \"intended for early stages of dataset curation where no task-specific ML model yet exists to aid the effort\" | anchor:\"replace manual methods for early stages\" | epistemic:stated\n[unsourced] N26. [2b812995651ff82da7be1b1efa11ec43e0eea0230f526884fcc53ea600050ed1] CML (2018): \"Cooperative Machine Learning (CML) techniques to reduce manual labelling efforts by combining the power of computational capabilities and human intelligence\" | anchor:\"reduce manual labelling efforts by combining the power of computational capabilities and human intelligence\"\n[unsourced] N27. [b598fb66e450370e63031f8e16f8871a4ac3ca3920771b2b8877910f583b4a97] CT-scan annotation tool (2019): \"interactive annotation-tool for semantic segmentation that assists the radiologist in labeling CT scans\"; evaluated by 6 radiologists | anchor:\"interactive annotation-tool for semantic segmentation that assists the radiologist\"",
+  "gaps_final": "G1. Need Zeno's specific interface features (visualization, testing, comparison) and how they accelerate evaluation/annotation\nG2. Need to identify more corpus papers specifically about behavioral evaluation interfaces (Online Watch-And-Help entity)\nG3. Need concrete mechanisms by which these interfaces accelerate annotation (active learning, pre-annotation, uncertainty-guided sampling)",
+  "queried": [
+   "search|{\"query\": \"interface for behavioral evaluation of machine learning models annotation acceleration\"}",
+   "card|{\"entity\": \"behavioral models\"}",
+   "findings|{\"contains\": \"interface|annotation|behavioral evaluation|watch-and-help\"}",
+   "search_text|{\"k\": 12, \"query\": \"interface behavioral evaluation annotation tool ML model\"}",
+   "card|{\"entity\": \"Online Watch-And-Help\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"interface|annotation|behavioral|evaluation tool|watch\"}",
+   "search_text|{\"k\": 12, \"query\": \"interface tool behavioral evaluation ML model annotation accelerate human-in-the-loop\"}",
+   "findings|{\"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "search_text|{\"k\": 12, \"query\": \"watch-and-help interface behavioral evaluation machine learning model annotation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"watch|help|behavioral|annotation tool|evaluation interface|human evaluation\"}",
+   "search_text|{\"k\": 12, \"query\": \"annotation tool interface accelerate labeling human-in-the-loop ML model evaluation\"}",
+   "card|{\"entity\": \"evaluation and benchmarking\"}",
+   "search_papers|{\"k\": 10, \"query\": \"interface tool for behavioral evaluation of machine learning models human annotation\"}",
+   "search_papers|{\"k\": 10, \"query\": \"human-in-the-loop annotation interface accelerate labeling machine learning model evaluation\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"interface|annotation|behavioral|evaluation|watch|help|tool\"}",
+   "search_papers|{\"k\": 10, \"query\": \"watch-and-help interface behavioral evaluation machine learning model annotation\"}",
+   "admit_paper|{\"title\": \"zeno: an interactive framework for behavioral evaluation of machine learning\"}",
+   "search_papers|{\"k\": 10, \"query\": \"interactive tool interface human annotation labeling machine learning model evaluation accelerate\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_tissuewand_a_rapid_histopathology_annotation_tool\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_adanonymizer_interactively_navigating_and_balancing_the_duality_of_privacy_and_o\"}",
+   "deep_read|{\"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\", \"sections\": [\"introduction\", \"system design\", \"evaluation\"]}",
+   "search_papers|{\"k\": 10, \"query\": \"interactive interface tool behavioral evaluation machine learning model testing annotation active learning human-in-the-loop\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"interface|annotation|evaluation|tool|interactive\", \"entity\": \"behavioral models\"}",
+   "search_text|{\"k\": 12, \"query\": \"Zeno interactive framework behavioral evaluation machine learning interface features visualization testing\"}",
+   "deep_read|{\"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\", \"sections\": [\"system design\", \"evaluation\", \"discussion\"]}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"annotation|labeling|speed|accelerate|reduce|effort|time\", \"entity\": \"behavioral models\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"annotation|labeling|speed|accelerate|reduce|effort|time\", \"entity\": \"behavioral models\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"ext_zeno_an_interactive_framework_for_behavioral_evaluation_of_machine_learning\"}",
+   "search_text|{\"k\": 12, \"query\": \"Zeno visualization testing interface features model comparison behavioral evaluation annotation\"}"
+  ],
+  "gate": {
+   "note_rejects": 30,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 30
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 45,
+   "merge_total_lines": 328,
+   "relaxed_writes": 15,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 14,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "ef77a4f716eda4a6c980c9d7",
+  "type": "aggregation",
+  "question": "What is a good Ontology semantic similarity measure that considers multiple inheritance cases of concepts?",
+  "gold_hint": "",
+  "answer": "Based on the consulted records, a suitable ontology semantic similarity measure that explicitly accounts for multiple inheritance is the one proposed in a 2015 study, which the paper states is designed to consider multiple inheritance in ontologies alongside the common specificity of the evaluated concepts to achieve more accurate similarity assessments . The specific name, mathematical formula, or detailed mechanism by which this 2015 measure processes multiple inheritance paths is not surfaced in the available notes, nor are the specific numerical results or advantages over prior measures detailed in the retrieved text, although the paper states that it compares the correlation of its measure with human scores against other measures . The evaluation of this 2015 measure was conducted using two datasets of biomedical term pairs that were scored by human experts, with SNOMED CT serving as the input ontology .\n\nAdditionally, a 2018 paper proposes an improved synthetic weighted algorithm for ontology-based semantic similarity computation, which the paper states yields results with higher accuracy and can solve the problem of multiple inheritance as well as the asymmetry of concepts  . However, the consulted records do not provide the specific name, formula, or detailed mechanism for this 2018 algorithm, nor do they specify the exact datasets or numerical performance metrics used to validate its claims regarding multiple inheritance.",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "new measure considering multiple inheritance and common specificity"
+    },
+    "intent": "dossier for the measure entity",
+    "obs_chars": 455,
+    "notes_chars": 557
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "definition"
+    },
+    "intent": "definition of the measure from the 2015 paper",
+    "obs_chars": 603,
+    "notes_chars": 557
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "mechanism"
+    },
+    "intent": "how it handles multiple inheritance",
+    "obs_chars": 603,
+    "notes_chars": 557
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "definition"
+    },
+    "intent": "definition from the 2018 improved algorithm paper",
+    "obs_chars": 1023,
+    "notes_chars": 557
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "contains": "multiple inheritance|common specificity|measure|formula|similarity"
+    },
+    "intent": "get mechanism/definition records for the 2015 measure",
+    "obs_chars": 1594,
+    "notes_chars": 1102
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "observation"
+    },
+    "intent": "get observation/result records for the 2015 measure",
+    "obs_chars": 1594,
+    "notes_chars": 1102
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "contains": "multiple inheritance|inheritance|weighted|improved"
+    },
+    "intent": "check if 2018 algorithm addresses multi-inheritance",
+    "obs_chars": 1072,
+    "notes_chars": 1102
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "multiple inheritance ontology semantic similarity measure common specificity",
+     "k": 8
+    },
+    "intent": "full-text search for the measure's formula and multi-inheritance handling",
+    "obs_chars": 2701,
+    "notes_chars": 1102
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "improved synthetic weighted algorithm of ontology-based semantic similarity computation"
+    },
+    "intent": "dossier for 2018 improved algorithm: configs/results/findings/lineage",
+    "obs_chars": 583,
+    "notes_chars": 1583
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "ontology-based measures"
+    },
+    "intent": "dossier for ontology-based measures family: comparison context",
+    "obs_chars": 401,
+    "notes_chars": 1583
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "recommendation"
+    },
+    "intent": "any recommendation/advantage claims from 2015 paper",
+    "obs_chars": 603,
+    "notes_chars": 1583
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "recommendation"
+    },
+    "intent": "any recommendation/advantage claims from 2018 paper",
+    "obs_chars": 535,
+    "notes_chars": 1583
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2015 paper's own critical/limitation statements and any named measure details",
+    "obs_chars": 603,
+    "notes_chars": 1583
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "criticism"
+    },
+    "intent": "Get 2018 paper's critical statements re multi-inheritance/asymmetry",
+    "obs_chars": 535,
+    "notes_chars": 1583
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b",
+     "claim_type": "qualitative_ablation"
+    },
+    "intent": "Get ablation/qualitative findings on the measure's components (multi-inheritance, specificity)",
+    "obs_chars": 603,
+    "notes_chars": 1583
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "qualitative_ablation"
+    },
+    "intent": "Get 2018 ablation/qualitative findings on weighted algorithm components",
+    "obs_chars": 535,
+    "notes_chars": 1583
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "semantic similarity"
+    },
+    "intent": "Cross-paper dossier on semantic similarity measures to find the recommended one",
+    "obs_chars": 1792,
+    "notes_chars": 1583
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism of 2018 improved algorithm re multi-inheritance",
+    "obs_chars": 535,
+    "notes_chars": 1583
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "new measure considering multiple inheritance and common specificity",
+     "claim_type": "definition"
+    },
+    "intent": "Get the formal definition/name of the 2015 measure",
+    "obs_chars": 187,
+    "notes_chars": 1583
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "new measure considering multiple inheritance and common specificity",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism of how multiple inheritance is handled",
+    "obs_chars": 187,
+    "notes_chars": 1583
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "improved synthetic weighted algorithm of ontology-based semantic similarity computation",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism of 2018 improved algorithm",
+    "obs_chars": 587,
+    "notes_chars": 1583
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from 2018 paper for improved algorithm details",
+    "obs_chars": 1072,
+    "notes_chars": 1583
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "query": "multiple inheritance common specificity measure formula",
+     "k": 8
+    },
+    "intent": "Get verbatim prose from 2015 paper: measure name, formula, mechanism for multi-inheritance",
+    "obs_chars": 2751,
+    "notes_chars": 1583
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "query": "synthetic weighted algorithm multiple inheritance asymmetry accuracy",
+     "k": 8
+    },
+    "intent": "Get verbatim prose from 2018 paper: how it handles multi-inheritance and asymmetry",
+    "obs_chars": 2433,
+    "notes_chars": 1583
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: good ontology semantic similarity measure considering multiple inheritance of concepts.\nCore paper: sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b (2015).\nN1. [coarse:860f19d0439d] 2015 paper proposes a new measure considering multiple inheritance in ontologies + common specificity of evaluated concepts for more accurate similarity | anchor:\"we propose a new measure considering the multiple inheritance in ontologies and the\" | epistemic:stated\nN2. [coarse:640b7d581a79] 2015 measure evaluated on two datasets of biomedical term pairs scored by human experts, SNOMED CT as input ontology | anchor:\"we evaluate the proposed measure using two datasets of biomedical term pairs scor\" | epistemic:stated\nN3. [coarse:f21d810468c1] 2015: correlation of proposed measure with human scores compared against other measures | anchor:\"We compare the correlation obtained by our measure with human scores against other measure\" | epistemic:stated\nN4. [coarse:13410665f1fd] 2018 paper proposes improved synthetic weighted algorithm for ontology-based semantic similarity computation | anchor:\"improved synthetic weighted algorithm of ontology-based semantic similarity computation\" | epistemic:stated\nN5. [coarse:8c6a6244c831] 2018: results have higher accuracy and can solve the problem of multiple inheritance and the asymmetry of concepts | anchor:\"The results of semantic similarity computation based on ontology have higher accuracy and\" | epistemic:stated\nGaps: need measure name/formula, mechanism for multi-inheritance, results/advantages.",
+  "gaps_final": "G1. Specific measure name and definition/formula (2015 paper)\nG2. How it handles multiple inheritance (mechanism)\nG3. Reported results/advantages over prior measures\nG4. Whether 2018 improved algorithm also addresses multi-inheritance",
+  "queried": [
+   "card|{\"entity\": \"new measure considering multiple inheritance and common specificity\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "findings|{\"contains\": \"multiple inheritance|common specificity|measure|formula|similarity\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"contains\": \"multiple inheritance|inheritance|weighted|improved\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "search_text|{\"k\": 8, \"query\": \"multiple inheritance ontology semantic similarity measure common specificity\"}",
+   "card|{\"entity\": \"improved synthetic weighted algorithm of ontology-based semantic similarity computation\"}",
+   "card|{\"entity\": \"ontology-based measures\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "findings|{\"claim_type\": \"qualitative_ablation\", \"paper_id\": \"sciverse_an_ontology_based_semantic_similarity_measure_considering_multi_inheritance_in_b\"}",
+   "findings|{\"claim_type\": \"qualitative_ablation\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "card|{\"entity\": \"semantic similarity\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"new measure considering multiple inheritance and common specificity\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"new measure considering multiple inheritance and common specificity\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"improved synthetic weighted algorithm of ontology-based semantic similarity computation\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_improved_synthetic_weighted_algorithm_of_ontology_based_semantic_similarity_comp\"}",
+   "search_text|{\"k\": 8, \"query\": \"multiple inheritance common specificity measure formula\"}",
+   "search_text|{\"k\": 8, \"query\": \"synthetic weighted algorithm multiple inheritance asymmetry accuracy\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 5,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "5e6e212dc63d2064ba909a08",
+  "type": "aggregation",
+  "question": "What is the difference between FMRI datasets and MRI datasets in terms of data analysis?",
+  "gold_hint": "",
+  "answer": "The distinction between fMRI and MRI datasets in terms of data analysis is fundamentally rooted in their differing physical properties, data structures, and analytical objectives, as detailed in the consulted records.\n\n**Data Structure and Dimensionality**\nThe most significant structural difference lies in how the data is organized and interpreted. fMRI datasets are characterized as a set of cuboid elements, known as voxels, of variable dimension, where each voxel contains a time-series of data points corresponding to the number of volumes acquired . In this context, the data from a single scanning session, comprising $t$ volumes, is often treated as a single observation in advanced 4D approaches . Alternatively, an fMRI dataset can be defined as a collection of a large number of data samples in a Euclidean space . In contrast, MRI is denoted as anatomical high-resolution imaging, typically with in-plane resolution of less than 1mm . While fMRI data captures dynamic states due to blood flow, giving it a superiority over standard MRI in this regard , MRI datasets are often static anatomical references. For instance, in multi-modal contexts, MRI scans serve as the source for segmentation labels that act as ground truth for other modalities .\n\n**Analytical Objectives and Methods**\nThe analytical goals for fMRI and MRI diverge sharply. Conventional fMRI statistical analysis aims to determine which voxels have a time-course that correlates with a known stimulation pattern . This process is critical for determining brain activation patterns . To achieve this, fMRI analysis typically begins with pre-processing transformations designed to correct for potential artifacts from data acquisition . Because fMRI data often presents high-dimensional and low-sample settings, conventional analysis approaches include specific restrictions to prevent overfitting . For example, L1/L2 regularization approaches have been shown to provide visible improvements over nonconvex alternatives in these contexts . Furthermore, fMRI datasets require very detailed designed experiments to be conducted to effectively learn the brain . Specific analytical techniques for fMRI include neutrosophic-entropy-based clustering for signal analysis  and the use of machine learning classifiers, such as those applied to the Haxby dataset . Additionally, fMRI data from tasks like word observation has been connected with shallow embeddings such as GloVe and Word2Vec .\n\nIn contrast, MRI analysis is heavily focused on spatial prediction, which plays a critical role in automatic medical diagnosis from MRI imagery [svy_0e1545242c53]. A prominent area of MRI data analysis is style transfer, which enables the alignment of medical images taken with different scanners into a single unified style dataset for classification or detection . This is particularly relevant for methods like StyleMapper, a novel medical image style transfer method for MRI (specifically breast) that operates with limited training data . Experimental results on breast magnetic resonance images have validated these style transfer approaches . Furthermore, MRI reconstruction is a key analytical challenge, addressed by methods like SwinMR, a novel Swin transformer-based approach for fast MRI reconstruction . In multi-modal settings, MRI data is often processed using attention mechanisms, such as multiplying reference MRI with subtraction images as an attention gate [svy_c3dcb22c12be].\n\n**Dataset Composition and Context**\nThe composition of the datasets also reflects these analytical differences. Medical image databases generally include images from different sources such as CT, X-ray, MRI, and PET from various body parts [svy_382cc565dad3]. Specific datasets, like the APIS dataset, are designed as paired CT-MRI for ischemic stroke, highlighting the complementary nature of these modalities in clinical analysis . In such clinical contexts, a high percentage of patients (98.8%) had additional MRI modalities, such as T1, provided alongside standard sequences like DWI, B0, and ADC .\n\n**Gaps in Consulted Records**\nThe consulted records did not surface explicit comparative statements detailing the specific differences in analysis pipelines between fMRI and MRI beyond the structural and objective distinctions noted above. Additionally, the records did not provide detailed characteristics of structural MRI analysis beyond segmentation, classification, and reconstruction, nor did they include specific fMRI-specific analysis challenges from critical review papers.",
+  "arm": "main",
+  "steps": 14,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity list] Question asks: difference between fMRI datasets and MRI datasets in terms of data ",
+     "N2. [entity list] Relevant entities: \"mri and fmri data analysis\", \"conventional approaches for the ",
+     "N3. [paper list] Relevant papers: sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "mri and fmri data analysis"
+    },
+    "intent": "Get cross-paper evidence dossier on the combined mri/fmri data analysis entity",
+    "obs_chars": 530,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "4d approach to the analysis of functional brain images"
+    },
+    "intent": "Get dossier on the 4D fMRI analysis approach",
+    "obs_chars": 560,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "conventional fmri datasets"
+    },
+    "intent": "Get dossier on conventional fMRI datasets",
+    "obs_chars": 406,
+    "notes_chars": 872
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "mri analysis"
+    },
+    "intent": "Get dossier on MRI analysis",
+    "obs_chars": 384,
+    "notes_chars": 872
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity list] Question: difference between fMRI datasets and MRI datasets in terms of data analy",
+     "N2. [paper list] Relevant fMRI papers: sciverse_a_4d_approach_to_the_analysis_of_functional_brain_im",
+     "N3. [paper list] Relevant MRI paper: arxiv_2301.02069 (Deep Learning for Breast MRI Style Transfer, "
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat",
+     "contains": "fMRI|4D|functional|time series|analysis"
+    },
+    "intent": "Extract findings from the 4D fMRI analysis paper to understand fMRI data characteristics and analysis",
+    "obs_chars": 1012,
+    "notes_chars": 841
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach",
+     "contains": "fMRI|GLM|time series|statistical|analysis|limitations"
+    },
+    "intent": "Extract findings from the GLM fMRI review to understand fMRI analysis methods and their limitations",
+    "obs_chars": 1697,
+    "notes_chars": 841
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2301.02069",
+     "contains": "MRI|breast|style transfer|structural|analysis|dataset"
+    },
+    "intent": "Extract findings from the breast MRI paper to understand MRI data characteristics and analysis",
+    "obs_chars": 2307,
+    "notes_chars": 841
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u",
+     "contains": "fMRI|dimensionality|reduction|classifier|ML|analysis"
+    },
+    "intent": "Extract findings from the ML classifiers for fMRI paper to understand fMRI data analysis with ML",
+    "obs_chars": 1930,
+    "notes_chars": 841
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_state_of_brain_ne",
+     "contains": "fMRI|MRI|analysis|time series|signal|difference|structural|functional"
+    },
+    "intent": "Get findings from the working memory fMRI paper for additional fMRI analysis details",
+    "obs_chars": 1918,
+    "notes_chars": 2378
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "difference between fMRI and MRI data analysis structural functional",
+     "k": 12
+    },
+    "intent": "Search full texts for explicit comparisons between fMRI and MRI data analysis",
+    "obs_chars": 2023,
+    "notes_chars": 2378
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach",
+     "claim_type": "criticism",
+     "contains": "GLM|limitation|problem|issue|assumption|violation"
+    },
+    "intent": "Get critical/limitation statements about GLM approach to fMRI analysis",
+    "obs_chars": 244,
+    "notes_chars": 2378
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u",
+     "claim_type": "mechanism",
+     "contains": "dimensionality|reduction|PCA|feature|classification|MRI|fMRI|difference"
+    },
+    "intent": "Get mechanism findings about how fMRI data is processed differently (dimensionality reduction, ML)",
+    "obs_chars": 1403,
+    "notes_chars": 2378
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the 4D fMRI paper to understand the specific analytical approach",
+    "obs_chars": 987,
+    "notes_chars": 3245
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticism/limitation findings from the GLM review paper to understand fMRI analysis challenges",
+    "obs_chars": 1697,
+    "notes_chars": 3245
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "fMRI vs MRI structural functional data analysis difference time series",
+     "k": 12
+    },
+    "intent": "Search for explicit comparison statements between fMRI and MRI data analysis",
+    "obs_chars": 2046,
+    "notes_chars": 3245
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_state_of_brain_ne",
+     "claim_type": "mechanism",
+     "contains": "fMRI|MRI|difference|structural|functional|time series|analysis|signal"
+    },
+    "intent": "Get mechanism findings from the working memory fMRI paper about fMRI vs MRI differences",
+    "obs_chars": 950,
+    "notes_chars": 3245
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u",
+     "claim_type": "mechanism",
+     "contains": "fMRI|dimensionality|reduction|PCA|feature|classification|MRI|analysis"
+    },
+    "intent": "Get mechanism findings from the ML classifier comparison paper about fMRI analysis methods",
+    "obs_chars": 1403,
+    "notes_chars": 3245
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "mri"
+    },
+    "intent": "Get cross-paper evidence dossier for MRI to understand structural MRI analysis characteristics",
+    "obs_chars": 348,
+    "notes_chars": 3245
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "mri",
+     "contains": "structural|anatomy|image|analysis|classification|segmentation"
+    },
+    "intent": "Find findings about structural MRI data analysis characteristics",
+    "obs_chars": 3958,
+    "notes_chars": 3245
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "mri",
+     "claim_type": "definition",
+     "contains": "fMRI|MRI|functional|structural|difference|time series|volume"
+    },
+    "intent": "Find definitional findings distinguishing fMRI from MRI",
+    "obs_chars": 2479,
+    "notes_chars": 3245
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "mri",
+     "claim_type": "observation",
+     "contains": "fMRI|MRI|analysis|data|difference|time|spatial|volume|voxel"
+    },
+    "intent": "Find observational findings about fMRI vs MRI data characteristics",
+    "obs_chars": 2501,
+    "notes_chars": 3245
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "entity": "mri",
+     "claim_type": "mechanism",
+     "contains": "fMRI|MRI|analysis|method|approach|GLM|4D|dimensionality|reduction|classification"
+    },
+    "intent": "Find mechanism findings about fMRI vs MRI analysis methods",
+    "obs_chars": 2479,
+    "notes_chars": 3245
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach",
+     "claim_type": "criticism",
+     "contains": "GLM|assumption|violation|problem|limitation|issue|independence|correlation"
+    },
+    "intent": "Get GLM review's critical statements about fMRI analysis assumptions and limitations",
+    "obs_chars": 244,
+    "notes_chars": 5357
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat",
+     "claim_type": "mechanism",
+     "contains": "4D|voxel|time series|volume|session|observation|analysis|approach"
+    },
+    "intent": "Get the 4D approach's mechanism for fMRI analysis and how it differs from conventional",
+    "obs_chars": 987,
+    "notes_chars": 5357
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u",
+     "claim_type": "mechanism",
+     "contains": "dimensionality|reduction|PCA|feature|classification|fMRI|Haxby|MRI"
+    },
+    "intent": "Get ML classifier comparison details for fMRI data analysis",
+    "obs_chars": 1403,
+    "notes_chars": 5357
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_state_of_brain_ne",
+     "claim_type": "observation",
+     "contains": "fMRI|working memory|resting state|signal|analysis|difference|task|brain"
+    },
+    "intent": "Get working memory fMRI paper's observations on fMRI signal analysis",
+    "obs_chars": 1457,
+    "notes_chars": 5357
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach",
+     "claim_type": "observation",
+     "contains": "fMRI|MRI|time series|GLM|analysis|difference|functional|structural|voxel|volume"
+    },
+    "intent": "Get observation-type findings from the GLM critical review paper about fMRI analysis characteristics",
+    "obs_chars": 1697,
+    "notes_chars": 5357
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat",
+     "claim_type": "observation",
+     "contains": "fMRI|MRI|4D|voxel|time series|volume|session|analysis|difference|functional|structural"
+    },
+    "intent": "Get observation-type findings from the 4D approach paper about fMRI vs MRI analysis differences",
+    "obs_chars": 987,
+    "notes_chars": 5357
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u",
+     "claim_type": "observation",
+     "contains": "fMRI|MRI|dimensionality|reduction|PCA|feature|classification|analysis|difference|functional|structural"
+    },
+    "intent": "Get observation-type findings from the ML classifier comparison paper about fMRI vs MRI analysis",
+    "obs_chars": 1486,
+    "notes_chars": 5357
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_state_of_brain_ne",
+     "claim_type": "observation",
+     "contains": "fMRI|MRI|working memory|resting state|signal|analysis|difference|task|brain|activation"
+    },
+    "intent": "Get observation-type findings from the neutrosophic entropy paper about fMRI signal analysis",
+    "obs_chars": 1457,
+    "notes_chars": 5357
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "query": "fMRI vs MRI difference analysis time series structural functional",
+     "k": 12
+    },
+    "intent": "Find explicit statements comparing fMRI and MRI data analysis approaches",
+    "obs_chars": 1753,
+    "notes_chars": 5357
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 14,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:0b86225bb557] 4D approach paper presents new approach to fMRI data analysis | anchor:\"new approach to functional magnetic resonance imaging (FMRI) data an\" | epistemic:stated\nN2. [coarse:bb94ff95e09c] 4D approach treats data from one scanning session (t volumes) as a single observation | anchor:\"treat the data from one scanning session (comprising $t$ volumes, say) as one obse\" | epistemic:stated\nN3. [coarse:fa287622d524] fMRI dataset = set of cuboid elements (voxels) of variable dimension, each with time-series of as many time-points as volumes acquired | anchor:\"set of cuboid elements (i.e., voxels) of variable dimens\" | epistemic:stated\nN4. [coarse:99c8bbb6badf] Conventional fMRI statistical analysis aims to determine which voxels have time-course correlating with known stimulation pattern | anchor:\"determine which voxels have a time-course that correlates with some known pattern\" | epistemic:stated\nN5. [coarse:1937d530252e] First step in fMRI analysis: pre-processing transformations to correct artifacts from data acquisition | anchor:\"pre-processing transformations with the aim of correcting for several potential artifacts\" | epistemic:stated\nN6. [coarse:d6edc308b823] fMRI data has superiority over MRI due to blood flow capturing states | anchor:\"fMRI data has the superiority over MRI due to blood flow capturing states\" | epistemic:stated\nN7. [coarse:985897802b5b] fMRI datasets need very detailed designed experiments to learn the brain | anchor:\"fMRI datasets need very detailed designed experiment to be conducted to learn the\" | epistemic:stated\nN8. [coarse:8090378c7e31] ML classifier comparison study uses fMRI data from Haxby dataset | anchor:\"fMRI data from Haxby dataset\" | epistemic:stated\nN9. [coarse:567b8726f75c] StyleMapper: medical image style transfer for MRI (breast) with limited training data | anchor:\"novel medical image style transfer method\" | epistemic:stated\nN10. [coarse:0ca16f03d6c4] MRI style transfer enables alignment of images from different scanners into unified style dataset for classification/detection | anchor:\"alignment of medical images taken with different scanners into a single unified style dataset\" | epistemic:stated\nN11. [coarse:8aefba5410bc] MRI style transfer validated on breast magnetic resonance images | anchor:\"Experimental results on breast magnetic resonance images\" | epistemic:stated\nN12. [coarse:3d8535ec61d5] fMRI dataset defined as collection of large number of data samples in Euclidean space | anchor:\"An fMRI dataset is a collection of large number of data sample in a Euclidean space\" | epistemic:stated\nN13. [coarse:51ef79f485e8] Neutrosophic-entropy-based clustering proposed for fMRI signal analysis | anchor:\"analysis of fmri signals from working memory tasks and resting-state of brain: neutrosophi\" | epistemic:stated\nN14. [coarse:392450de1842] fMRI signal analysis important for determining brain activation patterns | anchor:\"The analysis of functional magnetic resonance imaging (fMRI) signals has an important role\" | epistemic:stated\nN15. [coarse:68da9e5] MRI = anatomical high resolution (<1mm in-plane) imaging | anchor:\"MRI is denoted as the anatomical high resolution ( $< 1\\\\math\" | epistemic:stated\nN16. [coarse:1dff32c] Conventional fMRI analysis approaches include restrictions to prevent overfitting in high-dimensional low-sample settings | anchor:\"To prevent overfitting in these high-dimensional and low-sam\" | epistemic:stated\nN17. [coarse:79c86e3] L1/L2 regularization approach shows visible improvements over nonconvex alternatives | anchor:\"Experimentally, we demonstrate visible improvements of L1/L2\" | epistemic:stated\nN18. [coarse:51eac82] Analysis of task-fMRI data during working memory shows apparent differences | anchor:\"Our results obtained through an analysis of task-fMRI data d\" | epistemic:stated\nN19. [coarse:4d19523] SwinMR: Swin transformer for fast MRI reconstruction | anchor:\"SwinMR, a novel Swin transformer based\" | epistemic:stated\nN20. [svy_090387a6d3] fMRI data from word observation tasks connected with shallow embeddings (GloVe, Word2Vec) | anchor:\"Xu et al. (2016) connected shallow embeddings (GloVe, Word2V\" | epistemic:survey-claimed\nN21. [svy_c3dcb22c12be] Multi-modal MRI attention mechanism: multiply reference MRI with subtraction images as attention gate | anchor:\"multiply the multi-mo\" | epistemic:survey-claimed\nN22. [svy_0e1545242c53] Spatial prediction plays critical role in automatic medical diagnosis from MRI imagery | anchor:\"Spatial prediction plays a critical role in automatic medical diagnosis from MRI imagery\" | epistemic:survey-claimed\nN23. [svy_382cc565dad3] Medical image databases include CT, X-ray, MRI, PET from different body parts | anchor:\"Images from different sources (such as CT, X-ray, MRI, and PET)\" | epistemic:survey-claimed\nN24. [svy_4291cfb6e3] Segmentation labels derived from MRI scans serve as ground truth | anchor:\"The segmentation labels were derived from the MRI scans, whi\" | epistemic:survey-claimed\nN25. [svy_2ba4b02e2f] APIS dataset: paired CT-MRI for ischemic stroke | anchor:\"The APIS dataset Gómez et al (2023) was designed as a paired\" | epistemic:survey-claimed\nN26. [svy_ef18ebe6ae] 98.8% of patients had additional MRI modalities (T1, etc.) | anchor:\"For all patients, DWI images, B0, and ADC were provided, and\" | epistemic:survey-claimed",
+  "gaps_final": "G1. Need explicit fMRI vs MRI analysis difference statements from corpus papers\nG2. Need more on structural MRI analysis characteristics (segmentation, classification, reconstruction)\nG3. Need to check the GLM critical review paper for fMRI-specific analysis challenges",
+  "queried": [
+   "card|{\"entity\": \"mri and fmri data analysis\"}",
+   "card|{\"entity\": \"4d approach to the analysis of functional brain images\"}",
+   "card|{\"entity\": \"conventional fmri datasets\"}",
+   "card|{\"entity\": \"mri analysis\"}",
+   "findings|{\"contains\": \"fMRI|4D|functional|time series|analysis\", \"paper_id\": \"sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat\"}",
+   "findings|{\"contains\": \"fMRI|GLM|time series|statistical|analysis|limitations\", \"paper_id\": \"sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach\"}",
+   "findings|{\"contains\": \"MRI|breast|style transfer|structural|analysis|dataset\", \"paper_id\": \"arxiv_2301.02069\"}",
+   "findings|{\"contains\": \"fMRI|dimensionality|reduction|classifier|ML|analysis\", \"paper_id\": \"sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced_fmri_data_u\"}",
+   "findings|{\"contains\": \"fMRI|MRI|analysis|time series|signal|difference|structural|functional\", \"paper_id\": \"sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_state_of_brain_ne\"}",
+   "search_text|{\"k\": 12, \"query\": \"difference between fMRI and MRI data analysis structural functional\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"GLM|limitation|problem|issue|assumption|violation\", \"paper_id\": \"sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"dimensionality|reduction|PCA|feature|classification|MRI|fMRI|difference\", \"paper_id\": \"sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_re",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_to_fmri_dat\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_of_the_glm_approach\"}",
+   "search_text|{\"k\": 12, \"query\": \"fMRI vs MRI structural functional data analysis difference time series\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"fMRI|MRI|difference|structural|functional|time series|analysis|signal\", \"paper_id\": \"sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_resting_st",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"fMRI|dimensionality|reduction|PCA|feature|classification|MRI|analysis\", \"paper_id\": \"sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_redu",
+   "card|{\"entity\": \"mri\"}",
+   "findings|{\"contains\": \"structural|anatomy|image|analysis|classification|segmentation\", \"entity\": \"mri\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"fMRI|MRI|functional|structural|difference|time series|volume\", \"entity\": \"mri\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|MRI|analysis|data|difference|time|spatial|volume|voxel\", \"entity\": \"mri\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"fMRI|MRI|analysis|method|approach|GLM|4D|dimensionality|reduction|classification\", \"entity\": \"mri\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"GLM|assumption|violation|problem|limitation|issue|independence|correlation\", \"paper_id\": \"sciverse_statistical_analysis_of_fmri_time_series_a_critical_review_o",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"4D|voxel|time series|volume|session|observation|analysis|approach\", \"paper_id\": \"sciverse_a_4d_approach_to_the_analysis_of_functional_brain_images_application_",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"dimensionality|reduction|PCA|feature|classification|fMRI|Haxby|MRI\", \"paper_id\": \"sciverse_comparison_of_machine_learning_classifiers_for_dimensionally_reduced",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|working memory|resting state|signal|analysis|difference|task|brain\", \"paper_id\": \"sciverse_analysis_of_fmri_signals_from_working_memory_tasks_and_restin",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|MRI|time series|GLM|analysis|difference|functional|structural|voxel|volume\", \"paper_id\": \"sciverse_statistical_analysis_of_fmri_time_series_a_critical_r",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|MRI|4D|voxel|time series|volume|session|analysis|difference|functional|structural\", \"paper_id\": \"sciverse_a_4d_approach_to_the_analysis_of_functional_br",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|MRI|dimensionality|reduction|PCA|feature|classification|analysis|difference|functional|structural\", \"paper_id\": \"sciverse_comparison_of_machine_learning",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"fMRI|MRI|working memory|resting state|signal|analysis|difference|task|brain|activation\", \"paper_id\": \"sciverse_analysis_of_fmri_signals_from_working_memory_t",
+   "search_text|{\"k\": 12, \"query\": \"fMRI vs MRI difference analysis time series structural functional\"}"
+  ],
+  "gate": {
+   "note_rejects": 7,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 2,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 7
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 7,
+   "merge_total_lines": 7,
+   "relaxed_writes": 2,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 21,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

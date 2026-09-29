@@ -1,0 +1,49 @@
+# Overview
+# Background
+## Challenges in Synthetic Query Generation
+### Data Scarcity and Cost of Labeled Pairs
+### Quality Variability of LLM-Generated Queries
+## Misalignment Between Generation and Ranking Objectives
+### Likelihood Maximization vs. Retrieval Utility
+### Limitations of Post-Hoc Filtering Methods
+## Direct Preference Optimization
+### Advantages over Traditional RLHF (PPO)
+### Computational Efficiency and Training Stability
+# Methodology
+## Framework Architecture
+### Role of the Large Language Model
+### Integration with External Re-Rankers
+## Preference Data Construction
+### Source of Ranking Signals
+### Construction of Chosen and Rejected Pairs
+### Comparison with Existing Filtering Approaches
+## Optimization Strategy
+### Direct Integration of Ranking Signals
+### Objective: Maximizing Downstream Retrieval Effectiveness
+# Experimental Setup
+## Datasets
+### Web Document Collections (e.g., ClueWeb22)
+## Baselines
+### Traditional Synthetic Query Generation
+### External Re-Ranker Filtering Methods
+## Evaluation Metrics
+### Retrieval Effectiveness Metrics (e.g., nDCG)
+### Ranker-Assessed Relevance
+# Results
+## Performance Comparison
+### Improvement in Downstream Retrieval
+### Comparison with Baseline Methods
+## Ablation Studies
+### Impact of DPO Integration
+### Role of External Ranking Signals
+# Discussion
+## Impact on Search Relevance
+### Addressing Semantic and Distribution Mismatches
+### End-to-End Optimization Benefits
+## Computational Efficiency
+### Elimination of Reward Models and Online Sampling
+### Training Stability
+## Limitations and Generalizability
+### Specificity to Neural Retrieval Models
+### Lack of Comparative Data Across Sparse vs. Dense Retrievers
+# Conclusion

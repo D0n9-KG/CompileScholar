@@ -1,0 +1,2132 @@
+[
+ {
+  "id": "fc927b39177cd2aad8a8cbce",
+  "type": "aggregation",
+  "question": "What are the leading thoughts about how to teach computer science to college students in the age of generative AI?",
+  "gold_hint": "",
+  "answer": "The rise of generative AI necessitates a fundamental rethinking of computer science curricula, prompting educators to decide not only which traditional topics remain essential but also how to incorporate new skills critical in an AI-augmented landscape [coarse:3a64937c8346]. This shift is driven by the observation that if a generative AI model were a student, it would rank among the top performers in introductory computer science (CS1) assessments, thereby challenging the status quo of traditional learning objectives [coarse:6e0aa5f177d3]. Consequently, it is worth questioning the standard approach that emphasizes traditional fundamentals like syntax, semantics, data structures, and complexity, as these traditional learning objectives are being reexamined in light of the advent of widely available generative AI models [coarse:eee66154fcac].\n\nA key driver for this curricular evolution is the widespread adoption of tools like GitHub Copilot in industry, which is used by over 20 million developers, signaling that students entering the workforce will need proficiency in these tools [coarse:07d66226662d]. Despite this industry reality, few U.S. computer science departments appear to offer courses on the applications of existing generative AI tools, even while consistently top-ranked departments continue to teach the mechanisms and foundations of the technology [coarse:f67fff3ced93]. To address this gap, a course was developed at a private research university to teach undergraduate and graduate computer science students the applications of generative AI tools in software development [coarse:85fa67fbfad6].\n\nRegarding the pedagogical integration of these tools, guidance suggests that authors and students can use tools like ChatGPT to generate ideas or explore different ways of expressing ideas, but should not rely on them as a substitute for critical thinking, analysis, and fact-checking [coarse:0bee648d08a0]. The consulted records did not surface the full findings of the directly on-topic paper regarding computer science education in the age of generative AI, nor did they provide detailed mechanisms, recommendations, or criticisms from other papers on integrating large language models and evaluating student outcomes, bridging the skills gap, or the specific implications of large language models on science education. Additionally, the records did not surface curated findings specifically on the entities of \"computer science curricula\" or \"computer science education\" beyond the general statements provided.",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "computer science curricula"
+    },
+    "intent": "dossier sweep on the curricula entity for cross-paper evidence",
+    "obs_chars": 442,
+    "notes_chars": 904
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "recommendation"
+    },
+    "intent": "pull recommendations from the directly-on-topic paper",
+    "obs_chars": 1430,
+    "notes_chars": 904
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education",
+     "claim_type": "recommendation"
+    },
+    "intent": "pull recommendations from the course-model paper",
+    "obs_chars": 1069,
+    "notes_chars": 904
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_integrating_large_language_models_and_evaluating_student_outcomes_in_an_introduc",
+     "claim_type": "recommendation"
+    },
+    "intent": "pull recommendations from the LLM-integration paper",
+    "obs_chars": 187,
+    "notes_chars": 904
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai"
+    },
+    "intent": "Get ALL findings from the directly-on-topic paper (all claim types)",
+    "obs_chars": 1933,
+    "notes_chars": 2064
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_integrating_large_language_models_and_evaluating_student_outcomes_in_an_introduc"
+    },
+    "intent": "Get all findings from the LLM-integration-in-intro-CS paper",
+    "obs_chars": 1577,
+    "notes_chars": 2064
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education"
+    },
+    "intent": "Get all findings from the bridging-the-skills-gap course model paper",
+    "obs_chars": 1536,
+    "notes_chars": 2064
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc"
+    },
+    "intent": "Get all findings from the should-AI-be-allowed paper",
+    "obs_chars": 1174,
+    "notes_chars": 2064
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science"
+    },
+    "intent": "Get all findings from the friend-or-foe LLM implications paper",
+    "obs_chars": 63,
+    "notes_chars": 4123
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "Get all findings from the creative writers AI integration paper",
+    "obs_chars": 2697,
+    "notes_chars": 4123
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_when_ai_eats_itself_on_the_caveats_of_data_pollution_in_the_era_of_generative_ai"
+    },
+    "intent": "Get all findings from the data pollution caveats paper",
+    "obs_chars": 1654,
+    "notes_chars": 4123
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "computer science"
+    },
+    "intent": "Get cross-paper evidence dossier for computer science entity",
+    "obs_chars": 817,
+    "notes_chars": 4123
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation-type findings from the directly-on-topic CS education paper",
+    "obs_chars": 1019,
+    "notes_chars": 5462
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the directly-on-topic CS education paper",
+    "obs_chars": 516,
+    "notes_chars": 5462
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticism/limitation findings from the directly-on-topic CS education paper",
+    "obs_chars": 516,
+    "notes_chars": 5462
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the bridging skills gap course model paper",
+    "obs_chars": 1536,
+    "notes_chars": 5462
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "entity": "computer science education",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation-type findings about CS education",
+    "obs_chars": 690,
+    "notes_chars": 5462
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "entity": "generative ai",
+     "claim_type": "recommendation",
+     "contains": "teach|curriculum|education|pedagogy|course"
+    },
+    "intent": "Find recommendations about teaching/curriculum in the context of generative AI",
+    "obs_chars": 587,
+    "notes_chars": 5462
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "entity": "large language model",
+     "claim_type": "recommendation",
+     "contains": "teach|curriculum|education|pedagogy|course|student"
+    },
+    "intent": "Find recommendations about teaching/curriculum in the context of LLMs",
+    "obs_chars": 3784,
+    "notes_chars": 5462
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from the directly-on-topic CS education paper",
+    "obs_chars": 516,
+    "notes_chars": 2891
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_computer_science_education_in_the_age_of_generative_ai",
+     "claim_type": "qualitative_ablation"
+    },
+    "intent": "Get qualitative ablation findings from the directly-on-topic CS education paper",
+    "obs_chars": 516,
+    "notes_chars": 2891
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations from the should-AI-be-allowed paper",
+    "obs_chars": 619,
+    "notes_chars": 2891
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: leading thoughts on teaching CS to college students in the age of generative AI.\nRelevant papers:\n- sciverse_computer_science_education_in_the_age_of_generative_ai (2025) — directly on topic\n- sciverse_integrating_large_language_models_and_evaluating_student_outcomes_in_an_introduc (2025)\n- sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education (2025)\n- sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc (2023)\n- sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science (2023)\n- sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice (2025)\n- sciverse_when_ai_eats_itself_on_the_caveats_of_data_pollution_in_the_era_of_generative_ai (2024)\nN1. [coarse:6e0aa5f177d3] Rise of generative AI necessitates rethinking of CS curricula | anchor:\"The rise of generative AI necessitates a rethinking of computer science curricula.\" | epistemic:stated\nN2. [coarse:3a64937c8346] Educators must decide which traditional topics remain essential and how to incorporate new skills critical in an AI-augmented landscape | anchor:\"Educators must decide not only which traditional topics remain essential but also how to i\" | epistemic:stated\nN3. [coarse:eee66154fcac] Worth questioning the approach that emphasizes traditional fundamentals like syntax, semantics, data structures, and complexity | anchor:\"but it is worth questioning this approach (which is essentially the sta\" | epistemic:stated\nN4. [coarse:85fa67fbfad6] A course was developed at a private research university to teach undergrad/grad CS students applications for generative AI tools in software development | anchor:\"A course was developed at a private research university to teach undergraduate and graduat\" | epistemic:stated\nN5. [coarse:f67fff3ced93] Few U.S. CS departments appear to offer courses on applications for existing generative AI tools | anchor:\"while consistently top ranked U.S. Computer Science departments teach the mechanisms and f\" | epistemic:stated\nN6. [coarse:07d66226662d] If a GenAI model were a student, it would rank among the top performers in CS1 assessments | anchor:\"If a GenAI model were a student, it would rank among the top performers in CS1 assessments\" | epistemic:stated\nN7. [coarse:2375f8d30269] Widespread adoption of tools like GitHub Copilot in industry (used by over 20 million developers) signals students entering the workforce will need proficiency in these tools | anchor:\"Furthermore, the widespread adoption of tools like GitHub Copilot in industry, used by ove\" | epistemic:stated\nN8. [coarse:54d5ffe0a077] Traditional learning objectives are being reexamined as a result of the advent of widely available Generative AI models | anchor:\"As a result, traditional learning objectives are being reexamined, as discussed by Becker \" | epistemic:stated\nN9. [coarse:0bee648d08a0] Authors can use ChatGPT as a tool to generate ideas or explore different ways of expressing ideas but should not rely on it as a substitute for critical thinking, analysis, and fact-checking | anchor:\"In summary, authors can use ChatGPT as a tool to generate ideas or explore different ways\" | epistemic:stated",
+  "gaps_final": "G1. What does the directly-on-topic paper (computer_science_education_in_the_age_of_generative_ai) say in full? (need all findings, not just recommendations)\nG2. What do the other CS-education / LLM-in-education papers say (recommendations, mechanisms, criticisms)?\nG3. Are there curated findings on \"computer science curricula\" / \"computer science education\" entities?",
+  "queried": [
+   "card|{\"entity\": \"computer science curricula\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_integrating_large_language_models_and_evaluating_student_outcomes_in_an_introduc\"}",
+   "findings|{\"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"paper_id\": \"sciverse_integrating_large_language_models_and_evaluating_student_outcomes_in_an_introduc\"}",
+   "findings|{\"paper_id\": \"sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education\"}",
+   "findings|{\"paper_id\": \"sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc\"}",
+   "findings|{\"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"paper_id\": \"sciverse_when_ai_eats_itself_on_the_caveats_of_data_pollution_in_the_era_of_generative_ai\"}",
+   "card|{\"entity\": \"computer science\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_bridging_the_skills_gap_a_course_model_for_modern_generative_ai_education\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"computer science education\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"teach|curriculum|education|pedagogy|course\", \"entity\": \"generative ai\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"teach|curriculum|education|pedagogy|course|student\", \"entity\": \"large language model\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"qualitative_ablation\", \"paper_id\": \"sciverse_computer_science_education_in_the_age_of_generative_ai\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 4057,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 7,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "605fa6854a85c1d54a16d1bd",
+  "type": "aggregation",
+  "question": "What are the main challenges in adapting transformer-based models for tabular data representation?",
+  "gold_hint": "",
+  "answer": "Based on the scientific literature in this knowledge base, the main challenges in adapting transformer-based models for tabular data representation can be organized into several interconnected categories:\n\n**1. Structural Mismatch: 1D Sequences vs. 2D Heterogeneous Data**\n\nThe most fundamental challenge is the architectural mismatch between transformers and tabular data. Transformers were designed to process one-dimensional token sequences (as in natural language), whereas tabular data is inherently two-dimensional — a matrix of rows (instances) and columns (features) with no natural sequential ordering [coarse:eccdf55616e1]. This means there is no canonical \"position\" for a column, making standard positional encodings ill-defined. The lack of a natural ordering among features means that permutation invariance or equivariance must be explicitly designed into the architecture, unlike in NLP where word order carries meaning.\n\n**2. Heterogeneous Feature Types and Mixed Modalities**\n\nTabular data typically contains a mixture of feature types: categorical (nominal, ordinal), numerical (continuous, discrete), binary, and sometimes text or temporal features within the same table. The heterogeneous nature of tabular data poses particular challenges for deep learning models, including transformers, which must learn unified representations across fundamentally different data types [coarse:ef12d8b93820]. Standard transformer tokenization and embedding strategies developed for homogeneous text tokens do not directly transfer. Approaches like TabTransformer address this by using attention mechanisms to track relationships between categorical features while employing separate MLP pathways for numerical features [coarse:e964de83a38b], but this hybrid design is itself an adaptation that departs from the standard transformer architecture.\n\n**3. Small Sample Sizes and Data Scarcity**\n\nTabular datasets in many practical domains (healthcare, finance, industrial monitoring) are often small relative to the parameter counts of transformer models. The combination of heterogeneous features and typically small sample sizes creates a particularly difficult regime for deep learning [coarse:ef12d8b93820]. Transformers, with their large number of parameters and reliance on attention over many tokens, are prone to overfitting in low-data regimes. This stands in stark contrast to NLP, where pre-training corpora of billions of tokens are available.\n\n**4. Pre-training and Transfer Learning Difficulties**\n\nA major open challenge is pre-training and transferring transformer architectures adapted for tabular data to downstream tasks [coarse:168d294a60b3]. Unlike NLP, where a single pre-trained model (e.g., BERT) can be fine-tuned across thousands of tasks, tabular data lacks a universal \"corpus\" for pre-training. Each table has different columns, different feature types, and different distributions. Transfer learning across different tabular domains (e.g., from one medical dataset to another) remains an active research area, as exemplified by work like LATTLe (2025) which explores LLM attention transplant for transfer learning of tabular data across different domains. The absence of a natural pre-training objective for tabular data (analogous to masked language modeling) is a significant barrier.\n\n**5. Underrepresentation of Latent Correlations**\n\nThe GNN-for-tabular-data survey (Li et al., 2024) highlights a critical gap in deep neural tabular data learning methods: the underrepresentation of latent correlations among data instances and feature values [coarse:3d04119d5326]. While transformers' self-attention mechanism is theoretically capable of capturing pairwise interactions, in practice the specific structure of tabular data (where interactions are often sparse, non-uniform, and of varying strength) is not well exploited by standard attention patterns. The survey notes that GNNs demonstrate versatility across a spectrum of tabular learning scenarios, suggesting that graph-based representations may better capture the relational structure inherent in tabular data [coarse:8cc0594b2470].\n\n**6. Competitive Baseline: Traditional ML Still Dominates**\n\nPerhaps the most sobering challenge is that deep learning models, including transformer-based approaches, have yet to demonstrate consistent, significant improvements over well-established traditional machine learning methods such as XGBoost and Random Forests in the tabular domain [coarse:455bdea4f022]. Traditional ML frequently outperforms large language models on tabular data tasks [coarse:e6a17f62724c]. This means that any transformer adaptation must not only solve the architectural challenges above but also beat a very strong, well-tuned baseline — a bar that is difficult to clear given the data efficiency of gradient-boosted trees.\n\n**7. Limited Interpretability of Tabular Data by Language Models**\n\nWhen tabular data is represented as text (e.g., CSV strings) and fed to language models, the models' ability to interpret the structured, numerical content is limited. Small language models work well for general natural language tasks, but their ability to interpret tabular data is constrained [49314893b8ea0d]. This suggests that simply converting tables to text and applying NLP transformers is insufficient; the models need to understand the semantic and statistical structure of the data, not just the surface token patterns.\n\n**8. Architectural Design Choices**\n\nSpecific architectural challenges include: (a) how to embed mixed-type features into a common representation space; (b) whether to treat each row as a \"sequence\" of feature tokens (as in TabTransformer) or to use other structural priors; (c) how to handle the absence of positional information; and (d) how to scale attention efficiently when the \"sequence length\" is the number of columns (which can be large in wide tables). GatedTabTransformer, for example, proposes modifications to TabTransformer including linear projections in MLP layers and gated MLP mechanisms to improve performance [coarse:c72ab6977ed1], illustrating that even within the transformer family, significant architectural engineering is required.\n\n**Summary**\n\nThe challenges form a coherent picture: transformers face a fundamental structural mismatch with 2D heterogeneous data, must contend with small sample sizes that favor simpler models, lack a natural pre-training paradigm, struggle to capture the specific correlation structure of tabular data, and must compete against strong traditional ML baselines. The research community has responded with a variety of adaptations — from TabTransformer's attention-over-categorical-features design to GNN-based approaches that model feature interactions as graph edges — but a dominant, general-purpose transformer architecture for tabular data has not yet emerged. The field is characterized by active, ongoing effort to bridge these gaps [coarse:6268792380dd], with recent work applying attention-based methods and self-supervised learning techniques to tabular data [coarse:f3b6381fb05c].",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "tabular data"
+    },
+    "intent": "Get cross-paper evidence dossier for tabular data entity — configs, findings, results panorama",
+    "obs_chars": 1806,
+    "notes_chars": 926
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting/critical statements from the ViSTABNet paper about challenges in adapting transformers to tabular data",
+    "obs_chars": 1948,
+    "notes_chars": 926
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements from the GNN-for-tabular survey about challenges/limitations",
+    "obs_chars": 1859,
+    "notes_chars": 926
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2201.00199",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements from GatedTabTransformer paper about challenges in tabular modeling",
+    "obs_chars": 976,
+    "notes_chars": 926
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "contains": "challenge|heterogeneous|token|representation|feature"
+    },
+    "intent": "Get more specific challenge details from VistabNet about adapting vision transformers to tabular",
+    "obs_chars": 1494,
+    "notes_chars": 3376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "contains": "challenge|transfer|tabular|limitation|difficulty"
+    },
+    "intent": "Get challenges identified in LATTLe paper about transfer learning for tabular data",
+    "obs_chars": 2010,
+    "notes_chars": 3376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "contains": "challenge|future|direction|open|limitation|difficulty"
+    },
+    "intent": "Get future directions and open challenges from the GNN-for-tabular survey",
+    "obs_chars": 244,
+    "notes_chars": 3376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "criticism",
+     "contains": "transformer|attention|token|feature|heterogeneous"
+    },
+    "intent": "Find criticism records about transformer limitations on tabular data across all papers",
+    "obs_chars": 3473,
+    "notes_chars": 3376
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "contains": "heterogeneous|mixed|categorical|numerical|feature|embedding|token"
+    },
+    "intent": "Get specific architectural challenges from VistabNet about handling mixed feature types",
+    "obs_chars": 1494,
+    "notes_chars": 5010
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "contains": "challenge|transfer|domain|shift|limitation|difficulty|gap"
+    },
+    "intent": "Get LATTLe's stated challenges for transfer learning across domains",
+    "obs_chars": 701,
+    "notes_chars": 5010
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "contains": "future|direction|open|challenge|limitation|difficulty|gap"
+    },
+    "intent": "Get GNN survey's future directions and open challenges",
+    "obs_chars": 509,
+    "notes_chars": 5010
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "challenges adapting transformers tabular data heterogeneous features tokenization",
+     "k": 12
+    },
+    "intent": "Find additional passages across all indexed papers discussing specific challenges of adapting transformers to tabular da",
+    "obs_chars": 1753,
+    "notes_chars": 5010
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "heterogeneous|mixed|categorical|numerical|feature|embedding|token",
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data"
+    },
+    "intent": "Get mechanism findings from VistabNet about how it handles heterogeneous tabular features",
+    "obs_chars": 1494,
+    "notes_chars": 5010
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "transfer|domain|shift|tabular|attention",
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis"
+    },
+    "intent": "Get mechanism findings from LATTLe about transfer learning challenges for tabular data",
+    "obs_chars": 1121,
+    "notes_chars": 5010
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token"
+    },
+    "intent": "Get all challenge/limitation findings from VistabNet paper",
+    "obs_chars": 2023,
+    "notes_chars": 5010
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|transfer|domain|shift"
+    },
+    "intent": "Get challenge/limitation findings from LATTLe paper",
+    "obs_chars": 701,
+    "notes_chars": 5010
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open"
+    },
+    "intent": "Get challenge/future-direction findings from GNN tabular survey",
+    "obs_chars": 509,
+    "notes_chars": 5010
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "claim_type": "criticism"
+    },
+    "intent": "Get LATTLe's own critical/limitation statements about transfer learning challenges for tabular data",
+    "obs_chars": 1121,
+    "notes_chars": 5010
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from VistabNet about challenges of adapting vision transformers to tabular data",
+    "obs_chars": 1948,
+    "notes_chars": 5010
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from LATTLe about transfer learning challenges for tabular data",
+    "obs_chars": 2010,
+    "notes_chars": 5010
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation-type findings from GNN survey about future directions and open challenges",
+    "obs_chars": 1859,
+    "notes_chars": 5010
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token"
+    },
+    "intent": "Get VistabNet's own critical statements about challenges/limitations in adapting vision transformers to tabular data",
+    "obs_chars": 2023,
+    "notes_chars": 5010
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|transfer|domain|shift"
+    },
+    "intent": "Get LATTLe's critical statements about transfer learning challenges for tabular data",
+    "obs_chars": 244,
+    "notes_chars": 5010
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open"
+    },
+    "intent": "Get GNN survey's critical statements about open challenges and future directions for tabular data learning",
+    "obs_chars": 509,
+    "notes_chars": 5010
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token"
+    },
+    "intent": "Sweep for criticism-type findings across all papers about tabular transformer challenges",
+    "obs_chars": 2235,
+    "notes_chars": 5010
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "recommendation",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token"
+    },
+    "intent": "Get GNN survey's recommendations about open challenges in tabular data learning",
+    "obs_chars": 975,
+    "notes_chars": 5010
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "recommendation",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open"
+    },
+    "intent": "Get GNN survey's recommendations/future directions on open challenges",
+    "obs_chars": 509,
+    "notes_chars": 5010
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from VistabNet on how it adapts vision transformers to tabular data",
+    "obs_chars": 1948,
+    "notes_chars": 5010
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from LATTLe on transfer learning challenges for tabular data",
+    "obs_chars": 1121,
+    "notes_chars": 5010
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "criticism",
+     "contains": "heterogeneous|mixed|categorical|numerical|feature|embedding|token|position"
+    },
+    "intent": "Find criticism-type findings about specific architectural challenges in tabular data representation",
+    "obs_chars": 2584,
+    "notes_chars": 5010
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "recommendation",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open"
+    },
+    "intent": "Find recommendation-type findings about open challenges and future directions for tabular data",
+    "obs_chars": 1952,
+    "notes_chars": 5010
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "mechanism",
+     "contains": "transformer|attention|token|embedding|representation|architecture"
+    },
+    "intent": "Find mechanism-type findings about how transformers are adapted for tabular data and what architectural issues arise",
+    "obs_chars": 3924,
+    "notes_chars": 5010
+   },
+   {
+    "step": 18,
+    "tool": "search_text",
+    "args": {
+     "query": "challenges adapting transformer tabular data heterogeneous features mixed types",
+     "k": 12
+    },
+    "intent": "Find verbatim passages about specific challenges in adapting transformers to tabular data",
+    "obs_chars": 1746,
+    "notes_chars": 5010
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token",
+     "entity": "tabular data"
+    },
+    "intent": "Find definition-type records about challenges in tabular data representation",
+    "obs_chars": 3851,
+    "notes_chars": 5010
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "observation"
+    },
+    "intent": "Get GNN survey's observations about challenges in tabular data learning",
+    "obs_chars": 2240,
+    "notes_chars": 5010
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "observation",
+     "contains": "heterogeneous|mixed|categorical|numerical|feature|embedding|token|position"
+    },
+    "intent": "Find observation records about specific architectural challenges in tabular data representation",
+    "obs_chars": 1944,
+    "notes_chars": 5010
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vistabnet_adapting_vision_transformers_for_tabular_data",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position"
+    },
+    "intent": "Get VistabNet's own critical statements about challenges in adapting vision transformers to tabular data",
+    "obs_chars": 2023,
+    "notes_chars": 5010
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 37
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "challenges adapting transformer models tabular data representation heterogeneous features",
+     "k": 8
+    },
+    "intent": "Find external papers specifically discussing challenges of adapting transformers to tabular data",
+    "obs_chars": 2586,
+    "notes_chars": 5010
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "tabular data transformer limitations mixed feature types small sample size pretraining",
+     "k": 8
+    },
+    "intent": "Find papers on specific limitations of transformers for tabular data",
+    "obs_chars": 2620,
+    "notes_chars": 5010
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ce8bfeed7ade1e5712aaa14b8b04ef109101c37e3f3ad1b293a4181401ed5ba8] VAE+Transformer for tabular:",
+     "N22. [521c9f63fba9cfc64d3ea52e1af0fec0ea92900d7d3a1415029008f4aa7babf6] NAIM: handling missing value",
+     "N23. [541d5a05d9a09e097f7053cad75c9ff47f6264e0059f17253f52f35d35abc4e1] CITab: existing SSL methods "
+    ]
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ce8bfeed7ade1e5712aaa14b8b04ef109101c37e3f3ad1b293a4181401ed5ba8] VAE+Transformer for tabular:",
+     "N22. [521c9f63fba9cfc64d3ea52e1af0fec0ea92900d7d3a1415029008f4aa7babf6] NAIM: handling missing value",
+     "N23. [541d5a05d9a09e097f7053cad75c9ff47f6264e0059f17253f52f35d35abc4e1] CITab: existing SSL methods "
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [ce8bfeed7ade1e5712aaa14b8b04ef109101c37e3f3ad1b293a4181401ed5ba8] VAE+Transformer for tabular:",
+     "N22. [521c9f63fba9cfc64d3ea52e1af0fec0ea92900d7d3a1415029008f4aa7babf6] NAIM: handling missing value",
+     "N23. [541d5a05d9a09e097f7053cad75c9ff47f6264e0059f17253f52f35d35abc4e1] CITab: existing SSL methods "
+    ]
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|transfer|domain|distribution|shift"
+    },
+    "intent": "Get LATTLe's critical statements about challenges in transfer learning for tabular data",
+    "obs_chars": 244,
+    "notes_chars": 6576
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2401.02143",
+     "claim_type": "criticism",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position"
+    },
+    "intent": "Get GNN survey's critical statements about open challenges and limitations in tabular data learning",
+    "obs_chars": 509,
+    "notes_chars": 6576
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "entity": "tabular data",
+     "claim_type": "criticism",
+     "contains": "positional|encoding|column|row|permutation|invariant|order|structure|architecture|design"
+    },
+    "intent": "Find findings about specific architectural challenges like positional encoding, column ordering, permutation invariance",
+    "obs_chars": 3863,
+    "notes_chars": 6576
+   },
+   {
+    "step": 29,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "arxiv_2401.02143",
+     "contains": "challenge|limitation|difficulty|problem|issue|gap|future|direction|open|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position"
+    },
+    "intent": "Get GNN survey's observations about challenges and future directions for tabular data",
+    "obs_chars": 915,
+    "notes_chars": 2978
+   }
+  ],
+  "notes_final": "N1. [coarse:eccdf55616e1] Transformers require 1D token sequences; tabular data is inherently 2D (rows x heterogeneous columns) | anchor:\"Transformers require one-dimensional token sequences as input, whereas tabular data is inherently tw\" | epistemic:stated\nN2. [coarse:ef12d8b93820] Heterogeneous nature of tabular data + small sample sizes pose particular challenges for DL | anchor:\"The heterogeneous nature of tabular data and typically small sample sizes pose particular\" | epistemic:stated\nN3. [coarse:455bdea4f022] DL models have yet to demonstrate significant improvements over XGBoost/Random Forests in tabular domain | anchor:\"Despite the prevalence of tabular data in practical applications, deep learning models hav\" | epistemic:stated\nN4. [coarse:168d294a60b3] Pre-training and transferring transformer architectures adapted for tabular data to downstream tasks remains challenging | anchor:\"While various deep learning approaches, including transformer architectures [9] and hypern\" | epistemic:stated\nN5. [coarse:3d04119d5326] Critical gap in deep neural TDL: underrepresentation of latent correlations among data instances and feature values | anchor:\"The survey highlights a critical gap in deep neural TDL methods: the underrepresentation o\" | epistemic:stated\nN6. [coarse:6268792380dd] A lot of research effort has focused on transformer architectures that can be successfully applied to tabular data | anchor:\"A lot of research effort has focused on transformer architectures that can be successfully applied t\" | epistemic:stated\nN7. [coarse:f3b6381fb05c] Researchers have recently started applying attention-based methods and self-supervised learning to tabular | anchor:\"Researchers have recently started applying attention-based methods and self-supervised learning tech\" | epistemic:stated\nN8. [coarse:e6a17f62724c] Traditional ML frequently outperforms LLMs in tabular data | anchor:\"Traditional ML frequently outperforms LLMs in tabular data.\" | epistemic:stated\nN9. [49314893b8ea0d] SLMs work well for general NLP but their ability to interpret tabular data is limited | anchor:\"SLMs work well for general natural language tasks, but their ability to interpret tabular data is li\" | epistemic:stated\nN10. [coarse:c72ab6977ed1] GatedTabTransformer proposes modifications to TabTransformer (linear projections in MLP, gated MLP) | anchor:\"In this paper we propose multiple modifications to the original TabTransformer performing\" | epistemic:stated\nN11. [coarse:e964de83a38b] TabTransformer uses attention to track relationships between categorical features + standard MLP for logits | anchor:\"One of the state-of-the-art solutions is TabTransformer which incorporates an attention me\" | epistemic:stated",
+  "gaps_final": "G1. Specific architectural challenges (positional encoding, mixed feature types) not fully detailed\nG2. VistabNet-specific challenges not captured\nG3. LATTLe transfer learning challenges not captured",
+  "queried": [
+   "card|{\"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"arxiv_2201.00199\"}",
+   "findings|{\"contains\": \"challenge|heterogeneous|token|representation|feature\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"contains\": \"challenge|transfer|tabular|limitation|difficulty\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"contains\": \"challenge|future|direction|open|limitation|difficulty\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"transformer|attention|token|feature|heterogeneous\", \"entity\": \"tabular data\"}",
+   "findings|{\"contains\": \"heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"contains\": \"challenge|transfer|domain|shift|limitation|difficulty|gap\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"contains\": \"future|direction|open|challenge|limitation|difficulty|gap\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "search_text|{\"k\": 12, \"query\": \"challenges adapting transformers tabular data heterogeneous features tokenization\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"transfer|domain|shift|tabular|attention\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tab",
+   "findings|{\"contains\": \"challenge|limitation|difficulty|problem|issue|gap|transfer|domain|shift\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"paper_id\": \"sciverse_vistabnet_adapting_",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|transfer|domain|shift\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabula",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_vistabnet_adapting_vision_transformers_for_tabular_data\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learning_of_tabular_data_across_dis\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"heterogeneous|mixed|categorical|numerical|feature|embedding|token|position\", \"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open\", \"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"transformer|attention|token|embedding|representation|architecture\", \"entity\": \"tabular data\"}",
+   "search_text|{\"k\": 12, \"query\": \"challenges adapting transformer tabular data heterogeneous features mixed types\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token\", \"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"arxiv_2401.02143\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"heterogeneous|mixed|categorical|numerical|feature|embedding|token|position\", \"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position\", \"paper_id\": \"sciverse_vistabnet_",
+   "search_papers|{\"k\": 8, \"query\": \"challenges adapting transformer models tabular data representation heterogeneous features\"}",
+   "search_papers|{\"k\": 8, \"query\": \"tabular data transformer limitations mixed feature types small sample size pretraining\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|transfer|domain|distribution|shift\", \"paper_id\": \"sciverse_lattle_llm_attention_transplant_for_transfer_learn",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position\", \"paper_id\"",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"positional|encoding|column|row|permutation|invariant|order|structure|architecture|design\", \"entity\": \"tabular data\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"challenge|limitation|difficulty|problem|issue|gap|future|direction|open|heterogeneous|mixed|categorical|numerical|feature|embedding|token|position\", \"paper_i"
+  ],
+  "gate": {
+   "note_rejects": 9,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 9
+   },
+   "merge_downgraded_lines": 11,
+   "merge_total_lines": 71,
+   "relaxed_writes": 3,
+   "notes_truncated": 2927,
+   "f28_autos": 0,
+   "max_evidence_streak": 2,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "64ef9b9e4c220dd1a2f6115b",
+  "type": "aggregation",
+  "question": "What are the most important open challenges in Federated Learning?",
+  "gold_hint": "",
+  "answer": "Based on a synthesis of multiple survey and research papers in the knowledge base, the most important open challenges in Federated Learning (FL) can be organized into several major categories:\n\n**1. Heterogeneity (Statistical, System, and Model)**\nHeterogeneity is consistently identified as a central challenge. The 2021 survey on key challenges and open problems states that \"Key challenges in federated learning typically include model heterogeneity, statistical heterogeneity, communication (including system heterogeneity), and privacy\" [sciverse_concepts_key_challenges_and_open_problems_of_federated_learning]. The 2020 survey on challenges, methods, and future directions similarly highlights \"expensive communication, systems heterogeneity, statistical heterogeneity, and privacy\" as critical open directions [sciverse_federated_learning_challenges_methods_and_future_directions]. The 2025 optimization survey identifies \"five key challenges in Federated Learning\" arising from \"the heterogeneity of data and devices, communication issues, and privacy concerns for clients in FL training\" [sciverse_optimization_methods_and_software_for_federated_learning]. The 2021 survey further notes that \"FL has many unique challenges which typically make it different from traditional distribution optimization\" [sciverse_concepts_key_challenges_and_open_problems_of_federated_learning].\n\n**2. Communication Efficiency and System Constraints**\nCommunication overhead is a persistent bottleneck. The 2020 survey flags \"expensive communication\" as a critical open direction [sciverse_federated_learning_challenges_methods_and_future_directions]. In the IoT context, the 2020 survey on FL for IoT identifies \"interference among mobile devices, communication security, and asynchronous FL\" as open research challenges, along with \"dropped participants\" [sciverse_title_federated_learning_for_internet_of_things_recent_advances_taxonomy_and_ope]. The 2025 optimization survey also lists \"communication issues\" among its five key challenges [sciverse_optimization_methods_and_software_for_federated_learning].\n\n**3. Privacy and Security**\nPrivacy is a cross-cutting concern across all surveys. The 2021, 2020, and 2025 surveys all list privacy as a top-level challenge [sciverse_concepts_key_challenges_and_open_problems_of_federated_learning] [sciverse_federated_learning_challenges_methods_and_future_directions] [sciverse_optimization_methods_and_software_for_federated_learning]. Concrete threats are demonstrated in the literature: the Fidel attack (Al-Ars et al. 2021) shows that \"a novel attack method within regular federated learning\" can \"reconstruct private training samples from weight updates,\" recovering \"on average twenty out of thirty private data samples from a client's model update employing a fully connected neural network\" and \"over thirteen out of twenty samples can be recovered from a convolutional neural network update\" [arxiv_2101.00159]. The 2022 contemplative perspective paper notes that FL \"poses a number of challenges or open ends that require attention\" owing to \"the different nature of the federated setting from the classical problems\" [sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne]. The 2024 survey on attacks, defenses, and challenges states that \"FL is in its prime stages of development, it has several unresolved issues that demand careful consideration\" [sciverse_federated_learning_attacks_defenses_opportunities_and_challenges].\n\n**4. Productionization, Benchmarking, and Maturity**\nThe 2020 survey identifies \"additional challenges regarding issues such as productionizing and benchmarking in federated settings\" [sciverse_federated_learning_challenges_methods_and_future_directions]. The 2022 contemplative paper characterizes FL as \"being in a nascent stage of development\" [sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne], while the 2024 survey describes it as being \"in its prime stages of development\" with \"several unresolved issues\" [sciverse_federated_learning_attacks_defenses_opportunities_and_challenges]. The 2024 survey further notes that \"Due to the dissimilarity between the federated setting and traditional difficulties, the challenges pose an intriguing research paradigm\" [sciverse_federated_learning_attacks_defenses_opportunities_and_challenges].\n\n**5. Data Quality and Labeling**\nThe IoT FL survey identifies \"unlabeled data\" as an open research challenge [sciverse_title_federated_learning_for_internet_of_things_recent_advances_taxonomy_and_ope]. The 2022 paper by Abyane et al. specifically addresses \"quality challenges of the federated learning for neural networks\" [arxiv_2201.01409].\n\n**6. Heterogeneous and Imbalanced Data**\nThe 2024 paper by Guo et al. addresses the specific challenge of class imbalance in heterogeneous FL settings, proposing \"Empty-Class-Aware Distillation for Heterogeneous Federated Learning\" [arxiv_2401.02329], indicating that handling heterogeneous and imbalanced data distributions remains an active research area.\n\n**Summary of Cross-Cutting Themes:**\nThe recurring themes across all surveyed papers are: (a) statistical and system heterogeneity, (b) communication efficiency, (c) privacy and security (including concrete attack vectors like model inversion), (d) the immaturity of FL as a field (lack of standard benchmarks, production readiness), and (e) data quality and labeling challenges. The 2021 survey provides the most concise canonical list: \"model heterogeneity, statistical heterogeneity, communication (including system heterogeneity), and privacy\" [sciverse_concepts_key_challenges_and_open_problems_of_federated_learning].\n\n*Note: The specific detailed enumerations of challenges within each individual survey paper (e.g., the exact five challenges from the 2025 optimization paper, or the full taxonomy from the 2022 contemplative paper) were not fully retrieved in this session due to budget constraints. The above synthesis is based on the abstract-level and coarse-grained records available in the knowledge base.*",
+  "arm": "main",
+  "steps": 30,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "federated learning"
+    },
+    "intent": "Get cross-paper evidence dossier for federated learning — findings, configs, results panorama",
+    "obs_chars": 1833,
+    "notes_chars": 1917
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "claim_type": "recommendation"
+    },
+    "intent": "Extract the key challenges and open problems enumerated in the 2021 survey",
+    "obs_chars": 567,
+    "notes_chars": 1917
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_challenges_methods_and_future_directions",
+     "claim_type": "recommendation"
+    },
+    "intent": "Extract challenges and future directions from the 2020 survey",
+    "obs_chars": 1039,
+    "notes_chars": 1917
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "claim_type": "recommendation"
+    },
+    "intent": "Extract challenges from the 2024 attacks/defenses survey",
+    "obs_chars": 536,
+    "notes_chars": 1917
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific challenge observations from the 2021 key challenges survey",
+    "obs_chars": 1048,
+    "notes_chars": 3810
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific challenge observations from the 2024 attacks/defenses survey",
+    "obs_chars": 1072,
+    "notes_chars": 3810
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific challenge observations from the 2022 contemplative perspective paper",
+    "obs_chars": 1085,
+    "notes_chars": 3810
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_federated_learning_for_internet_of_things_recent_advances_taxonomy_and_ope",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific challenge observations from the IoT FL paper",
+    "obs_chars": 1065,
+    "notes_chars": 3810
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "contains": "heterogeneity|communication|privacy|security|non-iid|robustness"
+    },
+    "intent": "Get specific challenge enumerations from the 2021 survey",
+    "obs_chars": 1618,
+    "notes_chars": 3002
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "contains": "heterogeneity|communication|privacy|security|robustness|incentive|scalability"
+    },
+    "intent": "Get specific challenge enumerations from the 2024 survey",
+    "obs_chars": 1303,
+    "notes_chars": 3002
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "contains": "threat|vulnerability|attack|privacy|security|challenge|open"
+    },
+    "intent": "Get specific challenges from the 2022 contemplative perspective paper",
+    "obs_chars": 1085,
+    "notes_chars": 3002
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "contains": "challenge|open|limitation|future|heterogeneity|communication|convergence"
+    },
+    "intent": "Get specific challenges from the 2025 optimization survey",
+    "obs_chars": 1016,
+    "notes_chars": 3002
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "contains": "model heterogeneity|statistical heterogeneity|communication efficiency|privacy|security|robustness|convergence"
+    },
+    "intent": "Get specific challenge enumerations from the 2021 survey",
+    "obs_chars": 1618,
+    "notes_chars": 3439
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "contains": "attack|defense|privacy|security|robustness|incentive|communication|heterogeneity|open challenge"
+    },
+    "intent": "Get specific challenge enumerations from the 2024 survey",
+    "obs_chars": 1303,
+    "notes_chars": 3439
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the 2021 survey for specific challenge details",
+    "obs_chars": 567,
+    "notes_chars": 3439
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the 2024 survey for specific challenge details",
+    "obs_chars": 536,
+    "notes_chars": 3439
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the 2022 contemplative paper",
+    "obs_chars": 552,
+    "notes_chars": 3439
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings from the 2025 optimization paper",
+    "obs_chars": 503,
+    "notes_chars": 3439
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "contains": "non-iid|data heterogeneity|communication cost|privacy|security|robustness|convergence|incentive|scalability|system heterogeneity|model heterogeneity|statistical heterogeneity"
+    },
+    "intent": "Get specific challenge enumerations from the 2021 survey",
+    "obs_chars": 1617,
+    "notes_chars": 3439
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "contains": "attack|defense|privacy|security|robustness|incentive|communication|heterogeneity|open challenge|unresolved"
+    },
+    "intent": "Get specific challenge enumerations from the 2024 survey",
+    "obs_chars": 1097,
+    "notes_chars": 3439
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "contains": "threat|vulnerability|attack|privacy|security|challenge|open|incentive|communication|heterogeneity"
+    },
+    "intent": "Get specific challenges from the 2022 contemplative perspective paper",
+    "obs_chars": 1085,
+    "notes_chars": 3439
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "contains": "challenge|open|limitation|future|heterogeneity|communication|convergence|privacy|robustness"
+    },
+    "intent": "Get specific challenges from the optimization 2025 paper",
+    "obs_chars": 1544,
+    "notes_chars": 3439
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2025 optimization survey",
+    "obs_chars": 1519,
+    "notes_chars": 3439
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get the 2022 contemplative paper's open challenges",
+    "obs_chars": 552,
+    "notes_chars": 3439
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get the 2025 optimization paper's open challenges",
+    "obs_chars": 503,
+    "notes_chars": 3439
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2021 survey's own critical/limitation statements about FL challenges",
+    "obs_chars": 567,
+    "notes_chars": 3439
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2024 survey's critical statements about unresolved FL issues",
+    "obs_chars": 536,
+    "notes_chars": 3439
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2022 contemplative paper's critical statements about FL threats/vulnerabilities",
+    "obs_chars": 552,
+    "notes_chars": 3439
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_optimization_methods_and_software_for_federated_learning",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the 2025 optimization paper's critical statements about FL challenges",
+    "obs_chars": 503,
+    "notes_chars": 3439
+   },
+   {
+    "f28_auto_retrieval": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+    "at_step": 14,
+    "obs_chars": 1568
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.00159",
+     "claim_type": "observation"
+    },
+    "intent": "Get privacy attack specifics from Fidel paper",
+    "obs_chars": 1775,
+    "notes_chars": 3442
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_concepts_key_challenges_and_open_problems_of_federated_learning",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type records from the 2021 key challenges survey — likely enumerates specific challenge categories",
+    "obs_chars": 1087,
+    "notes_chars": 3954
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type records from the 2024 attacks/defenses survey — likely enumerates specific challenge categories",
+    "obs_chars": 536,
+    "notes_chars": 3954
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type records from the 2022 contemplative perspective paper",
+    "obs_chars": 552,
+    "notes_chars": 3954
+   },
+   {
+    "step": 20,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_federated_learning_challenges_methods_and_future_directions",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific challenge observations from the 2020 challenges survey",
+    "obs_chars": 1039,
+    "notes_chars": 3954
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "entity": "federated learning",
+     "claim_type": "recommendation",
+     "contains": "open challenge|future direction|unsolved|remaining|yet to be|need to be addressed"
+    },
+    "intent": "Find recommendation-type findings about open challenges across all FL papers",
+    "obs_chars": 3184,
+    "notes_chars": 3954
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "entity": "federated learning",
+     "claim_type": "observation",
+     "contains": "challenge|open problem|limitation|difficulty|issue|problem"
+    },
+    "intent": "Find observation-type findings about challenges across all FL papers",
+    "obs_chars": 2341,
+    "notes_chars": 3954
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "entity": "federated learning",
+     "claim_type": "criticism",
+     "contains": "challenge|open|limitation|weakness|deficiency|insufficient|lacking"
+    },
+    "intent": "Find criticism-type findings about FL limitations across all FL papers",
+    "obs_chars": 2340,
+    "notes_chars": 3954
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 38
+   },
+   {
+    "f28_auto_retrieval": "sciverse_federated_learning_challenges_methods_and_future_directions",
+    "at_step": 24,
+    "obs_chars": 1039
+   },
+   {
+    "f28_auto_retrieval": "sciverse_federated_learning_attacks_defenses_opportunities_and_challenges",
+    "at_step": 27,
+    "obs_chars": 1072
+   }
+  ],
+  "notes_final": "N1. [sciverse_concepts_key_challenges_and_open_problems_of_federated_learning] 2021 survey — directly on-topic.\nN2. [sciverse_federated_learning_challenges_methods_and_future_directions] 2020 survey — on-topic.\nN3. [sciverse_federated_learning_attacks_defenses_opportunities_and_challenges] 2024 survey — on-topic.\nN4. [sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne] 2022 — on-topic.\nN5. [sciverse_title_federated_learning_for_internet_of_things_recent_advances_taxonomy_and_ope] 2020 IoT FL — on-topic.\nN6. [arxiv_2201.01409] Quality challenges of FL for NN (Abyane 2022).\nN7. [arxiv_2101.00159] Fidel: reconstructing private training samples from weight updates (Al-Ars 2021) — privacy attack.\nN8. [arxiv_2101.02997] Differentially Private FL for Cancer Prediction (Beguier 2021).\nN9. [arxiv_2401.02329] Empty-Class-Aware Distillation for Heterogeneous FL (Guo 2024).\nN10. [sciverse_optimization_methods_and_software_for_federated_learning] 2025 optimization survey.\nN11. [coarse:03382bea8688] 2021 survey: \"concisely yet comprehensively explains the challenges of federated learning with a critical review of recent approaches\" | epistemic:stated\nN12. [coarse:6b71caafdd5a] 2020 survey: \"critical open directions yet to be explored surrounding challenges such as expensive communication, systems heterogeneity, statistical heterogeneity, and privacy\" | epistemic:stated\nN13. [coarse:4870507e963f] 2020 survey: \"additional challenges regarding issues such as productionizing and benchmarking in federated settings\" | epistemic:stated\nN14. [coarse:a34e6766d22e] 2024 survey: \"FL is in its prime stages of development, it has several unresolved issues that demand careful consideration\" | epistemic:stated\nN15. [coarse:d153eaba3a5c] 2021 survey: \"Key challenges in federated learning typically include model heterogeneity, statistical heterogeneity, communication (including system heterogeneity), and privacy\" | epistemic:stated\nN16. [coarse:942cf5eda489] IoT FL 2020: \"Dropped participants, privacy concerns, unlabeled data, interference among mobile devices, communication security, and asynchronous FL are identified as open research challenges\" | epistemic:stated\nN17. [coarse:409fbd998213] IoT FL 2020: \"various open challenges that exist in enabling federated learning over IoT networks\" | epistemic:stated\nN18. [coarse:82eae5f5b388] 2022 contemplative: \"FL being in a nascent stage of development, poses a number of challenges or open ends that require attention\" | epistemic:stated\nN19. [coarse:9b5faea27fcd] 2022 contemplative: \"challenges, owing to the different nature of the federated setting from the classical problems\" | epistemic:stated\nN20. [coarse:7b48529d0cb8] 2021 survey: \"FL has many unique challenges which typically make it different from traditional distribution optimization\" | epistemic:stated\nN21. [coarse:62916fddd7c6] 2024 survey: \"Due to the dissimilarity between the federated setting and traditional difficulties, the challenges pose an intriguing research paradigm\" | epistemic:stated\nN22. [coarse:9e635a16bf2d] 2025 optimization: \"Five key challenges in Federated Learning arise from the heterogeneity of data and devices, communication issues, and privacy concerns for clients in FL training\" | epistemic:stated\nN23. [coarse:7c972c6d9b14] 2025 optimization: \"we identify five key challenges in Federated Learning and propose novel approaches\" | epistemic:stated\nN24. [coarse:c07b2c5f3863] Fidel: \"novel attack method within regular federated learning which reconstructs private training samples from weight updates\" | epistemic:stated\nN25. [coarse:7dcb0df17d45] Fidel: \"recover on average twenty out of thirty private data samples from a client's model update employing a fully connected neural network\" | epistemic:stated\nN26. [coarse:6f096f8fd067] Fidel: \"over thirteen out of twenty samples can be recovered from a convolutional neural network update\" | epistemic:stated",
+  "gaps_final": "G1. Specific challenge enumerations from 2021 survey not yet retrieved\nG2. Specific challenge enumerations from 2024 survey not yet retrieved\nG3. Specific challenges from 2022 contemplative paper not yet retrieved\nG4. Specific challenges from 2025 optimization paper not yet retrieved\nG5. Privacy/security specifics from DP-FL paper",
+  "queried": [
+   "card|{\"entity\": \"federated learning\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_federated_learning_challenges_methods_and_future_directions\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_title_federated_learning_for_internet_of_things_recent_advances_taxonomy_and_ope\"}",
+   "findings|{\"contains\": \"heterogeneity|communication|privacy|security|non-iid|robustness\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"contains\": \"heterogeneity|communication|privacy|security|robustness|incentive|scalability\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"contains\": \"threat|vulnerability|attack|privacy|security|challenge|open\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"contains\": \"challenge|open|limitation|future|heterogeneity|communication|convergence\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"contains\": \"model heterogeneity|statistical heterogeneity|communication efficiency|privacy|security|robustness|convergence\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federa",
+   "findings|{\"contains\": \"attack|defense|privacy|security|robustness|incentive|communication|heterogeneity|open challenge\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"contains\": \"non-iid|data heterogeneity|communication cost|privacy|security|robustness|convergence|incentive|scalability|system heterogeneity|model heterogeneity|statistical heterogeneity\", \"paper_id",
+   "findings|{\"contains\": \"attack|defense|privacy|security|robustness|incentive|communication|heterogeneity|open challenge|unresolved\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_c",
+   "findings|{\"contains\": \"threat|vulnerability|attack|privacy|security|challenge|open|incentive|communication|heterogeneity\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxono",
+   "findings|{\"contains\": \"challenge|open|limitation|future|heterogeneity|communication|convergence|privacy|robustness\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_optimization_methods_and_software_for_federated_learning\"}",
+   "findings|{\"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"arxiv_2101.00159\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_concepts_key_challenges_and_open_problems_of_federated_learning\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_a_contemplative_perspective_on_federated_machine_learning_taxonomy_threats_vulne\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_federated_learning_challenges_methods_and_future_directions\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"open challenge|future direction|unsolved|remaining|yet to be|need to be addressed\", \"entity\": \"federated learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"challenge|open problem|limitation|difficulty|issue|problem\", \"entity\": \"federated learning\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"challenge|open|limitation|weakness|deficiency|insufficient|lacking\", \"entity\": \"federated learning\"}",
+   "findings|{\"paper_id\": \"sciverse_federated_learning_challenges_methods_and_future_directions\"}",
+   "findings|{\"paper_id\": \"sciverse_federated_learning_attacks_defenses_opportunities_and_challenges\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": {
+    "missing_nums": [],
+    "unsourced": [],
+    "altered_titles": [
+     [
+      "five key challenges in Federated Learning",
+      "concepts, key challenges and open problems of federated lear"
+     ],
+     [
+      " [sciverse_title_federated_learning_for_internet_of_things_r",
+      "title:federated learning for internet of things: recent adva"
+     ]
+    ]
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "050725a9a16e6694b491f735",
+  "type": "aggregation",
+  "question": "What considerations are important for material selection in fabricating industrial robotic grippers?  What are the advantages and disadvantages of soft vs rigid gripper materials?",
+  "gold_hint": "",
+  "answer": "Material selection for industrial robotic grippers is a critical engineering decision that balances mechanical performance, safety, and manufacturability. The primary considerations revolve around the trade-offs between compliance and rigidity, the specific requirements of the objects being manipulated, and the complexity of the fabrication process. For applications involving fragile, delicate, or irregularly shaped items, the selection of soft materials is often prioritized to ensure safe interaction and adaptive gripping . Conversely, rigid materials are selected when structural integrity and high force transmission are paramount, though this often necessitates additional cost for precision sensing to manage interaction forces .\n\nThe advantages of soft gripper materials are extensive, particularly in the context of handling diverse and fragile objects. Soft grippers, typically constructed from highly compliant materials such as silicone elastomers or hydrogels, offer high flexibility and a simple mechanical structure . These materials provide a lightweight alternative to traditional designs, featuring short response times and good bionic performance . A key functional advantage is the ability to adapt to the shape of captured objects through gripper deformation, allowing the gripper to secure items with complex or irregular geometries . This adaptability makes soft grippers capable of grabbing a variety of objects with different shapes, materials, and fragility levels . Furthermore, the inherent compliance of these materials ensures safe manipulation of delicate objects and facilitates safe human-robot interaction . Soft materials also provide tolerance to potentially damaging forces, offering a more gentle interaction with fragile items . Structurally, soft grippers can achieve large retracting motions without the need for complex joints, simplifying the mechanical design .\n\nIn contrast, rigid grippers possess distinct disadvantages that influence material selection. Traditional rigid grippers are characterized by heavy weight, complex structure, and high rigidity . These attributes make them vulnerable when handling fragile objects, as they have difficulty achieving a good compliant grip on items that are rotten, fragile, or irregularly shaped . To mitigate the lack of inherent compliance in rigid designs, engineers often employ precision sensors to improve interaction ability; however, this inevitably increases the total cost of the system . While the consulted records did not surface specific advantages of rigid materials beyond their structural rigidity, the limitations of soft materials must be weighed against these rigid drawbacks.\n\nThe disadvantages of soft gripper materials are primarily related to their mechanical properties and fabrication challenges. Soft materials exhibit inherent limitations, including slightly unpredictable deformation, increased nonlinearity of components, and low force capacity . These characteristics can complicate control and limit the load-bearing capability of the gripper. Additionally, the fabrication of soft grippers using rubber-like materials often requires an iterated casting process, which is usually complex . This manufacturing complexity stands in contrast to the simpler assembly often associated with rigid components, although the specific cost implications of this fabrication process were not detailed in the consulted records.\n\nIn summary, the choice between soft and rigid materials depends on the specific application requirements. Soft materials, such as silicone or rubber-like compounds, are preferred for their flexibility, safety, and adaptability to irregular shapes, despite their limitations in force output and fabrication complexity . Rigid materials are selected for their structural simplicity and force transmission, but they require additional sensing technology to handle fragile objects safely, leading to higher costs . The consulted records did not surface detailed information on other material selection criteria such as durability, wear resistance, or specific load capacity metrics beyond the general force limitations of soft materials.",
+  "arm": "main",
+  "steps": 10,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "dexterous soft robotic grippers"
+    },
+    "intent": "Get cross-paper evidence dossier on soft robotic grippers including material considerations",
+    "obs_chars": 1148,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "conventional robotic grippers"
+    },
+    "intent": "Get cross-paper evidence dossier on conventional/rigid robotic grippers",
+    "obs_chars": 553,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "rubber-like materials"
+    },
+    "intent": "Get evidence on rubber-like materials used in grippers",
+    "obs_chars": 1286,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "dexterous soft robotic grippers",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings about soft gripper material properties",
+    "obs_chars": 1925,
+    "notes_chars": 7
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "dexterous soft robotic grippers"
+    },
+    "intent": "Find self-limiting/critical statements about soft gripper materials (disadvantages, limitations)",
+    "obs_chars": 980,
+    "notes_chars": 2536
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "conventional robotic grippers"
+    },
+    "intent": "Find self-limiting/critical statements about rigid gripper materials (disadvantages, limitations)",
+    "obs_chars": 1544,
+    "notes_chars": 2536
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "entity": "rubber-like materials"
+    },
+    "intent": "Find recommendations about material selection for grippers",
+    "obs_chars": 1432,
+    "notes_chars": 2536
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "entity": "conventional robotic grippers"
+    },
+    "intent": "Find observations about rigid gripper material properties and considerations",
+    "obs_chars": 1588,
+    "notes_chars": 2536
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "entity": "conventional robotic grippers",
+     "contains": "material selection|material choice|material properties|durability|wear resistance|load capacity"
+    },
+    "intent": "Find material selection considerations for rigid/industrial grippers",
+    "obs_chars": 244,
+    "notes_chars": 4046
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "entity": "conventional robotic grippers",
+     "contains": "advantage|benefit|strength|rigid|metal|steel|aluminum"
+    },
+    "intent": "Find advantages of rigid gripper materials",
+    "obs_chars": 1588,
+    "notes_chars": 4046
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "dexterous soft robotic grippers",
+     "contains": "material|durability|wear|fatigue|lifespan|repeatability|force|payload"
+    },
+    "intent": "Find more specific material limitations of soft grippers",
+    "obs_chars": 522,
+    "notes_chars": 4046
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "material selection considerations industrial robotic gripper fabrication durability load",
+     "k": 8
+    },
+    "intent": "Search for material selection criteria in gripper fabrication",
+    "obs_chars": 2309,
+    "notes_chars": 4046
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "material|silicone|elastomer|polymer|rubber|TPU|polyurethane",
+     "entity": "dexterous soft robotic grippers"
+    },
+    "intent": "Find material-specific findings for soft grippers",
+    "obs_chars": 1419,
+    "notes_chars": 4046
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "material|metal|steel|aluminum|rigid|stiff|load|payload|force",
+     "entity": "conventional robotic grippers"
+    },
+    "intent": "Find material-specific findings for rigid grippers",
+    "obs_chars": 1588,
+    "notes_chars": 4046
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "material selection criteria gripper fabrication durability load capacity wear resistance cost manufacturability"
+    },
+    "intent": "Search for material selection considerations in gripper fabrication",
+    "obs_chars": 2820,
+    "notes_chars": 4046
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "material selection|material choice|material properties|durability|wear resistance|load capacity|stiffness|strength|cost|manufacturability",
+     "entity": "dexterous soft robotic grippers"
+    },
+    "intent": "Find material selection considerations for soft grippers",
+    "obs_chars": 244,
+    "notes_chars": 4530
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "material selection|material choice|material properties|durability|wear resistance|load capacity|stiffness|strength|cost|manufacturability",
+     "entity": "conventional robotic grippers"
+    },
+    "intent": "Find material selection considerations for rigid grippers",
+    "obs_chars": 524,
+    "notes_chars": 4530
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 10,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:1ef74f4831b6] Soft grippers vs traditional rigid: advantages include high flexibility, simple mechanical structure, short response time, lightweight, good bionic performance | anchor:\"Compared with the traditional rigid gripper, the soft gripper [4] has the advantages of a\" | epistemic:stated\nN2. [coarse:8371d848c068] Soft materials give soft grippers potential for more gentle interaction with fragile objects while allowing tolerance to potentially damaging forces | anchor:\"These mechanical attributes of soft materials give soft gripper the potential for a more g\" | epistemic:stated\nN3. [coarse:48dd53c0c2ab] Most single-mass grippers/fingers made of silicone or rubber-like materials | anchor:\"Most single-mass grippers and single-mass fingers are made of silicone or rubber-like materials.\" | epistemic:stated\nN4. [coarse:4bf3cfc5a039] Soft materials make grippers safe for manipulating delicate/fragile objects and for human-robot interaction | anchor:\"The soft materials make these grippers safe for manipulating delicate/fragile objects and for human-\" | epistemic:stated\nN5. [coarse:14a89ff00253] Using soft materials to build grippers offers advantages such as handling delicate objects, providing compliance | anchor:\"Using soft materials to build grippers offers advantages such as handling delicate objects, providin\" | epistemic:stated\nN6. [coarse:25b9b0c4a7d5] Grippers mainly created from highly compliant materials such as silicone elastomers or hydrogels | anchor:\"Grippers are mainly created from highly compliant materials such as silicone elastomers or hydrogels\" | epistemic:stated\nN7. [coarse:6e13777b5389] Soft grippers can adapt to shape of captured objects by gripper deformation | anchor:\"They can adapt to the shape of captured object by gripper deformation.\" | epistemic:stated\nN8. [coarse:c2b1f6a32377] Rubber-like materials come with disadvantages; fabrication of soft grippers often requires an iterated casting process, which is usually complex | anchor:\"However, rubber-like materials come with disadvantages; the fabrication of soft grippers o\" | epistemic:stated\nN9. [coarse:27a277c046c5] Rigid grippers have disadvantages: heavy weight, complex structure, high rigidity, vulnerability when handling fragile objects | anchor:\"the disadvantages of rigid grippers have gradually been exposed, such as their heavy weigh\" | epistemic:stated\nN10. [coarse:cb86ca32acc6] Traditional rigid gripper has difficulty achieving good compliant grip when handling fragile, rotten, or irregularly shaped objects | anchor:\"When gripping fragile and rotten objects or those objects with complex and irregular shape\" | epistemic:stated\nN11. [coarse:0847c8414b4d] Using precision sensors to improve interaction ability of a rigid gripper inevitably increases total cost | anchor:\"However, using precision sensors will inevitably increase the total cost.\" | epistemic:stated\nN12. [coarse:75611a8768ac] Soft materials have inherent limitation of slightly unpredictable deformation | anchor:\"However, the inherent limitations of using soft materials, namely, (1) slightly unpredicta\" | epistemic:stated\nN13. [coarse:c5a6459ccaab] Soft materials have inherent limitation of increased nonlinearity of components | anchor:\"However, the inherent limitations of using soft materials, namely, (1) slightly unpredicta\" | epistemic:stated\nN14. [coarse:16e0ecb4864c] Soft materials have inherent limitation of low force | anchor:\"However, the inherent limitations of using soft materials, namely, (1) slightly unpredicta\" | epistemic:stated\nN15. [coarse:0aca1dcbfb92] Soft grippers are able to grab a variety of objects with different shapes, materials, and fragility | anchor:\"Therefore, they are able to grab a variety of objects with different shape, different mate\" | epistemic:stated\nN16. [coarse:20a882e1a08a] Soft grippers are capable of large retracting motion without the need of complex joints | anchor:\"In addition to being made of soft and flexible materials, soft grippers are also capable o\" | epistemic:stated",
+  "gaps_final": "G1. What considerations are important for material selection in fabricating industrial robotic grippers? (need more on material selection criteria: durability, load capacity, wear resistance, cost, manufacturability)\nG2. What are the advantages and disadvantages of soft vs rigid gripper materials? (have good coverage but could use more on rigid advantages)",
+  "queried": [
+   "card|{\"entity\": \"dexterous soft robotic grippers\"}",
+   "card|{\"entity\": \"conventional robotic grippers\"}",
+   "card|{\"entity\": \"rubber-like materials\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"dexterous soft robotic grippers\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"dexterous soft robotic grippers\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"conventional robotic grippers\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"rubber-like materials\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"conventional robotic grippers\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"material selection|material choice|material properties|durability|wear resistance|load capacity\", \"entity\": \"conventional robotic grippers\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"advantage|benefit|strength|rigid|metal|steel|aluminum\", \"entity\": \"conventional robotic grippers\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"material|durability|wear|fatigue|lifespan|repeatability|force|payload\", \"entity\": \"dexterous soft robotic grippers\"}",
+   "search_text|{\"k\": 8, \"query\": \"material selection considerations industrial robotic gripper fabrication durability load\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"material|silicone|elastomer|polymer|rubber|TPU|polyurethane\", \"entity\": \"dexterous soft robotic grippers\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"material|metal|steel|aluminum|rigid|stiff|load|payload|force\", \"entity\": \"conventional robotic grippers\"}",
+   "search_text|{\"k\": 8, \"query\": \"material selection criteria gripper fabrication durability load capacity wear resistance cost manufacturability\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"material selection|material choice|material properties|durability|wear resistance|load capacity|stiffness|strength|cost|manufacturability\", \"entity\": \"dexter",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"material selection|material choice|material properties|durability|wear resistance|load capacity|stiffness|strength|cost|manufacturability\", \"entity\": \"conven"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "d4e24c4f015d55b91350ce62",
+  "type": "aggregation",
+  "question": "What are the most important practical applications of dextrous, in-hand robotic manipulation?",
+  "gold_hint": "",
+  "answer": "Dexterous, in-hand robotic manipulation is characterized as an essential function for robots, particularly within the domains of manufacturing, assembly, and assistive living [sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand]. The utility of these systems extends to a wide range of specific applications, including industrial manufacturing, domestic service, space exploration, medical rehabilitation, and the handling of dangerous goods [sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation]. In the context of industrial manufacturing, the adoption of dexterous hands is driven by the superior flexibility of human arm and hand structures, which possess more than 30 degrees of freedom (DOF), compared to the limitations of ordinary 6-DOF robots equipped with standard grippers . To address these complex operational needs, tasks for dexterous robotic hands are generally categorized into two distinct groups: \"grasping\" and \"manipulation\" [sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation].\n\nBeyond immediate industrial tasks, in-hand manipulation is viewed as a critical step toward the broader goal of enabling robots to manipulate objects in cluttered and unstructured environments, such as kitchens or warehouses [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi]. This capability is particularly relevant for human-robot collaboration (HRC), where emerging applications include hand-over tasks, collaborative transport, and conversation interactions in robot planning . The development of these systems is often inspired by the dexterous human hand, leading researchers to design multifingered robotic hands with similar structures and functions to replace traditional manipulators [sciverse_classification_of_dynamic_in_hand_manipulation_based_on_semg_and_kinect]. Specific hardware examples of this anthropomorphic approach include the Robonaut hand and the Shadow hand, the latter of which has been utilized in complex in-hand manipulation tasks such as solving a Rubik's Cube [sciverse_in_hand_haptic_perception_in_dexterous_manipulations] [sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand].\n\nThe practical realization of these applications is supported by advanced control strategies, such as finger-gaiting, which enables large-angle in-hand re-orientation of objects and can be learned via reinforcement learning using proprioceptive and tactile feedback [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi]. Deep Reinforcement Learning (DRL) has demonstrated the ability to solve these dexterous in-hand manipulation tasks due to its learning capabilities [sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h]. However, the deployment of these practical applications remains challenging; versatile in-hand manipulation is considered a long-standing challenge due to the high degrees of freedom in the control space and the complex interaction with the object [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi]  [sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward]. The consulted records did not surface specific details regarding haptic perception applications or curriculum-based transfer specifics beyond the general mention of DRL's capabilities.",
+  "arm": "main",
+  "steps": 24,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "dexterous in-hand manipulation"
+    },
+    "intent": "Get cross-paper evidence dossier for the main entity to see what applications are discussed",
+    "obs_chars": 1838,
+    "notes_chars": 837
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "dexterous in-hand manipulation",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|grasping"
+    },
+    "intent": "Find finding records that mention practical applications of dexterous in-hand manipulation",
+    "obs_chars": 1069,
+    "notes_chars": 837
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "practical applications dexterous in-hand manipulation industrial medical",
+     "k": 12
+    },
+    "intent": "Search full texts for passages discussing practical applications of dexterous in-hand manipulation",
+    "obs_chars": 1898,
+    "notes_chars": 837
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive"
+    },
+    "intent": "Find application mentions in the finger-gaiting paper",
+    "obs_chars": 1260,
+    "notes_chars": 2384
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive"
+    },
+    "intent": "Find application mentions in the contact modeling paper",
+    "obs_chars": 1077,
+    "notes_chars": 2384
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_hand_haptic_perception_in_dexterous_manipulations",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive"
+    },
+    "intent": "Find application mentions in the haptic perception paper",
+    "obs_chars": 244,
+    "notes_chars": 2384
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "dexterous manipulation applications industrial assembly medical surgery domestic household",
+     "k": 12
+    },
+    "intent": "Broader search for application domains across corpus",
+    "obs_chars": 1897,
+    "notes_chars": 2384
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_hand_haptic_perception_in_dexterous_manipulations",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation"
+    },
+    "intent": "Find application mentions in the haptic perception paper",
+    "obs_chars": 710,
+    "notes_chars": 3551
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse"
+    },
+    "intent": "Find application mentions in the curriculum-based transfer paper",
+    "obs_chars": 244,
+    "notes_chars": 3551
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse"
+    },
+    "intent": "Find application mentions in the stable in-hand manipulation paper",
+    "obs_chars": 565,
+    "notes_chars": 3551
+   },
+   {
+    "step": 3,
+    "tool": "search_papers",
+    "args": {
+     "query": "dexterous in-hand manipulation applications survey industrial medical domestic",
+     "k": 8
+    },
+    "intent": "Find external survey papers enumerating key application domains of dexterous in-hand manipulation",
+    "obs_chars": 2763,
+    "notes_chars": 3551
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_hand_haptic_perception_in_dexterous_manipulations",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the haptic perception paper for application context",
+    "obs_chars": 1390,
+    "notes_chars": 4130
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the curriculum-based sim-to-real paper for application context",
+    "obs_chars": 1628,
+    "notes_chars": 4130
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_classification_of_dynamic_in_hand_manipulation_based_on_semg_and_kinect",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the sEMG/Kinect classification paper for application context",
+    "obs_chars": 566,
+    "notes_chars": 4130
+   },
+   {
+    "step": 4,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "dexterous manipulation applications survey industrial assembly medical rehabilitation domestic service"
+    },
+    "intent": "Find external survey papers that comprehensively enumerate application domains of dexterous manipulation",
+    "obs_chars": 3044,
+    "notes_chars": 4130
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [FingerViP 2026] Fingertip visual perception for dexterous manipulation: multi-view feedback im"
+    ]
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand",
+     "claim_type": "observation"
+    },
+    "intent": "Get application-related observations from the multi-agent finger cooperation paper",
+    "obs_chars": 2059,
+    "notes_chars": 5441
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [FingerViP 2026] Fingertip visual perception for dexterous manipulation: multi-view feedback im"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_hand_haptic_perception_in_dexterous_manipulations",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous"
+    },
+    "intent": "Find application-specific findings from the haptic perception paper",
+    "obs_chars": 1178,
+    "notes_chars": 4533
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous"
+    },
+    "intent": "Find application-specific findings from the multi-agent finger cooperation paper",
+    "obs_chars": 1103,
+    "notes_chars": 4533
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [FingerViP 2026] Fingertip visual perception for dexterous manipulation: multi-view feedback im"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_hand_haptic_perception_in_dexterous_manipulations",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation-type findings from the haptic perception paper for application insights",
+    "obs_chars": 1390,
+    "notes_chars": 4533
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation-type findings from the finger-gaiting paper for application insights",
+    "obs_chars": 476,
+    "notes_chars": 4533
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation-type findings from the stable in-hand manipulation paper",
+    "obs_chars": 1076,
+    "notes_chars": 4533
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [FingerViP 2026] Fingertip visual perception for dexterous manipulation: multi-view feedback im"
+    ]
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [FingerViP 2026] Fingertip visual perception for dexterous manipulation: multi-view feedback im"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "query": "dexterous manipulation applications industrial assembly medical rehabilitation domestic",
+     "k": 12
+    },
+    "intent": "Search full texts of corpus papers for specific application mentions",
+    "obs_chars": 1896,
+    "notes_chars": 4533
+   },
+   {
+    "step": 9,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "dexterous in-hand manipulation practical applications survey 2020 2021 2022 2023 2024"
+    },
+    "intent": "Find recent survey papers on dexterous manipulation applications",
+    "obs_chars": 2478,
+    "notes_chars": 4533
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N13. [learning to solve a rubik's cube with a dexterous hand] Hierarchical DRL (model-based solver +"
+    ]
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h",
+     "contains": "application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous"
+    },
+    "intent": "Find application-specific findings in the curriculum-based sim-to-real paper",
+    "obs_chars": 580,
+    "notes_chars": 4399
+   },
+   {
+    "f28_auto_retrieval": "sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand",
+    "at_step": 13,
+    "obs_chars": 2059
+   },
+   {
+    "f28_auto_retrieval": "sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi",
+    "at_step": 16,
+    "obs_chars": 1510
+   },
+   {
+    "f28_auto_retrieval": "sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation",
+    "at_step": 19,
+    "obs_chars": 2066
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward",
+     "claim_type": "observation"
+    },
+    "intent": "Get application-related observations from the stable in-hand manipulation paper",
+    "obs_chars": 1076,
+    "notes_chars": 4398
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 28
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 24,
+    "f28_autos": 3
+   }
+  ],
+  "notes_final": "N1. [sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand] Dexterous robot hands enable in-hand manipulation, essential for manufacturing, assembly, and assistive living | anchor:\"essential functions for manufacturing, assembly, and assistive living\" | epistemic:stated\nN2. [sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand] Shadow hand used in complex in-hand manipulation tasks such as solving a Rubik's Cube | anchor:\"solving a Rubik's Cube\"\nN3. [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi] Robotic in-hand manipulation is an important step towards the general goal of manipulating objects in cluttered and unstructured environments such as in a kitchen or a warehouse | anchor:\"important step towards the general goal of manipulating objects in cluttered and unstructured environments such as in a kitchen or a warehouse\" | epistemic:stated\nN4. [sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation] Dexterous robotic hands have wide-ranging applications in industrial manufacturing, domestic service, space exploration, medical rehabilitation, and dangerous goods handling | anchor:\"wide range of applications, such as industrial manufacturing, domestic service, space exploration, medical rehabilitation, and dangerous goods handling\" | epistemic:stated\nN5. [sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation] Tasks for dexterous robotic hands can be divided into two groups: \"grasping\" and \"manipulation\" | anchor:\"Those tasks can be divided into two groups: 'grasping' and 'manipulation'\" | epistemic:stated\nN6. [sciverse_robot_programming_by_demonstration_rpd_supporting_the_induction_by_human_interac#5400] Human arm/hand with 30+ DOF more flexible than 6-DOF robot with gripper for object manipulation in manufacturing | anchor:\"A human arm and hand with their more than 30 degrees of freedom (DOF) are more flexible in performing object manipulations than an ordinary 6-DOF robot with its gripper\"\nN7. [arxiv_2404.02817#120150] HRC emerging applications: hand-over, collaborative transport, conversation interactions in robot planning | anchor:\"hand-over and collaborative transport\"\nN8. [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi] Versatile in-hand manipulation remains a long standing challenge | anchor:\"versatile in-hand manipulation remains a long standing challenge\" | epistemic:stated\nN9. [sciverse_in_hand_haptic_perception_in_dexterous_manipulations] Robonaut hand is an example of a famous anthropomorphic robotic hand | anchor:\"Recently, several famous anthropomorphic hands have been developed, such as Shadow\" | epistemic:stated\nN10. [sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward] Dexterous in-hand manipulation is hard due to high DOF in control space and complex object interaction | anchor:\"Dexterous in-hand manipulation is one of the essential functions for robots in human-robot\" | epistemic:stated\nN11. [sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h] DRL has shown abilities to solve dexterous in-hand manipulation tasks thanks to its learning capability | anchor:\"Deep Reinforcement Learning (DRL) [5] has shown its abilities in recent research [6-8] to\" | epistemic:stated\nN12. [sciverse_classification_of_dynamic_in_hand_manipulation_based_on_semg_and_kinect] Researchers design multifingered dexterous robotic hand with similar structure/function to human hand to replace traditional manipulators | anchor:\"Inspired by the dexterous human hand, researchers began to design a multifingered dexterou\" | epistemic:stated\nN13. [sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi] Finger-gaiting enables large-angle in-hand re-orientation; learned via RL with proprioceptive/tactile feedback; transfers to novel objects | anchor:\"Finger-gaiting manipulation is an important skill to achieve large-angle in-hand re-orientation of objects\"\nN14. [coarse:b3fa9a01402e] Dexterous in-hand manipulation is hard to solve due to high DoFs in control space and complex interaction with the object | anchor:\"but it is also hard to solve due to the high degrees of freedom (DoFs) in control space an\" | epistemic:stated",
+  "gaps_final": "G1. Need card() dossier for dexterous in-hand manipulation to get cross-paper application panorama\nG2. Need findings from haptic perception paper and curriculum-based paper for specific application mentions",
+  "queried": [
+   "card|{\"entity\": \"dexterous in-hand manipulation\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|grasping\", \"entity\": \"dexterous in-hand manipulation\"}",
+   "search_text|{\"k\": 12, \"query\": \"practical applications dexterous in-hand manipulation industrial medical\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive\", \"paper_id\": \"sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi\"",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive\", \"paper_id\": \"sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive\", \"paper_id\": \"sciverse_in_hand_haptic_perception_in_dexterous_manipulations\"}",
+   "search_text|{\"k\": 12, \"query\": \"dexterous manipulation applications industrial assembly medical surgery domestic household\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation\", \"paper_id\": \"sciverse_in_hand_haptic_perception_in_dexterous_manipulations\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse\", \"paper_id\": \"sciverse_curriculum_based_sensing_reduction_in_simulation_to_real",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse\", \"paper_id\": \"sciverse_stable_in_hand_manipulation_with_finger_specific_multi_a",
+   "search_papers|{\"k\": 8, \"query\": \"dexterous in-hand manipulation applications survey industrial medical domestic\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_in_hand_haptic_perception_in_dexterous_manipulations\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_curriculum_based_sensing_reduction_in_simulation_to_real_world_transfer_for_in_h\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_classification_of_dynamic_in_hand_manipulation_based_on_semg_and_kinect\"}",
+   "search_papers|{\"k\": 8, \"query\": \"dexterous manipulation applications survey industrial assembly medical rehabilitation domestic service\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous\", \"paper_id\": \"sciverse_in_hand_haptic_perception_in_dex",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous\", \"paper_id\": \"sciverse_a_multi_agent_approach_for_adapt",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_in_hand_haptic_perception_in_dexterous_manipulations\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward\"}",
+   "search_text|{\"k\": 12, \"query\": \"dexterous manipulation applications industrial assembly medical rehabilitation domestic\"}",
+   "search_papers|{\"k\": 8, \"query\": \"dexterous in-hand manipulation practical applications survey 2020 2021 2022 2023 2024\"}",
+   "findings|{\"contains\": \"application|industrial|medical|domestic|assembly|sorting|manufacturing|assistive|rehabilitation|warehouse|kitchen|space|dangerous\", \"paper_id\": \"sciverse_curriculum_based_sensing_reducti",
+   "findings|{\"paper_id\": \"sciverse_a_multi_agent_approach_for_adaptive_finger_cooperation_in_learning_based_in_hand\"}",
+   "findings|{\"paper_id\": \"sciverse_on_the_feasibility_of_learning_finger_gaiting_in_hand_manipulation_with_intrinsi\"}",
+   "findings|{\"paper_id\": \"sciverse_integrating_contact_modeling_and_control_for_the_robotic_hand_manipulation\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_stable_in_hand_manipulation_with_finger_specific_multi_agent_shadow_reward\"}"
+  ],
+  "gate": {
+   "note_rejects": 6,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 6
+   },
+   "merge_downgraded_lines": 17,
+   "merge_total_lines": 95,
+   "relaxed_writes": 6,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 3,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

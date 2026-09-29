@@ -1,0 +1,2269 @@
+[
+ {
+  "id": "5079291508735025cf2643c7",
+  "type": "aggregation",
+  "question": "I want to measure the distance between two Bluetooth devices (A Master and a slave) using the corresponding RSSI value. Is there any algorithm or popular approach that maps RSSI values directly to distance?",
+  "gold_hint": "",
+  "answer": "Yes, there are established algorithms and popular approaches that map Received Signal Strength Indicator (RSSI) values to distance, primarily relying on physical propagation models or statistical fingerprinting techniques. RSSI is defined as the calculation of the real signal power received by a receiver, typically expressed in decibel milliwatts (dBm) . This measure can be used to measure the distance between transmitter and receiver devices based on the differences between transmitted and received signal power .\n\nThe most direct approach to mapping RSSI to distance involves using geometric approaches where distances are calculated from RSSI values using an adequate model . Two propagation models are generally used to convert RSSI to distance: the free-space model and the log-normal model  . In a pure \"free-space\" scenario, the pathloss power loss is proportional to the square of the distance $d$ between the transmitter and receiver . More generally, the path loss is modeled as $d^{n_{PL}}$, where the pathloss coefficient $n_{PL}$ depends on the environment and whether a line-of-sight (LOS) connection exists  . The specific free-space path loss equation is given as $P_{RX} = P_{TX}|G_{TX}|^2|G_{RX}|^2(\\lambda_w/4\\pi d)^2$ . However, in practice, the channel model is often unknown, making distance inference prone to errors . Multipath propagation has been generally considered an obstacle in determining distance accurately .\n\nAn alternative to direct physical modeling is the fingerprinting approach, which does not rely on a specific propagation formula but rather on pattern matching. In this method, Access Points (APs) are compared against a stored RSSI dataset, and the comparison is usually done using Euclidean distance, defined as $L(x_i,x_0)=\\sqrt{\\sum|x_{i,k}-x_{0,k}|^2}$ . RF-based localization methods, which encompass these techniques, can be roughly categorised into four main classes, including Trilateration [svy_9b0973fa70fa]. Additionally, machine learning-based localization can be used in any of the introduced localization methods to improve accuracy . Small scale fading provides a very sensitive measure of location, where a movement of the transmitter or receiver on the order of a wavelength is sufficient to change the signal characteristics .\n\nRegarding the specific log-distance path-loss model formula (often expressed as $RSSI = A - 10 \\cdot n \\cdot \\log_{10}(d) + X_{\\sigma}$) and any Bluetooth-specific RSSI-distance records, the consulted records did not surface these specific details. While the notes confirm the use of log-normal models  and reference Okomura statistical channel models , the explicit mathematical formulation for the log-distance model and device-specific calibration data for Bluetooth were not present in the available information.",
+  "arm": "main",
+  "steps": 9,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "simplified form of the relation between distance and RSSI"
+    },
+    "intent": "dossier for the RSSI-distance relation entity",
+    "obs_chars": 571,
+    "notes_chars": 624
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "rssi"
+    },
+    "intent": "dossier for rssi entity",
+    "obs_chars": 352,
+    "notes_chars": 624
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m",
+     "contains": "rssi|distance|path loss|log-distance|calibration"
+    },
+    "intent": "what the indoor positioning paper says about RSSI-distance mapping",
+    "obs_chars": 2896,
+    "notes_chars": 624
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "RSSI distance mapping log-distance path loss model Bluetooth",
+     "k": 12
+    },
+    "intent": "lexical+semantic sweep for RSSI-to-distance approaches across corpus",
+    "obs_chars": 1764,
+    "notes_chars": 624
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "log-distance|path loss|log-normal|free-space|propagation model|calibration",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records describing the specific RSSI-to-distance formulas (log-distance path-loss, free-space)",
+    "obs_chars": 2438,
+    "notes_chars": 2188
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "log-distance path loss model RSSI distance formula 10 log d n calibration Bluetooth BLE"
+    },
+    "intent": "Search full texts for the log-distance path-loss formula and Bluetooth-specific RSSI distance mapping",
+    "obs_chars": 1766,
+    "notes_chars": 2188
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2012.11171",
+     "contains": "rssi|distance|path loss|localization|positioning"
+    },
+    "intent": "Get all findings from the localization paper arxiv_2012.11171 about RSSI-distance mapping",
+    "obs_chars": 3991,
+    "notes_chars": 2188
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "residential wearable rssi and accelerometer measurements dataset",
+     "contains": "rssi|distance|bluetooth|mapping"
+    },
+    "intent": "Check if the residential wearable RSSI dataset entity has any RSSI-distance mapping records",
+    "obs_chars": 244,
+    "notes_chars": 2188
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "log-distance path loss model RSSI = A - 10 n log10 d X_sigma calibration Bluetooth BLE distance estimation"
+    },
+    "intent": "Find the log-distance path-loss formula and Bluetooth-specific RSSI-distance content",
+    "obs_chars": 1762,
+    "notes_chars": 2573
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2012.11171",
+     "contains": "path loss|log-distance|log-normal|RSSI|distance estimation|propagation"
+    },
+    "intent": "Get more RSSI-distance findings from the localization survey paper",
+    "obs_chars": 2143,
+    "notes_chars": 2573
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m",
+     "contains": "RSSI|distance|path loss|fingerprint|positioning|localization"
+    },
+    "intent": "Get RSSI-distance approach from the indoor positioning paper",
+    "obs_chars": 2896,
+    "notes_chars": 2573
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:a8c01cf93a1e",
+     "window": 200
+    },
+    "intent": "Get full context around the free-space/log-normal model mention in the indoor positioning paper to see the actual formul",
+    "obs_chars": 151,
+    "notes_chars": 3094
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:d5dfac6e403e",
+     "window": 200
+    },
+    "intent": "Get full context around the log-normal model mention in the indoor positioning paper",
+    "obs_chars": 151,
+    "notes_chars": 3094
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "contains": "rssi|distance|path loss|fingerprint|positioning|localization",
+     "paper_id": "sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m"
+    },
+    "intent": "Check the indoor positioning paper for its specific RSSI-distance approach",
+    "obs_chars": 2896,
+    "notes_chars": 3094
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 9,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:007ca687b4d3] RSSI = real signal power received by receiver, expressed in dBm | anchor:\"RSSI is the calculation of real signal power received by a receiver and is typically expressed in decibel milliwatts (dBm)\" | epistemic:stated\nN2. [coarse:fd261cd3b324] RSSI can measure distance between TX/RX based on transmitted vs received signal power differences | anchor:\"This measure can be used to measure the distance between transmitter and receiver devices\" | epistemic:stated\nN3. [coarse:9f01d8a7edbb] In geometric approaches, distances calculated from RSSI values using an adequate model | anchor:\"In geometric approaches, distances are calculated from the RSSI values using an adequate m\" | epistemic:stated\nN4. [coarse:a8c01cf93a1e] Free-space models generally used to convert RSSI to distance | anchor:\"Two propagation models have been generally used to convert the RSSI to distance: the free-\" | epistemic:stated\nN5. [coarse:d5dfac6e403e] Log-normal models generally used to convert RSSI to distance | anchor:\"Two propagation models have been generally used to convert the RSSI to distance: the free-\" | epistemic:stated\nN6. [arxiv_2012.11171#94500] Free-space path loss: P_RX = P_TX|G_TX|^2|G_RX|^2(λ_w/4πd)^2; in practice channel model unknown, distance inference prone to errors; mentions Okomura statistical channel models | anchor:\"P RX = P TX | G TX | 2 | G RX | 2 ( λ w 4 π d ) 2\" | conditions:free-space\nN7. [svy_72c15c06e554] In pure free-space, pathloss power loss proportional to square of TX-RX distance d; more generally d^n_PL where n_PL depends on environment | anchor:\"In the case of a pure \"free-space\" scenario, this power loss is proportional to the square\" | epistemic:survey-claimed\nN8. [svy_9b0973fa70fa] RF-based localization methods categorised into four main classes: Trilateration, ... | anchor:\"RF based localization methods can be roughly categorised into four main classes: • Trilate\" | epistemic:survey-claimed\nN9. [svy_320f917b19] ML-based localization can be used in any of the introduced localization methods | anchor:\"ML-based localization can be used in any of the introduced l\" | epistemic:survey-claimed\nN10. [svy_965d295f98] Small scale fading provides very sensitive measure of location; movement on order of wavelength | anchor:\"A movement of the TX or RX on the order of a wavelength is u\" | epistemic:survey-claimed\nN11. [svy_2d58b24c80] Multipath propagation generally considered an obstacle in determining distance | anchor:\"Multipath propagation has been generally considered an obsta\" | epistemic:survey-claimed\nN12. [arxiv_2012.11171#136350] Fingerprinting: APs compared against stored RSSI dataset using Euclidean distance L(x_i,x_0)=sqrt(sum|x_i,k-x_0,k|^2) | anchor:\"The comparison is usually done using Euclidean distance\" | conditions:fingerprinting\nN13. [arxiv_2012.11171#76950] Pathloss modeled as d^n_PL where n_PL depends on environment and LOS; channel models used to test localization algorithms | anchor:\"PL d^{n_{PL}}, where the pathloss coefficient n_PL depends on the environment and whether a LOS connection exists\"",
+  "gaps_final": "G3. Need the log-distance path-loss model formula (RSSI = A - 10*n*log10(d) + X_sigma) and any Bluetooth-specific RSSI-distance records.\nG4. Check arxiv_2012.11171 for more RSSI-distance content (localization survey).\nG5. Check the indoor positioning paper (sciverse_indoor_2d_positioning...) for its specific RSSI-distance approach.",
+  "queried": [
+   "card|{\"entity\": \"simplified form of the relation between distance and RSSI\"}",
+   "card|{\"entity\": \"rssi\"}",
+   "findings|{\"contains\": \"rssi|distance|path loss|log-distance|calibration\", \"paper_id\": \"sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m\"}",
+   "search_text|{\"k\": 12, \"query\": \"RSSI distance mapping log-distance path loss model Bluetooth\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"log-distance|path loss|log-normal|free-space|propagation model|calibration\"}",
+   "search_text|{\"k\": 12, \"query\": \"log-distance path loss model RSSI distance formula 10 log d n calibration Bluetooth BLE\"}",
+   "findings|{\"contains\": \"rssi|distance|path loss|localization|positioning\", \"paper_id\": \"arxiv_2012.11171\"}",
+   "findings|{\"contains\": \"rssi|distance|bluetooth|mapping\", \"entity\": \"residential wearable rssi and accelerometer measurements dataset\"}",
+   "search_text|{\"k\": 12, \"query\": \"log-distance path loss model RSSI = A - 10 n log10 d X_sigma calibration Bluetooth BLE distance estimation\"}",
+   "findings|{\"contains\": \"path loss|log-distance|log-normal|RSSI|distance estimation|propagation\", \"paper_id\": \"arxiv_2012.11171\"}",
+   "findings|{\"contains\": \"RSSI|distance|path loss|fingerprint|positioning|localization\", \"paper_id\": \"sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m\"}",
+   "fetch_chunk|{\"record_id\": \"coarse:a8c01cf93a1e\", \"window\": 200}",
+   "fetch_chunk|{\"record_id\": \"coarse:d5dfac6e403e\", \"window\": 200}",
+   "findings|{\"contains\": \"rssi|distance|path loss|fingerprint|positioning|localization\", \"paper_id\": \"sciverse_indoor_2d_positioning_method_for_mobile_robots_based_on_the_fusion_of_rssi_and_m\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e458a18949d8b51f3a463419",
+  "type": "aggregation",
+  "question": "In recommendation systems, how are new methods that optimize diversity typically evaluated?",
+  "gold_hint": "",
+  "answer": "The evaluation of new methods that optimize diversity in recommendation systems is a complex and multifaceted task that extends beyond measuring a few key metrics of a single model, as these systems have far-reaching impacts on users' experiences [arxiv_2404.00579#43200]. Consequently, the performance of recommender systems should be evaluated in terms of not only accuracy but also diversity and novelty [coarse:3320492bfe03]. To address this, a unified taxonomy has been proposed for classifying the metrics and approaches of diversification in search and recommendation [arxiv_2212.14464#1350]. This taxonomy distinguishes between relevance-oblivious and relevance-aware diversity metrics, maintaining a lookup table for their applicability in search versus recommendation contexts [arxiv_2212.14464#22950].\n\nA primary dimension of evaluation involves the level at which diversity is measured, with a focus on three levels of recommended diversity and evaluation criteria [coarse:e8c3f185844f]. It is stated that systems optimizing for user- or item-level diversity do not necessarily score well in system-level diversity, prompting the development of new objectives that combine user-level, item-level, and system-level diversity [coarse:0861ad406c3a]. At the system level, the P-Coverage metric is utilized, though it generally focuses on the system level and is hardly used for single ranking lists, while also relating to the cold-start problem [arxiv_2212.14464#32400]. Other metric families identified in the literature include NRBP, nDCU@K, M-IA (IA-family), and D-M/D#-M (D-family) [arxiv_2212.14464#24300].\n\nSpecific computational approaches to measuring diversity often rely on item-item similarity based on item content to form item neighborhoods, after which the minimum, maximum, sum, or average distance between items is measured [coarse:4a71d322f181]. An alternative method involves measuring the value of inserting a new item to the list of recommendation, an approach attributed to Ziegler et al. [coarse:e5fc6870fbfb]. Additionally, Adomavicius and Kwon used the total number of different items recommended across all users as an aggregate diversity measure [coarse:175029617e61]. For relevance-aware evaluation, D/D#-metrics combine traditional ranking quality metrics such as nDCG, MRR, and MAP with a diversity measure D-M@K via a parameter gamma [arxiv_2212.14464#55350]. The survey also references the rank-biased utility metric by Amigó et al. (SIGIR 2018), Hurley's work on diverse recommendation (DiveRS@RecSys 2011), and DPP-based diversity by Chen et al. (NIPS 2018) [arxiv_2212.14464#108000].\n\nThe evaluation process is further characterized by an in-depth analysis of the advantages, disadvantages, and applicable environments of these evaluation metrics [coarse:815d68fa0575]. This analysis is conducted from multiple perspectives, including accuracy, diversity, and novelty [coarse:0c93b7371549]. The inclusion of these factors is supported by findings that approaches such as diversity, novelty, and serendipity have been found to increase user satisfaction [coarse:6c377ee79133]. In specific applications, proposed diversification scenarios have been shown to improve the diversity measures in session-based recommender systems [coarse:29e3f027c96b].\n\nRegarding datasets, the MovieLens-100K dataset, which contains 100,000 ratings from 943 users for 1682 movies, is a standard benchmark published by GroupLens [arxiv_2301.00767#60750]. Another variant of the MovieLens dataset includes 487.1K social relations from 138.1K users and 1.5M ratings, which is used in GNN-based SocialRS methods [arxiv_2212.04481#99900].\n\nThe consulted records did not surface specific details regarding the typical evaluation protocol (such as offline versus online testing or specific accuracy-diversity tradeoff curves) or the specific evaluation approaches used by the system-wide diversity paper and the probabilistic model paper. Furthermore, the records did not provide a comprehensive list of specific diversity metrics such as Intra-List Diversity (ILD) or category coverage beyond the families and specific metrics already cited. It is also noted that the authors of the relevant work do not address the meta-concern that increasing diversity can change user behavior and lead to polarization [coarse:d4a42345db43].",
+  "arm": "main",
+  "steps": 15,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "diversity in recommendation"
+    },
+    "intent": "Get cross-paper evidence dossier on diversity in recommendation to understand evaluation practices",
+    "obs_chars": 395,
+    "notes_chars": 958
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "evaluation metrics for personalized recommendation systems"
+    },
+    "intent": "Get dossier on evaluation metrics for recommendation systems",
+    "obs_chars": 517,
+    "notes_chars": 958
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "adomavicius and kwon aggregate diversity measure"
+    },
+    "intent": "Get dossier on the specific diversity measure",
+    "obs_chars": 500,
+    "notes_chars": 958
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "diversity in recommendation",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition records about how diversity is measured/evaluated in recommendation",
+    "obs_chars": 429,
+    "notes_chars": 958
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "diversity"
+    },
+    "intent": "Get cross-paper evidence dossier for diversity entity",
+    "obs_chars": 3854,
+    "notes_chars": 635
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluation_metrics_for_personalized_recommendation_systems",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of evaluation metrics from the evaluation metrics paper",
+    "obs_chars": 522,
+    "notes_chars": 635
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of the system-wide diversity measure",
+    "obs_chars": 1017,
+    "notes_chars": 635
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions from the probabilistic diversity-accuracy paper",
+    "obs_chars": 989,
+    "notes_chars": 635
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluation_metrics_for_personalized_recommendation_systems",
+     "contains": "diversity|metric|evaluation|measure"
+    },
+    "intent": "Get specific diversity metrics and evaluation methods from the evaluation metrics paper",
+    "obs_chars": 2386,
+    "notes_chars": 1859
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm",
+     "contains": "diversity|metric|evaluation|measure|dataset|benchmark"
+    },
+    "intent": "Get specific diversity measures and evaluation protocol from the system-wide diversity paper",
+    "obs_chars": 1504,
+    "notes_chars": 1859
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2102.03265",
+     "contains": "diversity|metric|evaluation|measure|dataset|benchmark"
+    },
+    "intent": "Get evaluation details from the session-based news diversification paper",
+    "obs_chars": 922,
+    "notes_chars": 1859
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_",
+     "contains": "diversity|metric|evaluation|measure|dataset|benchmark|accuracy"
+    },
+    "intent": "Get evaluation protocol and diversity-accuracy tradeoff details from the probabilistic model paper",
+    "obs_chars": 555,
+    "notes_chars": 1859
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "entity": "diversity in recommendation"
+    },
+    "intent": "Get observation-type findings about diversity evaluation in recommendation",
+    "obs_chars": 828,
+    "notes_chars": 2141
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_evaluation_metrics_for_personalized_recommendation_systems"
+    },
+    "intent": "Get observation findings from the evaluation metrics paper",
+    "obs_chars": 1918,
+    "notes_chars": 2141
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm"
+    },
+    "intent": "Get observation findings from the system-wide diversity measure paper",
+    "obs_chars": 1504,
+    "notes_chars": 2141
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_"
+    },
+    "intent": "Get observation findings from the probabilistic diversity-accuracy paper",
+    "obs_chars": 989,
+    "notes_chars": 2141
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "diversity-aware session-based recommender systems"
+    },
+    "intent": "Get cross-paper evidence dossier for diversity-aware session-based recommenders to find evaluation details",
+    "obs_chars": 521,
+    "notes_chars": 2141
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "diversity-aware retrieval systems"
+    },
+    "intent": "Get cross-paper evidence dossier for diversity-aware retrieval systems to find evaluation details",
+    "obs_chars": 423,
+    "notes_chars": 2141
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "recommendation system"
+    },
+    "intent": "Get cross-paper evidence dossier for recommendation systems to find evaluation practices",
+    "obs_chars": 2491,
+    "notes_chars": 2141
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "diversity in recommendation",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation-type findings about diversity evaluation practices",
+    "obs_chars": 429,
+    "notes_chars": 2141
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "evaluation metrics for personalized recommendation systems",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition records for evaluation metrics in recommendation systems",
+    "obs_chars": 521,
+    "notes_chars": 2141
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "diversity evaluation metric recommendation system offline online accuracy tradeoff",
+     "k": 12
+    },
+    "intent": "Search full texts for diversity evaluation protocols and metrics",
+    "obs_chars": 1752,
+    "notes_chars": 2141
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluation_metrics_for_personalized_recommendation_systems",
+     "contains": "diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark"
+    },
+    "intent": "Get specific findings from the evaluation metrics paper about diversity metrics and evaluation protocols",
+    "obs_chars": 2386,
+    "notes_chars": 2798
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm",
+     "contains": "diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|system-level"
+    },
+    "intent": "Get specific findings from the system-wide diversity measure paper about how diversity is measured and evaluated",
+    "obs_chars": 1504,
+    "notes_chars": 2798
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_",
+     "contains": "diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|probabilistic"
+    },
+    "intent": "Get specific findings from the probabilistic diversity-accuracy paper about evaluation methodology",
+    "obs_chars": 1031,
+    "notes_chars": 2798
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "diversity metric evaluation protocol offline online A/B test dataset benchmark recommendation accuracy tradeoff nDCG coverage ILD"
+    },
+    "intent": "Search for specific evaluation protocols, metrics, and datasets used in diversity-optimizing recommendation papers",
+    "obs_chars": 1751,
+    "notes_chars": 2798
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm",
+     "contains": "evaluation|metric|dataset|experiment|baseline|compare|accuracy|nDCG|coverage|ILD|intra-list"
+    },
+    "intent": "Get specific evaluation details from the system-wide diversity paper",
+    "obs_chars": 1260,
+    "notes_chars": 2798
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_",
+     "contains": "evaluation|metric|dataset|experiment|baseline|compare|accuracy|nDCG|coverage|ILD|intra-list|probabilistic"
+    },
+    "intent": "Get specific evaluation details from the probabilistic diversity-accuracy paper",
+    "obs_chars": 1032,
+    "notes_chars": 2798
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "intra-list diversity ILD coverage category coverage evaluation dataset MovieLens Amazon benchmark offline evaluation diversity recommendation"
+    },
+    "intent": "Find specific diversity metrics and datasets used in evaluation",
+    "obs_chars": 1747,
+    "notes_chars": 2798
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2102.03265",
+     "contains": "evaluation|metric|dataset|experiment|baseline|diversity|accuracy|nDCG|coverage|ILD|session"
+    },
+    "intent": "Get evaluation details from the session-based news diversification paper",
+    "obs_chars": 1788,
+    "notes_chars": 2798
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "MovieLens Amazon dataset evaluation experiment baseline comparison diversity accuracy tradeoff offline online A/B test"
+    },
+    "intent": "Find specific datasets and evaluation protocols used in diversity-optimizing recommendation papers",
+    "obs_chars": 1753,
+    "notes_chars": 3237
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_insights_towards_developing_recommender_systems",
+     "contains": "diversity|evaluation|metric|dataset|experiment|accuracy|novelty|coverage"
+    },
+    "intent": "Get evaluation details from the 'new insights' paper on recommender systems",
+    "obs_chars": 1555,
+    "notes_chars": 3237
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_improving_reachability_and_navigability_in_recommender_systems",
+     "contains": "diversity|evaluation|metric|dataset|experiment|accuracy|coverage|reachability|navigability"
+    },
+    "intent": "Get evaluation details from the reachability/navigability paper",
+    "obs_chars": 525,
+    "notes_chars": 3237
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "contains": "diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|system-level|user-level|item-level",
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm"
+    },
+    "intent": "Get specific evaluation details from the system-wide diversity paper",
+    "obs_chars": 1504,
+    "notes_chars": 4354
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "contains": "diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|probabilistic|model",
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_"
+    },
+    "intent": "Get specific evaluation details from the probabilistic model paper",
+    "obs_chars": 1508,
+    "notes_chars": 4354
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "contains": "offline|online|A/B test|user study|experiment|protocol|benchmark|dataset|MovieLens|Amazon",
+     "paper_id": "sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm"
+    },
+    "intent": "Find specific evaluation protocol details in the system-wide diversity paper",
+    "obs_chars": 748,
+    "notes_chars": 4354
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "contains": "offline|online|A/B test|user study|experiment|protocol|benchmark|dataset|MovieLens|Amazon|probabilistic",
+     "paper_id": "sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_"
+    },
+    "intent": "Find specific evaluation protocol details in the probabilistic model paper",
+    "obs_chars": 1238,
+    "notes_chars": 4354
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 15,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How are new diversity-optimizing recommendation methods typically evaluated?\nRelevant papers: sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm, sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_, sciverse_evaluation_metrics_for_personalized_recommendation_systems, arxiv_2102.03265, sciverse_new_insights_towards_developing_recommender_systems, sciverse_title_improving_reachability_and_navigability_in_recommender_systems, arxiv_2212.14464 (survey on diversity metrics)\nN1. [coarse:0861ad406c3a] Systems that optimize for user- or item-level diversity do not necessarily score well in system-level diversity; new objective combines user-level, item-level, and system-level diversity | epistemic:stated\nN2. [coarse:d4a42345db43] Authors do not address meta concern that increasing diversity can change user behavior and lead to polarization | epistemic:stated\nN3. [coarse:3320492bfe03] Performance of recommender systems should be evaluated in terms of not only accuracy but also diversity and novelty | epistemic:stated\nN4. [coarse:0c93b7371549] Paper expounds on evaluation metrics from multiple perspectives such as accuracy, diversity, and novelty | epistemic:stated\nN5. [coarse:e8c3f185844f] Paper focuses on three levels of recommended diversity and evaluation criteria | epistemic:stated\nN6. [coarse:815d68fa0575] Paper conducts in-depth analysis of advantages/disadvantages and applicable environments of evaluation metrics | epistemic:stated\nN7. [arxiv_2212.14464#1350] Survey proposes unified taxonomy for classifying metrics and approaches of diversification in search and recommendation | anchor:\"unified taxonomy for classifying the metrics and approaches of diversification\"\nN8. [arxiv_2212.14464#55350] D/D#-metrics combine traditional ranking quality metric (nDCG, MRR, MAP) with diversity measure D-M@K via parameter gamma | anchor:\"gamma*M*D-M@K\"\nN9. [arxiv_2212.14464#108000] References: rank-biased utility metric (Amigó et al. SIGIR 2018), Hurley \"Towards diverse recommendation\" (DiveRS@RecSys 2011), DPP-based diversity (Chen et al. NIPS 2018) | anchor:\"rank-biased utility metric\"\nN10. [arxiv_2212.14464#22950] Survey classifies relevance-aware diversity metrics into sub-classes; maintains lookup table for applicability in search vs recommendation | anchor:\"Relevance-aware Diversity Metrics\"\nN11. [arxiv_2404.00579#43200] Evaluating RS is complex and multifaceted; goes beyond measuring a few key metrics of a single model; systems have far-reaching impacts on users' experiences | anchor:\"Evaluating RS is a complex and multifaceted task\"\nN12. [coarse:29e3f027c96b] Proposed diversification scenarios improve the diversity measures in session-based recommender systems | epistemic:stated\nN13. [arxiv_2212.14464#24300] Survey lists metric families: P-Coverage (system-level), NRBP, nDCU@K, M-IA (IA-family), D-M/D#-M (D-family); relevance-oblivious vs relevance-aware distinction | anchor:\"Relevance-oblivious Diversity Metrics\"\nN14. [arxiv_2212.14464#32400] P-Coverage focuses on system level, hardly used for single ranking lists; also relates to cold-start problem | anchor:\"P-Coverage generally focuses on the system level\"\nN15. [coarse:4a71d322f181] Most methods to evaluate diversity use item-item similarity based on item content to form item neighborhoods, then measure min/max/sum/average distance between items | epistemic:stated\nN16. [coarse:e5fc6870fbfb] Another way to evaluate diversity: measure value of inserting a new item to the list of recommendation (Ziegler et al.) | epistemic:stated\nN17. [coarse:175029617e61] Adomavicius and Kwon used total number of different items recommended across all users as aggregate diversity measure | epistemic:stated\nN18. [coarse:6c377ee79133] Approaches such as diversity, novelty, and serendipity have been found to increase user satisfaction | epistemic:stated\nN19. [arxiv_2301.00767#60750] MovieLens-100K: 100,000 ratings from 943 users for 1682 movies; MovieLens datasets published by GroupLens | anchor:\"MovieLens-100K contains 100,000 ratings from 943 users for 1682 movies\"\nN20. [arxiv_2212.04481#99900] MovieLens dataset: 487.1K social relations from 138.1K users and 1.5M ratings; used in GNN-based SocialRS methods | anchor:\"487.1K social relations from 138.1K users and 1.5M rat\"",
+  "gaps_final": "G1. What specific diversity metrics (ILD, coverage, category coverage, etc.) are used?\nG2. What datasets/benchmarks are used for evaluation?\nG3. What is the typical evaluation protocol (offline vs online, accuracy-diversity tradeoff)?\nG4. What specific evaluation approaches do the key papers use (e.g., the system-wide diversity paper, the probabilistic model paper)?",
+  "queried": [
+   "card|{\"entity\": \"diversity in recommendation\"}",
+   "card|{\"entity\": \"evaluation metrics for personalized recommendation systems\"}",
+   "card|{\"entity\": \"adomavicius and kwon aggregate diversity measure\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"diversity in recommendation\"}",
+   "card|{\"entity\": \"diversity\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_evaluation_metrics_for_personalized_recommendation_systems\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_\"}",
+   "findings|{\"contains\": \"diversity|metric|evaluation|measure\", \"paper_id\": \"sciverse_evaluation_metrics_for_personalized_recommendation_systems\"}",
+   "findings|{\"contains\": \"diversity|metric|evaluation|measure|dataset|benchmark\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm\"}",
+   "findings|{\"contains\": \"diversity|metric|evaluation|measure|dataset|benchmark\", \"paper_id\": \"arxiv_2102.03265\"}",
+   "findings|{\"contains\": \"diversity|metric|evaluation|measure|dataset|benchmark|accuracy\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"diversity in recommendation\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_evaluation_metrics_for_personalized_recommendation_systems\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algorithm\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendation_\"}",
+   "card|{\"entity\": \"diversity-aware session-based recommender systems\"}",
+   "card|{\"entity\": \"diversity-aware retrieval systems\"}",
+   "card|{\"entity\": \"recommendation system\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"diversity in recommendation\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"evaluation metrics for personalized recommendation systems\"}",
+   "search_text|{\"k\": 12, \"query\": \"diversity evaluation metric recommendation system offline online accuracy tradeoff\"}",
+   "findings|{\"contains\": \"diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark\", \"paper_id\": \"sciverse_evaluation_metrics_for_personalized_recommendation_systems\"}",
+   "findings|{\"contains\": \"diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|system-level\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_algori",
+   "findings|{\"contains\": \"diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|probabilistic\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recommendat",
+   "search_text|{\"k\": 12, \"query\": \"diversity metric evaluation protocol offline online A/B test dataset benchmark recommendation accuracy tradeoff nDCG coverage ILD\"}",
+   "findings|{\"contains\": \"evaluation|metric|dataset|experiment|baseline|compare|accuracy|nDCG|coverage|ILD|intra-list\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient",
+   "findings|{\"contains\": \"evaluation|metric|dataset|experiment|baseline|compare|accuracy|nDCG|coverage|ILD|intra-list|probabilistic\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_chal",
+   "search_text|{\"k\": 12, \"query\": \"intra-list diversity ILD coverage category coverage evaluation dataset MovieLens Amazon benchmark offline evaluation diversity recommendation\"}",
+   "findings|{\"contains\": \"evaluation|metric|dataset|experiment|baseline|diversity|accuracy|nDCG|coverage|ILD|session\", \"paper_id\": \"arxiv_2102.03265\"}",
+   "search_text|{\"k\": 12, \"query\": \"MovieLens Amazon dataset evaluation experiment baseline comparison diversity accuracy tradeoff offline online A/B test\"}",
+   "findings|{\"contains\": \"diversity|evaluation|metric|dataset|experiment|accuracy|novelty|coverage\", \"paper_id\": \"sciverse_new_insights_towards_developing_recommender_systems\"}",
+   "findings|{\"contains\": \"diversity|evaluation|metric|dataset|experiment|accuracy|coverage|reachability|navigability\", \"paper_id\": \"sciverse_title_improving_reachability_and_navigability_in_recommender_systems\"}",
+   "findings|{\"contains\": \"diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|system-level|user-level|item-level\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations",
+   "findings|{\"contains\": \"diversity|metric|measure|evaluation|accuracy|tradeoff|dataset|benchmark|probabilistic|model\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challenge_of_recom",
+   "findings|{\"contains\": \"offline|online|A/B test|user study|experiment|protocol|benchmark|dataset|MovieLens|Amazon\", \"paper_id\": \"sciverse_a_new_system_wide_diversity_measure_for_recommendations_with_efficient_a",
+   "findings|{\"contains\": \"offline|online|A/B test|user study|experiment|protocol|benchmark|dataset|MovieLens|Amazon|probabilistic\", \"paper_id\": \"sciverse_a_probabilistic_model_to_resolve_diversity_accuracy_challe"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 20,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "b9ecca8a0858c732a3bced34",
+  "type": "aggregation",
+  "question": "In robotics, what are the leading methods for learning terrain traversibility costs automatically from robot experience?",
+  "gold_hint": "",
+  "answer": "In the domain of robotics, the leading methods for automatically learning terrain traversability costs from robot experience are primarily categorized into experience-based autonomous learning, regression models utilizing proprioceptive and exteroceptive data, and unsupervised mapping techniques. A prominent approach is the \"I move, therefore I learn\" framework, which is described as a novel experience-based method that allows robots to autonomously learn which terrains are traversable based on prior navigation experience . This method is characterized by its ability to learn traversability without relying on external sources, thereby enabling the robot to derive cost information directly from its own operational history . This aligns with the broader principle of experiential learning, which addresses robotic navigation by learning how to traverse real-world environments from real-world data . Within this experiential framework, the problem is often decomposed into a low level that deals with local traversability and a high level that determines which route to take .\n\nAnother significant category of methods involves the use of machine learning to regress traversability costs from sensor data, particularly for legged robots. In this context, Faigl and Prágr are noted for using robot proprioceptive features to characterize three traversal costs, which are then attached to exteroceptive features for regression . This approach is further supported by the use of an unsupervised method adopted by Faigl and Prágr for traversability cost maps regression . The necessity of such methods is underscored by the observation that it is difficult to accurately estimate a terrain's actual cost until the robot traverses it itself . To address this, recent work in traversability-aware legged navigation fuses color data (terrain texture), depth, and proprioceptive feedback in real time to estimate terrain traversability cost . Additionally, machine learning methods are employed for tactile terrain classification, where a neural network takes variable-length signals such as forces and torques to output terrain classes for localization . In some implementations, annotated images are used to train a score regression network to facilitate this cost estimation .\n\nFor ground vehicles, self-organizing maps are proposed to predict three traversal costs based on terrain morphology and appearance derived from RGB-D cameras . A critical component of this predictive model is that it is fed with the traversal costs actually experienced by the robot during the learning phase, ensuring that the learned costs reflect real-world performance . In the context of crawling robots, the integration of perception with learning enables the automatic discovery of mappings between terrain features and costs . It is stated that combining all modalities together better models robot perception, which is key for assessing traversability costs . However, the specific method proposed by the 2015 crawling robot paper is not detailed in the available records, though it notes future work to incorporate a gait modality for better traversability cost modeling .\n\nRegarding the specific limitations and numeric results, the consulted records did not surface detailed numeric comparisons or specific performance metrics for these methods. Furthermore, while the general framing of experiential learning is provided, the specific traversability cost learning methods detailed in the 2022 navigation-from-experience survey beyond this general framing were not surfaced in the available notes. The records also do not provide a comprehensive list of recorded limitations or absences for the specific methods discussed, other than the noted difficulty in estimating costs prior to traversal and the future work regarding gait modalities.",
+  "arm": "main",
+  "steps": 20,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics",
+     "contains": "traversability|cost|terrain|experience|learning"
+    },
+    "intent": "Extract method/finding records from the 2025 experience-based traversability paper",
+    "obs_chars": 1098,
+    "notes_chars": 1122
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein",
+     "contains": "traversability|cost|terrain|inverse reinforcement|energy|learning"
+    },
+    "intent": "Extract method/finding records from the 2022 deep inverse RL traversability paper",
+    "obs_chars": 1554,
+    "notes_chars": 1122
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data",
+     "contains": "traversability|cost|terrain|visual|learning|navigation"
+    },
+    "intent": "Extract method/finding records from the 2024 visual-data traversability navigation paper",
+    "obs_chars": 1529,
+    "notes_chars": 1122
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob",
+     "contains": "traversability|cost|proprioceptive|crawling|learning|terrain"
+    },
+    "intent": "Extract method/finding records from the 2015 proprioceptive traversability cost paper",
+    "obs_chars": 1595,
+    "notes_chars": 1122
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result",
+     "contains": "traversability|cost|terrain|experience|learning|proprioceptive"
+    },
+    "intent": "Get findings from the 2022 navigation-from-experience survey on traversability cost learning",
+    "obs_chars": 1558,
+    "notes_chars": 2945
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_based_methods_of_perception_and_navigation_for_ground_vehicles_in_unstr",
+     "contains": "traversability|cost|terrain|learning|experience|proprioceptive"
+    },
+    "intent": "Get findings from the 2020 ground-vehicles perception/navigation paper on traversability",
+    "obs_chars": 1517,
+    "notes_chars": 2945
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism claims from the energy-based legged robot paper for its own proposed method",
+    "obs_chars": 1954,
+    "notes_chars": 2945
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism claims from the i_move_therefore_i_learn paper for its own proposed method",
+    "obs_chars": 1098,
+    "notes_chars": 2945
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result",
+     "contains": "traversability|cost|terrain|proprioceptive|learning|experience|regression|neural"
+    },
+    "intent": "Get more specific method details from the navigation-from-experience survey",
+    "obs_chars": 1558,
+    "notes_chars": 4345
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob",
+     "contains": "traversability|cost|proprioceptive|crawling|learning|terrain|method|model"
+    },
+    "intent": "Get the specific method proposed by the crawling robot paper",
+    "obs_chars": 1595,
+    "notes_chars": 4345
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein",
+     "claim_type": "criticism"
+    },
+    "intent": "Find recorded limitations/weaknesses of the energy-based legged robot approach",
+    "obs_chars": 1954,
+    "notes_chars": 4345
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics",
+     "claim_type": "criticism"
+    },
+    "intent": "Find recorded limitations/weaknesses of the i_move_therefore_i_learn approach",
+    "obs_chars": 585,
+    "notes_chars": 4345
+   },
+   {
+    "step": 5,
+    "tool": "card",
+    "args": {
+     "entity": "traversability"
+    },
+    "intent": "Get cross-paper evidence dossier for traversability to see all methods, results, and lineage in one sweep",
+    "obs_chars": 699,
+    "notes_chars": 4345
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the navigation-from-experience survey for specific method descriptions",
+    "obs_chars": 573,
+    "notes_chars": 4345
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from the crawling robot paper to understand its specific method proposal",
+    "obs_chars": 560,
+    "notes_chars": 4345
+   },
+   {
+    "step": 5,
+    "tool": "find_gap",
+    "args": {
+     "entity": "traversability"
+    },
+    "intent": "Check what is recorded as NOT done / absent for traversability methods",
+    "obs_chars": 703,
+    "notes_chars": 4345
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "traversability cost learning method proprioceptive regression neural network",
+     "k": 12
+    },
+    "intent": "Find specific method descriptions and any numeric results across the traversability papers",
+    "obs_chars": 1753,
+    "notes_chars": 4345
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result"
+    },
+    "intent": "Get the survey's recommendations on traversability cost learning methods",
+    "obs_chars": 1113,
+    "notes_chars": 4345
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "paper_id": "sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics"
+    },
+    "intent": "Get the formal definition/method description of the i_move_therefore_i_learn approach",
+    "obs_chars": 585,
+    "notes_chars": 4345
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data"
+    },
+    "intent": "Get observations/results from the 2024 traversability-aware legged navigation paper",
+    "obs_chars": 1021,
+    "notes_chars": 4345
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result",
+     "contains": "traversability|cost|proprioceptive|regression|neural|learning|experience|terrain"
+    },
+    "intent": "Get specific method descriptions from the navigation-from-experience survey",
+    "obs_chars": 1558,
+    "notes_chars": 4345
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get the specific method proposed by the crawling robot paper",
+    "obs_chars": 1595,
+    "notes_chars": 4345
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the navigation-from-experience survey to identify specific traversability cost learnin",
+    "obs_chars": 573,
+    "notes_chars": 4345
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get the specific method/mechanism of the traversability-aware legged navigation paper",
+    "obs_chars": 547,
+    "notes_chars": 4345
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_learning_based_methods_of_perception_and_navigation_for_ground_vehicles_in_unstr",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get the specific method/mechanism of the ground vehicles paper",
+    "obs_chars": 1517,
+    "notes_chars": 4345
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data",
+     "claim_type": "definition"
+    },
+    "intent": "Get the definition/method description of the traversability-aware legged navigation paper",
+    "obs_chars": 547,
+    "notes_chars": 4345
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob",
+     "claim_type": "observation"
+    },
+    "intent": "Get the specific method/observations of the crawling robot 2015 paper",
+    "obs_chars": 560,
+    "notes_chars": 4345
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result"
+    },
+    "intent": "Get limitations/weaknesses stated in the navigation-from-experience survey",
+    "obs_chars": 573,
+    "notes_chars": 4345
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 20,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: leading methods for learning terrain traversability costs automatically from robot experience (robotics).\nCorpus papers on-point:\n- sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics (2025)\n- sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein (2022)\n- sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob (2015)\n- sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data (2024)\n- sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result (2022)\n- sciverse_learning_based_methods_of_perception_and_navigation_for_ground_vehicles_in_unstr (2020)\nFindings so far:\nN1. [coarse:49417c0b4d28] i_move_therefore_i_learn: novel experience-based method; robots autonomously learn which terrains are traversable from prior navigation experience | anchor:\"autonomously learn which terrains are traversable based on prior navigation experience\" | epistemic:stated\nN2. [coarse:477c41e64726] i_move_therefore_i_learn: learns traversability without relying on external sources | anchor:\"without relying on exten\" | epistemic:stated\nN3. [coarse:a45c3d408693] energy-based legged (2022): Faigl & Prágr use robot proprioceptive features to characterize three traversal costs, attach to exteroceptive features for regression | anchor:\"use robot proprioceptive features to characterize thr\" | epistemic:stated\nN4. [coarse:ef3dcc8ba3fe] energy-based legged: Bednarek et al. use ML for tactile terrain classification | anchor:\"machine learning methods for tactile terrain classific\" | epistemic:stated\nN5. [coarse:e653c2a30004] energy-based legged: NN takes variable-length signals (forces/torques) -> terrain classes for localization | anchor:\"variable-length signals such as forces and tor\" | epistemic:stated\nN6. [coarse:f313f89e621c] traversability-aware legged nav (2024): fuses color, depth, proprioceptive feedback in real time to estimate terrain traversability cost | anchor:\"fuse color data (terrain textu\" | epistemic:stated\nN7. [coarse:1f7ff91be0f6] traversability-aware legged nav: difficult to accurately estimate terrain's actual cost until robot traverses it itself | anchor:\"difficult to accu\" | epistemic:stated\nN8. [coarse:58dd335f98fe] crawling robot (2015): future work to incorporate gait modality for better traversability cost modeling | anchor:\"incorporate a gait modality in future work\" | epistemic:stated\nN9. [coarse:1230dcf3ff53] crawling robot: combining all modalities better models robot perception, key for assessing traversability costs | anchor:\"Combined all modalities together\" | epistemic:stated\nN10. [coarse:d7b080794b3f] crawling robot: perception connected to learning enables automatic discovery of mappings between terrain features and costs | anchor:\"perception can be connected to learning and mapping between the terrain feat\" | epistemic:stated\nN11. [coarse:06f4638eddbf] navigation-from-experience survey (2022): experiential learning addresses robotic navigation by learning how to traverse real-world environments from real-world data | anchor:\"experiential learning can be used to address robotic navigation problems\" | epistemic:stated\nN12. [coarse:9052780c0d02] navigation-from-experience survey: low level deals with local traversibility, high level determines which route | anchor:\"The low level deals with local traversibility\" | epistemic:stated\nN13. [coarse:0ef8e1718748] ground-vehicles (2020): self-organizing maps predict three traversal costs based on terrain morphology and appearance from RGB-D camera | anchor:\"self-organizing maps are proposed, to predict three traversal costs\" | epistemic:stated\nN14. [coarse:33e67489bc68] ground-vehicles (2020): predicting model fed with traversal costs actually experienced by robot during learning phase | anchor:\"predicting model is also fed with the traversal\" | epistemic:stated\nN15. [coarse:e26e46e17d4c] ground-vehicles (2020): unsupervised method adopted for traversability cost maps regression (Faigl & Prágr) | anchor:\"unsupervised method is adopted by Faigl and Prágr\" | epistemic:stated\nN16. [coarse:ce38f47ce75a] energy-based legged: annotated images train a score regression network | anchor:\"annotated images are used to train a score regression network\" | epistemic:stated",
+  "gaps_final": "G1. What does the navigation-from-experience survey (2022) say about specific traversability cost learning methods (beyond the general framing)?\nG2. Are there numeric results / comparisons for these methods?\nG3. What are the recorded limitations/absences (what is NOT done)?\nG4. What does the crawling robot (2015) paper specifically propose as its method?",
+  "queried": [
+   "findings|{\"contains\": \"traversability|cost|terrain|experience|learning\", \"paper_id\": \"sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics\"}",
+   "findings|{\"contains\": \"traversability|cost|terrain|inverse reinforcement|energy|learning\", \"paper_id\": \"sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein\"}",
+   "findings|{\"contains\": \"traversability|cost|terrain|visual|learning|navigation\", \"paper_id\": \"sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data\"}",
+   "findings|{\"contains\": \"traversability|cost|proprioceptive|crawling|learning|terrain\", \"paper_id\": \"sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob\"}",
+   "findings|{\"contains\": \"traversability|cost|terrain|experience|learning|proprioceptive\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"}",
+   "findings|{\"contains\": \"traversability|cost|terrain|learning|experience|proprioceptive\", \"paper_id\": \"sciverse_learning_based_methods_of_perception_and_navigation_for_ground_vehicles_in_unstr\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics\"}",
+   "findings|{\"contains\": \"traversability|cost|terrain|proprioceptive|learning|experience|regression|neural\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"",
+   "findings|{\"contains\": \"traversability|cost|proprioceptive|crawling|learning|terrain|method|model\", \"paper_id\": \"sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_energy_based_legged_robots_terrain_traversability_modeling_via_deep_inverse_rein\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics\"}",
+   "card|{\"entity\": \"traversability\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob\"}",
+   "find_gap|{\"entity\": \"traversability\"}",
+   "search_text|{\"k\": 12, \"query\": \"traversability cost learning method proprioceptive regression neural network\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_i_move_therefore_i_learn_experience_based_traversability_in_outdoor_robotics\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data\"}",
+   "findings|{\"contains\": \"traversability|cost|proprioceptive|regression|neural|learning|experience|terrain\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_learning_based_methods_of_perception_and_navigation_for_ground_vehicles_in_unstr\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_traversability_aware_legged_navigation_by_learning_from_real_world_visual_data\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_on_traversability_cost_evaluation_from_proprioceptive_sensing_for_a_crawling_rob\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_learning_robotic_navigation_from_experience_principles_methods_and_recent_result\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 15,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "8f5a6ec4ad13c0b7881a9af2",
+  "type": "aggregation",
+  "question": "In auditory speech perception using iEEG, I will use Temporal Response Function (TRF) to determine correlations between stimulus characteristics (variations in the acoustic signal envelope, for example) and characteristics of recorded neuronal activity. I would like to fully understand the different stages of data processing carried out, as well as the reasoning and hypotheses behind them.",
+  "gold_hint": "",
+  "answer": "The Temporal Response Function (TRF) is a linear transfer function that describes the relationship between features of the speech stimulus (such as the acoustic envelope) and the recorded neural response [coarse:6a82d2c66c0f]. It is a functionally informative statistic derived from a linear model that predicts the neural response to sound stimuli [coarse:c8f674a11699]. The approach stems from a system identification technique [coarse:389698eeb87e], in which the instantaneous neural activity is modeled as the convolution of the acoustic stimulation with an unknown, channel-specific TRF [coarse:d2a8a2f185c2]. The envelope-to-EEG mapping across various time lags yields the TRF [coarse:ed410cf47a9b].\n\n**Stimulus preparation (acoustic signal processing):**\nThe speech signal is typically processed to extract the temporal envelope. One approach uses an equally spaced filterbank between 100 and 10000 Hz based on Liberman's cochlear frequency map to extract a broadband envelope [coarse:5a46ab2d5958]. Envelope compression may also be applied to the speech signal as part of stimulus preparation [8f46a228fc072b]. The reasoning behind these steps is to isolate the temporal modulation structure of the speech signal that is most relevant to neural encoding, while the filterbank design is grounded in the known frequency organization of the cochlea.\n\n**Neural data preprocessing:**\nFor the recorded neural signals (EEG/iEEG), a bandpass filter is applied to isolate the frequency range of interest. In one study, segmented data were bandpass filtered between 1–20 Hz using a zero-phase FIR filter, and then downsampled to 100 Hz for computational efficiency [sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_#18900]. The zero-phase FIR filter is chosen to avoid introducing phase distortion that would shift the temporal alignment between stimulus and response. Downsampling reduces computational load without losing the temporal resolution needed for TRF estimation.\n\nImportantly, one study explicitly chose minimal preprocessing on the EEG signal (for example, excluding common preprocessing steps such as ICA) because the data would be further processed using the TRF framework [coarse:801e30790ae3]. The reasoning is that the TRF analysis itself identifies neural signals related to auditory processing and therefore acts as an additional preprocessing stage [coarse:b7cf424d717d] — the linear model inherently separates signal from noise by only retaining the component of the neural response that is linearly related to the stimulus.\n\n**TRF estimation:**\nThe TRF is estimated to capture the linear relationship between particular features of the stimulus and the neural response [coarse:3f6ef0ab8423]. The core model assumes that the neural response at each time point is the convolution of the stimulus envelope with the TRF kernel. This is a linear time-invariant (LTI) system identification problem. The TRF is a continuous signal which exhibits neural encoding over time; peaks of different latencies indicate separate processing stages [coarse:c8fd09d3b565].\n\nA key motivation for using TRF rather than simple correlation is that temporal smearing from averaging across time points will create noise in the correlation function, and the TRF modeling approach solves this problem [sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog#12150].\n\n**Validation and comparison considerations:**\nWhen comparing TRFs across conditions (e.g., different passage types), TRFs should be generated from the same number of predictors to ensure unbiased comparison, and peaks are typically compared using repeated measures ANOVA [sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_#21600].\n\n**Hypotheses and reasoning behind the pipeline:**\nThe overarching hypothesis in studies using TRF for speech perception is that ascending brain processing stages will show emergent features, from acoustic to sentence-level linguistic representations [coarse:290562d77be3]. Neural/cortical tracking of the temporal envelope of speech has been used to study segmentation of speech [coarse:dfa2ec38d506]. The TRF framework allows researchers to identify at what latencies (i.e., which processing stages) the neural response tracks the stimulus, thereby mapping the temporal hierarchy of speech processing in the brain.\n\n**iEEG-specific considerations:**\nThe corpus does not contain papers specifically addressing iEEG (intracranial EEG) in the context of TRF pipelines. The studies in the knowledge base primarily use EEG. However, the general pipeline principles (bandpass filtering, envelope extraction, linear convolution modeling) would apply to iEEG data as well, with the key difference being that iEEG provides higher spatial resolution and signal-to-noise ratio, potentially reducing the need for aggressive artifact rejection. The minimal preprocessing philosophy (excluding ICA, relying on the TRF model to isolate relevant signals) [coarse:801e30790ae3] would be particularly relevant for iEEG, where the higher SNR means fewer artifacts need to be removed before TRF estimation.\n\n**Limitations of this answer:** The knowledge base does not contain detailed iEEG-specific TRF pipeline papers, nor does it contain explicit descriptions of the regression method (e.g., ridge regression, L2 penalty) used for TRF estimation in the corpus papers. The specific regularization and cross-validation strategies for TRF fitting are not documented in the available records. For a complete methodological account of iEEG TRF pipelines, the external literature (e.g., work by Mesgarani, Cheung, and colleagues on intracranial speech tracking) would need to be consulted directly.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Temporal Response Function"
+    },
+    "intent": "Get cross-paper evidence dossier for TRF - configs, findings, results",
+    "obs_chars": 491,
+    "notes_chars": 552
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "neural/cortical tracking of the temporal envelope of speech"
+    },
+    "intent": "Get dossier for the broader topic of neural tracking of speech envelope",
+    "obs_chars": 493,
+    "notes_chars": 552
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism-type findings about TRF processing stages",
+    "obs_chars": 3094,
+    "notes_chars": 552
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings from the key 2019 neural entrainment paper",
+    "obs_chars": 1565,
+    "notes_chars": 552
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "contains": "preprocessing|filtering|envelope|normalization|segmentation|epoch"
+    },
+    "intent": "Get all processing-stage findings from the key 2019 review paper",
+    "obs_chars": 590,
+    "notes_chars": 2133
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_",
+     "contains": "preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing"
+    },
+    "intent": "Get processing pipeline details from the 2024 neural dynamics paper",
+    "obs_chars": 1137,
+    "notes_chars": 2133
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_ecological_investigation_of_the_capacity_to_follow_simultaneous_speech_and_pr",
+     "contains": "preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline"
+    },
+    "intent": "Get processing pipeline details from the ecological investigation paper",
+    "obs_chars": 1134,
+    "notes_chars": 2133
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_",
+     "contains": "preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline"
+    },
+    "intent": "Get processing pipeline details from the capacity/tradeoffs paper",
+    "obs_chars": 1677,
+    "notes_chars": 2133
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "sections": [
+      "methods",
+      "data processing",
+      "TRF estimation"
+     ]
+    },
+    "intent": "Get full detail on the TRF processing pipeline from the key 2019 review paper",
+    "obs_chars": 2480,
+    "notes_chars": 3388
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_",
+     "sections": [
+      "methods",
+      "data processing",
+      "TRF"
+     ]
+    },
+    "intent": "Get full detail on TRF pipeline and processing stages from the 2024 neural dynamics paper",
+    "obs_chars": 1404,
+    "notes_chars": 3388
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline|regression|ridge|regularization",
+     "paper_id": "sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_"
+    },
+    "intent": "Get processing pipeline details from the capacity/tradeoffs paper",
+    "obs_chars": 1677,
+    "notes_chars": 3388
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_",
+     "sections": [
+      "Methods",
+      "Data preprocessing",
+      "TRF estimation",
+      "Stimulus preparation"
+     ]
+    },
+    "intent": "Get full processing pipeline details from the capacity/tradeoffs paper which has iEEG data and TRF estimation",
+    "obs_chars": 1361,
+    "notes_chars": 5106
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_an_ecological_investigation_of_the_capacity_to_follow_simult",
+     "sections": [
+      "Methods",
+      "Data preprocessing",
+      "TRF estimation",
+      "Stimulus preparation"
+     ]
+    },
+    "intent": "Get full processing pipeline details from the ecological investigation paper",
+    "obs_chars": 181,
+    "notes_chars": 5106
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_",
+     "contains": "preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline|regression|ridge|regularization|filterbank|downsample|bandpass"
+    },
+    "intent": "Get all processing pipeline findings from the neural dynamics paper",
+    "obs_chars": 1137,
+    "notes_chars": 5106
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "contains": "TRF|convolution|regression|ridge|regularization|filterbank|envelope extraction|preprocessing|pipeline|estimation|model"
+    },
+    "intent": "Get TRF estimation method details from the pushing the envelope review",
+    "obs_chars": 2175,
+    "notes_chars": 5106
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_",
+     "contains": "TRF|convolution|regression|ridge|regularization|filterbank|envelope|preprocessing|pipeline|estimation|model|filter|downsample|bandpass|segment|epoch|normalize"
+    },
+    "intent": "Get detailed processing pipeline records from the capacity paper's deep-read extraction",
+    "obs_chars": 1652,
+    "notes_chars": 2767
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "contains": "TRF|convolution|regression|ridge|regularization|filterbank|envelope|preprocessing|pipeline|estimation|model|filter|downsample|bandpass|segment|epoch|normalize|forward|backward|spectrogram"
+    },
+    "intent": "Get detailed processing pipeline records from the pushing the envelope paper's deep-read extraction",
+    "obs_chars": 2666,
+    "notes_chars": 2767
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "iEEG TRF temporal response function data processing pipeline envelope extraction regression ridge regularization",
+     "k": 12
+    },
+    "intent": "Search full texts for iEEG-specific TRF pipeline details across all papers",
+    "obs_chars": 2187,
+    "notes_chars": 2767
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N4. [sciverse_neural_dynamics...#75600] TRF model weights estimated by minimizing mean absolute diff",
+     "N15. [sciverse_capacity...#18900] Segmented data bandpass filtered 1-20 Hz zero-phase FIR, downsampl"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "TRF ridge regression regularization filterbank envelope extraction stimulus preparation iEEG electrode preprocessing",
+     "k": 12
+    },
+    "intent": "Find detailed pipeline descriptions across corpus papers for TRF estimation with iEEG",
+    "obs_chars": 2187,
+    "notes_chars": 3594
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "speech envelope"
+    },
+    "intent": "Get cross-paper dossier on speech envelope extraction methods",
+    "obs_chars": 433,
+    "notes_chars": 3594
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "TRF estimation ridge regression regularization design matrix stimulus envelope neural response iEEG electrode"
+    },
+    "intent": "Find specific TRF estimation methodology details (regression type, regularization, design matrix construction)",
+    "obs_chars": 2187,
+    "notes_chars": 3501
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "iEEG intracranial EEG preprocessing segmentation epoching baseline correction artifact rejection electrode"
+    },
+    "intent": "Find iEEG-specific preprocessing steps and reasoning",
+    "obs_chars": 1748,
+    "notes_chars": 3501
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "TRF ridge regression design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching"
+    },
+    "intent": "Find detailed TRF estimation pipeline including regression method, design matrix construction, and iEEG-specific preproc",
+    "obs_chars": 286,
+    "notes_chars": 4222
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings about TRF for formal understanding of the method",
+    "obs_chars": 3115,
+    "notes_chars": 4711
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "speech envelope",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings about speech envelope extraction and its role in TRF",
+    "obs_chars": 3207,
+    "notes_chars": 4711
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "neural/cortical tracking of the temporal envelope of speech",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings about the broader neural tracking framework",
+    "obs_chars": 533,
+    "notes_chars": 4711
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "TRF pipeline stages stimulus envelope extraction Hilbert transform filterbank neural data preprocessing segmentation epoching baseline correction ridge regression regularization validation cross-validation"
+    },
+    "intent": "Find detailed pipeline descriptions across all papers in corpus",
+    "obs_chars": 2189,
+    "notes_chars": 2862
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "contains": "preprocessing|filtering|segmentation|epoch|baseline|artifact|downsample|bandpass|Hilbert|filterbank|envelope extraction|stimulus preparation|design matrix|ridge|regularization|cross-validation|validation",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition-type records about pipeline stages and methods",
+    "obs_chars": 2239,
+    "notes_chars": 2862
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog",
+     "claim_type": "mechanism",
+     "contains": "envelope|filterbank|Hilbert|convolution|design matrix|ridge|regularization|validation|cross-validation|segmentation|epoch|baseline|artifact|downsample|bandpass|preprocessing|pipeline|estimation|model|filter|spectrogram|mel|gammatone|wavelet|spectral|amplitude|phase|rectify|half-wave|full-wave|log|compress|nonlinear|linear|transfer|impulse|response|kernel|weight|coefficient|parameter|fit|optimize|minimize|loss|cost|objective|constraint|penalty|shrinkage|L1|L2|elastic|net|lasso|bayesian|prior|posterior|MAP|MLE|OLS|GLM|generalized|linear|mixed|random|fixed|effect|subject|trial|session|block|condition|stimulus|response|neural|electrode|channel|contact|grid|depth|surface|cortical|subcortical|temporal|parietal|frontal|occipital|insular|amygdala|hippocampus|thalamus|brainstem|auditory|speech|language|word|syllable|phoneme|phone|segment|prosody|intonation|stress|rhythm|tempo|rate|duration|timing|latency|onset|offset|peak|trough|amplitude|frequency|band|channel|filter|bank|bank|filter|bank|bank|bank"
+    },
+    "intent": "Get all mechanism findings from the key TRF review paper (Cherry et al. 2018) covering pipeline details",
+    "obs_chars": 2565,
+    "notes_chars": 3223
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "TRF estimation ridge regression L2 regularization design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching baseline correction"
+    },
+    "intent": "Find detailed TRF pipeline description including regression method, regularization, and iEEG-specific preprocessing",
+    "obs_chars": 286,
+    "notes_chars": 3866
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find methodological recommendations about TRF pipeline stages (regularization, validation, preprocessing choices)",
+    "obs_chars": 2654,
+    "notes_chars": 3866
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "observation"
+    },
+    "intent": "Find observational findings about TRF pipeline behavior, validation results, and iEEG-specific observations",
+    "obs_chars": 3146,
+    "notes_chars": 3866
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "criticism"
+    },
+    "intent": "Find limitations/criticisms of TRF approach — what the papers say about weaknesses, assumptions, or what is missing in t",
+    "obs_chars": 2654,
+    "notes_chars": 5094
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "entity": "speech envelope",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition records for speech envelope — how it is extracted, what features are used, reasoning behind extraction ch",
+    "obs_chars": 1077,
+    "notes_chars": 5094
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "mechanism",
+     "contains": "ridge|regularization|L2|penalty|design matrix|convolution|filterbank|Hilbert|envelope extraction|segmentation|epoch|baseline|artifact|downsample|bandpass|validation|cross-validation|leave-one"
+    },
+    "intent": "Find mechanism records about TRF estimation details: regression type, regularization, design matrix construction, valida",
+    "obs_chars": 1103,
+    "notes_chars": 5143
+   },
+   {
+    "step": 17,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "iEEG intracranial electrode TRF temporal response function preprocessing segmentation epoching baseline correction artifact rejection high gamma broadband envelope"
+    },
+    "intent": "Find iEEG-specific TRF pipeline details from full texts",
+    "obs_chars": 2186,
+    "notes_chars": 5143
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "speech envelope",
+     "claim_type": "mechanism",
+     "contains": "Hilbert|filterbank|envelope extraction|amplitude modulation|bandpass|rectify|analytic signal|cochlear|frequency map|Liberman"
+    },
+    "intent": "Find mechanism records about how the speech envelope is extracted from the acoustic signal",
+    "obs_chars": 3538,
+    "notes_chars": 5143
+   },
+   {
+    "step": 18,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "TRF estimation ridge regression L2 penalty design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching baseline correction"
+    },
+    "intent": "Find detailed TRF estimation pipeline including regression method, regularization, and iEEG-specific preprocessing",
+    "obs_chars": 286,
+    "notes_chars": 4810
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "entity": "neural/cortical tracking of the temporal envelope of speech",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitional records about the tracking methodology — may contain pipeline stage descriptions",
+    "obs_chars": 533,
+    "notes_chars": 4810
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "entity": "neural/cortical tracking of the temporal envelope of speech",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get methodological recommendations about TRF pipeline choices — reasoning behind processing stages",
+    "obs_chars": 533,
+    "notes_chars": 4810
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the iEEG concurrent speech paper for iEEG-specific TRF pipeline details",
+    "obs_chars": 2613,
+    "notes_chars": 4810
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the neural dynamics paper for TRF estimation and validation details",
+    "obs_chars": 2765,
+    "notes_chars": 4810
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 42
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "iEEG intracranial EEG temporal response function TRF speech envelope preprocessing pipeline ridge regression",
+     "k": 8
+    },
+    "intent": "Search external literature for iEEG-specific TRF pipeline papers with detailed preprocessing and estimation methods",
+    "obs_chars": 2612,
+    "notes_chars": 4810
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N24. [external:2022_TRF_intelligibility] TRF between speech envelope and EEG; accuracy varies with S",
+     "N25. [external:2018_cortical_tracking] 19 participants, Flemish Matrix sentences at different SNRs; "
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "admit_paper",
+    "args": {
+     "title": "prediction of speech intelligibility by means of eeg responses to sentences in noise"
+    },
+    "intent": "Admit the 2022 TRF paper for deep reading of its full pipeline details",
+    "obs_chars": 486,
+    "notes_chars": 5595
+   },
+   {
+    "step": 24,
+    "tool": "admit_paper",
+    "args": {
+     "title": "predicting individual speech intelligibility from the cortical tracking of acoustic- and phonetic-level speech representations"
+    },
+    "intent": "Admit the 2018 cortical tracking paper for deep reading of its full pipeline details",
+    "obs_chars": 528,
+    "notes_chars": 5595
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "design matrix|regression|ridge|L2|penalty|regularization|convolution|filter|envelope|segment|epoch|baseline|artifact|downsample|bandpass|valid|invalid|trial|reject",
+     "entity": "neural/cortical tracking of the temporal envelope of speech"
+    },
+    "intent": "Find mechanism records about the full TRF pipeline steps for the tracking entity",
+    "obs_chars": 533,
+    "notes_chars": 5595
+   },
+   {
+    "step": 25,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n",
+     "sections": [
+      "methods",
+      "experimental setup",
+      "data processing"
+     ]
+    },
+    "intent": "Get full TRF pipeline details from this paper: envelope extraction, EEG preprocessing, TRF estimation method, validation",
+    "obs_chars": 1492,
+    "notes_chars": 2731
+   },
+   {
+    "step": 25,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous",
+     "sections": [
+      "methods",
+      "experimental setup",
+      "data processing"
+     ]
+    },
+    "intent": "Get full TRF pipeline details from this paper: speech representation extraction, EEG preprocessing, model fitting, valid",
+    "obs_chars": 1252,
+    "notes_chars": 2731
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism/processing details from the EEG speech intelligibility paper",
+    "obs_chars": 187,
+    "notes_chars": 4275
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism/processing details from the cortical tracking paper",
+    "obs_chars": 187,
+    "notes_chars": 4275
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "entity": "Temporal Response Function",
+     "claim_type": "mechanism",
+     "contains": "ridge|regularization|L2|penalty|design matrix|convolution|estimation|fitting|cross-validation|holdout|split"
+    },
+    "intent": "Find mechanism records about TRF estimation: regression type, regularization, validation strategy",
+    "obs_chars": 1103,
+    "notes_chars": 4275
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "entity": "neural/cortical tracking of the temporal envelope of speech",
+     "claim_type": "observation",
+     "contains": "iEEG|intracranial|electrode|high gamma|ECoG|preprocessing|segmentation|epoch|artifact|rejection|baseline"
+    },
+    "intent": "Find iEEG-specific observations about data processing in neural tracking studies",
+    "obs_chars": 533,
+    "notes_chars": 4275
+   },
+   {
+    "step": 28,
+    "tool": "search_text",
+    "args": {
+     "query": "iEEG intracranial electrode TRF temporal response function preprocessing pipeline ridge regression design matrix",
+     "k": 12
+    },
+    "intent": "Find full-text passages describing the complete iEEG TRF pipeline including preprocessing steps and regression details",
+    "obs_chars": 286,
+    "notes_chars": 4718
+   },
+   {
+    "step": 28,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "TRF|temporal response|linear|limitation|assumption|nonlinear|artifact|noise|iEEG|intracranial",
+     "entity": "Temporal Response Function"
+    },
+    "intent": "Find limitations/criticisms of TRF approach and iEEG-specific caveats",
+    "obs_chars": 2654,
+    "notes_chars": 4718
+   }
+  ],
+  "notes_final": "N1. [coarse:6a82d2c66c0f] TRF = linear transfer function describing relationship between speech features and neural response | anchor:\"a linear transfer function describing the relationship between feature(s) of the speech and the neural response\" | epistemic:stated\nN2. [sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_#18900] Segmented data bandpass filtered 1-20 Hz zero-phase FIR, downsampled to 100 Hz for computational efficiency | anchor:\"bandpass filtered between 1-20 Hz using a zero-phase FIR filter, and then downsampled to 100 Hz, for computational efficiency\" | epistemic:stated\nN3. [sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_#21600] TRFs generated from same number of predictors for unbiased comparison; peaks compared via repeated measures ANOVA | anchor:\"TRFs were generated from the same number of predictors\" | epistemic:stated\nN4. [sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog#12150] Temporal smearing from averaging creates noise in correlation; TRF modeling approach solves this | anchor:\"temporal smearing (from averaging across time points) will create noise in the correlation function\" | epistemic:stated\nN5. [coarse:5a46ab2d5958] Broadband envelope extracted using equally spaced filterbank 100-10000 Hz based on Liberman's cochlear frequency map | anchor:\"equally spaced filterbank between 100 to 10000 Hz based on Liberman's cochlear frequency map\" | epistemic:stated\nN6. [coarse:801e30790ae3] Minimal preprocessing on EEG signal chosen, excluding ICA, because data further processed using TRF | anchor:\"We chose minimal preprocessing on the EEG signal (for example, excluding common preprocess\" | epistemic:stated\nN7. [coarse:389698eeb87e] TRF approach stems from system identification technique | anchor:\"This approach stems from a system identification technique\" | epistemic:stated\nN8. [coarse:d2a8a2f185c2] Instantaneous neural activity modeled as convolution of acoustic stimulation with unknown channel-specific TRF | anchor:\"the instantaneous neural activity r(t,n)\" | epistemic:stated\nN9. [coarse:c8fd09d3b565] TRF is continuous signal exhibiting neural encoding over time; peaks of different latencies indicate separate processing stages | anchor:\"Analogous to event related potentials (ERPs), the TRF is a continuous signal which exhibit\" | epistemic:stated\nN10. [coarse:290562d77be3] Hypothesis: ascending brain processing stages show emergent features from acoustic to sentence-level linguistic | anchor:\"We hypothesize that the ascending brain processing stages will show emergent features, fro\" | epistemic:stated\nN11. [259355fc75cbd8] EEG bandpass filter frequency range (config) | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN12. [b034edcf190425] Down sampling rate (config) | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN13. [06eaba33d42f94] Filter type (config) | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN14. [8f46a228fc072b] Speech signal envelope compression (config) | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN15. [65670487670249] Highest correlation between speech intelligibility and EEG obtained with delta filter | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN16. [8e34eb397a0b75] Highest correlation between speech intelligibility and EEG obtained with theta filter | paper:ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\nN17. [c4de6ec0b7f34b] SNRs config | paper:ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\nN18. [475d26029b9f2a] Metric for SRT (config) | paper:ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\nN19. [529aee0a0d7abc] Speech level (config) | paper:ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\nN20. [269e15fa2e0599] Silence duration (config) | paper:ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\nN21. [coarse:ed410cf47a9b] Envelope-to-EEG mapping across various time lags yields the TRF | anchor:\"The envelope to EEG mapping across various time lags yields the Temporal Response Function\" | epistemic:stated\nN22. [coarse:dfa2ec38d506] Neural/cortical tracking of temporal envelope used to study segmentation of speech | anchor:\"Neural/cortical tracking of the temporal envelope of speech has been used to study segment\" | epistemic:stated\nN23. [coarse:3f6ef0ab8423] TRF estimated to capture linear relationship between particular features of stimulus and neural response | anchor:\"a Temporal Response Function (TRF) is estimated, which captures\" | epistemic:stated\nN24. [coarse:b7cf424d717d] TRF identifies neural signals related to auditory processing and acts as additional preprocessing stage | anchor:\"This analysis identifies neural signals related to auditory processing and therefore acts\" | epistemic:stated\nN25. [coarse:c8f674a11699] TRF is functionally informative statistic derived from linear model predicting neural response to sound stimuli | anchor:\"The temporal response function (TRF) is a functionally informative statistic, derived from\" | epistemic:stated",
+  "gaps_final": "G1. Full processing pipeline detail (stimulus prep, neural data preprocessing, TRF estimation method, validation) — partially covered but lacking iEEG-specific details and regression specifics\nG2. Reasoning/hypotheses behind each processing stage — partially covered\nG3. iEEG-specific considerations in TRF pipeline — not directly addressed in corpus",
+  "queried": [
+   "card|{\"entity\": \"Temporal Response Function\"}",
+   "card|{\"entity\": \"neural/cortical tracking of the temporal envelope of speech\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog\"}",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|normalization|segmentation|epoch\", \"paper_id\": \"sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog\"}",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing\", \"paper_id\": \"sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_p",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline\", \"paper_id\": \"sciverse_an_ecological_investigation_of_the_capacity_to_follow_simult",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline\", \"paper_id\": \"sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_spee",
+   "deep_read|{\"paper_id\": \"sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog\", \"sections\": [\"methods\", \"data processing\", \"TRF estimation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_\", \"sections\": [\"methods\", \"data processing\", \"TRF\"]}",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline|regression|ridge|regularization\", \"paper_id\": \"sciverse_capacity_and_tradeoffs_in_ne",
+   "deep_read|{\"paper_id\": \"sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_\", \"sections\": [\"Methods\", \"Data preprocessing\", \"TRF estimation\", \"Stimulus preparation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_an_ecological_investigation_of_the_capacity_to_follow_simult\", \"sections\": [\"Methods\", \"Data preprocessing\", \"TRF estimation\", \"Stimulus preparation\"]}",
+   "findings|{\"contains\": \"preprocessing|filtering|envelope|TRF|convolution|normalization|segmentation|epoch|processing|pipeline|regression|ridge|regularization|filterbank|downsample|bandpass\", \"paper_id\": \"sciver",
+   "findings|{\"contains\": \"TRF|convolution|regression|ridge|regularization|filterbank|envelope extraction|preprocessing|pipeline|estimation|model\", \"paper_id\": \"sciverse_pushing_the_envelope_developments_in_neural",
+   "findings|{\"contains\": \"TRF|convolution|regression|ridge|regularization|filterbank|envelope|preprocessing|pipeline|estimation|model|filter|downsample|bandpass|segment|epoch|normalize\", \"paper_id\": \"sciverse_cap",
+   "findings|{\"contains\": \"TRF|convolution|regression|ridge|regularization|filterbank|envelope|preprocessing|pipeline|estimation|model|filter|downsample|bandpass|segment|epoch|normalize|forward|backward|spectrogra",
+   "search_text|{\"k\": 12, \"query\": \"iEEG TRF temporal response function data processing pipeline envelope extraction regression ridge regularization\"}",
+   "search_text|{\"k\": 12, \"query\": \"TRF ridge regression regularization filterbank envelope extraction stimulus preparation iEEG electrode preprocessing\"}",
+   "card|{\"entity\": \"speech envelope\"}",
+   "search_text|{\"k\": 12, \"query\": \"TRF estimation ridge regression regularization design matrix stimulus envelope neural response iEEG electrode\"}",
+   "search_text|{\"k\": 12, \"query\": \"iEEG intracranial EEG preprocessing segmentation epoching baseline correction artifact rejection electrode\"}",
+   "search_text|{\"k\": 12, \"query\": \"TRF ridge regression design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"speech envelope\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"neural/cortical tracking of the temporal envelope of speech\"}",
+   "search_text|{\"k\": 12, \"query\": \"TRF pipeline stages stimulus envelope extraction Hilbert transform filterbank neural data preprocessing segmentation epoching baseline correction ridge regression regularization va",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"preprocessing|filtering|segmentation|epoch|baseline|artifact|downsample|bandpass|Hilbert|filterbank|envelope extraction|stimulus preparation|design matrix|rid",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"envelope|filterbank|Hilbert|convolution|design matrix|ridge|regularization|validation|cross-validation|segmentation|epoch|baseline|artifact|downsample|bandpass",
+   "search_text|{\"k\": 12, \"query\": \"TRF estimation ridge regression L2 regularization design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching baseline correction\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"speech envelope\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"ridge|regularization|L2|penalty|design matrix|convolution|filterbank|Hilbert|envelope extraction|segmentation|epoch|baseline|artifact|downsample|bandpass|valid",
+   "search_text|{\"k\": 12, \"query\": \"iEEG intracranial electrode TRF temporal response function preprocessing segmentation epoching baseline correction artifact rejection high gamma broadband envelope\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"Hilbert|filterbank|envelope extraction|amplitude modulation|bandpass|rectify|analytic signal|cochlear|frequency map|Liberman\", \"entity\": \"speech envelope\"}",
+   "search_text|{\"k\": 12, \"query\": \"TRF estimation ridge regression L2 penalty design matrix stimulus envelope neural response iEEG electrode preprocessing segmentation epoching baseline correction\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"neural/cortical tracking of the temporal envelope of speech\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"neural/cortical tracking of the temporal envelope of speech\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_capacity_and_tradeoffs_in_neural_encoding_of_concurrent_speech_during_selective_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_neural_dynamics_of_the_processing_of_speech_features_evidence_for_a_progression_\"}",
+   "search_papers|{\"k\": 8, \"query\": \"iEEG intracranial EEG temporal response function TRF speech envelope preprocessing pipeline ridge regression\"}",
+   "admit_paper|{\"title\": \"prediction of speech intelligibility by means of eeg responses to sentences in noise\"}",
+   "admit_paper|{\"title\": \"predicting individual speech intelligibility from the cortical tracking of acoustic- and phonetic-level speech representations\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"design matrix|regression|ridge|L2|penalty|regularization|convolution|filter|envelope|segment|epoch|baseline|artifact|downsample|bandpass|valid|invalid|trial|re",
+   "deep_read|{\"paper_id\": \"ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\", \"sections\": [\"methods\", \"experimental setup\", \"data processing\"]}",
+   "deep_read|{\"paper_id\": \"ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\", \"sections\": [\"methods\", \"experimental setup\", \"data processing\"]}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"ext_prediction_of_speech_intelligibility_by_means_of_eeg_responses_to_sentences_in_n\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"ext_predicting_individual_speech_intelligibility_from_the_cortical_tracking_of_acous\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"ridge|regularization|L2|penalty|design matrix|convolution|estimation|fitting|cross-validation|holdout|split\", \"entity\": \"Temporal Response Function\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"iEEG|intracranial|electrode|high gamma|ECoG|preprocessing|segmentation|epoch|artifact|rejection|baseline\", \"entity\": \"neural/cortical tracking of the tempora",
+   "search_text|{\"k\": 12, \"query\": \"iEEG intracranial electrode TRF temporal response function preprocessing pipeline ridge regression design matrix\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"TRF|temporal response|linear|limitation|assumption|nonlinear|artifact|noise|iEEG|intracranial\", \"entity\": \"Temporal Response Function\"}"
+  ],
+  "gate": {
+   "note_rejects": 4,
+   "numeric_fail": {
+    "missing_nums": [
+     "150",
+     "30",
+     "65670487670249",
+     "70"
+    ],
+    "unsourced": [],
+    "altered_titles": []
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 1,
+   "a_chars": 96,
+   "a_skipped_dup": 3,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 10767,
+   "reject_reasons": {
+    "bad_backref": 4
+   },
+   "merge_downgraded_lines": 4,
+   "merge_total_lines": 40,
+   "relaxed_writes": 2,
+   "f28_autos": 0,
+   "max_evidence_streak": 2,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:5a46ab2d5958] ually spaced filterbank between=100 | src:findings@step1 | epi:stated"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "d521598603fbab74a6c13d58",
+  "type": "aggregation",
+  "question": "Is it possible to get frequency domain information in a fenquency band beyond the limitation of nyquist theory?",
+  "gold_hint": "",
+  "answer": "Yes, it is possible to obtain frequency domain information in bands beyond the standard limitations of the Nyquist-Shannon sampling theorem, provided that specific experimental and theoretical conditions are met. The Nyquist-Shannon sampling theorem states that the sampling frequency should not be less than twice the signal's maximum frequency [coarse:ca900747531e]. In a specific context, the minimum required sampling frequency is stated to be 2.0 Hz, which corresponds to the maximum allowed sampling period [coarse:ac3632378b68]. Under standard sampling conditions, sampling with a frequency $\\omega_{sample}$ allows for obtaining information in a frequency band of width $\\Delta\\omega_{FFT} = \\omega_{sample}/2$ [coarse:9ebc38c0a48c]. However, research indicates that these limits can be surpassed through advanced techniques.\n\nOne approach involves the application of sampled-data control theory, which can be used to reconstruct lost high-frequency components that lie beyond the so-called Nyquist frequency [coarse:1ad9895f8ede]. Another method utilizes the advantageous use of aliasing for measurements above the Nyquist frequency; this is achieved by repeating measurements in various frequency bands and merging the resulting data [coarse:786102f7ea50]. In the time domain, if the signal is repeatable and its phase is manipulable, performing repetitions with different phases is a feasible approach to accessing higher frequency content [coarse:9a46360ba3d6]. Furthermore, J. Javh et al. demonstrated that exciting a structure in a predetermined frequency band allows for the recovery of higher frequency content than the Nyquist frequency without the Restricted Isometry Property (RIP) [coarse:c9f777037148].\n\nThese techniques are particularly relevant in contexts where pure sinusoidal excitation is a severe limitation, as many single-frequency measurements are typically needed to fully describe a wide frequency range [coarse:adb3d539ca13]. In frequency bands with a high density of natural modes, the component response strongly depends on the specific excitation frequency, and slight variations can cause significant changes [coarse:ebc1076da271]. A 2022 paper directly addresses the context of operating \"beyond the limitation of single frequency\" in frequency-band applications [sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency]. However, the consulted records did not surface the specific mechanism proposed by the frequency-band down-sampled stereo-DIC paper to overcome single-frequency limitations, nor did they detail the specific aliasing mechanism described in the camera-based experimental modal analysis paper beyond the general strategy of merging repeated measurements. Additionally, the records did not surface further findings on super-Nyquist reconstruction or band-limited techniques beyond those explicitly noted.",
+  "arm": "main",
+  "steps": 22,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N5. [frequency domain analysis*] Entity exists in corpus with records"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "nyquist sampling theorem"
+    },
+    "intent": "Get cross-paper evidence dossier on Nyquist sampling theorem - what the corpus says about its limitations and any work b",
+    "obs_chars": 749,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "nyquist frequency",
+     "contains": "beyond|exceed|limitation|super|above"
+    },
+    "intent": "Find findings about going beyond Nyquist frequency limitations",
+    "obs_chars": 1043,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "contains": "frequency|band|nyquist|limitation|beyond"
+    },
+    "intent": "Get specific findings from the frequency-band down-sampled stereo-DIC paper about going beyond frequency limitations",
+    "obs_chars": 1123,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "nyquist band"
+    },
+    "intent": "Get dossier on nyquist band entity for context on what the corpus knows about Nyquist band limitations",
+    "obs_chars": 294,
+    "notes_chars": 520
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get the mechanism/approach the stereo-DIC paper uses to go beyond single-frequency limitation",
+    "obs_chars": 1123,
+    "notes_chars": 1621
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get the mechanism for using aliasing above Nyquist in the camera-based modal analysis paper",
+    "obs_chars": 1078,
+    "notes_chars": 1621
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "contains": "aliasing|super-nyquist|band-limited|reconstruct|beyond nyquist",
+     "claim_type": "mechanism"
+    },
+    "intent": "Search for any other mechanism records about super-Nyquist or band-limited reconstruction in the corpus",
+    "obs_chars": 2099,
+    "notes_chars": 1621
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "claim_type": "observation"
+    },
+    "intent": "Get observational findings from the stereo-DIC paper about what was demonstrated",
+    "obs_chars": 1123,
+    "notes_chars": 1621
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "frequency domain analysis"
+    },
+    "intent": "Get cross-paper evidence dossier on frequency domain analysis to find additional super-Nyquist or band-limited technique",
+    "obs_chars": 552,
+    "notes_chars": 2397
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "aliasing|super-nyquist|band-limited|reconstruct|beyond nyquist",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation-type findings about aliasing or super-Nyquist reconstruction across the corpus",
+    "obs_chars": 2099,
+    "notes_chars": 2397
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "frequency band|down-sampled|stereo|DIC|band excitation",
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency"
+    },
+    "intent": "Find the specific recommendation/approach the stereo-DIC paper makes for overcoming single-frequency limitations",
+    "obs_chars": 607,
+    "notes_chars": 2397
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "aliasing|band|excitation|recovery|reconstruct",
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr"
+    },
+    "intent": "Find the specific recommendation/approach the camera-based modal analysis paper makes for aliasing above Nyquist",
+    "obs_chars": 577,
+    "notes_chars": 2397
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "contains": "down-sampled|stereo|DIC|band|approach|method|propose"
+    },
+    "intent": "Get the specific mechanism/approach proposed by the stereo-DIC paper to overcome single-frequency limitations",
+    "obs_chars": 607,
+    "notes_chars": 2406
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr",
+     "contains": "aliasing|band|excitation|recovery|reconstruct|nyquist"
+    },
+    "intent": "Get the mechanism for aliasing-based recovery above Nyquist in the camera-based modal analysis paper",
+    "obs_chars": 1110,
+    "notes_chars": 2406
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "super-Nyquist frequency band reconstruction beyond sampling theorem",
+     "k": 8
+    },
+    "intent": "Search for any additional corpus content on super-Nyquist or band-limited reconstruction techniques",
+    "obs_chars": 2563,
+    "notes_chars": 2406
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "band-limited|reconstruct|aliasing|super-nyquist|frequency band"
+    },
+    "intent": "",
+    "obs_chars": 3963,
+    "notes_chars": 2406
+   },
+   {
+    "f28_auto_retrieval": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+    "at_step": 8,
+    "obs_chars": 1123
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "claim_type": "definition"
+    },
+    "intent": "Get the paper's definition of its proposed approach to overcome single-frequency limitations",
+    "obs_chars": 1123,
+    "notes_chars": 2194
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr",
+     "claim_type": "definition"
+    },
+    "intent": "Get the camera-based modal analysis paper's definition of its aliasing-based approach",
+    "obs_chars": 1078,
+    "notes_chars": 2194
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "query": "frequency band excitation beyond Nyquist limit recover high frequency content",
+     "k": 8
+    },
+    "intent": "Find additional corpus content on super-Nyquist frequency band techniques",
+    "obs_chars": 2557,
+    "notes_chars": 2194
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "frequency band|band excitation|down-sampled|stereo DIC"
+    },
+    "intent": "Find mechanism records about frequency band excitation approaches across the corpus",
+    "obs_chars": 3552,
+    "notes_chars": 2194
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "band excitation|frequency band|down-sampled|stereo DIC",
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency"
+    },
+    "intent": "Get the specific mechanism/approach proposed by the stereo-DIC paper for overcoming single-frequency limitations",
+    "obs_chars": 1148,
+    "notes_chars": 2450
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "aliasing|band|excitation|recovery|reconstruct|nyquist",
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr"
+    },
+    "intent": "Get the mechanism for aliasing above Nyquist from the camera-based modal analysis paper",
+    "obs_chars": 577,
+    "notes_chars": 2450
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "nyquist|aliasing|sampling|band-limited|frequency limit",
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency"
+    },
+    "intent": "Get the paper's own critical statements about Nyquist limitations and what it proposes to overcome them",
+    "obs_chars": 244,
+    "notes_chars": 2450
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "nyquist|aliasing|sampling|band-limited|frequency limit",
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr"
+    },
+    "intent": "Get the camera-based modal analysis paper's critical statements about Nyquist and aliasing",
+    "obs_chars": 577,
+    "notes_chars": 2450
+   },
+   {
+    "step": 14,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "super-Nyquist sampling band-limited signal reconstruction beyond Nyquist frequency aliasing recovery"
+    },
+    "intent": "Broader search for any additional corpus content on super-Nyquist or band-limited reconstruction techniques",
+    "obs_chars": 2683,
+    "notes_chars": 2450
+   },
+   {
+    "step": 15,
+    "tool": "card",
+    "args": {
+     "entity": "excitation in a predetermined frequency band"
+    },
+    "intent": "Get cross-paper dossier on excitation in a predetermined frequency band to find related findings",
+    "obs_chars": 442,
+    "notes_chars": 2450
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "claim_type": "mechanism",
+     "contains": "band|down-sampled|stereo|frequency|excitation|reconstruct|nyquist|aliasing"
+    },
+    "intent": "Get mechanism findings from the stereo-DIC paper on how band excitation overcomes single-frequency limits",
+    "obs_chars": 1123,
+    "notes_chars": 2450
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+     "claim_type": "observation",
+     "contains": "band|down-sampled|stereo|frequency|excitation|reconstruct|nyquist|aliasing"
+    },
+    "intent": "Get observation-type findings from the stereo-DIC paper on its band-based approach",
+    "obs_chars": 1123,
+    "notes_chars": 2450
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr",
+     "claim_type": "observation",
+     "contains": "aliasing|band|excitation|recovery|reconstruct|nyquist"
+    },
+    "intent": "Get observation-type findings from the camera-based modal analysis paper on aliasing above Nyquist",
+    "obs_chars": 1110,
+    "notes_chars": 2450
+   },
+   {
+    "step": 19,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "bandpass sampling undersampling recover frequency content above Nyquist limit aliasing exploitation"
+    },
+    "intent": "Search for additional papers on bandpass/undersampling techniques that recover content above Nyquist",
+    "obs_chars": 2682,
+    "notes_chars": 2450
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 22,
+    "f28_autos": 1
+   }
+  ],
+  "notes_final": "N1. [sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency] Paper title directly addresses \"beyond the limitation of single frequency\" in frequency-band context (2022)\nN2. [coarse:ca900747531e] Nyquist-Shannon sampling theorem: sampling frequency should not be less than twice the signal's max frequency | epistemic:stated\nN3. [coarse:ac3632378b68] Minimum required sampling frequency is 2.0 Hz, corresponding to max allowed sampling period | epistemic:stated\nN4. [coarse:1ad9895f8ede] Sampled-data control theory can be applied to reconstruct lost high-frequency components beyond the so-called Nyquist frequency | epistemic:stated | paper: ieee 2013 ieee international symposium\nN5. [coarse:786102f7ea50] Repeating measurements in various frequency bands and merging them demonstrated advantageous use of aliasing for measurements above the Nyquist frequency | epistemic:stated | paper: sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\nN6. [coarse:adb3d539ca13] Pure sinusoidal excitation remains a severe limitation because many single-frequency measurements are needed to fully describe a wide frequency range | epistemic:stated | paper: sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\nN7. [coarse:ebc1076da271] In frequency bands with high density of natural modes, component response strongly depends on specific excitation frequency; slight variations cause significant changes | epistemic:stated | paper: sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\nN8. [coarse:c9f777037148] J. Javh et al. excited the structure in a predetermined frequency band to recover higher frequency content than the Nyquist frequency without the RIP | epistemic:stated | paper: sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\nN9. [coarse:9a46360ba3d6] In the time domain, repetitions with different phases are a feasible approach if the signal is repeatable and its phase is manipulable | epistemic:stated | paper: sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\nN10. [coarse:9ebc38c0a48c] Sampling with frequency ω_sample allows obtaining information in a frequency band of width Δω_FFT = ω_sample/2 | epistemic:stated | paper: sciverse_feasibility_engineering_aspects_and_physics_reach_of_microwave_cavity_experiment",
+  "gaps_final": "G1. What does the frequency-band down-sampled stereo-DIC paper specifically propose to overcome single-frequency limitations? (mechanism/approach)\nG2. What does the camera-based experimental modal analysis paper say about aliasing above Nyquist? (mechanism)\nG3. Are there additional findings on super-Nyquist reconstruction or band-limited techniques in the corpus?",
+  "queried": [
+   "card|{\"entity\": \"nyquist sampling theorem\"}",
+   "findings|{\"contains\": \"beyond|exceed|limitation|super|above\", \"entity\": \"nyquist frequency\"}",
+   "findings|{\"contains\": \"frequency|band|nyquist|limitation|beyond\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "card|{\"entity\": \"nyquist band\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"aliasing|super-nyquist|band-limited|reconstruct|beyond nyquist\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "card|{\"entity\": \"frequency domain analysis\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"aliasing|super-nyquist|band-limited|reconstruct|beyond nyquist\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"frequency band|down-sampled|stereo|DIC|band excitation\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_freq",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"aliasing|band|excitation|recovery|reconstruct\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\"}",
+   "findings|{\"contains\": \"down-sampled|stereo|DIC|band|approach|method|propose\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "findings|{\"contains\": \"aliasing|band|excitation|recovery|reconstruct|nyquist\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\"}",
+   "search_text|{\"k\": 8, \"query\": \"super-Nyquist frequency band reconstruction beyond sampling theorem\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"band-limited|reconstruct|aliasing|super-nyquist|frequency band\"}",
+   "findings|{\"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\"}",
+   "search_text|{\"k\": 8, \"query\": \"frequency band excitation beyond Nyquist limit recover high frequency content\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"frequency band|band excitation|down-sampled|stereo DIC\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"band excitation|frequency band|down-sampled|stereo DIC\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"aliasing|band|excitation|recovery|reconstruct|nyquist\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr\"",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"nyquist|aliasing|sampling|band-limited|frequency limit\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation_of_single_frequency",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"nyquist|aliasing|sampling|band-limited|frequency limit\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_fr",
+   "search_text|{\"k\": 8, \"query\": \"super-Nyquist sampling band-limited signal reconstruction beyond Nyquist frequency aliasing recovery\"}",
+   "card|{\"entity\": \"excitation in a predetermined frequency band\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"band|down-sampled|stereo|frequency|excitation|reconstruct|nyquist|aliasing\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitation",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"band|down-sampled|stereo|frequency|excitation|reconstruct|nyquist|aliasing\", \"paper_id\": \"sciverse_frequency_band_down_sampled_stereo_dic_beyond_the_limitati",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"aliasing|band|excitation|recovery|reconstruct|nyquist\", \"paper_id\": \"sciverse_camera_based_experimental_modal_analysis_with_impact_excitation_reaching_high_f",
+   "search_text|{\"k\": 8, \"query\": \"bandpass sampling undersampling recover frequency content above Nyquist limit aliasing exploitation\"}"
+  ],
+  "gate": {
+   "note_rejects": 1,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 78,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 3,
+   "reject_reasons": {
+    "bad_backref": 1
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 1,
+   "merge_total_lines": 6,
+   "relaxed_writes": 1,
+   "f28_autos": 1,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:ac3632378b68] required sampling frequency is=2.0 | src:card@step0"
+  ],
+  "degenerate": false
+ }
+]

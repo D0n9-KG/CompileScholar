@@ -1,0 +1,45 @@
+# Overview
+## Definition
+## Motivation
+## Relationship to Standard Next-Token Prediction
+# Methodology
+## Multi-Token Prediction (MTP) Mechanisms
+### Parallel Prediction Heads
+### Auxiliary Unembedding Layers
+### Training-Free Probing and Masked Inputs
+### Distillation into Standalone Models
+## Curriculum Learning Strategy
+### Forward Curriculum
+### Reverse Curriculum
+### Scheduling and Transition Mechanisms
+## Training Dynamics
+### Computational Load and Memory Usage
+### Training Stability and Convergence
+### Mitigation of Gradient Variance and Loss Spikes
+# Theoretical Foundations
+## Representational Contractivity and Belief States
+## Two-Stage Reverse Reasoning
+## Structural Hallucinations and Latent Space Constraints
+# Experimental Results
+## Benchmark Performance
+### Synthetic Graph Path-Finding
+### Reasoning Benchmarks (Countdown, Boolean Satisfiability)
+### Downstream Next-Token Prediction Performance
+## Efficiency Metrics
+### Inference Speedup
+### Training Efficiency for Smaller Language Models
+## Ablation Studies
+### Impact of Curriculum Direction
+### Architectural Variants (TOP vs. Standard MTP)
+# Comparison with Related Work
+## Speculative Decoding
+## Token Order Prediction (TOP)
+## Latent Semantic Enhancement (LSE-MTP)
+# Limitations and Challenges
+## Specific Scheduling Details
+## Performance of Reverse Curriculum
+## Generalization to Distributed Environments
+## Transformer (deep learning architecture)
+## Speculative Decoding
+## Curriculum Learning
+## Large Language Model

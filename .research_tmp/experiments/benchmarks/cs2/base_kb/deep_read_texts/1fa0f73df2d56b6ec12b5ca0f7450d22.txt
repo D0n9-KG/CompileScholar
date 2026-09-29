@@ -1,0 +1,1191 @@
+# Lower Bound for Succinct Range Minimum Query
+
+Mingmou Liu* Huacheng Yu†
+
+April 14, 2020
+
+# Abstract
+
+Given an integer array $A[1..n]$ , the Range Minimum Query problem (RMQ) asks to preprocess $A$ into a data structure, supporting RMQ queries: given $a, b \in [1, n]$ , return the index $i \in [a, b]$ that minimizes $A[i]$ , i.e., $\arg \min_{i \in [a, b]} A[i]$ . This problem has a classic solution using $O(n)$ space and $O(1)$ query time by Gabow, Bentley, Tarjan [GBT84] and Harel, Tarjan [HT84]. The best known data structure by Fischer, Heun [FH11] and Navarro, Sadakane [NS14] uses $2n + n / (\frac{\log n}{t})^t + \tilde{O}(n^{3/4})$ bits and answers queries in $O(t)$ time, assuming the word-size is $w = \Theta(\log n)$ . In particular, it uses $2n + n / \text{poly} \log n$ bits of space when the query time is a constant.
+
+In this paper, we prove the first lower bound for this problem, showing that $2n + n/$ poly $\log n$ space is necessary for constant query time. In general, we show that if the data structure has query time $O(t)$ , then it must use at least $2n + n / (\log n)^{\tilde{O}(t^2)}$ space, in the cell-probe model with word-size $w = \Theta(\log n)$ .
+
+arXiv:2004.05738v1 [cs.DS] 13 Apr 2020
+
+$^{*}$ Nanjing University. liu.mingmou@smail.nju.edu.cn. Supported by National Key R&D Program of China 2018YFB1003202 and the National Science Foundation of China under Grant Nos. 61722207 and 61672275. Part of the research was done when Mingmou Liu was visiting the Harvard University.
+
+†Princeton University. yuhch123@gmail.com.
+
+# 1 Introduction
+
+Given an array $A[1..n]$ of integers, the Range Minimum Query (RMQ) problem asks to preprocess $A$ into a data structure, supporting
+
+- RMQ(a, b): return arg $\min_{i\in [a,b]}A[i]$ (if multiple entries have the smallest $A[i]$ , return the one with smallest $i$ ).
+
+RMQ data structures have numerous applications in computer science, for instance, in text processing [ALV92, Mut02, FHK06, Sad07a, Sad07b, VM07, CPS08, FMN09, HSV09, $\mathrm{CIK}^{+}12$ ], graph problems [RV88, BV93, GT04, $\mathrm{BFP}^{+}05$ , LC08] and other areas of computer science [Sax09, SK03, CC07].
+
+The RMQ problem has a classic "textbook" solution using $O(n)$ space and answering each RMQ query in constant time, due to Gabow, Bentley, Tarjan [GBT84] and Harel, Tarjan [HT84]. To build this data structure, one first constructs the Cartesian tree of the input array $A$ . The Cartesian tree is an $n$ -node binary tree, where the nodes correspond to the entries of $A$ . The root $A[i]$ has the minimum value in $A$ , and its left and right subtrees are recursively constructed on $A[1..i - 1]$ and $A[i + 1..n]$ respectively. It turns out that $\mathsf{RMQ}(a,b)$ is exactly the lowest common ancestor (LCA) of nodes $A[a]$ and $A[b]$ in this tree. The LCA problem admits an $O(n)$ space and $O(1)$ query time solution, based on a reduction to the $\pm 1\mathsf{RMQ}$ problem.
+
+In terms of the space usage, this data structure is in fact suboptimal. The only information needed to answer all RMQ queries on $A$ is the Cartesian tree of $A$ , which is a rooted binary tree with $n$ nodes. It is well known that the number of such binary trees is equal to the $n$ -th Catalan number $C_n = \frac{1}{n + 1} \binom{2n}{n}$ . Hence, the information theoretical space lower bound for this problem is in fact, $\log_2 C_n = 2n - \Theta(\log n)$ bits, whereas the above data structure uses $O(n)$ words of space.
+
+Sadakane [Sad07b] showed that it is possible to achieve "truly" linear space and constant query time. He proposed a data structure using $\sim 4n$ bits of space and supporting RMQ queries in $O(1)$ time, assuming the word-size is $\Omega (\log n)$ . Later, the space is further improved to $2n + O(n\log \log n / \log n)$ by Fischer and Heun [FH07, FH11]. The space bound matches the best possible in the leading constant. Such data structures that use $H + r$ bits, for problems that require $H$ bits of space² and for $r = o(H)$ , are called the succinct data structures [Jac88]. The amount of the extra space $r$ is usually referred to as the redundancy. For succinct data structures, the main focus is on the trade-off between the redundancy and query time [GM07, Păt08b, PV10].
+
+The state-of-the-art $^3$ RMQ data structure [Păt08b, NS14, FH11, DRS17] uses $2n + n / (\frac{\log n}{t})^{\Omega(t)} + \tilde{O}(n^{3/4})$ bits of space and answers queries in $O(t)$ time, for any parameter $t > 1$ and word-size $\Theta(\log n)$ . In particular, one can achieve $n/$ poly log $n$ redundancy and constant query time for any poly log $n$ . On the other hand, despite the fact that the Range Minimum Query problem has drawn a significant amount of attention from the algorithm community, to the best of our knowledge, no lower bound is known.
+
+<sup>1</sup>It is a standard assumption that the word-size is at least $\Omega(\log n)$ , since the query answer is an index, which requires $\log n$ bits to describe.
+
+2We denote the information theoretical minimum space by $H$ , since the minimum space is exactly the entropy of the truth table for random database.
+
+<sup>3</sup>Due to the wide application, special cases of the problem are also interesting. Researchers have designed data structures that outperform the best worst-case solution on inputs with certain structures [ACN13, BLR⁺15, GJMW19].
+
+4Their data structure was originally stated as $2n + n / \log^t n$ space and $O(t)$ time for constant $t$ . It naturally generalizes to the above trade-off. See Appendix C.
+
+1
+
+Question. What is the lowest possible redundancy for RMQ data structures with constant query time?
+
+Our contribution. In this paper, we prove the first lower bound on the trade-off between redundancy and query time for the Range Minimum Query problem. In particular, we prove that for constant query time, one must use $n / \text{poly} \log n$ bits of redundancy, answering the above question. Our lower bound also extends to the following full trade-off between the redundancy and query time.
+
+Theorem 1. Given an array $A[1..n]$ , for any data structure supporting RMQ queries using $2n + r$ bits of space and query time $t$ , we must have
+
+$$
+r \geq n / w ^ {O (t ^ {2} \log^ {2} t)},
+$$
+
+in the cell-probe model with word-size $w \geq \Omega(\log n)$ .
+
+Our proof technique is inspired by a lower bound of Pătrașcu and Viola [PV10], which asserts a similar trade-off for a different data structure problem (see Section 1.3). Nevertheless, our proof majorly deviates from [PV10], due to the nature of the differences in the two problems. In the following, we briefly survey the known techniques for proving redundancy-query time trade-off, and the difficulties in generalizing the proofs to our problem. In Section 2, we present a technical overview of our proof. Finally, we prove our main theorem in Section 3 and Section 4. In Appendix B and Appendix C, we present a simplified upper bound for RMQ.
+
+# 1.1 The cell-probe model
+
+The cell-probe model [Yao81] is a classic computational model for studying the complexity of data structures, which is similar to the well-known RAM model, except that all operations are free except memory access. It is easy to see the practicality of the theoretical model: the time cost on memory accessing is dominant over the time costs on all other operations in a typical modern computer.
+
+In particular, a data structure that occupies $s$ memory units on a machine with word size of $w$ bits and answers queries by accessing at most $t$ memory units is described by a preprocessing algorithm and a query algorithm. Given a database $D$ , the preprocessing algorithm outputs a table consists of $s$ cells, $w$ bits per cell, which stands for our data structure. We emphasize that the preprocessing algorithm can take arbitrarily long time and arbitrarily large space, but has to halt and output the table.
+
+On the other hand, the query algorithm captures the interaction between CPU and data structure when the CPU is trying to answer a query. Given a query $q$ , the query algorithm makes cell-probes (i.e.
+
+memory accesses) adaptively in following sense: the algorithm reads the query $q$ , then chooses a cell $c_{1}$ , makes a cell-probe to retrieve the content of $c_{1}$ ; combining $q$ and content of cell $c_{1}$ , the algorithm chooses second cell $c_{2}$ , makes a cell-probe to retrieve the content of cell $c_{2}$ ; and goes on; after retrieved the content of cell $c_{t}$ , the algorithm outputs the answer by combining $q$ and the contents of cells $c_{1},\ldots ,c_{t}$ .
+
+There is a substantial body of notable works on the cell-probe complexity of static data structure problems [MNSW98, CR10, PT06a, PTW08, PTW10, Lar12b, Yin16].
+
+# 1.2 Related work
+
+One of the most widely used technique in proving data structure lower bounds is the cell-sampling. It has applications to dynamic data structures [Lar12a, CGL15, LWY18], streaming lower bounds [LNN15],
+
+2
+
+static data structures with low space usage [PTW10, Lar12b, GL16, Yin16], as well as succinct data structures [GM07]. To prove a lower bound using cell-sampling, one samples a small fraction of the memory cells, and argues that if the query time is low, then many queries can still be answered using only the sampled cells. Finally, one proves that too much information about the input is revealed by the answers to those queries, yielding a contradiction. In order to apply this technique, the problem is usually required to have the property that the answers to a set of $n^{1.1}$ random queries almost determine the entire input data, which the RMQ problem does not have (as one could keep getting indices with small values).
+
+Golynski [Gol09] developed a different technique for proving succinct data structure lower bounds, and proved lower bounds for several problems, including storing a permutation $\pi$ supporting $\pi$ , $\pi^{-1}$ queries, and storing a string $S$ supporting pattern matching (return the $i$ -th occurrence of$P$ ) and substring access queries (return the substring $S[i..i + p]$ ). His technique mostly applies to problems with two types of queries that "verifies" each other, e.g., $\pi(i) = j$ and $\pi^{-1}(j) = i$ .
+
+# 1.3 Pătrașcu and Viola's technique
+
+Our proof uses a few important ideas from [PV10]. Pătrașcu and Viola proved a lower bound for succinct rank data structures. The rank problem asks to preprocess a 0-1 array $A[1..n]$ into a data structure, supporting queries of form "return the number of ones in $A[1..i]$ ." They proved that in the cell-probe model with word-size $w \geq \Omega(\log n)$ , if a data structure uses at most $n + n/w^t$ bits of space, then its query time must be at least $\Omega(t)$ , which is known to be tight in the cell-probe model [Păt08b, Yu19].
+
+Pătrascu and Viola's proof uses a variant of round elimination. We first fix the input distribution to be uniform. In each round of the argument, we are given a cell-probe data structure that uses $n$ bits of memory with additional $p$ published bits, where the published bits can be accessed by the query algorithm at no cost. In the other words, the data structure uses $p$ more bits than the information theoretical lower bound, and the $p$ extra bits are given to the query algorithm for free.
+
+Then, we create a new data structure with a factor of $w^{O(1)}$ more publish bits, and at the same time, argue that its expected query time must decrease by some constant $\epsilon$ , where the expectation is taken over a random input and a random query. To see why it already implies the above trade-off, suppose we have a cell-probe data structure with $n + n / w^t$ bits of space, we first "publish" the last $n / w^t$ bits, and then apply the above argument for $\Theta(t)$ rounds.
+
+Thereafter, a total of strictly less than $n$ bits are published, while the query time is decreased by $\Theta(t)$ . If the initial query time was much less than $t$ , then we would have obtained a data structure with $< n$ published bits and query time 0, i.e., all queries can be answered by only reading the published bits, yielding a contradiction.
+
+The key argument lies in choosing the extra bits to publish and proving the decay of the query time. To this end, consider two sets of queries $Q_{1}$ and $Q_{2}$ of size $O(p)$ , comparable to the number of published bits. We can show that for the rank problem, if both $Q_{1}$ and $Q_{2}$ are evenly distributed over the $n$ possible queries, then their answers are very correlated. In particular, the mutual information between the answers to $Q_{1}$ and $Q_{2}$ is at least $\Omega(p)$ .
+
+Roughly speaking, there are $\Omega(p)$ bits of information about the input array that is both contained in $Q_{1}$ and $Q_{2}$ . It implies that in order to answer $Q_{2}$ , the query algorithm must probe many cells that are also probed when answering $Q_{1}$ . This is because otherwise, most of the $\Omega(p)$ bits of "shared information" between the answers would be stored in two separate locations in the memory, "wasting" $\Omega(p)$ bits of space. It is unaffordable, as the data structure uses only $p$ extra bits.
+
+The above argument shows that if we publish all memory cells that are probed when answering
+
+3
+
+$Q_{1}$ (by publishing the bits encoding their addresses and contents), then for an average query $q \in Q_{2}$ , $\Omega(1)$ cells that are probed when answering $q$ get published, i.e., the query algorithm can now access their contents for free (by reading the published bits), and the query time is reduced by $\Omega(1)$ . Moreover, this argument works for the same $Q_{1}$ and every evenly distributed $Q_{2}$ . Therefore, by publishing those cells, the expected query time of a random query must decrease by a constant. On the other hand, the total number of published bits is at most $O(|Q_{1}| \cdot tw) \leq p \cdot w^{O(1)}$ . This completes the argument for one round, and by the earlier argument, it implies the lower bound.
+
+The main obstacle in applying this strategy to the RMQ problem is to prove the correlation lower bound between two sets of queries $Q_{1}$ and $Q_{2}$ . More precisely, one needs to prove that for two random sets of $p$ queries $Q_{1}$ and $Q_{2}$ , the mutual information between their answers (assuming uniformly random input data) is at least $\Omega(p)$ .
+
+Unfortunately, this is not true for the RMQ problem, because even the entropy of the answers to $p$ random queries is significantly lower than $\Omega(p) - \alpha$ a random query has $\Omega(n)$ length and the small entries are likely to appear in many answers. One simple idea to resolve this particular issue is to only consider shorter queries, and prove lower bounds on their query time. For instance, if we only consider queries of length $O(n/p)$ , then two random sets $Q_{1}$ and $Q_{2}$ of $p$ queries will both be spread out and significantly overlap.
+
+In this case, one can show their mutual information is indeed $\Omega(p)$ . However, our argument proceeds in rounds, and the value of $p$ increases by a factor of $w^{O(1)}$ each round. We must consider the same set of queries and reduce their query time in all rounds. This simple "hack" of the proof does not solve the problem.
+
+# 2 Our Technique
+
+In the previous section, we showed a concrete technical difficulty to apply [PV10] directly to our problem. It turns out that the more inherent reason is that their technique is too "strong": It lower bounds the expected query time of a query on a random input database, i.e., proving an average-case lower bound. For the RMQ problem, we believe much more efficient average-case solutions exist (see also the next paragraph). In this case, the techniques from [PV10] would become inapplicable for proving a high lower bound. This observation also suggests that the hard queries should be chosen depending on the input database. This is one major modification in our argument, which turns out to cause new issues. We will elaborate below.
+
+To prove the RMQ lower bound, we first reduce RMQ from a variant of the predecessor search problem. In the predecessor search problem, we are given a sorted list $S = \{s_1, s_2, \dots, s_m\} \subset [U]$ , and asked to preprocess $S$ into a data structure so that given a query $x \in [U]$ , the largest element in $S$ that is at most $x$ can be found efficiently. To see why RMQ is even related to predecessor search, let us consider all queries of form $\mathsf{RMQ}(n/2, x)$ .
+
+The only indices $i$ that could become an answer to (at least) one of such queries are the ones with a smaller value than all other entries in $A[n/2..i-1]$ . Denote this set by $S$ , then the answer to $\mathsf{RMQ}(n/2, x)$ is precisely the predecessor of $x$ in $S$ . A more careful analysis shows that for a uniformly random Cartesian tree, $|S|$ is likely to be $\Theta(\sqrt{n})$ . A classic lower bound for predecessor search [PT06b] shows that for such instances,
+
+This might be counter-intuitive at the first glance, as a random array $A$ would only generate an $S$ of size $\Theta(\log n)$ . However, note that the distribution of the Cartesian tree generated by a uniformly random $A$ is in fact, (very) different from a uniformly random Cartesian tree. The space benchmark of the RMQ problem is based on the
+
+4
+
+any data structure must use at least $\Omega (\log \log n)$ query time, even with linear space (and not in the succinct regime). However, the distribution of $S$ induced by a random Cartesian tree is different from the hard instances from [PT06b], which makes the instances easier and relevant for the succinct regime, and at the same time, it requires a different argument to prove lower bounds. For now, let us think of the space benchmark (the information theoretical lower bound) being the entropy of the input $H(S)$ .
+
+Note that since $S$ is non-uniform, this space benchmark could only be achieved in expectation. See the next section for the formal definition of the problem, which allows us to define the space benchmark in worst case. It turns out that this variant of predecessor search has a cell-probe data structure with constant redundancy and constant average-case query time. Therefore, as mentioned in the previous paragraph, in order to prove any non-trivial lower bound, we must choose queries based on the data.
+
+To prove the lower bound, we first observe that this average-case data structure has a very slow query time on the exact input data points (all points in $S$ ). Thus, we will define the set of all predecessor search queries $\mathbf{pred}(x)$ for $x \in S$ (which returns $x$ ) to be our hard queries $\mathcal{Q}$ .
+
+The high-level strategy is similar to [PV10], using round elimination: Given a data structure using optimal space " $H(S)$ " bits with $p$ extra published bits, we find a set of queries $Q_{\mathrm{pub}}$ of size $\tilde{O}(p)$ , and prove that an average query in $\mathcal{Q}$ must probe $\epsilon$ cells that are also probed by $Q_{\mathrm{pub}}$ in expectation; then we publish all the cells probed by $Q_{\mathrm{pub}}$ , which reduces the average query time of $\mathcal{Q}$ by $\epsilon$ .
+
+In each round, we publish a factor of poly log $n$ more bits while reducing the average query time of $\mathcal{Q}$ by $\epsilon$ . On the other hand, we must have published at least $\tilde{\Omega}(|S|)$ bits before reducing the query time to 0, which implies a lower bound on the initial average query time of $\mathcal{Q}$ . Hence, same as [PV10], the key argument lies in finding such a set $Q_{\mathrm{pub}}$ (and proving the decay of the query time).
+
+To this end, let us fix a set $Q_{\mathrm{pub}}$ , whose answers have entropy much higher than $p$ . The goal is to show $\epsilon$ -fraction of the queries in $\mathcal{Q}$ probe cells that are also probed by $Q_{\mathrm{pub}}$ . It is actually not hard to prove a weaker statement: at least one query in $\mathcal{Q}$ probe cells also probed by $Q_{\mathrm{pub}}$ .
+
+If the sets of cellsprobed by $\mathcal{Q}$ and $Q_{\mathrm{pub}}$ were disjoint, then by deleting all cells probed by $Q_{\mathrm{pub}}$ , we would obtain a significantly smaller data structure that still encodes the whole database. To recover the database, we go over all queries and try to answer each of them without using the deleted cells. The whole database can be recovered, since all $\mathcal{Q}$ can be answered, and their answers determine $S$ .
+
+On the other hand, since $Q_{\mathrm{pub}}$ 's answers have entropy much higher than $p$ , it means that we must have deleted much more than $p$ bits from the data structure, yielding a contradiction.<sup>6</sup> However, this argument does not extend to proving $\epsilon$ -fraction of $\mathcal{Q}$ must probe the cells probed by $Q_{\mathrm{pub}}$ .
+
+Since assume for contradiction this is not the case, then after deleting all cells probed by $Q_{\mathrm{pub}}$ , the data structure can recover only up to $(1 - \epsilon)$ -fraction of the data points (the ones that do not use cells probed by $Q_{\mathrm{pub}}$ ), there will be no contradiction unless the entropy of $Q_{\mathrm{pub}}$ is at least $\epsilon H(S)$ , which can be significantly larger than $p$ .
+
+However, this $(1 - \epsilon)$ -fraction of $\mathcal{Q}$ may reveal a lot of information about $Q_{\mathrm{pub}}$ , as the entire $\mathcal{Q}$ completely determines the answers to $Q_{\mathrm{pub}}$ . Intuitively, we should be able to compress the set of the cells probed by $Q_{\mathrm{pub}}$ , given the set of all the other cells, since the former determines the answers to $Q_{\mathrm{pub}}$ , the latter determines the answers to this $(1 - \epsilon)$ -fraction of $\mathcal{Q}$ , and they must have high mutual information. That means we could compress the whole data structure by first encoding the set of all other cells, then writing down the "compressed" encoding of set of cells
+
+number of different $n$ -node Cartesian trees $C_n$ . Therefore, sampling a uniform Cartesian tree would maximize the input entropy (matching the space benchmark), and is the right input distribution to keep in mind.
+
+The status of a cell being "deleted" still carries information, but as long as $w \geq 2\log n$ , this is not an issue.
+
+5
+
+probed by $Q_{\mathrm{pub}}$ . Such compression would yield a contradiction. However, there is a very subtle issue in implementing this idea: it is possible that this mutual information comes from the addresses of the two sets, but not their contents. That is, the queries in $Q_{\mathrm{pub}}$ can be adaptive, and both sets of cells determine which cells are probed by $Q_{\mathrm{pub}}$ , which contains information. For example, this will not be an issue when the query algorithm is non-adaptive, i.e. the set of probed cells depends only on the query, but not the database.
+
+In this case, the addresses of the cells probed by $Q_{\mathrm{pub}}$ are fixed, and they have no information about the database. To obtain a contradiction, we compress the memory of the data structure as follows: write down all published bits and the contents of all cells that are not probed by $Q_{\mathrm{pub}}$ , then encode the cells probed by $Q_{\mathrm{pub}}$ conditioned on the cells we have written down.
+
+From the first part of the compression, one can recover the $(1 - \epsilon)$ -fraction of $\mathcal{Q}$ that does not use cells probed by $Q_{\mathrm{pub}}$ (since the data structure is non-adaptive, the decoding algorithm knows which cells are not probed by $Q_{\mathrm{pub}}$ and are encoded here). If they reveal more than $p$ bits of information about $Q_{\mathrm{pub}}$ , then the last part of the compression saves more than $p$ bits, yielding a contradiction.
+
+For general data structures, which can be adaptive, observe that the addresses of the $\ell$ -th probe of $Q_{\mathrm{pub}}$ are determined by the contents of the previous $\ell - 1$ probes. We will choose an $\ell$ such that the $(1 - \epsilon)$ -fraction of $\mathcal{Q}$ reveals sufficient information about the $\ell$ -th probe of $Q_{\mathrm{pub}}$ , conditioned on the first $\ell - 1$ probes. By the chain rule of mutual information, such $\ell$ exists. At the same time, by conditioning on the first $\ell - 1$ probes, the addresses of the $\ell$ -th probes no longer carry information.
+
+The final argument is similar to the non-adaptive case: write down the $p$ published bits, the contents of the first $(\ell - 1)$ probes and the contents of all cells except the $\ell$ -th probes; at last, encode the contents of the $\ell$ -th probes conditioned on the cells we have written down. One can show that this encoding compresses the data structure below the input entropy if $\epsilon$ is too small, which implies a lower bound on how much the average query time of $\mathcal{Q}$ must decrease in each round, and in turn, it implies a query time lower bound.
+
+See Section 3.2 for the detailed argument.
+
+# 3 Lower Bound for Succinct Range Minimum Query
+
+In this section, we prove our main theorem, a lower bound for succinct RMQ.
+
+Theorem 1 (restated). Given an array $A[1..n]$ , for any data structure supporting RMQ queries using $2n + r$ bits of space and query time $t$ , we must have
+
+$$
+r \geq n / w ^ {O (t ^ {2} \log^ {2} t)},
+$$
+
+in the cell-probe model with word-size $w \geq \Omega(\log n)$ .
+
+To prove the lower bound, we will reduce RMQ from a variant of the predecessor search problem, which we refer to as pred-z. In this problem, we are given $d$ sets $S_{1},\ldots ,S_{d}\subseteq [B]$ of size $u$ for $u = \Theta (\sqrt{B})$ , together with a positive integer $z$ , s.t.
+
+$$
+1 \leq z \leq Z \cdot \prod_ {i = 1} ^ {d} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} ^ {(i)} - s _ {j} ^ {(i)} - 1},
+$$
+
+where $S_{i} = \{s_{1}^{(i)},\ldots ,s_{u}^{(i)}\}$ such that $s_j^{(i)} < s_{j + 1}^{(i)}$ , $s_0^{(i)}$ is assumed to be 0 and $s_{u + 1}^{(i)}$ is assumed to be $B + 1$ , and $C_x = \frac{1}{x + 1}\binom{2x}{x}$ is the $x$ -th Catalan number. Note that, $d,B,u$ and $Z$ are all parameters
+
+$^7 [B]\coloneqq \{1,\ldots ,B\}$
+
+6
+
+of the problem, the only inputs are the $d$ sets and the integer $z$ . The goal is to construct a data structure to store the sets and the integer, supporting
+
+We are interested in two parameters of the data structure: the space usage and the query time of pred (and query-z could take arbitrarily long time).
+
+The reason we involve the $z$ is that we would like to use a solution for RMQ as a black-box to solve the predecessor search. However our version of predecessor search has low entropy, comparing with RMQ. It turns out that the reduction will introduce a large redundancy for predecessor search, which makes it impossible to prove any non-trivial lower bound. To avoid this, we move substantial information (i.e. the $z$ ) of the reduced RMQ instance to our predecessor search. The reduced RMQ instance becomes a function of $z$ and $S$ 's. We then maximize the entropy of reduced RMQ instance by properly choosing the joint distribution of $Z$ and $S$ 's, so that the reduction introduces at most $O(d\log B)$ bits of redundancy. See the proof of Theorem 1 for more details.
+
+One useful way to view the role of the integer $z$ is that if we sample a uniformly random input among all possible inputs, the existence of $z$ distorts the distribution of $\{S_i\}$ . More specifically, all $S_i$ will be mutually independent, while for each $S_i$ ,
+
+$$
+\operatorname * {P r} [ S _ {i} = \{s _ {1}, \ldots , s _ {u} \} ] \propto \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} - s _ {j} - 1}.
+$$
+
+We will analyze this distribution more carefully in Section 4.
+
+Since the set of all queries can recover the sets and the integer, the data structure must store the entire input (and this is the purpose of having query-z). The total number of possible inputs to the problem is
+
+$$
+Z \cdot \left(\sum_ {0 <   s _ {1} <   \dots <   s _ {u} <   B + 1} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} - s _ {j} - 1}\right) ^ {d}.
+$$
+
+By the Catalan $u$ -fold convolution formula, it is equal to
+
+$$
+Z \cdot \left(\frac {u + 1}{2 B - u + 1} \binom {2 B - u + 1} {B + 1}\right) ^ {d}.
+$$
+
+Therefore, by the fact that $u = \Theta(\sqrt{B})$ , we obtain the following lemma on the information theoretical minimum space for this problem.
+
+Lemma 2. The information theoretical minimum space for pred- $z$ is
+
+$$
+H _ {d, u, B, Z} := d \cdot (2 B - u - \Theta (\log B)) + \log Z
+$$
+
+bits.
+
+In the following subsections, we will prove the following lower bound for pred-z.
+
+7
+
+Lemma 3. For any parameters $d, u, B$ and $Z$ satisfying $u = \Theta(\sqrt{B})$ , any data structure for the pred- $z$ problem that uses at most $H_{d,u,B,Z} + O(d\log B)$ bits of space and answers pred queries in time $t$ must have
+
+$$
+(w t \log B) ^ {O (t ^ {2} \log^ {2} t)} \geq B,
+$$
+
+in the cell-probe model with word-size $w$ .
+
+Before we proceed and prove the lemma, let us first show that it implies our main theorem.
+
+Proof of Theorem 1. Suppose we have an RMQ data structure using space $2n + r$ bits with query time $O(t)$ . We will use it to solve pred-z for
+
+$$
+\left\{ \begin{array}{l} d := 2 r \\ B := \left\lfloor \frac {n}{d} \right\rfloor - 1 \\ u := \left\lfloor \sqrt {B} \right\rfloor \\ Z := \binom {2 u} {u} ^ {r}. \end{array} \right.
+$$
+
+Roughly speaking, we will divide the array $A$ into $d = 2r$ blocks of length $B$ each (with a gap of one entry between the adjacent blocks), and embed one set $S_{i}$ into each block, e.g., $S_{2}$ is embedded into $A[B + 2,\ldots ,2B + 1]$ . Suppose $S_{2} = \{s_{1}^{(2)},\dots,s_{u}^{(2)}\}$ , then for each integer $j\in [u]$ , the element $s_j^{(2)}$ corresponds to the entry $A[B + 1 + s_j]$ . We will ensure that
+
+$$
+A [ B + 1 ] > A [ B + 1 + s _ {1} ^ {(2)} ] > \dots > A [ B + 1 + s _ {u} ^ {(2)} ],
+$$
+
+i.e., the entries corresponding to elements in $\{0\} \cup S_2$ have decreasing values, and they are all smaller than other entries in $A[B + 1,\ldots ,2B + 1]$ . Hence, to answer the query $\mathbf{pred}(2,x)$ , it suffices to send the query $\mathbb{RMQ}(B + 1,B + 1 + x)$ to the RMQ data structure, and the predecessor of $x$ is equal to $\mathbb{RMQ}(B + 1,B + 1 + x) - (B + 1)$ . All even $S_{i}$ are embedded likewise, and for technical reasons, the odd $S_{i}$ are embedded with the universe reversed. Finally, $z$ is used to encode other parts of $A$ . We elaborate below.
+
+Given the inputs $\{S_1, \ldots, S_d\}$ and $z$ to the pred- $z$ problem, we have
+
+$$
+z \leq \left( \begin{array}{c} 2 u \\ u \end{array} \right) ^ {r} \cdot \prod_ {i = 1} ^ {d} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} ^ {(i)} - s _ {j} ^ {(i)} - 1},
+$$
+
+where $S_{i} = \{s_{1}^{(i)},\ldots ,s_{u}^{(i)}\}$ . We interpret $z$ as a tuple of $r + d(u + 1)$ integers: $k_{1},\dots ,k_{r}$ and $\{z_j^{(i)}\}$ for $i = 1,\ldots ,d$ and $j = 0,\dots ,u$ , such that $k_{i}\leq \binom {2u}{u}$ and $z_{j}^{(i)}\leq C_{s_{j + 1}^{(i)} - s_{j}^{(i)} - 1}$ . Now we construct the input $A$ to the RMQ problem as follows:
+
+1. let $i \in [d]$ be an odd integer, we require
+
+$$
+A [ i (B + 1) ] > A [ i (B + 1) - s _ {1} ^ {(i)} ] > A [ i (B + 1) - s _ {2} ^ {(i)} ] > \dots > A [ i (B + 1) - s _ {u} ^ {(i)} ],
+$$
+
+and
+
+$$
+A [ i (B + 1) ] > A [ i (B + 1) + s _ {1} ^ {(i + 1)} ] > A [ i (B + 1) + s _ {2} ^ {(i + 1)} ] > \dots > A [ i (B + 1) + s _ {u} ^ {(i + 1)} ],
+$$
+
+they are all smaller than all other entries in $A[(i - 1)(B + 1) + 1, \ldots, (i + 1)(B + 1) - 1]$ ;
+
+8
+
+2. for odd $i$ , the order of all elements in
+
+$$
+\{A [ i (B + 1) - s _ {j} ^ {(i)} ]: j \in [ u ] \} \cup \{A [ i (B + 1) + s _ {j} ^ {(i + 1)} ]: j \in [ u ] \}
+$$
+
+is determined by the integer $k_{(i+1)/2}$ (note that given the above requirement, there are exactly $\binom{2u}{u}$ different orderings);
+
+Then we construct the RMQ data structure for $A$ .
+
+Space usage. By assumption, the RMQ data structure uses $2n + r$ bits of space. On the other hand, by Lemma 2, we have
+
+$$
+\begin{array}{l} H _ {d, u, B, Z} = d (2 B - u - \Theta (\log B)) + \log Z \\ = 2 r (2 n / (2 r) - u - \Theta (\log B) + r \cdot (2 u - \Theta (\log B)) \\ = 2 n - \Theta (d \log B). \\ \end{array}
+$$
+
+Thus, the space usage of the pred-z data structure is $H_{d,u,B,Z} + O(d\log B)$ bits, as $r = O(d)$ .
+
+Query algorithm. To answer the query $\mathsf{pred}(i, x)$ , if $i$ is odd, we make the query $\mathsf{RMQ}(i(B + 1) - x, i(B + 1))$ to the RMQ data structure, and return $i(B + 1) - \mathsf{RMQ}(i(B + 1) - x, i(B + 1))$ . Similarly, if $i$ is even, we return $\mathsf{RMQ}((i - 1)(B + 1), (i - 1)(B + 1) + x) - (i - 1)(B + 1)$ . The query time is $O(t)$ .
+
+To see why query-z can be answered, it suffices to recover each of $k_{1},\ldots ,k_{r}$ and $\{z_j^{(i)}\}$ . We first ask all $\mathbf{pred}(i,x)$ queries to recover the sets $S_{1},\ldots ,S_{d}$ . Then each $k_{i}$ can be recovered by asking all queries of form
+
+$$
+\mathsf {R M Q} ((2 i - 1) (B + 1) - s _ {j _ {1}} ^ {(2 i - 1)}, (2 i - 1) (B + 1) + s _ {j _ {2}} ^ {(2 i)}),
+$$
+
+for $j_1, j_2 \in [u]$ . Since no entries in between can be the minimum, these queries directly compare $A[(2i - 1)(B + 1) - s_{j_1}^{(2i - 1)}]$ with $A[(2i - 1)(B + 1) + s_{j_2}^{(2i)}]$ for all $j_1$ and $j_2$ . By Item 2 above, their answers determine $k_i$ . By Item 3, for odd $i$ , $z_j^{(i)}$ can be recovered by asking all RMQ queries in the subarray
+
+$$
+A [ i (B + 1) - s _ {j + 1} ^ {(i)} + 1, \ldots , i (B + 1) - s _ {j} ^ {(i)} - 1 ],
+$$
+
+and for even $i$ , $z_{j}^{(i)}$ can be recovered by asking all queries in
+
+$$
+A [ (i - 1) (B + 1) + s _ {j} ^ {(i)} + 1, \ldots , (i - 1) (B + 1) + s _ {j + 1} ^ {(i)} - 1 ].
+$$
+
+Finally, by Lemma 3, we have
+
+$$
+\left(w t \log B\right) ^ {O (t ^ {2} \log^ {2} t)} \geq B = \Omega (n / r).
+$$
+
+9
+
+Since $w\geq \Omega (\log n)$ , we have
+
+$$
+r \geq \frac {n}{w ^ {O (t ^ {2} \log^ {2} t)}}.
+$$
+
+This proves the theorem.
+
+![](dt=2026-05-30/ht=05/8e71d996a2314689440193d2127e856baebe1baf8522ec19aec5e97f9f0aab2b.jpg)
+
+# 3.1 pred-z lower bound
+
+In this subsection, we prove Lemma 3. The proof strategy is based on a variant of round elimination of [PV10]. We will focus on the predecessor search queries on all input data points, which turn out to be the hard queries. That is, let $\mathcal{Q} := \{\mathsf{pred}(i, s_j^{(i)}): i \in [d], j \in [u]\}$ . We will prove a lower bound on the expected average query time of all queries in $\mathcal{Q}$ , when the inputs $\{S_1, \ldots, S_u\}$ and $z$ are uniformly random. Note that the set of queries $\mathcal{Q}$ is also random, as it depends on the input.
+
+During the round elimination, we will work with data structures with published bits. More specifically, at the beginning of each round, we are given a data structure for pred-z using optimal $H_{d,u,B,Z}$ bits of memory, with extra $p$ published bits. The query algorithm may access these published bits for free, as well as probing the regular memory cells with standard cost of one per probe. In each round, we will create a new data structure with more published bits, but faster expected average query time of $\mathcal{Q}$ (probing fewer regular memory cells).
+
+To this end, for any fixed data structure, we denote by $\mathbf{Probe}(q)$ , the set of memory cells probed in order to answer query $q$ . Similarly for any set of queries $Q$ , $\mathbf{Probe}(Q) := \bigcup_{q \in Q} \mathbf{Probe}(q)$ . We have the following lemma.
+
+Lemma 4. Given a pred- $z$ data structure with $p$ published bits for $p \geq d$ and $p < du \cdot \log^{-4} B$ and worst-case pred query time $t$ , there exists a set $Q_{\mathrm{pub}}$ of $p \log^4 B \mathsf{pred}(\cdot, \cdot)$ queries, possibly random and depending on the input, such that
+
+$$
+\mathbb {E} \left[ \frac {1}{| \mathcal {Q} |} \sum_ {q \in \mathcal {Q}} | \mathrm {P r o b e} (q) \cap \mathrm {P r o b e} (Q _ {\mathrm {p u b}}) | \right] \geq \Omega \left(\frac {1}{t \log^ {2} t}\right),
+$$
+
+where the expectation is taken over uniformly random input data $\{S_1, \ldots, S_d\}$ , $z$ and the choice of $Q_{\mathrm{pub}}$ .
+
+The proof of lemma is deferred to the next subsection. Now, let us prove that it implies Lemma 3.
+
+Proof of Lemma 3. Suppose there is a pred-z data structure using $O(d\log B)$ bits of redundancy and query time $t$ . To initialize the round elimination argument, we simply publish the last $O(d\log B)$ bits of the data structure, and keep the first $H_{d,u,B,Z}$ bits in memory. Thus, we obtain a data structure with $p = O(d\log B)$ publish bits, worst-case query time $t$ and expected average query time of $\mathcal{Q}$ also at most $t$ .
+
+In each round, we begin with a data structure $D$ with $p$ published bits, and will modify it to a new data structure with a lower query time for $\mathcal{Q}$ . To this end, we first construct $D$ given the input data. Then, we apply Lemma 4 to find the set $Q_{\mathrm{pub}}$ , possibly depending on the inputs, and further publish all cells in $\operatorname{Probe}(Q_{\mathrm{pub}})$ . That is, we append the addresses and contents of all cells in $\operatorname{Probe}(Q_{\mathrm{pub}})$ to the published bits. Thereafter, when the query algorithm wants to probe a cell,
+
+10
+
+it first checks if the cell is already published, by reading the published bits. If it is, this probe can be avoided, as the published bits already have the contents.
+
+By the guarantee of Lemma 4, for an average query in $\mathcal{Q}$ , in expectation $\Omega(1/(t\log^2 t))$ probes are avoided, i.e., the expected average query time of $\mathcal{Q}$ is reduced by $\Omega(1/(t\log^2 t))$ . On the other hand, publishing $\mathbf{Probe}(Q_{\mathrm{pub}})$ takes $O(p \cdot wt\log^4 B)$ bits. If we were able to execute this argument for more than $O(t^2\log^2 t)$ rounds, the query time of $\mathcal{Q}$ would become a negative number, which is a contradiction. Hence, $p$ must have exceeded $du\log^{-4}B$ before it happens, so that the premises of Lemma 4 become unsatisfied. Therefore, we must have
+
+$$
+O (d \log B) \cdot \left(w t \log^ {4} B\right) ^ {O \left(t ^ {2} \log^ {2} t\right)} \geq d u \log^ {- 4} B,
+$$
+
+which by the fact that $u = \Theta(\sqrt{B})$ , simplifies to
+
+$$
+(w t \log B) ^ {O (t ^ {2} \log^ {2} t)} \geq B.
+$$
+
+# 3.2 Selecting queries $Q_{\mathrm{pub}}$
+
+The main argument of the proof lies in finding such a set of queries $Q_{\mathrm{pub}}$ . The intuition is that we want to select queries that reveal a lot of information (much more than $p$ bits) about the inputs. Then since all queries in $\mathcal{Q}$ determine the whole input, if the sets of cells $Q_{\mathrm{pub}}$ and $\mathcal{Q}$ probe are always very different and barely intersect, it would mean that more than $p$ bits of information must have been stored in two different locations in the data structure. However, the data structure only uses $p$ extra bits beyond the information theoretical minimum (since we assume the input is uniformly random), we derive a contradiction. The formal argument is more complex, which we elaborate below.
+
+It turns out that $Q_{\mathrm{pub}}$ can be selected by picking $p / d$ evenly spaced (over the $u$ elements) elements from each set $S_i$ , then selecting poly $\log n$ evenly spaced (over $[B]$ ) queries between the picked elements. More specifically, recall that $S_i = \{s_1^{(i)}, \ldots, s_u^{(i)}\}$ , let $m = ud / p$ be the gap between the picked elements, and
+
+$$
+S _ {\mathrm {p t}} ^ {(i)} := \left\{s _ {m} ^ {(i)}, s _ {2 m} ^ {(i)}, s _ {3 m} ^ {(i)}, \ldots , s _ {u} ^ {(i)} \right\}
+$$
+
+be $u / m = p / d$ evenly spaced elements in $S_{i}$ . $S_{\mathrm{pt}}^{(i)}$ partitions the universe $[B]$ into $p / d$ blocks, each block has $m$ elements from $S_{i}$ , but the blocks may have different lengths. In the following, we will only focus on the blocks whose length is approximately $m^2$ . Let $S_{\mathrm{good}}$ be the disjoint union of all such blocks $[x,y]$ from all $S_{i}$ :
+
+$$
+\mathcal {S} _ {\mathrm {g o o d}} := \left\{(i, [ x, y ]): i \in [ d ], \frac {1}{2} m ^ {2} \leq y - x \leq 2 m ^ {2}, \exists l \in [ p / d ], \mathrm {s . t .}, x = s _ {l m} ^ {(i)} + 1, y = s _ {(l + 1) m} ^ {(i)} - 1 \right\}.
+$$
+
+Finally, we pick approximately $\log^4 B$ evenly spaced points in each block in $S_{\mathrm{good}}$ , and the pred queries on them will form the set $Q_{\mathrm{pub}}$ (note that this is possible when $p < du\log^{-4}B$ ). Formally, let $L = m^{2}\cdot \log^{-4}B$ , and $\Delta \in [L]$ be uniformly random, we define
+
+$$
+Q _ {\mathrm {p u b}} := \bigcup_ {(i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}} \left\{\operatorname * {p r e d} (i, x + j \cdot L + \Delta): j \geq 1, x + j \cdot L + \Delta <   y \right\}.
+$$
+
+11
+
+The size of $Q_{\mathrm{pub}}$ is at most $O(p\log^4 B)$ , since $|\mathcal{S}_{\mathrm{good}}| \leq p$ and $y - x \leq 2L\log^4 B$ . Note that $S_{\mathrm{good}}$ together with $\Delta$ , determines $Q_{\mathrm{pub}}$ . From now on, it is helpful to view each block $(i, [x,y]) \in S_{\mathrm{good}}$ as an independent universe, since $x - 1$ is an input data point, any pred queries asked in this range must also have its answer in it (or equal to $x - 1$ ).
+
+As we argued above, we will need to show that the answers to $Q_{\mathrm{pub}}$ reveal a lot of information about the input. It turns out that the most "useful" information they reveal is whether there is any input data point between two adjacent queries. Define the indicator variable
+
+$$
+E _ {j} ^ {(i, [ x, y ])} := \mathbf {1} _ {\operatorname {p r e d} (i, x + j L + \Delta) \neq \operatorname {p r e d} (i, x + (j + 1) L + \Delta)},
+$$
+
+indicating if there is an input point between them. We can show that for each block in $S_{\mathrm{good}}$ , the joint entropy of $\{E_j^{(i,[x,y])}\}_{j}$ is large.
+
+Lemma 5. Let the input $(S_{1},\ldots ,S_{d})$ and $z$ be uniformly random, conditioned on $(i,[x,y])\in S_{\mathrm{good}}$ , the joint entropy is large for a random offset $\Delta$ ,
+
+$$
+H \left(E _ {1} ^ {(i, [ x, y ])}, \dots , E _ {(y - x) / L} ^ {(i, [ x, y ])} \mid (i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}, \Delta\right) \geq \Omega (\log^ {2} B).
+$$
+
+We can also show that most blocks are good.
+
+Lemma 6. Let the inputs $(S_{1},\ldots ,S_{d})$ and $z$ be uniformly random. For every $i\in [d],l\in [p / 3d,2p / 3d]$ we have
+
+$$
+\Pr \left[ (i, [ x, y ]) \in \mathcal {S} _ {\text {g o o d}} \right] \geq \Omega (1),
+$$
+
+where $x = s_{lm}^{(i)} + 1$ and $y = s_{(l + 1)m}^{(i)} - 1$ .
+
+On the other hand, if we are given a large subset of the $m$ input points in a block, then $\{E_j^{(i,[x,y])}\}_{j}$ can be described succinctly.
+
+Lemma 7. Let the input $(S_{1},\ldots ,S_{d})$ and $z$ , as well as $\Delta \in [L]$ , be uniformly random, and condition on $(i,[x,y])\in S_{\mathrm{good}}$ . Let $S_{i,[x,y]}^{\prime}\subseteq S_{i}\cap [x,y]$ be an (arbitrarily) jointly distributed subset, there is a prefix-free binary string $\operatorname{ext}_{\Delta ,S_i}(S_{i,[x,y]}^{\prime})$ , such that $\operatorname{ext}_{\Delta ,S_i}(S_{i,[x,y]}^{\prime})$ and $S_{i,[x,y]}^{\prime}$ together determine $\{E_j^{(i,[x,y])}\}_j$ . Moreover, we have the following bound on the length of $\operatorname{ext}_{\Delta ,S_i}(S_{i,[x,y]}^{\prime})$ :
+
+$$
+\mathbb {E} \left[ \left| \operatorname {e x t} _ {\Delta , S _ {i}} \left(S _ {i, [ x, y ]} ^ {\prime}\right) \right| | (i, [ x, y ]) \in \mathcal {S} _ {\text {g o o d}} \right] \leq O (\sqrt {\epsilon} \log^ {2} B \log (1 / \epsilon) + \log B \log \log B),
+$$
+
+where $\epsilon := 1 - \frac{1}{m}\mathbb{E}\left[\left|S_{i,[x,y]}^{\prime}\right|\mid (i,[x,y])\in \mathcal{S}_{\mathrm{good}}\right]$ .
+
+The proofs of the above three lemmas highly rely on the input distribution, especially on the marginal of each $S_{i}$ . To focus on the main storyline, we defer them to Section 4. For now, the only property we use about the uniform input distribution is that conditioned on $S_{\mathrm{good}}$ , the data points in different blocks are mutually independent, which can be seen easily from definition.
+
+Claim 8. Let $S_{\mathrm{pt}} \coloneqq \{S_{\mathrm{pt}}^{(i)}\}_{i}$ be the partitions. $S_{\mathrm{pt}}$ determines $S_{\mathrm{good}}$ , and given $S_{\mathrm{pt}}$ , all $p$ blocks $\left\{(i, [s_{lm}^{(i)} + 1, s_{(l+1)m}^{(i)} - 1]): i \in [d], l \in [p/d]\right\}$ are mutual independent.
+
+Now, we are ready to prove Lemma 4.
+
+12
+
+Proof of Lemma 4. The proof uses an encoding argument. We will show that if the intersection size in the lemma statement is too small, then there is a very efficient way to encode the entire input data, using bits less than its entropy, which yields a contradiction.
+
+To this end, a useful notion (following [PV10]) is the footprint of a query. Given a query $q$ , its footprint $\mathsf{Foot}(q)$ is a binary string obtained by concatenating the $(w$ -bit) content of the first cell the query algorithm probes when answering $q$ , the content of the second cell, third cell, and so on. This is a $w \cdot |\mathsf{Probe}(q)|$ -bit binary string, encoding all contents in $\mathsf{Probe}(q)$ . Note that it is not necessary to write down the addresses, since by simulating the query algorithm, one automatically knows what is the next cell to probe, given $q$ . Therefore, $\mathsf{Foot}(q)$ , together with $q$ , determines the answer to $q$ .
+
+Similarly, given a set of queries $Q$ , its footprint $\mathsf{Foot}(Q)$ is obtained by concatenating the contents of the first probes of all queries in $Q$ (in the lexicographical order of corresponding query), then the contents of the second probes of all queries, and so on. If a cell is already encoded, either in the same $l$ -th probe by a lexicographically smaller query or in an earlier probe, its content will be skipped. Likewise, $\mathsf{Foot}(Q)$ , together with $Q$ , also determines the answers to all queries in $Q$ .
+
+Finally, for $l \in [t]$ , let $\mathsf{Foot}_{<l}(Q)$ be the prefix of $\mathsf{Foot}(Q)$ that only encodes the cells in the first $(l-1)$ probes of $Q$ . Let $\mathsf{Foot}_l(Q)$ be the substring of $\mathsf{Foot}(Q)$ that encodes the $l$ -th probes. Note that given $\mathsf{Foot}_l(Q)$ alone, it might not be clear which cells it is encoding, since the location of the $l$ -th probe may depend on the contents of the previous probes. It may also not encode the $l$ -th probe of all queries in $Q$ , as some of them may have appeared in $\mathsf{Foot}_{<l}(Q)$ , which are skipped by the definition of $\mathsf{Foot}(Q)$ .
+
+Next, let $\mathcal{E}$ be the set of all indicator random variables $\{E_j^{(i,[x,y])}:(i,[x,y])\in S_{\mathrm{good}},j\in [(y - x) / L]\}$ . By Lemma 5, Lemma 6 and Claim 8, we have
+
+$$
+H (\mathcal {E} \mid S _ {\mathrm {p t}}, \Delta) \geq \Omega (p \log^ {2} B).
+$$
+
+The answers to $Q_{\mathrm{pub}}$ determine $\mathcal{E}$ , hence,
+
+$$
+I (\mathsf {F o o t} (Q _ {\mathrm {p u b}}); \mathcal {E} \mid S _ {\mathrm {p t}}, \Delta) \geq \Omega (p \log^ {2} B).
+$$
+
+By the chain rule of mutual information, we have
+
+$$
+\sum_ {l = 1} ^ {t} I \left(\operatorname {F o o t} _ {l} \left(Q _ {\text {p u b}}\right); \mathcal {E} \mid S _ {\mathrm {p t}}, \operatorname {F o o t} _ {<   l} \left(Q _ {\text {p u b}}\right), \Delta\right) \geq \Omega \left(p \log^ {2} B\right). \tag {1}
+$$
+
+Note that here it is clear which contents $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ is encoding, since we have conditioned on $\mathsf{Foot}_{< l}(Q_{\mathrm{pub}})$ , $\mathcal{S}_{\mathrm{good}}$ and $\Delta$ . Equivalently, it might be helpful to think $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ as a set of cells with both contents and addresses encoded, however, the entropy of the addresses is zero conditioned on $\mathsf{Foot}_{< l}(Q_{\mathrm{pub}})$ .
+
+Now, let us assume
+
+$$
+\underset {\Delta , S _ {1}, \dots , S _ {d}, z} {\mathbb {E}} \left[ \frac {1}{| \mathcal {Q} |} \sum_ {q \in \mathcal {Q}} | \operatorname {P r o b e} (q) \cap \operatorname {P r o b e} (Q _ {\mathrm {p u b}}) | \right] = \delta . \tag {2}
+$$
+
+The goal is to lower bound $\delta$ .
+
+13
+
+Encoding. Consider the following encoding scheme that encodes the data structure:
+
+$$
+H \left(\operatorname {F o o t} _ {l} \left(Q _ {\text {p u b}}\right) \mid \mathcal {E}, S _ {\text {p t}}, \operatorname {F o o t} _ {<   l} \left(Q _ {\text {p u b}}\right), \Delta\right) + O (1)
+$$
+
+bits, and write down the encoding.
+
+Decoding. Now, we show that one can recover the entire data structure from the above encoding, hence, all the inputs.
+
+Given the above encoding, we first read the $p$ published bits, $S_{\mathrm{pt}}$ , $\Delta$ and $l$ . From them, we know the set $Q_{\mathrm{pub}}$ . By simulating the query algorithm for $(l - 1)$ steps on $Q_{\mathrm{pub}}$ , we read $\mathsf{Foot}_{<l}(Q_{\mathrm{pub}})$ and recover all their contents. At the same time, we know the addresses of all cells in $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ (but not their contents). Next, we read the contents of all cells not in $\mathsf{Foot}_{<l}(Q_{\mathrm{pub}})$ or $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ from Step 5.
+
+So far, we have recovered contents of all cells not in $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ , and we know their addresses. We go over all possible $\mathsf{pred}(\cdot, \cdot)$ queries, and simulate the query algorithm on them. This identifies all queries that can be answered without probing cells in $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ . In particular, we recover the sets $S_{i,[x,y]}^{\prime}$ for every $(i, [x, y]) \in S_{\mathrm{good}}$ .
+
+Next, we read $\mathrm{ext}_{\Delta,S_i}(S_{i,[x,y]}^{\prime})$ . By Lemma 7, together with $S_{i,[x,y]}^{\prime}$ , we recover all $E_j^{(i,[x,y])}$ for all $(i,[x,y]) \in S_{\mathrm{good}}$ , i.e., we recover $\mathcal{E}$ . Finally, we read the encoding of $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ conditioned on $\mathcal{E}$ , $\mathcal{S}_{\mathrm{good}}$ , and $\mathsf{Foot}_{<l}(Q_{\mathrm{pub}})$ . This reconstructs the data structure, and thus, by making all queries to it, we recover the entire input data. Therefore, the encoding must use at least $H_{d,u,B,Z}$ bits in expectation.
+
+Analysis. Now let us analyze how many bits the above encoding scheme takes in expectation:
+
+14
+
+$$
+\underset {S _ {\mathrm {p t}}, \Delta , l, \{S _ {i} \} | S _ {\mathrm {p t}}} {\mathbb {E}} \left[ \frac {1}{| \mathcal {S} _ {\mathrm {g o o d}} |} \cdot \sum_ {(i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}} | S _ {i, [ x, y ]} ^ {\prime} | \right] \geq (1 - O (\delta / t)) m;
+$$
+
+7. for each $(i, [x, y]) \in S_{\mathrm{good}}$ , by Lemma 7, we have
+
+$$
+| \mathrm {e x t} _ {\Delta , S _ {i}} (S _ {i, [ x, y ]} ^ {\prime}) | \leq O \big ((\sqrt {\epsilon_ {s _ {\mathrm {p t}} , (i , [ x , y ])}} \log 1 / \epsilon_ {s _ {\mathrm {p t}}, (i, [ x, y ])} \big) \log^ {2} B + \log B \log \log B),
+$$
+
+where $\epsilon_{s_{\mathrm{pt}},(i,[x,y])} := 1 - \mathbb{E}[|S_{i,[x,y]}^{\prime}| \mid S_{\mathrm{pt}} = s_{\mathrm{pt}}] / m$ . Let $\epsilon_{s_{\mathrm{pt}}} := \mathbb{E}_{(i,[x,y]) \in S_{\mathrm{good}}}[\epsilon_{s_{\mathrm{pt}},(i,[x,y])}]$ , $\epsilon := \mathbb{E}[\epsilon_{s_{\mathrm{pt}}}] = O(\delta / t)$ . Writing down all $\exp_{\Delta, S_i}(S_{i,[x,y]}^{\prime})$ takes
+
+$$
+\begin{array}{l} \sum_ {s _ {\mathrm {p t}}} \operatorname * {P r} [ S _ {\mathrm {p t}} = s _ {\mathrm {p t}} ] \sum_ {(i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}} \mathbb {E} [ | \operatorname * {e x t} _ {\Delta , S _ {i}} (S _ {i, [ x, y ]} ^ {\prime}) | \mid S _ {\mathrm {p t}} = s _ {\mathrm {p t}} ] \\ = \underset {s _ {\mathrm {p t}}} {\mathbb {E}} \left[ | \mathcal {S} _ {\mathrm {g o o d}} | \underset {(i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}} {\mathbb {E}} [ | \mathrm {e x t} _ {\Delta , S _ {i}} (S _ {i, [ x, y ]} ^ {\prime}) | \mid S _ {\mathrm {p t}} = s _ {\mathrm {p t}} ] \right] \\ = \underset {s _ {\mathrm {p t}}} {\mathbb {E}} \left[ | \mathcal {S} _ {\mathrm {g o o d}} | \underset {(i, [ x, y ]) \in \mathcal {S} _ {\mathrm {g o o d}}} {\mathbb {E}} [ O ((\sqrt {\epsilon_ {s _ {\mathrm {p t}} , (i , [ x , y ])}} \log 1 / \epsilon_ {s _ {\mathrm {p t}}, (i, [ x, y ])}) \log^ {2} B + \log B \log \log B) | S _ {\mathrm {p t}} = s _ {\mathrm {p t}} ] \right] \\ \leq p \log^ {2} B \cdot \mathbb {E} _ {s _ {\mathrm {p t}}} \left[ O \left(\sqrt {\epsilon_ {s _ {\mathrm {p t}}}} \log 1 / \epsilon_ {s _ {\mathrm {p t}}}\right) \right] + O (p \log B \log \log B) \\ \leq p \log^ {2} B \cdot O (\sqrt {\epsilon} \log 1 / \epsilon) + O (p \log B \log \log B) \\ = O \left(p \log^ {2} B \cdot \sqrt {\delta / t} \log (t / \delta) + p \log B \log \log B\right) \\ \end{array}
+$$
+
+bits in expectation, due to the concavity of $\sqrt{x}\log (1 / x)$ for $0 <   x <   1$
+
+8. by Equation (1), encoding $\mathsf{Foot}_l(Q_{\mathrm{pub}})$ takes
+
+$$
+\left| \mathsf {F o o t} _ {l} (Q _ {\mathrm {p u b}}) \right| - \Omega ((p \log^ {2} B) / t)
+$$
+
+bits.
+
+Summing up the cost of each step, the encoding uses in total
+
+$$
+\begin{array}{l} H _ {d, u, B, Z} + p + O (p \log B) + O (\log B + \log t) \\ + O \left(p \left(\sqrt {\delta / t} \log (t / \delta)\right) \log^ {2} B\right) + O \left(p \log B \log \log B\right) - \Omega \left(\left(p \log^ {2} B\right) / t\right) \\ \leq H _ {d, u, B, Z} + O \left(p \left(\sqrt {\delta / t} \log (t / \delta)\right) \log^ {2} B\right) + O \left(p \log B \log \log B\right) - \Omega \left(\left(p \log^ {2} B\right) / t\right) \\ \end{array}
+$$
+
+bits. Since $t \ll \log B / \log \log B$ (otherwise the lower bound already holds), and thus, $p\log B\log \log B \ll (p\log^2 B) / t$ , we must have
+
+$$
+p (\sqrt {\delta / t} \log (t / \delta)) \log^ {2} B \geq \Omega ((p \log^ {2} B) / t),
+$$
+
+which simplifies to
+
+$$
+\delta \geq \Omega (1 / (t \log^ {2} t)).
+$$
+
+This proves the lemma.
+
+![](dt=2026-05-30/ht=05/ff5e7949fbbc504bbf483df4dd9e25e145d5272c02b47b6557d6bf1f72bd422a.jpg)
+
+15
+
+# 4 Analyzing the Input Distribution
+
+In this section, we analyze the input distribution and prove the three lemmas from the previous section. Recall that the input to the pred-z problem is $(S_{1},\ldots ,S_{d})$ and $z$ such that
+
+$$
+1 \leq z \leq Z \cdot \prod_ {i = 1} ^ {d} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} ^ {(i)} - s _ {j} ^ {(i)} - 1}.
+$$
+
+Therefore, if we sample a uniformly random input, the marginal distribution of each $S_{i}$ is
+
+$$
+\Pr \left[ S _ {i} = \left\{s _ {1}, \dots , s _ {u} \right\} \right] = \frac {1}{M (B , u)} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} - s _ {j} - 1}, \tag {3}
+$$
+
+where $0 = s_0 < s_1 < \dots < s_u < s_{u + 1} = B + 1$ , and
+
+$$
+M (B, u) := \sum_ {s _ {1}, \dots , s _ {u}} \prod_ {j = 0} ^ {u} C _ {s _ {j + 1} - s _ {j} - 1}
+$$
+
+is the Catalan's $(u + 1)$ -fold convolution. In general, we have the following equation.
+
+Theorem 9 (Catalan's $m$ -fold convolution formula [Cat87, Reg12]). For $m \leq U$
+
+$$
+\sum_ {\substack {i _ {1} + \dots + i _ {m} = U \\ i _ {1}, \dots , i _ {m} \geq 1}} C _ {i _ {1} - 1} \dots C _ {i _ {m} - 1} = \frac {m}{2 U - m} \binom {2 U - m}{U}. \tag{4}
+$$
+
+Thus, we have the following estimation for $M$ .
+
+Proposition 10. For super constant $B$ and any $u \ll B$ , it holds that
+
+$$
+M (B, u) \leq \frac {(1 + o (1)) 2 u}{\sqrt {\pi / 2} (2 B - u) ^ {1 . 5}} \cdot 2 ^ {2 B - u} e ^ {- u ^ {2} / (4 B)},
+$$
+
+and when $u^3\ll B^2$
+
+$$
+M (B, u) \geq \frac {(1 - o (1)) 2 u}{\sqrt {\pi / 2} (2 B - u) ^ {1 . 5}} \cdot 2 ^ {2 B - u} e ^ {- u ^ {2} / (4 B - 2 u)}.
+$$
+
+In particular, when $u = O(\sqrt{B})$ ,
+
+$$
+M (B, u) = \Theta (u 2 ^ {2 B - u} / B ^ {3 / 2}).
+$$
+
+Proof.
+
+$$
+\begin{array}{l} M (B, u) = \frac {u + 1}{2 B - u + 1} \left( \begin{array}{c} 2 B - u + 1 \\ B + 1 \end{array} \right) \\ = \frac {u + 1}{2 B - u + 1} \binom {2 B - u + 1} {B - \lfloor (u - 1) / 2 \rfloor} \frac {(B - u + 1) \cdots (B - \lceil (u - 1) / 2 \rceil)}{(B - \lfloor (u - 1) / 2 \rfloor + 1) \cdots (B + 1)} \\ = \frac {(1 \pm o (1)) u 2 ^ {2 B - u + 1}}{\sqrt {\pi / 2} (2 B - u) ^ {1 . 5}} \cdot \frac {(B - u + 1) \cdots (B - \lceil (u - 1) / 2 \rceil)}{(B - \lfloor (u - 1) / 2 \rfloor + 1) \cdots (B + 1)}. \\ \end{array}
+$$
+
+16
+
+The last factor is upper bounded by
+
+$$
+\begin{array}{l} \frac {(B - u + 1) \cdots (B - \lceil (u - 1) / 2 \rceil)}{(B - \lfloor (u - 1) / 2 \rfloor + 1) \cdots (B + 1)} \leq \left(\frac {B - \lceil (u - 1) / 2 \rceil}{B + 1}\right) ^ {\lfloor (u + 1) / 2 \rfloor} \\ \leq \left(1 - \frac {\lceil (u + 1) / 2 \rceil}{B + 1}\right) ^ {\lfloor (u + 1) / 2 \rfloor} \\ \leq (1 + o (1)) e ^ {- u ^ {2} / (4 B)}, \\ \end{array}
+$$
+
+and when $u^3 \ll B^2$ , it is lower bounded by
+
+$$
+\begin{array}{l} \frac {(B - u + 1) \cdots (B - \lceil (u - 1) / 2 \rceil)}{(B - \lfloor (u - 1) / 2 \rfloor + 1) \cdots (B + 1)} \geq \left(\frac {B - u}{B - \lfloor (u - 1) / 2 \rfloor}\right) ^ {\lfloor (u + 1) / 2 \rfloor} \\ \geq \left(1 - \frac {u}{2 B - u - 1}\right) ^ {u / 2} \\ \geq (1 - o (1)) e ^ {- u ^ {2} / (4 B - 2 u)}. \\ \end{array}
+$$
+
+![](dt=2026-05-30/ht=05/9a6d6bd52408c58c3962c5eca9072644f1654224783e36eb7cc67c866ac34e36.jpg)
+
+Now, let us first prove Lemma 6.
+
+Lemma 6 (restated). Let the inputs $(S_{1},\ldots ,S_{d})$ and $z$ be uniformly random. For every $i\in [d],l\in [p / 3d,2p / 3d]$ , we have
+
+$$
+\Pr \left[ (i, [ x, y ]) \in S _ {\text {g o o d}} \right] \geq \Omega (1),
+$$
+
+where $x = s_{lm}^{(i)} + 1$ and $y = s_{(l + 1)m}^{(i)} - 1$ .
+
+Proof. Let us first fix $i$ , and omit the superscript $(i)$ in the following for convenience of notations. Let $c = lm$ , it suffices to prove that $\operatorname*{Pr}[s_{c + m} - s_c \in [m^2 / 2, 2m^2]] \geq \Omega(1)$ . Note that $u^2 = \Theta(B)$ , we have
+
+$$
+\begin{array}{l} \Pr \left[ s _ {c + m} = y + 1, s _ {c} = x - 1 \right] \\ = M (x - 2, c - 1) \cdot M (y - x + 1, m - 1) \cdot M (B - y, u - c - m) / M (B, u) \\ = \Omega \left(\frac {c m (u - c - m) B ^ {1 . 5}}{x ^ {1 . 5} (y - x) ^ {1 . 5} (B - y) ^ {1 . 5} u} \cdot e ^ {- \frac {c ^ {2}}{4 x - 2 c} - \frac {m ^ {2}}{4 (y - x) - 2 m} - \frac {(u - c - m) ^ {2}}{4 (B - y) - 2 (u - c - m)} + \frac {u ^ {2}}{4 B}}\right). \\ \end{array}
+$$
+
+Since $m \ll u$ and $l \in [p/3d, 2p/3d]$ (i.e., $c \in [u/3, 2u/3]$ ), we have
+
+$$
+\begin{array}{l} \Pr \left[ s _ {c + m} - s _ {c} \in \left[ m ^ {2} / 2, 2 m ^ {2} \right] \right] \\ \geq \sum_ {x = B / 3} ^ {2 B / 3} \sum_ {y - x = m ^ {2} / 2} ^ {2 m ^ {2}} \Pr \left[ s _ {c + m} = y, s _ {c} = x \right] \\ = \sum_ {x = B / 3} ^ {2 B / 3} \sum_ {y - x = m ^ {2} / 2} ^ {2 m ^ {2}} \Omega \left(\frac {m}{B (y - x) ^ {1 . 5}} e ^ {- \frac {m ^ {2}}{4 (y - x) - 2 m}}\right) \\ \geq \Omega \left(B \cdot m ^ {2} \cdot \frac {m}{B (m ^ {2}) ^ {1 . 5}}\right) \geq \Omega (1). \\ \end{array}
+$$
+
+![](dt=2026-05-30/ht=05/2a6c697a385019019aad6edff9254999ce3804bb609232a2c58519a0cbc0a5fe.jpg)
+
+17
+
+In the rest of this section, we will prove the two remaining lemmas. Both lemmas consider one specific good block $(i, [x, y])$ . For simplicity of notations, we will omit all the superscripts $(i, [x, y])$ .
+
+We denote the length of the block by $U \coloneqq y - x + 1$ and $S = S_{i} \cap [x,y]$ be the set of input points contained in it. Thus, we have $U = \Theta (m^2)$ . It is easy to verify that the marginal distribution of $S$ is similar to Equation (3):
+
+$$
+\operatorname * {P r} [ S = \{s _ {1}, \dots , s _ {m} \} ] = \frac {1}{M (U , m)} \prod_ {j = 0} ^ {m} C _ {s _ {j + 1} - s _ {j} - 1}.
+$$
+
+Let $k = \log^4 B$ . We have $L = \lfloor m^2 / k \rfloor$ . Let $K = \lfloor U / L \rfloor$ be approximately the number of predecessor search queries we put in $Q_{\mathrm{pub}}$ in $[x, y]$ . We sample a random integer $\Delta \in [1, L]$ . Recall that within this block we put in $Q_{\mathrm{pub}}$ all predecessor search queries at points of form $\Delta + j \cdot L$ . That is, we divide $U$ into roughly $K$ intervals of size $L$ , with a uniformly random offset. Finally, recall that $E_j$ is the indicator random variable indicating $[\Delta + j \cdot L, \Delta + (j + 1) \cdot L)$ contains at least one point in $S$ .
+
+We will involve the following inequalities as a toolkit to finish our analysis. The proofs are deferred to the appendix.
+
+Fact 11. For $A, T > 0$ , $\sum_{h=1}^{T} e^{-A/h} \cdot h^{-1.5} \leq O(e^{-A/T}(1/\sqrt{T} + 1/\sqrt{A}))$ .
+
+Fact 12. For $A, T > 0$ , $\sum_{h=1}^{T} e^{-A/(T-h)} \cdot h^{-0.5} \leq O(e^{-A/T}\sqrt{T})$ .
+
+Fact 13. For $A_{1}, A_{2}, T > 0$ ,
+
+$$
+\begin{array}{l} \sum_ {h = 1} ^ {T} e ^ {- A _ {1} / h - A _ {2} / (T - h)} \cdot h ^ {- 1. 5} (T - h) ^ {- 1. 5} \\ \leq O \left(T ^ {- 1. 5} e ^ {- (A _ {1} + A _ {2}) / 2 T} \cdot \left(1 + \sqrt {(A _ {1} + A _ {2}) / T} + \sqrt {\frac {A _ {1} A _ {2}}{T (A _ {1} + A _ {2})}}\right) \cdot \left(1 / \sqrt {A _ {1}} + 1 / \sqrt {A _ {2}}\right)\right). \\ \end{array}
+$$
+
+Fact 14. For positive $2A_{1} \leq A_{2}$ and $B_{1} \geq B_{2}$ , we have $\frac{A_1^2}{B_1} + \frac{7}{8} \cdot \frac{A_2^2}{B_2} \geq \frac{(A_1 + A_2)^2}{B_1 + B_2}$ .
+
+The following lemma asserts that not too many non-empty intervals have few elements.
+
+Lemma 15. For $l \leq m / \sqrt{k} = O(\sqrt{L})$ , the expected number of intervals that have between $l / 2$ and $l$ elements is at most $O(lk / m + 1)$ .
+
+Proof. Instead of upper-bounding the expected number of such intervals directly, we are going to count how many elements can be the first element in such a interval in expectation. By linearity of expectation, it suffices to estimate for each element $s_c$ , what is the probability that it becomes such an element.
+
+Fix an integer $c \in [2, m - 3l]$ . $s_c$ can be the first element in a interval that have at most $l$ elements, only if
+
+18
+
+To bound the probability, let us first estimate the probability that $s_{c + l} = z$ conditioned on $s_c = y$ for some $y \leq U - 3L$ and $z > y$ . By Proposition 10, we have
+
+$$
+\begin{array}{l} \operatorname * {P r} [ s _ {c + l} = z \mid s _ {c} = y ] = \frac {M (z - y - 1 , l - 1) \cdot M (U - z , m - c - l)}{M (U - y , m - c)} \\ = O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)} \cdot \exp (- \frac {l ^ {2}}{4 (z - y)} - \frac {(m - c - l) ^ {2}}{4 (U - z)})}{M (U - y , m - c) \cdot (z - y) ^ {1 . 5} (U - z) ^ {1 . 5}}\right). \\ \end{array}
+$$
+
+By Cauchy-Schwarz, $\frac{l^2}{4(z - y)} + \frac{(m - c - l)^2}{4(U - z)} \geq \frac{(m - c)^2}{4(U - y)}$ . Thus, when $z \leq \frac{U + y}{2}$ (which implies $1 / (U - z) \leq 2 / (U - y)$ ), the probability is at most
+
+$$
+\operatorname * {P r} [ s _ {c + l} = z \mid s _ {c} = y ] \leq O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {\exp (- \frac {(m - c) ^ {2}}{4 (U - y)})}{(z - y) ^ {1 . 5} (U - y) ^ {1 . 5}}\right).
+$$
+
+When $z > \frac{U + y}{2}$ (which implies $1 / (U - y) \geq 1 / (2z - 2y)$ ), since $2l < m - c - l$ and $z - y > U - z$ , we have
+
+$$
+\operatorname * {P r} [ s _ {c + l} = z \mid s _ {c} = y ] = O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)} \cdot \exp (- \frac {l ^ {2}}{4 (z - y)} - \frac {(m - c - l) ^ {2}}{4 (U - z)})}{M (U - y , m - c) \cdot (z - y) ^ {1 . 5} (U - z) ^ {1 . 5}}\right).
+$$
+
+and by Fact 14,
+
+$$
+\frac {l ^ {2}}{4 (z - y)} + \frac {7}{8} \cdot \frac {(m - c - l) ^ {2}}{4 (U - z)} \geq \frac {(m - c) ^ {2}}{4 (U - y)}.
+$$
+
+The probability is also at most
+
+$$
+\Pr \left[ s _ {c + l} = z \mid s _ {c} = y \right] \leq O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {e ^ {- \frac {(m - c) ^ {2}}{4 (U - y)} - \frac {(m - c - l) ^ {2}}{3 2 (U - z)}}}{(U - y) ^ {1 . 5} (U - z) ^ {1 . 5}}\right).
+$$
+
+Thus, for $U - y \geq 3L$ and $y < x \leq y + L$ , we have
+
+$$
+\begin{array}{l} \Pr \left[ s _ {c + l} \geq x \mid s _ {c} = y \right] = \sum_ {z = x} ^ {U + y - x} \Pr \left[ s _ {c + l} = z \mid s _ {c} = y \right] + \sum_ {z = U + y - x + 1} ^ {U} \Pr \left[ s _ {c + l} = z \mid s _ {c} = y \right] \\ \leq O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {e ^ {- \frac {(m - c) ^ {2}}{4 (U - y)}}}{(U - y) ^ {1 . 5}} \cdot \left(\sum_ {z = x} ^ {U + y - x} \frac {1}{(z - y) ^ {1 . 5}} + \sum_ {z = U + y - x} ^ {U} \frac {e ^ {- \frac {(m - c - l) ^ {2}}{3 2 (U - z)}}}{(U - z) ^ {1 . 5}}\right)\right) \\ \leq O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {e ^ {- \frac {(m - c) ^ {2}}{4 (U - y)}}}{(U - y) ^ {1 . 5}} \cdot \left(\frac {1}{\sqrt {x - y}} + \sum_ {U - z = 1} ^ {x - y} \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (U - z)}}}{(U - z) ^ {1 . 5}}\right)\right) \\ \end{array}
+$$
+
+which by Fact 11, is at most
+
+$$
+\leq O \left(\frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {e ^ {- \frac {(m - c) ^ {2}}{4 (U - y)}}}{(U - y) ^ {1 . 5}} \cdot \left(\frac {1}{\sqrt {x - y}} + \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (x - y)}}}{m - c}\right)\right). \tag {5}
+$$
+
+19
+
+Similarly, for $y \geq 2L$ and $x > y - L$ (which implies $x > y/2$ ), we have
+
+$$
+\begin{array}{l} \operatorname * {P r} [ s _ {c - 1} \leq x \mid s _ {c} = y ] = \sum_ {z = 1} ^ {x} \frac {C _ {y - z - 1} \cdot M (z - 1 , c - 2)}{M (y - 1 , c - 1)} \\ \leq O \left(\frac {1}{M (y - 1 , c - 1)} \sum_ {z = 1} ^ {x} \frac {c 2 ^ {2 y - c} e ^ {- c ^ {2} / 4 z}}{(y - z) ^ {1 . 5} z ^ {1 . 5}}\right) \\ \leq O \left(\frac {c 2 ^ {2 y - c}}{M (y - 1 , c - 1)} \left(\sum_ {z = y - x} ^ {x} \frac {e ^ {- c ^ {2} / 4 z}}{(y - z) ^ {1 . 5} z ^ {1 . 5}} + \sum_ {z = 1} ^ {y - x} \frac {e ^ {- c ^ {2} / 4 z}}{(y - z) ^ {1 . 5} z ^ {1 . 5}}\right)\right) \\ \leq O \left(\frac {c 2 ^ {2 y - c}}{M (y - 1 , c - 1)} \cdot \frac {1}{y ^ {1 . 5}} \left(\frac {e ^ {- \frac {c ^ {2}}{4 y}}}{\sqrt {y - x}} + \frac {e ^ {- \frac {c ^ {2}}{4 (y - x)}}}{\sqrt {y - x}} + \frac {e ^ {- \frac {c ^ {2}}{4 (y - x)}}}{c}\right)\right) \\ \leq O \left(\frac {c 2 ^ {2 y - c}}{M (y - 1 , c - 1)} \cdot \frac {e ^ {- \frac {c ^ {2}}{4 y}}}{y ^ {1 . 5}} \left(\frac {1}{\sqrt {y - x}} + \frac {e ^ {- \frac {c ^ {2}}{8 (y - x)}}}{c}\right)\right). \tag {6} \\ \end{array}
+$$
+
+The probability that $2L \leq s_c \leq U - 3L$ , $c$ is the first element in a interval with at most $l$ elements, is at most
+
+$$
+\begin{array}{l} \sum_ {y = 2 L} ^ {U - 3 L} \sum_ {b = 1} ^ {L} \frac {1}{L} \operatorname * {P r} [ s _ {c} = y, s _ {c - 1} \leq y - b, s _ {c + l} > y - b + L ] \\ = \sum_ {y = 2 L} ^ {U - 3 L} \frac {\Pr [ s _ {c} = y ]}{L} \sum_ {b = 1} ^ {L} \Pr [ s _ {c - 1} \leq y - b, s _ {c + l} > y - b + L \mid s _ {c} = y ] \\ \leq \sum_ {y = 2 L} ^ {U - 3 L} \frac {M (y - 1 , c - 1) M (U - y , m - c)}{L \cdot M (U , m)} \sum_ {b = 1} ^ {L} O \left(\frac {c 2 ^ {2 y - c}}{M (y - 1 , c - 1)} \cdot \frac {e ^ {- \frac {c ^ {2}}{4 y}}}{y ^ {1 . 5}} \left(\frac {1}{\sqrt {b}} + \frac {e ^ {- \frac {c ^ {2}}{8 b}}}{c}\right) \right. \\ \left. \cdot \frac {l (m - c - l) 2 ^ {2 (U - y) - (m - c)}}{M (U - y , m - c)} \cdot \frac {e ^ {- \frac {(m - c) ^ {2}}{4 (U - y)}}}{(U - y) ^ {1 . 5}} \cdot \left(\frac {1}{\sqrt {L - b}} + \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (L - b)}}}{m - c}\right)\right) \\ \leq O \left(\frac {2 ^ {2 U - m} c l (m - c - l)}{L \cdot M (U , m)} \sum_ {y = 1} ^ {U} \frac {e ^ {- \frac {c ^ {2}}{4 y} - \frac {(m - c) ^ {2}}{4 (U - y)}}}{y ^ {1 . 5} (U - y) ^ {1 . 5}} \sum_ {b = 1} ^ {L} \left(\frac {1}{\sqrt {b}} + \frac {e ^ {- \frac {c ^ {2}}{8 b}}}{c}\right) \left(\frac {1}{\sqrt {L - b}} + \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (L - b)}}}{m - c}\right)\right) \\ \leq O \left(\frac {c l (m - c - l) U ^ {1 . 5}}{m L} \left(\sum_ {y = 1} ^ {U} \frac {e ^ {- \frac {c ^ {2}}{4 y} - \frac {(m - c) ^ {2}}{4 (U - y)}}}{y ^ {1 . 5} (U - y) ^ {1 . 5}}\right) \sum_ {b = 1} ^ {L} \left(\frac {1}{\sqrt {b}} + \frac {e ^ {- \frac {c ^ {2}}{8 b}}}{c}\right) \left(\frac {1}{\sqrt {L - b}} + \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (L - b)}}}{m - c}\right)\right). \\ \end{array}
+$$
+
+By Fact 13, we have
+
+$$
+\begin{array}{l} \sum_ {y = 1} ^ {U} \frac {e ^ {- \frac {c ^ {2}}{4 y} - \frac {(m - c) ^ {2}}{4 (U - y)}}}{y ^ {1 . 5} (U - y) ^ {1 . 5}} \leq O \left(U ^ {- 1. 5} e ^ {- (c ^ {2} + (m - c) ^ {2}) / 2 U} \cdot \left(1 + \sqrt {\frac {c ^ {2} + (m - c) ^ {2}}{U}} + \sqrt {\frac {c ^ {2} (m - c) ^ {2}}{U (c ^ {2} + (m - c) ^ {2}}}\right) \cdot (1 / c + 1 / (m - c))\right) \\ \leq O \left(U ^ {- 1. 5} (1 / c + 1 / (m - c))\right). \\ \end{array}
+$$
+
+20
+
+Next, we bound the last sum:
+
+$$
+\begin{array}{l} \sum_ {b = 1} ^ {L} \left(\frac {1}{\sqrt {b}} + \frac {e ^ {- \frac {c ^ {2}}{8 b}}}{c}\right) \left(\frac {1}{\sqrt {L - b}} + \frac {e ^ {- \frac {(m - c) ^ {2}}{3 2 (L - b)}}}{m - c}\right) \\ \leq \sum_ {b = 1} ^ {L} \frac {1}{\sqrt {b (L - b)}} + \sum_ {b = 1} ^ {L} \frac {1}{(m - c) \sqrt {b}} + \sum_ {b = 1} ^ {L} \frac {1}{c \sqrt {L - b}} + \sum_ {b = 1} ^ {L} e ^ {- \frac {c ^ {2}}{8 b} - \frac {(m - c) ^ {2}}{3 2 (L - b)}} \\ \leq O \left(1 + \frac {\sqrt {L}}{m - c} + \frac {\sqrt {L}}{c}\right) + L \cdot e ^ {- \frac {m ^ {2}}{3 2 L}} \\ \leq O \left(1 + \frac {\sqrt {L}}{m - c} + \frac {\sqrt {L}}{c}\right), \\ \end{array}
+$$
+
+where the last inequality is due to our assumption $L\log L = o(U)$ . Hence, for $2\leq c\leq m - 3l$ , we have
+
+$\operatorname*{Pr}[2L \leq s_c \leq U - 3L, c$ is the first element of a interval with at most $l$ elements]
+
+$$
+\begin{array}{l} \sum_ {y = 2 L} ^ {U - 3 L} \frac {1}{L} \sum_ {b = 1} ^ {L} \Pr [ s _ {c} = y, s _ {c - 1} \leq y - b, s _ {c + l} > y - b + L ] \\ \leq O \left(\frac {c l (m - c - l)}{m L} \left(\frac {1}{c} + \frac {1}{m - c}\right) \left(1 + \frac {\sqrt {L}}{m - c} + \frac {\sqrt {L}}{c}\right)\right). \\ \end{array}
+$$
+
+Next, we take the sum over $c$ :
+
+$$
+\begin{array}{l} \sum_ {c = 2} ^ {m - 3 l} \frac {c l (m - c - l)}{m L} \left(\frac {1}{c} + \frac {1}{m - c}\right) \left(1 + \frac {\sqrt {L}}{m - c} + \frac {\sqrt {L}}{c}\right) \\ \leq 2 \sum_ {c = 1}^ {m / 2} \frac {c l (m - c)}{m L} \cdot \frac {2}{c} \cdot \left(1 + \frac {2 \sqrt {L}}{c}\right) \\ \leq O \left(\sum_ {c = 1} ^ {m / 2} \frac {l}{L} \left(1 + \frac {\sqrt {L}}{c}\right)\right) \\ \leq O \left(l m / L + (l \log m) / \sqrt {L}\right) \\ = O (l k / m), \\ \end{array}
+$$
+
+where the last inequality is due to our assumption $L = o(U / \log U)$ .
+
+So far, we obtained an upper bound on the expected number of non-empty intervals that
+
+However, there could be at most $O(1)$ intervals that begin with an $s_c$ with $s_c \leq 2L$ or $s_c \geq U - 3L$ , or $c = 1$ . For $c > m - 3l$ , there could be at least $O(1)$ intervals with at least $l/2$ elements.
+
+Hence, the expected number of non-empty intervals with at most $l$ and at least $l/2$ elements is $O(lk/m + 1)$ .
+
+21
+
+Let $S' \subseteq S$ be an (arbitrarily) jointly distributed subset of $S$ , and $\mathbb{E}[|S'|] = (1 - \epsilon)m$ . The above bound implies an upper bound on the number of non-empty intervals that do not contain any point in $S'$ .
+
+Corollary 16. Let $S' \subseteq S$ be an (arbitrarily) jointly distributed subset of $S$ , and $\mathbb{E}[|S'|] = (1 - \epsilon)m$ . The number of non-empty intervals that do no contain any point in $S'$ has expectation at most $O(\sqrt{\epsilon k} + \log m)$ , where the expectation is taken over the joint distribution of $S$ , $\Delta$ and $S'$ .
+
+Proof. By Lemma 15, the number of intervals that have at most $m\sqrt{\epsilon / k}$ elements is at most $O(\sqrt{\epsilon k} + \log m)$ (regardless of whether it contains a point in $S'$ ). On the other hand, the expected number of intervals that have at least $m\sqrt{\epsilon / k}$ elements that do not contain any point in $S'$ is at most
+
+$$
+{\frac {\epsilon m}{m \sqrt {\epsilon / k}}} = \sqrt {\epsilon k}.
+$$
+
+Summing up the two parts proves the corollary.
+
+![](dt=2026-05-30/ht=05/101398229b073fdbd407d5b4cd9761eb691e380c115482b65de75c49f89e12ab.jpg)
+
+Next lemma considers the gaps between adjacent non-empty intervals. It asserts that most non-empty intervals are consecutive intervals, and very few pairs are far away.
+
+Lemma 17. The expected number of non-empty interval pairs that have between $t - 1$ and $2t$ empty intervals and no non-empty interval in between is at most $O(\sqrt{k / t} + 1)$ . In particular, the expected number of non-empty intervals is at most $O(\sqrt{k} + \log K)$ .
+
+Proof. Let us first bound the expected number of non-empty interval pairs with exactly $t - 1$ empty intervals (and no non-empty interval) in between, i.e., adjacent non-empty interval pairs $(\mathcal{B}_1, \mathcal{B}_2)$ that are $t$ intervals far from each other. Instead of upper-bounding it directly, we are going to estimate for each element $s_c$ , the probability that it is the last element in $\mathcal{B}_1$ and $s_{c+1}$ is the first element in $\mathcal{B}_2$ . Then by linearity of expectation, taking the sum over $c$ gives us the desired bound. Indeed, for $1 \leq c \leq m - 1$ and $(t - 1)L < y - x < (t + 1)L$ , the probability that $s_c = x, s_{c+1} = y$ and they form such a pair is at most
+
+$$
+\begin{array}{l} \Pr \left[ s _ {c} = x, s _ {c + 1} = y \right] \cdot \left(1 - \frac {| y - x - t L |}{L}\right) \\ = \frac {M (x - 1 , c - 1) M (U - y , m - c) C _ {y - x - 1}}{M (U , m)} \cdot \left(1 - \frac {| y - x - t L |}{L}\right) \\ \leq O \left(\frac {c (m - c) \cdot U ^ {1 . 5}}{m \cdot x ^ {1 . 5} (y - x) ^ {1 . 5} (U - y) ^ {1 . 5}} \cdot \frac {L - | y - x - t L |}{L}\right) \\ \end{array}
+$$
+
+For $x \leq U - 5tL$ , we have
+
+$$
+\begin{array}{l} \sum_ {y = x + (t - 1) L + 1} ^ {x + (t + 1) L - 1} \frac {c (m - c) \cdot U ^ {1 . 5}}{m \cdot x ^ {1 . 5} (y - x) ^ {1 . 5} (U - y) ^ {1 . 5}} \cdot \frac {L - | y - x - t L |}{L} \\ \leq O \left(\sum_ {y - x = (t - 1) L + 1} ^ {t L} \frac {c (m - c) \cdot U ^ {1 . 5}}{m \cdot x ^ {1 . 5} (y - x) ^ {1 . 5} (U - x) ^ {1 . 5}} \left(\frac {y - x}{L} - (t - 1)\right)\right) \\ = O \left(\frac {c (m - c) \cdot U ^ {1 . 5}}{m \cdot x ^ {1 . 5} (U - x) ^ {1 . 5}} \cdot \frac {1}{t ^ {1 . 5} \sqrt {L}}\right). \\ \end{array}
+$$
+
+22
+
+Now, we take the sum over $x$ , the expected number of such $(\mathcal{B}_1, \mathcal{B}_2)$ pairs where the last element in $\mathcal{B}_1$ is $s_c \leq U - 5tL$ , is at most
+
+$$
+\sum_ {x = 1} ^ {U - 5 t L} O \left(\frac {c (m - c) \cdot U ^ {1 . 5}}{m \cdot x ^ {1 . 5} (U - x) ^ {1 . 5}} \cdot \frac {1}{t ^ {1 . 5} \sqrt {L}}\right) \leq O \left(\frac {c (m - c)}{m \cdot t ^ {1 . 5} \sqrt {L}}\right).
+$$
+
+Next, we take the sum over $c$ ,
+
+$$
+\sum_ {c = 1} ^ {m - 1} O \left(\frac {c (m - c)}{m \cdot t ^ {1 . 5} \sqrt {L}}\right) = O \left(\frac {m}{t ^ {1 . 5} \sqrt {L}}\right) = O (\sqrt {k} / t ^ {1. 5}).
+$$
+
+A similar argument shows that, for any $t' \in [t - 1, 2t)$ , the expected number of adjacent non-empty interval pairs $(\mathcal{B}_1, \mathcal{B}_2)$ such that
+
+is at most $O(\sqrt{k} / t'^{1.5})$ . However, there could be at most $O(1)$ interval pairs that are $[t - 1, 2t)$ intervals far after $U - 5tL$ . Hence, taking the sum over $t'$ , the expected total number of such pairs is $O(\sqrt{k / t} + 1)$ .
+
+In particular, taking the sum over $t = 2^i$ for $i = 0, \ldots, \log K$ gives us an upper bound of $O(\sqrt{k} + \log K)$ on the expected number of non-empty pairs.
+
+Now, we are ready to prove Lemma 7. Note that $k, K = \Theta (\log^4 B)$ .
+
+Lemma 7 (restated). For random $S$ and $\Delta$ , let $S' \subseteq S$ be a subset (arbitrarily) jointly distributed. Then there is a prefix-free binary string $\mathrm{ext}_{\Delta, S}(S')$ , such that $\mathrm{ext}_{\Delta, S}(S')$ and $S'$ together determine $\{E_j\}_{j \in [K]}$ (or equivalently, the set of non-empty intervals). Moreover, we have the following bound on the length of $\mathrm{ext}_{\Delta, S}(S')$ :
+
+$$
+\underset {\Delta , S, S ^ {\prime}} {\mathbb {E}} \left[ \left| \operatorname {e x t} _ {\Delta , S} \left(S ^ {\prime}\right) \right| \right] \leq O \left(\sqrt {\epsilon} \log^ {2} B \log (1 / \epsilon) + \log B \log \log B\right),
+$$
+
+where $\epsilon \coloneqq \mathbb{E}[1 - |S'| / m]$ .
+
+Proof. First observe that for each non-empty interval, when at least one of its elements appears in $S'$ , we already know this interval is non-empty. In the other words, it suffices to encode in $\mathrm{ext}_{\Delta, S}(S')$ , the non-empty intervals that none of the elements appears in $S'$ .
+
+Encode $\{E_j\}$ given $S'$ . We now describe $\mathrm{ext}_{\Delta, S}(S')$ , which encodes the non-empty intervals given $S'$ . To this end, we first compute all non-empty intervals, as well as the non-empty intervals that contain no points in $S'$ . Let $K_{ne}$ be the number of non-empty intervals, and $K_{un}$ be the number of "unknown" non-empty intervals (i.e. the non-empty intervals that do not contain a point in $S'$ ). Let $I_1, I_2, \ldots, I_{K_{ne}} \in [K]$ be all non-empty intervals in the increasing order. Let $I_{i_1}, I_{i_2}, \ldots$ be all non-empty intervals that contain no points in $S'$ (the "unknown" intervals to be encoded). We first write down $K_{ne}$ , then for each "unknown" interval $I_{i_a}$ , we do the following:
+
+All integers are encoded using the folklore prefix-free encoding which takes $O(\log N)$ bits to encode an integer $N$ . This completes $\operatorname{ext}_{\Delta, S}(S')$ .
+
+23
+
+Decode $\{E_j\}$ given $\mathrm{ext}_{\Delta, S}(S')$ and $S'$ . To decode $\{E_j\}$ , we first compute the list $\mathcal{J}$ of nonempty intervals that contain at least one point in $S'$ . Next, we read $K_{ne}$ (which together with $|\mathcal{J}|$ , determines $K_{un}$ ), and for $a = 1, \ldots, K_{un}$ , do the following:
+
+Finally, for $i = i_{K_{un}} + 1,\dots ,K_{ne}$ , let $I_{i}$ be the next interval in $\mathcal{J}$ . This recovers all $I_1,\ldots ,I_{K_{ne}}$ hence, decodes $\{E_j\}$ .
+
+The length of $\operatorname{ext}_{\Delta, S}(S')$ . Next, we analyze the expected length of $\operatorname{ext}_{\Delta, S}(S')$ . $K_{ne}$ takes $O(\log K)$ bits to encode. Then for $a = 1, \ldots, K_{un}$ , $i_a - i_{a-1}$ takes $O(\log (i_a - i_{a-1}))$ bits to encode. Since all these integers sum up to (at most) $K_{ne}$ , by concavity of log, the total number of bits used to encode $\{i_a - i_{a-1}\}$ is at most
+
+$$
+O (K _ {u n} \cdot \log \frac {K _ {n e}}{K _ {u n}}).
+$$
+
+By Corollary 16, $\mathbb{E}[K_{un}]\leq O(\sqrt{\epsilon k} +\log m) = O(\max \{\sqrt{\epsilon k},\log m\})$ . By Lemma 17, $\mathbb{E}[K_{ne}]\leq O(\sqrt{k})$ . Then by the concavity and monotonicity of $f(x,y) = x\ln (y / x)$ , the expected encoding length of all $i_a - i_{a - 1}$ is at most
+
+$$
+O \left(\max  \left\{\sqrt {\epsilon k}, \log m \right\} \log \left(\frac {\sqrt {k}}{\max  \left\{\sqrt {\epsilon k} , \log m \right\}}\right)\right). \tag {7}
+$$
+
+Next, the value $I_{i_a} - I_{i_a - 1}$ takes $O(\log (I_{i_a} - I_{i_a - 1}))$ bits to encode. For all $I_{i_a} - I_{i_a - 1} \leq \frac{\sqrt{k}}{\max\{\sqrt{\epsilon k}, \log m\}}$ , their total encoding length is at most
+
+$$
+O \left(K _ {u n} \cdot \log \left(\frac {\sqrt {k}}{\operatorname* {m a x} \{\sqrt {\epsilon k} , \log m \}}\right)\right),
+$$
+
+and its expectation is at most
+
+$$
+O \left(\max  \left\{\sqrt {\epsilon k}, \log m \right\} \cdot \log \left(\frac {\sqrt {k}}{\max  \left\{\sqrt {\epsilon k} , \log m \right\}}\right)\right). \tag {8}
+$$
+
+For all $I_{i_a} - I_{i_a - 1} > \frac{\sqrt{k}}{\max\{\sqrt{ek},\log m\}}$ , by Lemma 17, their expected encoding length is at most
+
+$$
+\begin{array}{l} \sum_{t = \frac{2^{b}\cdot\sqrt{k}}{\max\{\sqrt{\epsilon k},\log m\}}:b\geq 0,t\leq K}O((\sqrt{k / t} +1)\log t) \\ \leq O \left(\max  \left\{\sqrt {\epsilon k}, \log m \right\} \cdot \log \left(\frac {\sqrt {k}}{\max  \left\{\sqrt {\epsilon k} , \log m \right\}}\right) + \log^ {2} K\right). \tag {9} \\ \end{array}
+$$
+
+24
+
+Finally, summing up (7), (8) and (9), the expected length of $\mathrm{ext}_{S,\Delta}(S')$ is at most
+
+$$
+O \left(\max \{\sqrt {\epsilon k}, \log m \} \cdot \log \left(\frac {\sqrt {k}}{\max \{\sqrt {\epsilon k} , \log m \}}\right) + \log^ {2} K\right).
+$$
+
+Since $k, K = \Theta(\log^4 B)$ , $m \leq B$ and $f(x, y) = x \log(y / x)$ is non-decreasing when $x \leq y / e$ , it is at most
+
+$$
+O \left(\max  \{\sqrt {\epsilon k} \log (1 / \sqrt {\epsilon}), \log B \cdot \log \log B \} + \log^ {2} \log B\right) \leq O \left(\sqrt {\epsilon k} \log (1 / \epsilon) + \log B \cdot \log \log B\right).
+$$
+
+This proves the lemma.
+
+Finally, we prove Lemma 5 (and note that $k = \log^4 B$ ).
+
+Lemma 5 (restated). The entropy of $\{E_j\}_{j\in [K]}$ is at least $\Omega (\sqrt{k})$
+
+Proof. To prove the entropy lower bound, we will apply the chain rule, and show that for many $j$ , $H(E_{j-1} \mid E_{\geq j})$ is large. Denote by $c$ , the smallest element in $E_{\geq j}$ . Then $c$ and $s_c, \ldots, s_m$ determine $E_{\geq j}$ . Thus, it suffices to lower bound $H(E_{j-1} \mid c, s_c, \ldots, s_m)$ , as conditioning on more variables could only decrease the entropy.
+
+To this end, fix $j \in [k/30, 2k/30]$ , and suppose the $j$ -th interval is $[x, x + L)$ . Then $x \in [m^2/30, 2m^2/30]$ , and $x < 2U/3$ . We denote by $W_j$ , the event that $c \in [m/3, 2m/3]$ and $s_c \in [x + L/2, x + L)$ . The entropy lower bound follows from the following two claims.
+
+Claim 18. The probability of $W_{j}$ is at least $\operatorname*{Pr}[W_j] \geq \Omega(1/\sqrt{k})$ .
+
+Claim 19. The conditional entropy of $E_{j-1}$ conditioned on $W_j$ , is at least
+
+$$
+H \left(E _ {j - 1} \mid W _ {j}, c, s _ {c}, \dots , s _ {m}\right) \geq \Omega (1).
+$$
+
+We first prove the lemma assuming the two claims. Since $W_{j}$ is an event that depends only on $c$ and $s_{c}$ , by definition, we have
+
+$$
+\begin{array}{l} H \left(E _ {j - 1} \mid E _ {\geq j}\right) \geq H \left(E _ {j - 1} \mid c, s _ {c}, \dots , s _ {m}\right) \\ = \underset {c _ {0}, z} {\mathbb {E}} \left[ H \left(E _ {j - 1} \mid c = c _ {0}, s _ {c} = z, \dots , s _ {m}\right) \right] \\ \geq \Pr [ W _ {j} ] \cdot \underset {c _ {0}, z | W _ {j}} {\mathbb {E}} \left[ H \left(E _ {j - 1} \mid W _ {j}, c = c _ {0}, s _ {c} = z, \dots , s _ {m}\right) \right] \\ \geq \Pr \left[ W _ {j} \right] \cdot H \left(E _ {j - 1} \mid W _ {j}, c, s _ {c}, \dots , s _ {m}\right) \\ \geq \Omega (1 / \sqrt {k}). \\ \end{array}
+$$
+
+Finally, by chain rule, we have
+
+$$
+\begin{array}{l} H \left(E _ {1}, \dots , E _ {K}\right) = \sum_ {j = 1} ^ {K} H \left(E _ {j} \mid E _ {j + 1}, \dots , E _ {K}\right) \\ \geq \sum_ {j = k / 3 0} ^ {2 k / 3 0} H \left(E _ {j - 1} \mid E _ {j}, \dots , E _ {K}\right) \\ \ge \Omega (\sqrt {k}). \\ \end{array}
+$$
+
+25
+
+This proves the lemma. Hence, it suffices to prove the two claims.
+
+To prove Claim 18, let us first lower bound the probability that $s_c = z$ for some $z \in [x + L/2, x + L)$ ,
+
+$$
+\begin{array}{l} \operatorname * {P r} [ s _ {c} = z ] = \sum_ {y = 1} ^ {x} \operatorname * {P r} [ s _ {c} = z, s _ {c - 1} = y ] \\ \geq \sum_ {y = x - L} ^ {x} \frac {M (y - 1 , c - 2) C _ {z - y - 1} M (U - z , m - c)}{M (U , m)} \\ \end{array}
+$$
+
+which by Proposition 10, is at least
+
+$$
+\begin{array}{l} \geq \Omega \left(\sum_ {y = x - L} ^ {x} \frac {c (m - c) U ^ {1 . 5} e ^ {- O (c ^ {2} / y + (m - c) ^ {2} / (U - z)) + \Omega (m ^ {2} / U)}}{y ^ {1 . 5} (z - y) ^ {1 . 5} (U - z) ^ {1 . 5} m}\right) \\ = \Omega \left(\sum_ {y = x - L} ^ {x} \frac {m}{x ^ {1 . 5} (z - y) ^ {1 . 5}}\right) \\ \geq \Omega \left(\frac {1}{m ^ {2} \sqrt {L}}\right). \\ \end{array}
+$$
+
+Now, we take the sum over $z$ from $x + L / 2$ to $x + L$ and over $c$ from $m / 3$ to $2m / 3$ , proving $\operatorname{Pr}[W_j] = \sum_{c \in [m / 3, 2m / 3]} \sum_{z \in [x + L / 2, x + l)} \operatorname{Pr}[s_c = z] \geq \Omega(\sqrt{L} / m) = \Omega(1 / \sqrt{k})$ .
+
+To prove Claim 19, it suffices to show that the conditional probability of $E_{j-1} = 0$ is bounded away (by a constant) from both 0 and 1. Note that $s_c$ is the first element after $(j-1)$ -th interval, $s_{c-1}$ must be in $(j-1)$ -th interval or earlier. We have
+
+$$
+\begin{array}{l} \Pr \left[ E _ {j - 1} = 0 \mid c, s _ {c} = z, s _ {c + 1}, \dots , s _ {m} \right] = \Pr \left[ s _ {c - 1} <   x - L \mid s _ {c} = z, s _ {c - 1} <   x \right] \\ = \frac {\operatorname * {P r} [ s _ {c - 1} <   x - L \mid s _ {c} = z ]}{\operatorname * {P r} [ s _ {c - 1} <   x \mid s _ {c} = z ]} \\ = \frac {\sum_ {y = 1} ^ {x - L - 1} M (y - 1 , c - 2) C _ {z - y - 1}}{\sum_ {y = 1} ^ {x - 1} M (y - 1 , c - 2) C _ {z - y - 1}} \\ \end{array}
+$$
+
+Recall that $c = \Theta(m), x = \Theta(m^2), z - x = \Theta(L)$ . Note that $M(y, c) C_{z - y}$ is increasing when $y = O(m^2)$ and $\frac{\exp(-c^2 / 4y)}{\exp(-c^2 / (4y - 2c))} = 1 + o(1)$ when $y^2 = \omega(c^3)$ , thus the probability is
+
+$$
+= (1 \pm o (1)) \frac {\sum_ {y = 1} ^ {x - L} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}{\sum_ {y = 1} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}.
+$$
+
+26
+
+On the one hand, it is at least
+
+$$
+\begin{array}{l} \frac {\sum_ {y = 1} ^ {x - L} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}{\sum_ {y = 1} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}} \geq \frac {\sum_ {y = x - 2 L} ^ {x - L} e ^ {- c ^ {2} / 4 (x - 2 L)} (x - L) ^ {- 1 . 5} (z - (x - 2 L)) ^ {- 1 . 5}}{2 \sum_ {y = x / 2} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}} \\ \geq \Omega \left(\frac {\sum_ {y = x - 2 L} ^ {x - L} x ^ {- 1 . 5} (z - x) ^ {- 1 . 5}}{\sum_ {y = x / 2} ^ {x} x ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}\right) \\ = \Omega \left(\frac {L \cdot x ^ {- 1 . 5} \cdot L ^ {- 1 . 5}}{x ^ {- 1 . 5} L ^ {- 0 . 5}}\right) \\ = \Omega (1), \\ \end{array}
+$$
+
+since $z - x\in [L / 2,L)$ $L\ll x$ and $c^2 /x = O(1)$
+
+On the other hand, it is at most
+
+$$
+\begin{array}{l} \frac {\sum_ {y = 1} ^ {x - L} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}{\sum_ {y = 1} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}} = 1 - \frac {\sum_ {y = x - L + 1} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}{\sum_ {y = 1} ^ {x} e ^ {- c ^ {2} / 4 y} y ^ {- 1 . 5} (z - y) ^ {- 1 . 5}} \\ \leq 1 - \Omega \left(\frac {\sum_ {y = x - L + 1} ^ {x} e ^ {- c ^ {2} / 4 (x - L)} x ^ {- 1 . 5} (z - y) ^ {- 1 . 5}}{x ^ {- 1 . 5} L ^ {- 0 . 5}}\right) \\ \leq 1 - \Omega \left(\frac {L (z - (x - L)) ^ {- 1 . 5}}{L ^ {- 0 . 5}}\right) \\ \leq 1 - \Omega (1). \\ \end{array}
+$$
+
+In the other words, $\operatorname*{Pr}[E_{j - 1} = 0\mid c,s_c = z,s_{c + 1},\ldots ,s_m]$ is always bounded away from both 0 and 1. Thus, the conditional entropy is at least a constant
+
+$$
+H \left(E _ {j - 1} \mid c, s _ {c} = z, s _ {c + 1}, \dots , s _ {m}\right) \geq \Omega (1).
+$$
+
+This bound holds for all $c, z$ that satisfy $W_{j}$ , hence,
+
+$$
+H \left(E _ {j - 1} \mid W _ {j}, c, s _ {c}, s _ {c + 1}, \dots , s _ {m}\right) \geq \Omega (1).
+$$
+
+This completes the proof of the lemma.
+
+# References
+
+27
+
+28
+
+29
+
+30
+
+# A Proofs of the Facts
+
+Proof of Fact 11. Observe that $\exp(-A/h)h^{-1.5}$ is increasing when $h \in [1,1.5A]$ and decreasing when $h > 1.5A$ . Thus if $T \leq 1.5A$ ,
+
+$$
+\sum_ {h = 1} ^ {T} \exp (- A / h) h ^ {- 1. 5} \leq \exp (- A / T) \sum_ {h = 1} ^ {T} T ^ {- 1. 5} = \exp (- A / T) / \sqrt {T}.
+$$
+
+Otherwise,
+
+$$
+\sum_ {h = 1} ^ {T} \exp (- A / h) h ^ {- 1. 5} \leq \sum_ {h = 1} ^ {1. 5 A} \exp (- A / h) h ^ {- 1. 5} + O (1 / \sqrt {A}) = O (1 / \sqrt {A}).
+$$
+
+Then the desired inequality follows.
+
+31
+
+Proof of Fact 12.
+
+$$
+\sum_ {h = 1} ^ {T} \exp (- A / (T - h)) \cdot h ^ {- 0. 5} \leq \exp (- A / T) \sum_ {h = 1} ^ {T} \cdot h ^ {- 0. 5} = O (\exp (- A / T) \int_ {1} ^ {T} \frac {d x}{\sqrt {x}}) = O (\exp (- A / T) \sqrt {T}).
+$$
+
+Proof of Fact 13. Without loss of generality, assume $A_1 \leq A_2$ . Let $h^* := A_1 T / (A_1 + A_2)$ the point such that $A_1 / h^* = A_2 / (T - h)$ . Note that $h^* \leq T / 2$ . Thus
+
+$$
+\begin{array}{l} \sum_ {h = 1} ^ {T - 1} \exp (- A _ {1} / h - A _ {2} / (T - h)) h ^ {- 1. 5} (T - h) ^ {- 1. 5} \\ \leq O \left(\sum_ {h = 1} ^ {h ^ {*}} \exp (- A _ {1} / h) h ^ {- 1. 5} (T - h) ^ {- 1. 5} + \sum_ {h = h ^ {*}} ^ {T} \exp (- A _ {2} / (T - h)) h ^ {- 1. 5} (T - h) ^ {- 1. 5}\right) \\ \end{array}
+$$
+
+The former term is upper bounded by
+
+$$
+T ^ {- 1. 5} \sum_ {h = 1} ^ {h ^ {*}} \exp (- A _ {1} / h) h ^ {- 1. 5} \leq T ^ {- 1. 5} \exp (- A _ {1} / h ^ {*}) (1 / \sqrt {h ^ {*}} + 1 / \sqrt {A _ {1}}),
+$$
+
+due to the fact $h^* < T / 2$ and Fact 11. Note that
+
+$$
+\begin{array}{l} \sum_ {h = h ^ {*}} ^ {T / 2} \exp (- A _ {2} / (T - h)) h ^ {- 1. 5} (T - h) ^ {- 1. 5} \leq O (T ^ {- 1. 5} \exp (- 2 A _ {2} / T) (1 / \sqrt {h ^ {*}} - 1 / \sqrt {T}). \\ T ^ {- 1. 5} \sum_ {h = T / 2} ^ {T} \exp (- A _ {2} / h) (T - h) ^ {1. 5} \leq O (T ^ {- 1. 5} \exp (- A _ {2} / T) (1 / \sqrt {T} + 1 / \sqrt {A _ {2}})). \\ \end{array}
+$$
+
+Thus the latter term is upper bounded by
+
+$$
+T ^ {- 1. 5} \exp (- A _ {2} / T) (1 / \sqrt {h ^ {*}} + 1 / \sqrt {A _ {2}} + 1 / \sqrt {T}).
+$$
+
+By the symmetry of the expression,
+
+$$
+\begin{array}{l} \sum_ {h = 1} ^ {T - 1} \exp (- A _ {1} / h - A _ {2} / (T - h)) h ^ {- 1. 5} (T - h) ^ {- 1. 5} \\ \leq O \left(T ^ {- 1. 5} \exp (- (A _ {1} + A _ {2}) / 2 T) (\sqrt {\frac {A _ {1} + A _ {2}}{A _ {1} T}} + \sqrt {\frac {A _ {1} + A _ {2}}{A _ {2} T}} + 1 / \sqrt {A _ {1}} + 1 / \sqrt {A _ {2}} + 1 / \sqrt {T})\right) \\ = O \left(T ^ {- 1. 5} \exp \left(- \left(A _ {1} + A _ {2}\right) / 2 T\right) \left(1 + \sqrt {\frac {A _ {1} + A _ {2}}{T}} + \sqrt {\frac {A _ {1} A _ {2}}{T \left(A _ {1} + A _ {2}\right)}}\right) \left(1 / \sqrt {A _ {1}} + 1 / \sqrt {A _ {2}}\right)\right) \\ \end{array}
+$$
+
+32
+
+Proof of Fact 14. The following inequality is an alternative form of the desired inequality:
+
+$$
+8 (\frac {A _ {2}}{B _ {2}} - \frac {A _ {1}}{B _ {1}}) ^ {2} \geq \frac {A _ {2} ^ {2}}{B _ {2}} (\frac {1}{B _ {1}} + \frac {1}{B _ {2}}).
+$$
+
+Recall that $A_2 > 2A_1$ and $B_1 \geq B_2$ , so the L.H.S. is at least $2(A_2 / B_2)^2$ and the R.H.S. is at most $2(A_2 / B_2)^2$ .
+
+# B A Constant Redundancy Algorithm
+
+In this section, we aim to propose an algorithm which solves RMQ using space of $\log_2 C_n + 1$ bits and answer any query in $O(\log n)$ times. The upper bounds from [NS14] imply exactly identical result, but our approach is totally different from [NS14] which uses the algorithm from [FH11] as a black-box. Our approach is much simpler, clearer and easier to be implemented.
+
+Our algorithm is some kind of augmented binary (search) tree called by Mihai Pătraşcu[Păt08a, Păt08b] or segment tree called by Chinese competitive programming participants. Note that the structure is different with the one used to store segments invented by Jon Louis Bentley[Ben77].
+
+Query Algorithm. Given a query $[a, b]$ , starting from the root of the tree, we can always recurse to one of the children if $[a, b]$ is completely covered by the interval represented by the child. The problem is how do we find the position of the minimum value in the range $[a, b]$ if $[a, b]$ overlaps with both of the two children intervals.
+
+Given a node $v$ , let $[L_v, R_v]$ be the interval represented by $v$ , let $S_{l,v}, S_{r,v} \in [n]^*$ be the sequences of positions of the greedy longest decreasing subsequences starting from $L_v$ in $A[L_v, R_v]$ and starting from $R_v$ in $A[R_v, L_v]$ . Formally, $S_{l,v,1} \triangleq L_v, S_{l,v,i} \triangleq \min \{j \in [S_{l,v,i-1}, R_V] : A[j] < A[S_{l,v,i-1}]\}$ and $S_{r,v,1} \triangleq R_V, S_{r,v,i} \triangleq \max \{j \in [L_v, S_{r,v,i-1}] : A[j] < A[S_{r,v,i-1}]\}$ .
+
+Suppose our query $[a, b]$ is covered by a pair of sibling nodes $p, q$ with parameterers $a \leq R_p, b \geq L_q$ . Our idea is that the answer for query $[a, b]$ obviously is $\arg \min_{i \in \{S_{r,p,a'}, S_{l,q,b'}\}} A[i]$ if we have $a \in (S_{p,r,a' + 1}, S_{p,r,a'})$ and $b \in [S_{q,l,b'}, S_{q,l,b' + 1})$ . The remaining problems for our query algorithm are
+
+To solve the first problem, we store two values $|S_{l,v}|$ and $|S_{r,v}|$ in any node $v$ .
+
+33
+
+Consider the process when we merge the two array $A[S_{r,p}]$ and $A[S_{l,q}]$ into a sorted decreasing array $A'$ . We define a boolean string $\mathrm{Merge}_{pq} \in \{0,1\}^{[S_{r,p}| + |S_{r,q}|]}$ as the witness of the process: $\mathrm{Merge}_{pq,i} = 0 \iff A'[i]$ is from $A[S_{r,p}]$ , $\mathrm{Merge}_{pq,i} = 1 \iff A'[i]$ is from $A[S_{l,q}]$ . It is easy to see that, to compare $A[S_{r,p,a'}]$ and $A[S_{l,q,b'}]$ , it is sufficient to compare the index of $a'$ -th 0 and the index of $b'$ -th 1.
+
+To this end, we maintain an additional data structure in every internal node such that any select query can be answered in time $O(\log |\mathrm{Merge}_{pq}|)$ for any internal node with children nodes $p, q$ . The additional data structure is a fundamental application of augmented binary (tree) or segment tree[Pat08a]. Let $\mathrm{Merge}_{pq,(i)}$ denote the position of $i$ -th smallest one in $\mathrm{Merge}_{pq}$ .
+
+We just construct a string of numbers $T \in [u]^n$ from $\mathrm{Merge}_{pq}$ in the following way: $T_1 \triangleq \mathrm{Merge}_{pq,(1)}, \forall i > 1, T_i \triangleq \mathrm{Merge}_{pq,(i)} - \mathrm{Merge}_{pq,(i-1)}$ . Then the select(i) on $\mathrm{Merge}_{pq}$ is equal to rank(i) on $T$ . It is easy to see that
+
+$$
+A \left[ S _ {r, p, a ^ {\prime}} \right] <   A \left[ S _ {l, q, b ^ {\prime}} \right] \Longleftrightarrow \operatorname {s e l e c t} \left(b ^ {\prime}, \operatorname {M e r g e} _ {p q}\right) = \operatorname {r a n k} \left(b ^ {\prime}, T\right) \geq a ^ {\prime} + b ^ {\prime}. \tag {10}
+$$
+
+Table Construction. The remaining part is construct a data structure meets everything the query algorithm needs with at most $\log C_n + 1$ bits, where $C_n = \binom{2n}{n} / (n + 1) \sim \frac{2^{2n}}{n^{3/2}\sqrt{\pi}}$ is the $n$ -th Catalan number. Note that the number of possible databases of length $n$ for RMQ exactly is the number of binary trees of size $n$ , i.e. the $n$ -th Catalan number. To this end, we represent our data structure in spill-over representation by applying Mihai Pătrașcu's technique[Păt08b]. In spill-over representation, an element $x \in \mathcal{X}$ is represented as a tuple $(y_m, y_k) \in \{0, 1\}^m \times [k]$ for some integers
+
+34
+
+$m, k$ , so the number of bits used to store $x$ is considered as $m + \log_2 k$ . We want to apply Mihai Pătraşcu's lemma in a black-box way.
+
+Lemma 21 (Lemma 5 from [Păt08b]). Assume we have to represent a variable $x \in \mathcal{X}$ , and a pair $(y_{M}, y_{K}) \in \{0,1\}^{M(x)} \times \{0, \dots, K(x) - 1\}$ . Let $p: \mathcal{X} \to \mathbb{R}$ be a probability density function on $\mathcal{X}$ , and $K, M: \mathcal{X} \to \mathbb{N}$ be non-negative functions on $\mathcal{X}$ satisfying:
+
+$$
+\forall x \in \mathcal {X}: \log_ {2} \frac {1}{p (x)} + M (x) + \log_ {2} K (x) \leq H \tag {11}
+$$
+
+We can design a spill-over representation of $x, y_{M}$ and $y_{K}$ with the following parameters:
+
+However, the issue is that our tiny structures equipped by internal nodes can not be considered as a part of variable $x$ in Lemma (21), since the cardinality of the universe of the structure can be as large as $\exp(\Omega(n))$ , which can not be read in $O(1)$ times by a cell-probe shceme with word size $w = O(\log n)$ . To fix this issue, we treat the tiny structure as the third child of the internal nodes. Assume all the tiny structures are prepared into a spill-over representation in following way:
+
+Claim 22. We can design a spill-over representation of any $S \in \binom{[u]}{n}$ with the following parameters:
+
+The algorithmm is a simple application of Mihai Pătraşcu's algorithm [Păt08b], we omit the proof here. Now we are ready to show the construction of our table.
+
+Let $\varphi$ be some label assigned to some node, and $\varphi_v$ a label assigned to node $v$ . For any leaf $v$ , the universe of $\varphi_v$ will be identical, and the cardinality of the universe is 1. Hence there will be nothing to be stored in a leaf. For an internal node $v$ , $\varphi_v \triangleq (|S_{l,v}|, |S_{r,v}|)$ is a tuple. Let $\mathcal{N}(n, \varphi)$ denote the number of possible instances of cartesian trees of $A[1 \ldots n]$ conditioning on the root of our data structure is labeled with $\varphi$ . Note that we can write the following recursion of $\mathcal{N}(a+, b, \varphi)$ :
+
+$$
+\mathcal {N} (a + b, \varphi) = \sum_ {\varphi^ {\prime}, \varphi^ {\prime \prime}: \mathcal {A} (\varphi^ {\prime}, \varphi^ {\prime \prime}) \ni \varphi} \mathcal {N} (a, \varphi^ {\prime}) \cdot \mathcal {N} (b, \varphi^ {\prime \prime}) \cdot \mathcal {M} (\varphi , \varphi^ {\prime}, \varphi^ {\prime \prime}),
+$$
+
+35
+
+where $\mathcal{A}(\varphi', \varphi'')$ is the set of labels can be merged into from children with labels $\varphi'$ and $\varphi''$ , $\mathcal{M}(\varphi, \varphi', \varphi'')$ is the number of possible merge witnesses given the event that children is labeled with $\varphi', \varphi''$ and parent node is labeled with $\varphi$ . In particular,
+
+$$
+\mathcal {A} (\varphi^ {\prime}, \varphi^ {\prime \prime}) \triangleq \{(l, r): (\varphi_ {l} ^ {\prime} = l \wedge \varphi_ {r} ^ {\prime} + \varphi_ {r} ^ {\prime \prime} \geq r \geq \varphi_ {r} ^ {\prime \prime} + 1) \vee (\varphi_ {r} ^ {\prime \prime} = r \wedge \varphi_ {l} ^ {\prime} + \varphi_ {l} ^ {\prime \prime} \geq l \geq \varphi_ {r} ^ {\prime} + 1) \},
+$$
+
+where $\varphi_l, \varphi_r$ are the first and second elements of $\varphi$ respectively. Observe that the two substrees and the merge witness are mutual independent if the three labels $\varphi, \varphi', \varphi''$ are fixed. Also observe that $\mathcal{M}(\varphi, \varphi', \varphi'')$ is a binomial coefficient but a little bit complicated:
+
+$$
+\mathcal {M} \left(\varphi , \varphi^ {\prime}, \varphi^ {\prime \prime}\right) \triangleq \left\{ \begin{array}{l l} \binom {\varphi_ {r} ^ {\prime} - \left(\varphi_ {r} - \varphi_ {r} ^ {\prime \prime}\right) + \varphi_ {l} ^ {\prime \prime}} {\varphi_ {l} ^ {\prime \prime}} & (\text {i f} \varphi_ {l} = \varphi_ {l} ^ {\prime}) \\ \binom {\varphi_ {l} ^ {\prime \prime} - \left(\varphi_ {l} - \varphi_ {l} ^ {\prime}\right) + \varphi_ {r} ^ {\prime}} {\varphi_ {r} ^ {\prime}} & (\text {i f} \varphi_ {r} = \varphi_ {r} ^ {\prime \prime}) \end{array} \right. \tag {12}
+$$
+
+Assume all the tiny structures are prepared into a spill-over representation according to Claim (22) with the binomial coefficient in Eq(12). Let $K(n,\varphi), M(n,\varphi)$ be the spill universe and the memory bits used by our spill-over representation for any input array of length $n$ and root label $\varphi$ . Let $r$ to be determined. We guarantee inductively that:
+
+$$
+K (n, \varphi) \leq 2 r; \tag {13}
+$$
+
+$$
+M (n, \varphi) + \log_ {2} K (n, \varphi) \leq \log_ {2} \mathcal {N} (n, \varphi) + 8 \cdot \frac {n - 1}{r}. \tag {14}
+$$
+
+For a leaf, there are nothing to be stored. So $K(1,*) = 1$ , $M(1,*) = 0$ . For a internal node $v$ , we assume the array of length $n$ is broken into two subarrays of length $a$ and $b$ without loss of generality. Let $\varphi', \varphi''$ be labels of the children of $v$ . We recursively construct data structures for both of the two subtrees using space $(M(a, \varphi'), K(a, \varphi'))$ and $(M(b, \varphi''), K(b, \varphi''))$ respectively.
+
+We also construct our tiny structure for $v$ using space $K(\varphi, \varphi', \varphi'') \leq 2r$ and $M(\varphi, \varphi', \varphi'') + \log_2 K(\varphi, \varphi', \varphi'') \leq \log_2 \mathcal{M}(\varphi, \varphi', \varphi'') + 4/r$ . Then we directly concatenate the three blocks of memory bits into a bit vector $M' = M(a, \varphi') + M(b, \varphi'') + M(\varphi, \varphi', \varphi'')$ , and combine the spills into a superpill over the univser $K' = K(a, \varphi') \times K(b, \varphi'') \times K(\varphi, \varphi', \varphi'')$ .
+
+Since $\log_2 K' \leq O(\log r)$by our induction hypothesis, the superspill can be stored in constant number of cells if the word size $w = \Omega(\log r)$ . Given $a, b, \varphi, \varphi', \varphi''$ the query algorithm can easily locate the blocks of memory bits of the left child, the right child, and the tiny structure. According to our induction hypothesis, we have
+
+$$
+M ^ {\prime} + \log_ {2} K ^ {\prime} \leq \log_ {2} (\mathcal {N} (a, \varphi^ {\prime}) \cdot \mathcal {N} (b, \varphi^ {\prime \prime}) \cdot \mathcal {M} (\varphi , \varphi^ {\prime}, \varphi^ {\prime \prime})) + 8 \cdot \frac {n - 2}{r} + 4 / r.
+$$
+
+Let $p(\cdot)$ be the distribution of $\varphi^{\prime},\varphi^{\prime \prime}$ given $\varphi$ , we have
+
+$$
+p (\varphi^ {\prime}, \varphi^ {\prime \prime}) \triangleq \frac {\mathcal {N} (a , \varphi^ {\prime}) \cdot \mathcal {N} (b , \varphi^ {\prime \prime}) \cdot \mathcal {M} (\varphi , \varphi^ {\prime} , \varphi^ {\prime \prime})}{\mathcal {N} (n , \varphi)}.
+$$
+
+We insert $p(\cdot)$ into our space upper bound, result in
+
+$$
+\log_ {2} \frac {1}{p (\varphi^ {\prime} , \varphi^ {\prime \prime})} + M ^ {\prime} + \log_ {2} K ^ {\prime} \leq \log_ {2} \mathcal {N} (n, \varphi) + 8 \cdot \frac {n - 2}{r} + 4 / r.
+$$
+
+By applying Lemma (21) with the inequality above, we obtain a spill-over representation of subtree $v$ will spill universe $K_{\star} \leq 2r$ , and $M_{\star}$ memory bits, satisfying
+
+$$
+M _ {\star} + \log_ {2} K _ {\star} \leq \log_ {2} \mathcal {N} (n, \varphi) + 8 \cdot \frac {n - 2}{r} + \frac {8}{r} = \log_ {2} \mathcal {N} (n, \varphi) + 8 \cdot \frac {n - 1}{r}.
+$$
+
+36
+
+Note that at each step, we pack the labels of child nodes into a spill-over representation. The remaining problem is how can the query algorithm know the label of root node. To finish our construction, we apply Lemma (21) with $x = (\varphi, \varphi', \varphi'')$ at the root:
+
+$$
+\log_ {2} \frac {1}{p (\varphi , \varphi^ {\prime} , \varphi^ {\prime \prime})} + M ^ {\prime} + \log_ {2} K ^ {\prime} \leq \log_ {2} C _ {n} + 8 \cdot \frac {n - 1}{r}.
+$$
+
+Finally, we set $r \triangleq 8n$ .
+
+Final Query Algorithm. We state our final query algorithm in Algorithm 2.
+
+# C A Generalized Time-Redundancy Trade-Off
+
+The algorithm is a generalized version of the algorithm proposed by Fischer and Heun [FH11]. An exactly identical upper bounds was shown in [NS14]. The essential difference between our algorithm and Navarro-Sadakane algorithm is the solution for findopen: our solution is much more clear and simple.
+
+Corollary 23 (generalized from Corollary 14 of [FH11]). Given the DFUDS of $\mathcal{M}_A$ , $\mathrm{RMQ}_A(i,j)$ can be answered in $O(t)$ time with by the following sequence of operation ( $1 \leq i \leq j \leq n$ ).
+
+Our algorithm follows Mihai Pătrașcu's schema [Păt08b]. We break the parenthesis array of length $2n$ into $2n / r$ blocks of length $r$ . We choose $B \triangleq \frac{\log n}{\log r}$ and $t \triangleq \frac{\log r}{\log B}$ . For each block, we construct a segment tree with branching factor of $B$ . For any node with respect to range $[a, \ldots, b]$ in the segment tree, we maintain
+
+for all the $B$ sub-ranges $[a',\ldots,b']$ . Note that we can encode them with at most $O(B\log r) = O(\log n)$ bits.
+
+To answer select, rank and $\pm 1\mathrm{RMQ}$ , we maintain three extra data structures $A, B, C$ for prefix sum array $N \in [n]^{n/r}$ and block minimum value array $M \in [n]^{n/r}$ : for any $i$ , $N[i]$ is the total number of )'s in blocks $1, \ldots, i$ of DFUDS; $M[i]$ is the minimum value in $i$ -th block of array $E$ .
+
+select) $(i)$ : We do a predecessor search $i$ on $N$ with data structure $A$ , and find the block $x$ which contains $i$ -th (. To do the predecessor search, we adopt a variety of the algorithm from [PT06b]: in the leaf of the Van Emde Boas tree, recall that the leaf node denotes $\max \{v \in N : v < i\}$ , we write down the index of the block $x$ such that $x = \max \{j \in [n/r] : N[j] < i\}$ . Hence the block contains $i$ -th ( must be $x + 1$ , we then finish the query by querying on the segment tree with respect to block $x + 1$ .
+
+37
+
+$\operatorname{rank}_j(i)$ : The data structure $B$ is a copy of array $N$ . To answer the prefix sum query $i$ , we find the block $x$ which contains $i$ , return $N[x - 1]$ plus the answer of a rank query on the segment tree with respect to block $x$ .
+
+$\pm 1\mathrm{RMQ}(x,y)$ : We break the range $[x,y]$ into two in-block ranges and one out-block range. The two in-block RMQ can be easily answered by querying on at most two segment trees with respect to the two blocks which contains $x$ and $y$ respectively. Our data structure $C$ uses the algorithm from [Sad07b] as a black-box, which is a linear space data structure which can solve the out-block RMQ on array $M$ in constant time. Finally, we return the minimum value among the three answers.
+
+For now, we can answer three of the four kinds of queries in $O(t)$ times with redundancy $n / (\frac{\log n}{t})^{O(t)}$ . To finish our proof, we take care of the last query findopen(w) now.
+
+Recall that $E[i] \triangleq \mathrm{rank}_i(i) - \mathrm{rank}_j(i)$ . For a closing parenthesis with index $i$ , the index of its open parenthesis must be $\max \{ j : E[j - 1] = E[i] \}$ . Note that $\forall i, |E[i + 1] - E[i]| = 1$ . Which implies the index of the open parenthesis is the predecessor of $i$ in set $\{ j \in [n] : E[j] \leq E[i] \}$ plus one. Thus the open parenthesis is in the same block as long as $\min E[\dots, i - 1]$ (i.e. the minimum value of the prefix of the sub-array) is not larger than $E[i]$ and we can find its index in $2^{\frac{\log r}{\log B}} = 2t$ time, since the minimum values of any sub-range are stored in the nodes of the segment tree.
+
+To locate the block which contains the open parenthesis, we adopt the idea from Lemma 1 of [MR01]. A closing parenthesis is called far if its matching parenthesis is located in a different block. A far parenthesis is called pioneer if its matching parenthesis is located in a different block than its immediately next far parenthesis. Obviously, if a far closing parenthesis is not a pioneer, its matching parenthesis and the matching parenthesis of the immediately next pioneer of the closing parenthesis must be located in the same block.
+
+Given a closing parenthesis, we check whether it is a far parenthesis by looking for its matching parenthesis in at most two blocks with $O(t)$ time. We do a predecessor search to check whether a closing parenthesis is pioneer and find the immediately next pioneer of the closing parenthesis. Jacobson[Jac89] noted that there are at most $4n / r - 3$ pioneers if there are $2n / r$ blocks. We have at most $O(n / r)$ values from a universe of size $2n$ , so the second branch of [PT06b] can support query time $O(t)$ using space $(n / r) \cdot r^{\Omega(1 / t)} \leq n / B^{t - 1}$ words.
+
+To locate the block the matching parenthesis located in, we store the number of block in the leaf of the van Emde Boas tree.
+
+To summarize, we support all the four kinds of queries with a redundancy of $n / B^{O(t)} = n / \left(\frac{\log n}{t}\right)^{O(t)}$ bits and a time complexity of $O(t)$ .
+
+39

@@ -1,0 +1,849 @@
+{
+ "10": {
+  "counts": {
+   "miss_ref": 10,
+   "orphan_candidate": 9,
+   "all-refs-miss(nowhere)": 9
+  },
+  "orphan_candidates": [
+   {
+    "qid": "e2491bb6e4147c18762e7fb2",
+    "refs": [
+     "card:1-pps"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "No compiled dossier for 1-pps, PPS signal, or GNSS receiver — all out-of-corpus names with no records behind t"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Question: WHY is transformer embedding layer initialized randomly during pre-training rather than with pre-tra"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "search_text saturated (3+ times) — STOP searching this theme."
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "findings(claim_type=mechanism) on both papers returned 0 — no mechanism records."
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "findings(claim_type=criticism) with embedding/initializ/random/pre-trained returned 11 results but NONE direct"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "findings(claim_type=definition) with embedding/initializ/random/pre-trained/word2vec/GloVe returned 0."
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "search_papers returned 2 external papers: \"pretrained transformers for text ranking: bert and beyond\" (2020) a"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "deep_read of AMMU survey completed (29 records from 5 sections) — now queryable via findings(paper_id=...)"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "unsourced"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "deep_read of DEPT paper completed (12 records from 3 sections) — now queryable via findings(paper_id=...)"
+   }
+  ],
+  "noref": [],
+  "miss_refs": [
+   {
+    "qid": "dc761baf0fc9fead9889d9eb",
+    "ref": "2"
+   },
+   {
+    "qid": "e2491bb6e4147c18762e7fb2",
+    "ref": "card:1-pps"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "unsourced"
+   }
+  ]
+ },
+ "11": {
+  "counts": {
+   "orphan_candidate": 16,
+   "anchor-only(would-resolve-with-texts_dir)": 12,
+   "miss_ref": 10,
+   "anchor-only(text-missing)": 1,
+   "all-refs-miss(nowhere)": 3
+  },
+  "orphan_candidates": [
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "sciverse_dept_decoupled_embeddings_for_pre_training_language_models#18900"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "DEPT: for ACT and SPEC, enables global (shared) embedding through multi-phase adaptive pretraining; involves b"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "refs": [
+     "sciverse_dept_decoupled_embeddings_for_pre_training_language_models#81000"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "DEPT: models have undergone continued pre-training from random initialization; without continued pre-training "
+   },
+   {
+    "qid": "e2491bb6e4147c18762e7fb2",
+    "refs": [
+     "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c#20250"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "PPS output may not totally synchronize with GNSS T due to model/parameter setting; 10MHz from atomic clock use"
+   },
+   {
+    "qid": "e2491bb6e4147c18762e7fb2",
+    "refs": [
+     "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c#21600"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "PPS(r) of Septentrio synchronizes with PPS(s); PPS(r) of Novatel synchronizes with 10MHz(ref) — PPS output of "
+   },
+   {
+    "qid": "e2491bb6e4147c18762e7fb2",
+    "refs": [
+     "sciverse_research_on_absolute_calibration_of_gnss_receiver_delay_through_clock_steering_c#18900"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "SR620 PPS bias of Novatel is minus, meaning receiver time of Novatel is leading relatively to GPST"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "refs": [
+     "arxiv_2403.04931#25650"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Active learning is crucial for fine-tuning large pre-trained foundation models that require substantial labele"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "refs": [
+     "b5e85b8806502d"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "SIFT config: N (number of samples)"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "refs": [
+     "39b2ff61c04f64"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "SIFT config: learning rate"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "refs": [
+     "088a8c95e90445"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "SIFT config: LoRA"
+   },
+   {
+    "qid": "dc761baf0fc9fead9889d9eb",
+    "refs": [
+     "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#5400"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "BER for M-ary: sqrt([3 log2 L/(L^2-1)] * [2 Es/(N0 log2 M)]) — Eq 2.3"
+   },
+   {
+    "qid": "dc761baf0fc9fead9889d9eb",
+    "refs": [
+     "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#10800"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Eq 2.12 relates BER to EVM_RMS: BER = Q(sqrt(2 EVM_RMS^2 log2 M)) — simulations use gray-coded M-ary, Gaussian"
+   },
+   {
+    "qid": "dc761baf0fc9fead9889d9eb",
+    "refs": [
+     "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#6750"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "EVM_RMS formula: (1/N sum (\"E V M _ {R M S} = \\\\frac {\\\\frac {1}{N} \\\\sum_ {n = 1} ^ {N} \\\\left| S _ {n} - S _"
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "refs": [
+     "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases#58050"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "DL 2022: baseline (Kang) F1=0.40 on MIMIC; KMF matches 22/49, chimeric 20/49 (\"average F1 score of 0.40 0.40, "
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "refs": [
+     "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases#76950"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "DL 2022: chimeric encoder optimization difficult, loss far from optimum, sensitive to batch size/hyperparams"
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "refs": [
+     "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#47250"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Magneto-ft-llm has highest overall accuracy; zero-shot Magneto variations outperform recent SOTA"
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "refs": [
+     "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#45900"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Four Magneto variants: zs-bp, ft-bp, zs-llm, ft-llm (retriever x reranker combos)"
+   }
+  ],
+  "noref": [],
+  "miss_refs": [
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "45"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "32"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "40"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "81"
+   },
+   {
+    "qid": "e2d0eb391fbf674c070c74c3",
+    "ref": "90"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "ref": "b5e85b8806502d"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "ref": "39b2ff61c04f64"
+   },
+   {
+    "qid": "983e73defc06e6794a856330",
+    "ref": "088a8c95e90445"
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "ref": "48"
+   },
+   {
+    "qid": "0919a8528cd20166163de3fd",
+    "ref": "75"
+   }
+  ]
+ },
+ "12": {
+  "counts": {
+   "orphan_candidate": 17,
+   "anchor-only(would-resolve-with-texts_dir)": 6,
+   "anchor-only(text-missing)": 8,
+   "noref": 10,
+   "miss_ref": 11,
+   "all-refs-miss(nowhere)": 3
+  },
+  "orphan_candidates": [
+   {
+    "qid": "2bb40aa93ac3a6a673c839bd",
+    "refs": [
+     "sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#32400"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Various meticulously crafted prompt designs proposed for text-to-SQL, classified into categories including Sup"
+   },
+   {
+    "qid": "2bb40aa93ac3a6a673c839bd",
+    "refs": [
+     "sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#16200"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Survey covers pre-processing, ICL, and FT methodologies for text-to-SQL"
+   },
+   {
+    "qid": "2bb40aa93ac3a6a673c839bd",
+    "refs": [
+     "arxiv_2212.09420#83700"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Copilot (2021) supports SQL, T-SQL among many languages in IDEs (VS Code, Visual Studio, Neovim, JetBrains IDE"
+   },
+   {
+    "qid": "2bb40aa93ac3a6a673c839bd",
+    "refs": [
+     "sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#39150"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Novel model architectures and FT-based methods developed to address specific challenges in SQL generation task"
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "refs": [
+     "arxiv_2403.14734#31050"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Code generation: \"streamline some routine tasks through automation, and empower non-programmers to obtain solu"
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "refs": [
+     "arxiv_2212.09420#2700"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Programming by natural language: \"create software simply by describing their requirements in natural language\""
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "refs": [
+     "arxiv_2212.05773#8100"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "NL specs vs input-output examples: \"Lieberman (2001) list input-output examples as specifications, which are m"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#2700"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from ~2,000 CQM descriptions to guid"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#2700"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answerin"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#40500"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Limitation: QA extraction accuracy sensitive to wording of question, especially for info presented slightly di"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "plan"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Question: how can QG mitigate hallucination in LLMs? Need mechanism + evidence + numbers."
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "plan"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Key paper: sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access (2025) — directly l"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text:sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#31050",
+     "e"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Q2Q paper Appendix A.2: \"You are a specialized question generation system. Your task is to convert knowledg \" "
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text:sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#24300"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Q2Q limitations: \"For questions that need more than just one paragraph or fact, the system might fall short. W"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "deep_read:sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa",
+     "f2a69943135ed3",
+     "96e14e10aafc52",
+     "e4d9f979ac788a",
+     "4df422ea3b118a",
+     "814ba1aa83fb70",
+     "dfce0e581bf39c"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "L1 extraction complete: 9 records (7 config, 1 lineage, 1 finding) from sections [\"3 Methodology\", \"A.2 LLM pr"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text:arxiv_2403.16527#66150"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Hallucination survey: \"Another set of works explicitly identify contradictions among responses, instead of est"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text:hub_W2898695519#14850"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "Quality verification of generated questions: \"We train a disjoint group of workers to verify the generated que"
+   }
+  ],
+  "noref": [
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: automation and robotics] Question: how user demonstrations are represented in DSL programs and used f"
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: Programming by Demonstration] PbD method entity (in_corpus=false, mention_count=3)."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: interactive task and concept learning from natural language instructions and gui demonstrations] meth"
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: Demonstration Ordering] practice entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: Demonstration Reformatting] practice entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: demonstration selection] practice entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: human demonstration] practice entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: ranking demonstrations from simple to complex] method entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: scaling up the number of demonstration examples] practice entity."
+   },
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "text": "[entity: advanced few-shot demonstration-selection algorithms] method entity."
+   }
+  ],
+  "miss_refs": [
+   {
+    "qid": "3d1ff2a80239a37908a6f4c4",
+    "ref": "d"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "plan"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "plan"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "e"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "deep_read:sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "f2a69943135ed3"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "96e14e10aafc52"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "e4d9f979ac788a"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "4df422ea3b118a"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "814ba1aa83fb70"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "dfce0e581bf39c"
+   }
+  ]
+ },
+ "13": {
+  "counts": {
+   "miss_ref": 6,
+   "orphan_candidate": 5,
+   "all-refs-miss(nowhere)": 3,
+   "anchor-only(would-resolve-with-texts_dir)": 2
+  },
+  "orphan_candidates": [
+   {
+    "qid": "99fd4c1b54e1367bcd3cb3b2",
+    "refs": [
+     "coarse:d2467a7"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "The need to integrate environmental information with administrative, political, and economic data is emphasize"
+   },
+   {
+    "qid": "99fd4c1b54e1367bcd3cb3b2",
+    "refs": [
+     "coarse:68afca6"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Environmental modeling activities can tremendously benefit from geographic information systems"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "plan"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Question: how can question generation (QG) be used to mitigate hallucination in LLMs? Need mechanism + evidenc"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#31050"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "QG prompt: \"You are a specialized question generation system. Your task is to convert knowledge...\" — generate"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#4050"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Pipeline: generated questions are vector-embedded and stored in searchable vector store, mapped to source docu"
+   }
+  ],
+  "noref": [],
+  "miss_refs": [
+   {
+    "qid": "99fd4c1b54e1367bcd3cb3b2",
+    "ref": "coarse:d2467a7"
+   },
+   {
+    "qid": "99fd4c1b54e1367bcd3cb3b2",
+    "ref": "coarse:68afca6"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "plan"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "relevance"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "structure"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "terms"
+   }
+  ]
+ },
+ "14": {
+  "counts": {
+   "miss_ref": 12,
+   "orphan_candidate": 18,
+   "all-refs-miss(nowhere)": 7,
+   "noref": 2,
+   "anchor-only(would-resolve-with-texts_dir)": 8,
+   "anchor-only(text-missing)": 3
+  },
+  "orphan_candidates": [
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "plan"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Q: how can QG mitigate hallucination in LLMs? Need mechanism + evidence."
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "plan"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Key paper: sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa (2025)."
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Q2Q paper: uses LLM to generate all possible questions for a Wikidata statement; question-to-question comparis"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text",
+     "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#31050"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Q2Q prompt: \"You are a specialized question generation system. Your task is to convert knowledge [statements i"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text",
+     "hub_W2898695519#14850"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "hub_W2898695519: \"We train a disjoint group of workers to verify the generated questions. Verifiers annotate a"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "refs": [
+     "search_text",
+     "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#22950"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "Q2Q implementation: indexed under 1,000 Wikipedia articles, utilizing llama-3.1-8b-instruct-awq for question g"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "9174465ed55530"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Ontology: simplified version of a novel ontology (COVID-19 Risk Factor ontology)"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "29faac570f43b1"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Excludes \"Change Concept\" for simplification"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "590330480545cb"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Graph creation: igraph package"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "1438a3a31f0e85"
+    ],
+    "cause": "all-refs-miss(nowhere)",
+    "text": "Relevancy model: word2vec model trained on documents"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#24300"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: \"When the topic of a document is determined through the ontology-based topic identification module and i"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#10800"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: TF-IDF scoring (Christian et al. 2016) used to score sentences"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "arxiv_2212.08206#5400"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "arxiv_2212.08206: survey of summarization methods — ILP, submodular, graph-based (LexRank, TextRank), neural s"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "arxiv_2212.01669#112050"
+    ],
+    "cause": "anchor-only(text-missing)",
+    "text": "arxiv_2212.01669: references Sarker (2021) ML algorithms + question-driven summarization"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "oped",
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#22950"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: \"To extract the other triple from unstructured text without spending additional time and budget, an acce"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#41850"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: \"an odds ratio related to increased risk from hypertension was not included in the preprocessed text ava"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#2700"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: \"Schwemmer et al. (2019) manually extracted 'gold standard' concept graphs from around 2,000 clinical qu"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "refs": [
+     "ring",
+     "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#2700"
+    ],
+    "cause": "anchor-only(would-resolve-with-texts_dir)",
+    "text": "OATS: \"Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-a"
+   }
+  ],
+  "noref": [
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "text": "[hallucination card] QG-based hallucination mitigation mechanisms:"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "text": "[findings mechanism] 3 mechanism records:"
+   }
+  ],
+  "miss_refs": [
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "plan"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "plan"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "search_text"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "search_text"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "search_text"
+   },
+   {
+    "qid": "fb607bc177d2efb926cb3dff",
+    "ref": "search_text"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "9174465ed55530"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "29faac570f43b1"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "590330480545cb"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "1438a3a31f0e85"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "oped"
+   },
+   {
+    "qid": "00bdd80debc8549198001289",
+    "ref": "ring"
+   }
+  ]
+ }
+}

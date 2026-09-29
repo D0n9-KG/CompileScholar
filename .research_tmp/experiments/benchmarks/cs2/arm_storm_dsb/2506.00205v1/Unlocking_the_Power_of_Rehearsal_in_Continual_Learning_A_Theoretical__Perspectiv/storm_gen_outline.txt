@@ -1,0 +1,54 @@
+# Introduction
+## Definition of Rehearsal in Continual Learning
+## Distinction from Static Machine Learning
+## Scope of Theoretical Analysis
+# Theoretical Foundations
+## Mathematical Formulation of the Stability-Plasticity Dilemma
+### Dynamic Programming and Game-Theoretic Models
+### Quantifying Adaptability, Memorability, and Generalization
+## Optimization Landscape Dynamics
+### Loss Landscape Navigation and Optimal Control
+### Gradient Interference and Similarity
+### Overfitting Risks in Low-Loss Regions
+## Rehearsal Strategies in Theoretical Models
+### Concurrent Rehearsal
+### Sequential Rehearsal
+## Neural Tangent Kernel (NTK) Perspectives
+### Gradient Matching for Coreset Selection
+### Convergence and Generalization Bounds in NTK Regime
+# Biological Inspiration and Neuroscientific Mapping
+## Emulation of Sleep Processes
+### Veridical Memory Replay (NREM)
+### Generative Memory Replay (REM)
+### Synaptic Downscaling and Neural Upkeep
+## Complementary Learning Systems (CLS) Theory
+### Pattern Separation and Pattern Completion
+### Hippocampal-Neocortical Interactions
+## Homeostatic Mechanisms in Artificial Models
+### Rate-Based Feedback Control
+### Global vs. Local Activity-Dependent Degradation
+### Signal-to-Noise Ratio Tuning
+# Practical Constraints and Trade-offs
+## Memory Capacity and Data Reduction
+### The Quantity/Quality Trade-off
+### Instance Compression Techniques
+## Computational Bottlenecks
+### Storage vs. GPU Time Constraints
+### Throughput in Real-Time Data Streams
+## Impact of Buffer Size on Performance
+### Non-Linear Effects of Rehearsal Scale
+### Bias Toward Prior Tasks (Plasticity Loss)
+# Buffer Management and Sample Selection
+## Theoretical Justification for Sampling Algorithms
+### Reservoir Sampling
+### Gradient-Based Coreset Selection
+## Balancing Retention and Acquisition
+### Optimizing the Memory Budget
+### Mitigating Catastrophic Forgetting via Replay Frequency
+# Challenges and Open Problems
+## Theoretical Gaps
+### Lack of Unified Formal Definitions
+### Specific Error Bounds for Rehearsal Buffers
+### Role of Noise in Stability-Plasticity Balance
+## Scalability and Efficiency
+## Privacy and Data Protection in Replay

@@ -1,0 +1,3295 @@
+[
+ {
+  "id": "6f526f72804ce3eb59feb704",
+  "type": "aggregation",
+  "question": "What are good practices for detecting AI-generated texts in situations where false positives are extremely expensive?",
+  "gold_hint": "",
+  "answer": "When false positives in AI-generated text detection are extremely expensive, the primary good practice is to prioritize systems that are explicitly evaluated and selected based on low False Positive Rate (FPR) criteria . In practical and commercial applications, only detection systems that adhere to low FPR standards are considered good and reliable, as this approach is necessary to minimize potential harm to users . Consequently, the effectiveness of any detector must be carefully assessed using the FPR metric to ensure it meets these high-precision requirements .\n\nRegarding specific methodological approaches, white-box methods that utilize model-internal metrics such as entropy, likelihood, and log-rank are available for detection tasks . In contrast, black-box approaches like DetectGPT and NPR involve multiple evaluations and generations, which incurs high computational overhead . While the consulted records do not surface specific performance metrics or detailed mechanisms for how these white-box or black-box methods handle false positives in high-stakes scenarios, they do identify that existing approaches for detecting AI text are poorly suited to identifying AI-generated peer reviews .\n\nFurthermore, specialized zero-shot approaches, such as Vietbinoculars for detecting Vietnamese LLM-generated text, exist within the landscape of detection tools . However, the available information does not detail the specific internal mechanisms of these zero-shot systems or their comparative performance against the FPR-focused criteria mentioned above. Similarly, while Agent-X is identified as an adaptive guideline-based expert network for threshold-free AI-generated text detection, the consulted records did not surface its specific mechanism or recommendations for managing false positives . Therefore, the most actionable practice derived from the available evidence is the strict application of low FPR evaluation metrics to ensure reliability and minimize user harm in commercial contexts .",
+  "arm": "main",
+  "steps": 7,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ai-generated text detection"
+    },
+    "intent": "Cross-paper evidence dossier for the main entity",
+    "obs_chars": 413,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "recommendation"
+    },
+    "intent": "Recommendation records about detection practices",
+    "obs_chars": 537,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "ai-generated text detection",
+     "claim_type": "criticism"
+    },
+    "intent": "Self-limiting/critical statements about detection weaknesses",
+    "obs_chars": 1038,
+    "notes_chars": 520
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "false positive threshold AI generated text detection high precision",
+     "k": 12
+    },
+    "intent": "Full-text search for false-positive / threshold practices in detection papers",
+    "obs_chars": 1763,
+    "notes_chars": 520
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from Agent-X paper on best practices for AI text detection",
+    "obs_chars": 1474,
+    "notes_chars": 1050
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from Agent-X paper explaining how threshold-free detection works",
+    "obs_chars": 1474,
+    "notes_chars": 1050
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from VietBinoculars paper",
+    "obs_chars": 1514,
+    "notes_chars": 1050
+   },
+   {
+    "step": 2,
+    "tool": "find_gap",
+    "args": {
+     "entity": "ai-generated text detection"
+    },
+    "intent": "Find recorded absences/gaps in AI-generated text detection coverage",
+    "obs_chars": 120,
+    "notes_chars": 1050
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 7,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: good practices for detecting AI-generated texts when false positives are extremely expensive.\nRelevant papers: sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_ (2025), sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text (2025), sciverse_is_your_paper_being_reviewed_by_an_llm_investigating_ai_text_detectability_in_pe (2024).\nN1. [coarse:3d3d11852745] Agent-X: adaptive guideline-based expert network for threshold-free AI-generated text detection | anchor:\"agent-x: adaptive guideline-based expert network for threshold-free ai-generated text dete\" | epistemic:stated\nN2. [coarse:2dfc8f883fe3] Black-box approaches (DetectGPT, NPR) involve multiple evaluations/generations, incurring high computational overhead | anchor:\"Black-box approaches like DetectGPT (Mitchell et al., 2023a), NPR (Su et al., 2023a), and\" | epistemic:stated\nN3. [coarse:931eb18f4efd] White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank | anchor:\"White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank\" | epistemic:stated\nN4. [coarse:323a00146e97] Vietbinoculars: essential to carefully evaluate detector effectiveness using FPR metric for practical applications | anchor:\"it is essential to carefully evaluate the effectiveness of the detector using the FPR metric for practical applications\" | epistemic:stated | claim_type:recommendation\nN5. [coarse:102f0164d9b3] Vietbinoculars: Only systems based on low FPR criteria are considered good and reliable for commercial applications while minimizing potential harm to users | anchor:\"Only systems based on low FPR criteria are considered good and reliable for commercial applications while minimizing potential harm to users\" | epistemic:stated | claim_type:recommendation\nN6. [coarse:1d670f2453e3] Vietbinoculars: zero-shot approach for detecting Vietnamese LLM-generated text | anchor:\"vietbinoculars: a zero-shot approach for detecting vietnamese llm-generated text\" | epistemic:stated\nN7. [coarse:7eb07a41c55c] Existing approaches for detecting AI text are poorly suited to identifying AI-generated peer reviews | anchor:\"existing approaches for detecting AI text are poorly suited t\" | epistemic:stated | claim_type:criticism\nGaps: need deeper findings from Agent-X (mechanism, recommendations), vietbinoculars (mechanism, criticism), peer-review paper. Also need find_gap for absences.",
+  "gaps_final": "G1. What does the KB say about AI-generated text detection methods and their false-positive handling?\nG2. What recommendations/criticism records exist about threshold-free or high-precision detection?\nG3. What absences/gaps are recorded (what corpus methods cannot do)?",
+  "queried": [
+   "card|{\"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"ai-generated text detection\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"ai-generated text detection\"}",
+   "search_text|{\"k\": 12, \"query\": \"false positive threshold AI generated text detection high precision\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text\"}",
+   "find_gap|{\"entity\": \"ai-generated text detection\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "eef3ee38231d9fa5ffabbec7",
+  "type": "aggregation",
+  "question": "What are good benchmarks and evaluation strategies for comparing obstacle avoidance strategies in mobile robots?",
+  "gold_hint": "",
+  "answer": "Obstacle avoidance serves as a foundational benchmark task for mobile robotics, primarily because it can be implemented with a varying number of robots and relies on basic sensors and actuators that are available in most mobile platforms . This task is widely recognized as a suitable benchmark for testing learning capabilities, a role it has held since some of the earliest works applying evaluative adaptation with Genetic Algorithms to real robots  . The problem encompasses a variety of methods, including behavior learning, and has been addressed through several algorithms, each possessing distinct drawbacks and benefits  . For instance, reactive obstacle-avoidance systems for wheeled mobile robots based on artificial intelligence have been presented, though these approaches are noted to have no memory, making them overly cautious and prone to poor performance in challenging conditions  .\n\nRegarding evaluation strategies, the literature distinguishes between global and reactive approaches. Global obstacle avoidance requires full knowledge of the static environment to search for paths, making it the core content of global path planning in static scenes  . In contrast, hybrid methods have been proposed to guarantee safe navigation in partially known, dynamic environments by combining global path planning with reactive methods  . To validate the performance of such methods, computer simulations are frequently conducted . Additionally, strategies based on wireless sensor networks have been developed to improve real-time performance and accuracy . While specific metrics are developed to measure the performance of different obstacle avoidance strategies, and performance evaluation results generally indicate that proposed approaches are accurate and efficient, the consulted records did not surface the specific names of these metrics or the detailed numerical values associated with them  .\n\nIn terms of hardware and environmental representation, LiDAR with a range of up to 200 meters is often used for collision avoidance [svy_708713eefe3a]. However, the use of Signed Distance Fields (SDFs) for collision avoidance is noted to be very costly to generate and requires a very accurate representation of the underlying environment, leading most work in this area to use pre-computed SDFs . Other algorithmic approaches, such as the ant colony algorithm inspired by biological technology, have also been applied to path planning . The consulted records did not surface specific datasets or named simulation environments used for these evaluations, nor did they provide a comprehensive list of specific quantitative benchmarks such as collision rates or path lengths, despite the general statement that performance metrics can be defined for this task .",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 31,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity:obstacle avoidance*] Question asks for benchmarks + evaluation strategies for comparing ",
+     "N2. [entity:motion planning*] Related entity in corpus.",
+     "N3. [entity:mobile robots*] Related entity."
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "obstacle avoidance"
+    },
+    "intent": "Get cross-paper evidence dossier for obstacle avoidance entity",
+    "obs_chars": 1264,
+    "notes_chars": 10518
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "evaluation and benchmarking"
+    },
+    "intent": "Get cross-paper evidence dossier for evaluation and benchmarking entity",
+    "obs_chars": 537,
+    "notes_chars": 10518
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "mobile robots"
+    },
+    "intent": "Get cross-paper evidence dossier for mobile robots entity",
+    "obs_chars": 970,
+    "notes_chars": 10518
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation-type findings about obstacle avoidance evaluation",
+    "obs_chars": 2268,
+    "notes_chars": 10518
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "contains": "evaluation metric|benchmark|performance measure|collision rate|path length|success rate"
+    },
+    "intent": "Find specific evaluation metrics and benchmarks mentioned in obstacle avoidance papers",
+    "obs_chars": 1577,
+    "notes_chars": 3593
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "contains": "simulation|Gazebo|ROS|test environment|experimental setup|real-world test"
+    },
+    "intent": "Find simulation environments and experimental setups used for evaluation",
+    "obs_chars": 2058,
+    "notes_chars": 3593
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "observation"
+    },
+    "intent": "Get evaluation details from the reactive obstacle avoidance paper",
+    "obs_chars": 541,
+    "notes_chars": 3593
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "claim_type": "observation"
+    },
+    "intent": "Get evaluation details from the real-time obstacle avoidance paper",
+    "obs_chars": 1957,
+    "notes_chars": 3593
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific evaluation metrics and benchmark details from the distributed optimization paper that explicitly discusses ",
+    "obs_chars": 1111,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "observation"
+    },
+    "intent": "Get evaluation details from the control strategies paper for mobile robot obstacle avoidance",
+    "obs_chars": 512,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks",
+     "claim_type": "observation"
+    },
+    "intent": "Get evaluation details from the wireless sensor network obstacle avoidance paper",
+    "obs_chars": 1101,
+    "notes_chars": 3918
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col",
+     "claim_type": "observation"
+    },
+    "intent": "Get evaluation details from the ant colony path planning paper for dynamic environments",
+    "obs_chars": 1544,
+    "notes_chars": 3918
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "contains": "evaluation|metric|benchmark|performance|collision|success|path length|time"
+    },
+    "intent": "Get specific evaluation metrics and strategies from the reactive obstacle avoidance paper",
+    "obs_chars": 747,
+    "notes_chars": 3918
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "contains": "evaluation|metric|benchmark|performance|collision|success|path length|time"
+    },
+    "intent": "Get specific evaluation metrics from the real-time obstacle avoidance paper",
+    "obs_chars": 2005,
+    "notes_chars": 3918
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat",
+     "contains": "evaluation|metric|benchmark|performance|collision|success|path length|time"
+    },
+    "intent": "Get specific evaluation metrics from the environmental complexity paper",
+    "obs_chars": 1543,
+    "notes_chars": 3918
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "contains": "evaluation|metric|benchmark|performance|collision|success|path length|time"
+    },
+    "intent": "Get specific evaluation metrics from the control strategies paper",
+    "obs_chars": 1041,
+    "notes_chars": 3918
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "motion planning"
+    },
+    "intent": "Get cross-paper evidence dossier for motion planning to find evaluation approaches and benchmarks",
+    "obs_chars": 1093,
+    "notes_chars": 3932
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "query": "obstacle avoidance evaluation metrics collision rate path length success rate simulation benchmark",
+     "k": 12
+    },
+    "intent": "Search full texts for specific evaluation metrics and strategies used in obstacle avoidance papers",
+    "obs_chars": 1746,
+    "notes_chars": 3932
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism-type findings about how obstacle avoidance is evaluated",
+    "obs_chars": 2268,
+    "notes_chars": 4488
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendations about evaluation/benchmarking from the reactive obstacle avoidance paper",
+    "obs_chars": 541,
+    "notes_chars": 4488
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendations about evaluation from the real-time obstacle avoidance paper",
+    "obs_chars": 984,
+    "notes_chars": 4488
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendations about evaluation from the environmental complexity paper",
+    "obs_chars": 963,
+    "notes_chars": 4488
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendations about evaluation from the control strategies paper",
+    "obs_chars": 187,
+    "notes_chars": 4488
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation-type findings about obstacle avoidance evaluation across papers",
+    "obs_chars": 2279,
+    "notes_chars": 4488
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "obstacle avoidance",
+     "claim_type": "criticism"
+    },
+    "intent": "Find criticism/limitation findings about obstacle avoidance evaluation methods",
+    "obs_chars": 2268,
+    "notes_chars": 4488
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:373ae400b01a] Several evaluation metrics developed to measure performance of different obstacle avoidance strategies | anchor:\"Several evaluation metrics were developed to measure the performance of different obstacle avoidance\" | epistemic:stated\nN2. [coarse:29712cddd66c] Obstacle avoidance can be implemented with different number of robots, requires basic sensors and actuators available in most mobile robots, performance metric can be defined | anchor:\"We chose obstacle avoidance as a benchmark task because it can be implemented with differe\" | epistemic:stated\nN3. [coarse:ed99cac7f5fa] Obstacle avoidance can serve as a benchmark for testing learning | anchor:\"Thus, it can serve as a benchmark for testing learning\" | epistemic:stated\nN4. [coarse:d261d9dac11f] Obstacle avoidance used in one of earliest works of evaluative adaptation with Genetic Algorithms applied to real robots | anchor:\"Obstacle avoidance was used in one of the earliest works of evaluative adaptation with Gen\" | epistemic:stated\nN5. [coarse:f23cc988e409] Novel hybrid navigation for collision-free movement in dynamic environment proposed | anchor:\"In this section, a novel hybrid navigation for collision-free movement in a dynamic enviro\" | epistemic:stated\nN6. [coarse:b4c62a2e641b] Proposed method combines global path planning with reactive methods to guarantee safe navigation | anchor:\"The proposed method combines global path planning with reactive methods to guarantee safe \" | epistemic:stated\nN7. [coarse:3798d1887f53] Hybrid method provides optimal solution for safe navigation in partially known, dynamic environment | anchor:\"This hybrid method provides an optimal solution for safe navigation in a partially known, \" | epistemic:stated\nN8. [coarse:baf3b4cd9e32] Computer simulations conducted to validate performance of the method | anchor:\"Computer simulations are conducted to validate the performance of th\" | epistemic:stated\nN9. [coarse:9c868218b0a6] Paper presents reactive obstacle-avoidance systems for wheeled mobile robots based on AI | anchor:\"reactive obstacle–avoidance systems for wheeled mobile robots based on artificial intellig\" | epistemic:stated\nN10. [coarse:3781e02cc5aa] Several algorithms proposed for obstacle avoidance, each with drawbacks and benefits | anchor:\"Several algorithms have been proposed for obstacle avoidance, each having drawbacks and benefits\" | epistemic:stated\nN11. [coarse:552e756944d1] Robot obstacle avoidance and path planning in static scenes is core content of global path planning | anchor:\"Robot obstacle avoidance and path planning in static scenes is the core content of global path plann\" | epistemic:stated\nN12. [coarse:902d481d16ac] Global obstacle avoidance requires full knowledge of static environment to search the | anchor:\"A global type of obstacle avoidance requires full knowledge of the static environment to search the\" | epistemic:stated\nN13. [coarse:6466db9b6649] Performance evaluation results indicate proposed approach is accurate, efficient | anchor:\"The obtained results from performance evaluation indicate that the proposed approach is accurate, ef\" | epistemic:stated\nN14. [coarse:1605852] Obstacle avoidance strategy forms variety of methods: behavior learning, etc. | anchor:\"The problem forms a variety of methods: behavior learning me\" | epistemic:stated\nN15. [coarse:34c26a2] Obstacle avoidance strategy based on wireless sensor networks for real-time performance, accuracy | anchor:\"In order to improve the real time performance, accuracy and\" | epistemic:stated\nN16. [coarse:5fa0ec0] Ant colony algorithm inspired by biological technology for path planning | anchor:\"Many algorithms in the field of path planning have been insp\" | epistemic:stated\nN17. [svy_708713eefe3a] LiDAR range up to 200m used for collision avoidance | anchor:\"LiDAR, with a range of up to 200 meters often used for collision avoidance\" | epistemic:survey-claimed\nN18. [arxiv_2301.11275#5400] Reactive approaches have no memory, overly cautious, perform poorly in challenging conditions | anchor:\"A downside of this approach is that it has no memory: the robot can only act based on what it currently observes\" | epistemic:stated\nN19. [arxiv_2301.11275#13500] SDFs costly to generate, require accurate environment representation; most collision avoidance work uses pre-computed SDFs | anchor:\"SDFs are very costly to generate, and require a very accurate representation of the underlying environment\" | epistemic:stated",
+  "gaps_final": "G1. What specific benchmarks/metrics are used in corpus papers for obstacle avoidance evaluation?\nG2. What evaluation strategies (simulation, real-world, metrics like collision rate, path length, time) are discussed?\nG3. What datasets/simulation environments are mentioned?\nG4. Need to probe key obstacle avoidance papers for their specific evaluation approaches",
+  "queried": [
+   "card|{\"entity\": \"obstacle avoidance\"}",
+   "card|{\"entity\": \"evaluation and benchmarking\"}",
+   "card|{\"entity\": \"mobile robots\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"contains\": \"evaluation metric|benchmark|performance measure|collision rate|path length|success rate\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"contains\": \"simulation|Gazebo|ROS|test environment|experimental setup|real-world test\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_obstacle_avoidance_strategy_of_mobile_robot_based_on_wireless_sensor_networks\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col\"}",
+   "findings|{\"contains\": \"evaluation|metric|benchmark|performance|collision|success|path length|time\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"contains\": \"evaluation|metric|benchmark|performance|collision|success|path length|time\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles\"}",
+   "findings|{\"contains\": \"evaluation|metric|benchmark|performance|collision|success|path length|time\", \"paper_id\": \"sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat\"}",
+   "findings|{\"contains\": \"evaluation|metric|benchmark|performance|collision|success|path length|time\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "card|{\"entity\": \"motion planning\"}",
+   "search_text|{\"k\": 12, \"query\": \"obstacle avoidance evaluation metrics collision rate path length success rate simulation benchmark\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_reactive_obstacle_avoidance_systems_for_wheeled_mobile_robots_based_on_artificia\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_real_time_obstacle_avoidance_algorithms_for_unmanned_aerial_and_ground_vehicles\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_the_role_of_environmental_and_controller_complexity_in_the_distributed_optimizat\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_control_strategies_for_mobile_robot_with_obstacle_avoidance\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"obstacle avoidance\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"obstacle avoidance\"}"
+  ],
+  "gate": {
+   "note_rejects": 31,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 90,
+   "a_skipped_dup": 3,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 31
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 31,
+   "merge_total_lines": 100,
+   "relaxed_writes": 1,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 18,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [svy_708713eefe3a] has a range of up to=200 | src:findings@step0 | epi:survey-claimed"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "de3b24bf31962c6107002d48",
+  "type": "aggregation",
+  "question": "What are existing methods to elicit user intents when an automation encounters ambiguity, especially in failure cases?",
+  "gold_hint": "",
+  "answer": "Based on the knowledge base, several methods exist for eliciting user intents when automation encounters ambiguity, particularly in failure cases:\n\n**1. Mixed-Initiative Interaction and Clarification Questions**\n\nThe most prominent approach is mixed-initiative interaction, where the system pauses and asks the user for clarification. The ambiguity paper on natural language queries explicitly states that \"irresolvable ambiguities should be handled through mixed-initiative specification rather than failing or guessing\" [coarse:0b2d2d095f3d]. The key challenge identified is \"detecting and balancing when to automate grounding decisions and when to require explicit user consultation\" [coarse:96d6d9c14358].\n\nIn natural language interfaces for databases, systems like MISP and DialSQL use \"a mixed-initiative approach, asking follow-up questions to clarify user intent\" [coarse:daadaa71b5cd, coarse:c9663d526dac]. These interactive methods help establish \"common ground\" between the user and the AI [coarse:fa87561f27e0]. However, a noted limitation is that \"users can become frustrated if the conversation becomes repetitive or fails to address the core error\" [coarse:463c2cba7d43].\n\n**2. Demonstration-Based Intent Elicitation (DiLogics)**\n\nDiLogics, a web automation system, addresses the challenge that \"effectively communicating user intent is a major challenge in PBD systems\" [sciverse_dilogics#20250]. The system \"addresses this challenge by parsing input data and allowing users to refine their intent continuously during automation by coordinating with the system\" [coarse:285527797f2f]. Specifically, it \"first semantically segments input data to structured task steps\" [8764569d5976be] and \"by recording user demonstrations for each step, DiLogics generalizes\" [1cb492997599ca].\n\nFor failure cases specifically, \"when encountering novel cases that do not match with any steps in the catalog, DiLogics pauses the automation and elicits a demonstration to fulfill the new step\" [sciverse_dilogics#45900]. The system uses \"Horvitz's mixed-initiative UI principles\" to anchor the interaction on the task web page to alleviate user effort [sciverse_dilogics#37800]. In user studies, \"nine out of ten users edited the input data table to rephrase segmented steps to the appropriate detail\" [sciverse_dilogics#58050].\n\nThe paper also notes that \"specifying intents to cover every case can be tedious\" [coarse:c2cf2635126e] and \"users may not know all the cases in the first place\" [coarse:48ca830308c8], motivating the continuous refinement approach.\n\n**3. Recommendation-Based Resolution (Keep Doing What I Just Did)**\n\nThis system handles uncertainty by asking \"the user to resolve uncertainty by choosing a desired automation from a list of recommendations or editing a recommendation to meet expectations\" [coarse:37c2742813cd]. The \"inference algorithm generates recommendations by grouping user actions from the demonstration sequence into smaller sequences and inferring possible automation rules for each\" [coarse:74b303cd8358].\n\n**4. Error Recovery and Backtracking (Pumice/Interactive Task Learning)**\n\nFor interactive end-user development systems, \"error recovery and backtracking\" is identified as crucial: \"Like all other interactive EUD systems, it is crucial for Pumice to\" handle these cases [sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#39150].\n\n**5. Question Rewriting (Text-to-SQL)**\n\nIn the text-to-SQL domain, \"to address ambiguity in NL questions, question rewriting has emerged as an effective strategy\" [sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#74250].\n\n**6. LLM Assistant Failures**\n\nThe paper on LLM-based assistant failures notes that \"more insights [are] needed on where and how users struggle with LLMs\" [coarse:848b46531c9d], indicating this is an active area of research.\n\n**Summary of Methods:**\n- Pausing automation and eliciting demonstrations (DiLogics)\n- Asking clarification/follow-up questions (MISP, DialSQL, mixed-initiative)\n- Presenting recommendations for user selection/editing (Keep Doing What I Just Did)\n- Error recovery and backtracking mechanisms (Pumice)\n- Question rewriting to resolve ambiguity (Text-to-SQL)\n- Continuous intent refinement during execution (DiLogics)\n\nThe corpus does not contain extensive coverage of dedicated failure-recovery intent elicitation methods beyond these; the LLM assistant failure paper and scaffolded interfaces paper were identified as relevant but their specific mechanisms for failure-case intent elicitation are not fully detailed in the available records.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "ambiguity|ambiguous|clarif|disambig",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about handling ambiguity/clarification",
+    "obs_chars": 2335,
+    "notes_chars": 1435
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "user intent|intent elicitation|clarifying question|ask user",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about user intent elicitation",
+    "obs_chars": 2239,
+    "notes_chars": 1435
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "failure|fail|error|wrong",
+     "claim_type": "criticism"
+    },
+    "intent": "Find criticism records about failure cases",
+    "obs_chars": 2213,
+    "notes_chars": 1435
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "elicit user intent ambiguity automation clarification",
+     "k": 12
+    },
+    "intent": "Broad text search for intent elicitation in ambiguous automation",
+    "obs_chars": 2114,
+    "notes_chars": 1435
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get full dossier on DiLogics for intent elicitation methods",
+    "obs_chars": 647,
+    "notes_chars": 2345
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "contains": "ambiguity|clarif|intent|disambig|failure"
+    },
+    "intent": "Get findings from the ambiguity in NL queries paper",
+    "obs_chars": 1301,
+    "notes_chars": 2345
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "failure|ambiguity|clarif|intent|error|wrong"
+    },
+    "intent": "Get findings from LLM assistant failure paper",
+    "obs_chars": 1310,
+    "notes_chars": 2345
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "clarifying questions ambiguity resolution user intent elicitation automation failure",
+     "k": 12
+    },
+    "intent": "Broader search for clarification methods in automation contexts",
+    "obs_chars": 2114,
+    "notes_chars": 2345
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "contains": "intent|ambiguity|clarif|failure|error|wrong|user"
+    },
+    "intent": "Get all findings from DiLogics paper about intent elicitation, ambiguity, and failure handling",
+    "obs_chars": 2390,
+    "notes_chars": 2731
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "contains": "method|approach|strategy|technique|clarif|disambig|resolve"
+    },
+    "intent": "Get specific methods/approaches from the ambiguity paper",
+    "obs_chars": 1095,
+    "notes_chars": 2731
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "contains": "ambiguity|intent|clarif|failure|error|wrong|user"
+    },
+    "intent": "Get findings from the do-it-for-me vs do-it-with-me paper about user intent and failure",
+    "obs_chars": 1621,
+    "notes_chars": 2731
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "failure recovery user intent clarification ambiguity resolution automation"
+    },
+    "intent": "Search for failure-specific intent elicitation methods across all papers",
+    "obs_chars": 2005,
+    "notes_chars": 2731
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "contains": "ambiguity|clarif|intent|failure|error|wrong|user|ask|question"
+    },
+    "intent": "Get findings from interactive task learning paper on ambiguity/intent elicitation",
+    "obs_chars": 2695,
+    "notes_chars": 2731
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_",
+     "contains": "ambiguity|clarif|intent|failure|error|wrong|user|ask|question"
+    },
+    "intent": "Get findings from NL interfaces for databases paper",
+    "obs_chars": 1828,
+    "notes_chars": 2731
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_keep_doing_what_i_just_did",
+     "contains": "ambiguity|clarif|intent|failure|error|wrong|user|ask|question"
+    },
+    "intent": "Get findings from keep doing what I just did paper",
+    "obs_chars": 1464,
+    "notes_chars": 2731
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "contains": "ambiguity|clarif|intent|failure|error|wrong|user|ask|question"
+    },
+    "intent": "Get findings from scaffolded interfaces paper",
+    "obs_chars": 603,
+    "notes_chars": 2731
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "criticism"
+    },
+    "intent": "Get failure-specific criticism/limitation records from LLM assistant failure paper",
+    "obs_chars": 1079,
+    "notes_chars": 3824
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from ambiguity paper for methods to handle ambiguity",
+    "obs_chars": 1070,
+    "notes_chars": 3824
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from do-it-for-me vs do-it-with-me paper",
+    "obs_chars": 2117,
+    "notes_chars": 3824
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from interactive task learning paper for how it handles ambiguity",
+    "obs_chars": 2694,
+    "notes_chars": 3824
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "contains": "intent|ambiguity|clarif|failure|error|wrong|user",
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t"
+    },
+    "intent": "Get ambiguity/intent findings from NL query ambiguity paper",
+    "obs_chars": 1070,
+    "notes_chars": 3824
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t"
+    },
+    "intent": "Get full dossier on ambiguity paper for methods to handle ambiguity",
+    "obs_chars": 1026,
+    "notes_chars": 3824
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o"
+    },
+    "intent": "Get full dossier on LLM assistant failure paper for failure-case methods",
+    "obs_chars": 307,
+    "notes_chars": 3824
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get full dossier on interactive task learning paper",
+    "obs_chars": 3320,
+    "notes_chars": 3824
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "contains": "ambiguity|intent|clarif|failure|error|wrong|user|ask|question|mixed|initiative|carousel|widget"
+    },
+    "intent": "Get all findings from DiLogics paper on intent elicitation and ambiguity handling",
+    "obs_chars": 2388,
+    "notes_chars": 3824
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "contains": "ambiguity|clarif|intent|failure|error|wrong|user|ask|question|mixed|initiative|resolve|detect"
+    },
+    "intent": "Get all findings from ambiguity paper on methods to handle ambiguity",
+    "obs_chars": 1070,
+    "notes_chars": 3824
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "ambiguity|intent|clarif|failure|error|wrong|user|ask|question|recover|fix|repair"
+    },
+    "intent": "Get findings from LLM assistant failure paper on failure recovery and user intent",
+    "obs_chars": 1079,
+    "notes_chars": 3824
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "contains": "ambiguity|intent|clarif|failure|error|wrong|user|ask|question|paradigm|with|for"
+    },
+    "intent": "Get findings from do-it-for-me vs do-it-with-me paper on interaction paradigms",
+    "obs_chars": 2117,
+    "notes_chars": 3824
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from DiLogics on how it elicits user intent",
+    "obs_chars": 2387,
+    "notes_chars": 4985
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from ambiguity paper on how to handle ambiguity",
+    "obs_chars": 1070,
+    "notes_chars": 4985
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from do-it-for-me/with-me paper on interaction paradigms",
+    "obs_chars": 2117,
+    "notes_chars": 4985
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from LLM assistant failure paper",
+    "obs_chars": 1079,
+    "notes_chars": 4985
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get DiLogics self-limiting statements about failure cases and limitations",
+    "obs_chars": 2388,
+    "notes_chars": 4985
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t"
+    },
+    "intent": "Get ambiguity paper's own critical statements about limitations and failure modes",
+    "obs_chars": 1070,
+    "notes_chars": 4985
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi"
+    },
+    "intent": "Get do-it-for-me/with-me paper's critical statements about failure cases",
+    "obs_chars": 2117,
+    "notes_chars": 4985
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_"
+    },
+    "intent": "Get failure/limitation findings from NL interfaces for databases paper",
+    "obs_chars": 1388,
+    "notes_chars": 4985
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_keep_doing_what_i_just_did"
+    },
+    "intent": "Get failure/limitation findings from Keep Doing What I Just Did paper",
+    "obs_chars": 1026,
+    "notes_chars": 4985
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get failure/limitation findings from interactive task learning paper",
+    "obs_chars": 2678,
+    "notes_chars": 4985
+   },
+   {
+    "step": 13,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi"
+    },
+    "intent": "Get full dossier on do-it-for-me vs do-it-with-me paper",
+    "obs_chars": 307,
+    "notes_chars": 4985
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get DiLogics recommendations on intent elicitation methods",
+    "obs_chars": 3916,
+    "notes_chars": 4985
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get interactive task learning recommendations",
+    "obs_chars": 3252,
+    "notes_chars": 4985
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get LLM assistant failure recommendations",
+    "obs_chars": 1079,
+    "notes_chars": 4985
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get observation-type findings from DiLogics about how the system handles ambiguity/failure in practice",
+    "obs_chars": 2396,
+    "notes_chars": 2943
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t"
+    },
+    "intent": "Get observation-type findings from the ambiguity paper about how ambiguity is detected and handled",
+    "obs_chars": 1070,
+    "notes_chars": 2943
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi"
+    },
+    "intent": "Get observation-type findings from the do-it-for-me/with-me paper about failure cases and user intent elicitation",
+    "obs_chars": 2117,
+    "notes_chars": 2943
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o"
+    },
+    "intent": "Get observation-type findings from the LLM assistant failure paper about how failures manifest and how users seek clarif",
+    "obs_chars": 1079,
+    "notes_chars": 2943
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records for DiLogics intent elicitation approach",
+    "obs_chars": 2540,
+    "notes_chars": 2943
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records for ambiguity handling in NL queries",
+    "obs_chars": 2389,
+    "notes_chars": 2943
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records for do-it-for-me vs do-it-with-me paradigms",
+    "obs_chars": 1272,
+    "notes_chars": 2943
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "entity": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records for LLM assistant failure modes",
+    "obs_chars": 1272,
+    "notes_chars": 2943
+   },
+   {
+    "step": 19,
+    "tool": "search_text",
+    "args": {
+     "query": "ambiguity detection clarification question user intent elicitation failure recovery",
+     "k": 12
+    },
+    "intent": "Find all papers discussing ambiguity detection and clarification methods across the corpus",
+    "obs_chars": 2042,
+    "notes_chars": 2943
+   },
+   {
+    "step": 19,
+    "tool": "search_text",
+    "args": {
+     "query": "mixed initiative interaction user confirmation error handling automation failure",
+     "k": 12
+    },
+    "intent": "Find papers on mixed-initiative and error handling in automation",
+    "obs_chars": 2072,
+    "notes_chars": 2943
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "entity": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_"
+    },
+    "intent": "Get mechanism findings from NL database interfaces paper on how users handle ambiguity",
+    "obs_chars": 1837,
+    "notes_chars": 2943
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "entity": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess"
+    },
+    "intent": "Get mechanism findings from scaffolded interfaces paper",
+    "obs_chars": 1837,
+    "notes_chars": 2943
+   },
+   {
+    "step": 20,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation details from NL interfaces for databases paper",
+    "obs_chars": 1828,
+    "notes_chars": 3874
+   },
+   {
+    "step": 20,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_keep_doing_what_i_just_did",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from keep doing what I just did paper",
+    "obs_chars": 1026,
+    "notes_chars": 3874
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 56
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "mixed-initiative interaction eliciting user intent ambiguity resolution automation failure recovery",
+     "k": 10
+    },
+    "intent": "Search external literature for methods to elicit user intent in ambiguous/failure cases in automation",
+    "obs_chars": 2567,
+    "notes_chars": 5091
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "clarification questions disambiguation user intent elicitation interactive systems error handling",
+     "k": 10
+    },
+    "intent": "Search for clarification/disambiguation methods in interactive systems",
+    "obs_chars": 2541,
+    "notes_chars": 5091
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "program-by-demonstration error recovery user intent specification ambiguity",
+     "k": 10
+    },
+    "intent": "Search for PBD error recovery and intent specification methods",
+    "obs_chars": 2381,
+    "notes_chars": 5091
+   },
+   {
+    "step": 25,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_natural_language_interfaces_for_databases_what_do_users_think_"
+    },
+    "intent": "Get full dossier on NL interfaces for databases paper",
+    "obs_chars": 319,
+    "notes_chars": 4888
+   },
+   {
+    "f28_auto_retrieval": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+    "at_step": 27,
+    "obs_chars": 2389
+   }
+  ],
+  "notes_final": "Q: methods to elicit user intents when automation encounters ambiguity, esp. failure cases.\nKey papers:\n- sciverse_dilogics (web automation, intent elicitation, mixed-initiative UI)\n- sciverse_are_we_asking_the_right_questions_on_ambiguity (ambiguity in NL queries)\n- sciverse_do_it_for_me_vs_do_it_with_me (paradigms of automation interaction)\n- sciverse_why_and_when_llm_based_assistants_can_go_wrong (LLM assistant failures)\n- sciverse_interactive_task_and_concept_learning (interactive task learning)\n- sciverse_natural_language_interfaces_for_databases\n- sciverse_keep_doing_what_i_just_did\n- sciverse_designing_scaffolded_interfaces\n- arxiv_2401.02705 (XUAT-Copilot)\n- arxiv_2201.07620 (Validating Simulations of User Query Variants)\n- arxiv_2301.02113 (Anaphora Resolution in Dialogue)\n- sciverse_chatgpt_prompt_patterns (requirements elicitation)\n- sciverse_exploring_the_landscape_of_text_to_sql (question rewriting for ambiguity)\nFindings:\n- DiLogics: \"tools need to elicit users to better formulate their intent before creating automation programs\" [8629c9fb4172c5]\n- DiLogics: \"Effectively communicating user intent is a major challenge in PBD systems\" [sciverse_dilogics#20250]\n- DiLogics: \"Specifying intents to cover every case can be tedious\" [coarse:c2cf2635126e]\n- DiLogics: \"Users may not know all the cases in the first place\" [coarse:48ca830308c8]\n- DiLogics: \"addresses this challenge by parsing input data and allowing users to refine their intent continuously during automation by coordinating with the system\" [coarse:285527797f2f]\n- DiLogics: \"first semantically segments input data to structured task steps\" [8764569d5976be]\n- DiLogics: \"By recording user demonstrations for each step, DiLogics generalizes\" [1cb492997599ca]\n- DiLogics: \"A redo or undo option in the system workflow would further lower the u\" [f75f8615dd273e]\n- DiLogics: \"Future works can make the error-handling interaction more accessible a\" [073b45663b1ff3]\n- DiLogics: \"Researchers can focus on providing more guiding feedback and trust cue\" [a3ae2a32ca5652]\n- DiLogics: \"More signals of system state and current action could be added to impr\" [07242cfd7e7b57]\n- DiLogics: \"Future systems can constantly analyze the website's state and task com\" [d7d285d8c209e3]\n- DiLogics: \"Future works can derive patterns of execution based on previous task c\" [177ce827927de8]\n- Ambiguity paper: \"Irresolvable ambiguities should be handled through mixed-initiative specification rather than failing or guessing\" [coarse:0b2d2d095f3d]\n- Ambiguity paper: \"Key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation\" [coarse:96d6d9c14358]\n- LLM assistant failures: \"More insights needed on where and how users struggle with LLMs\" [coarse:848b46531c9d]\n- DiLogics: \"When encountering novel cases that do not match with any steps in the catalog, DiLogics pauses the automation and elicits a demonstration to fulfill the new s\" [sciverse_dilogics#45900]\n- DiLogics: \"Nine out of ten users edited the input data table to rephrase segmented steps to the appropriate detail\" [sciverse_dilogics#58050]\n- DiLogics: \"by Horvitz's mixed-initiative UI principles, we anchor the carousel on the task web page to alleviate effort\" [sciverse_dilogics#37800]\n- Interactive task learning: \"Error Recovery and Backtracking: Like all other interactive EUD systems, it is crucial for Pumice to\" [sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#39150]\n- Text-to-SQL: \"To address ambiguity in NL questions, question rewriting has emerged as an effective strategy\" [sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#74250]\n- NL interfaces for DBs: \"MISP uses a mixed-initiative approach, asking follow-up questions to clarify user intent\" [coarse:daadaa71b5cd]\n- NL interfaces for DBs: \"DialSQL uses a mixed-initiative approach, asking follow-up questions to clarify user intent\" [coarse:c9663d526dac]\n- NL interfaces for DBs: \"Users can become frustrated if the conversation becomes repetitive or fails to address the core error\" [coarse:463c2cba7d43]\n- NL interfaces for DBs: \"These interactive methods help establish 'common ground' between the user and the AI\" [coarse:fa87561f27e0]\n- Keep doing what I just did: \"The system asks the user to resolve uncertainty by choosing a desired automation from a list of recommendations or editing a recommendation to meet expectations\" [coarse:37c2742813cd]\n- Keep doing what I just did: \"The inference algorithm generates recommendations by grouping user actions from the demonstration sequence into smaller sequences and inferring possible automation rules for each n\" [coarse:74b303cd8358]",
+  "gaps_final": "G1. Need deeper content from DiLogics, interactive task learning, ambiguity papers\nG2. Need failure-case specific methods\nG3. Need to check LLM assistant failure paper and NL interface papers",
+  "queried": [
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"ambiguity|ambiguous|clarif|disambig\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"user intent|intent elicitation|clarifying question|ask user\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"failure|fail|error|wrong\"}",
+   "search_text|{\"k\": 12, \"query\": \"elicit user intent ambiguity automation clarification\"}",
+   "card|{\"entity\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|disambig|failure\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"contains\": \"failure|ambiguity|clarif|intent|error|wrong\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "search_text|{\"k\": 12, \"query\": \"clarifying questions ambiguity resolution user intent elicitation automation failure\"}",
+   "findings|{\"contains\": \"intent|ambiguity|clarif|failure|error|wrong|user\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"contains\": \"method|approach|strategy|technique|clarif|disambig|resolve\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarif|failure|error|wrong|user\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "search_text|{\"k\": 12, \"query\": \"failure recovery user intent clarification ambiguity resolution automation\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|failure|error|wrong|user|ask|question\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|failure|error|wrong|user|ask|question\", \"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|failure|error|wrong|user|ask|question\", \"paper_id\": \"sciverse_keep_doing_what_i_just_did\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|failure|error|wrong|user|ask|question\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"contains\": \"intent|ambiguity|clarif|failure|error|wrong|user\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "card|{\"entity\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "card|{\"entity\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "card|{\"entity\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"contains\": \"ambiguity|intent|clarif|failure|error|wrong|user|ask|question|mixed|initiative|carousel|widget\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"contains\": \"ambiguity|clarif|intent|failure|error|wrong|user|ask|question|mixed|initiative|resolve|detect\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_q",
+   "findings|{\"contains\": \"ambiguity|intent|clarif|failure|error|wrong|user|ask|question|recover|fix|repair\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"",
+   "findings|{\"contains\": \"ambiguity|intent|clarif|failure|error|wrong|user|ask|question|paradigm|with|for\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_keep_doing_what_i_just_did\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "card|{\"entity\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_do_it_for_me_vs_do_it_with_me_investigating_user_perceptions_of_different_paradi\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o\"}",
+   "search_text|{\"k\": 12, \"query\": \"ambiguity detection clarification question user intent elicitation failure recovery\"}",
+   "search_text|{\"k\": 12, \"query\": \"mixed initiative interaction user confirmation error handling automation failure\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_keep_doing_what_i_just_did\"}",
+   "search_papers|{\"k\": 10, \"query\": \"mixed-initiative interaction eliciting user intent ambiguity resolution automation failure recovery\"}",
+   "search_papers|{\"k\": 10, \"query\": \"clarification questions disambiguation user intent elicitation interactive systems error handling\"}",
+   "search_papers|{\"k\": 10, \"query\": \"program-by-demonstration error recovery user intent specification ambiguity\"}",
+   "card|{\"entity\": \"sciverse_natural_language_interfaces_for_databases_what_do_users_think_\"}",
+   "findings|{\"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": {
+    "missing_nums": [],
+    "unsourced": [],
+    "altered_titles": [
+     [
+      "integrating context of feature-rich applications",
+      "integrating contact, modeling, and control for the robotic h"
+     ]
+    ]
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 5,
+   "a_chars": 433,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 5,
+   "_consec_full_reject": 0,
+   "notes_truncated": 3191,
+   "f28_autos": 1,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [c0be8ac8bfd8bb] act forgetting frequency=500 steps | src:card@step6",
+   "A2. [28fcf7e881e197] act embedding matrix scheduling=independently across the 500 s | src:card@step6",
+   "A3. [290d6a89d34d57] act scheduler for the body=cosine scheduler | src:card@step6",
+   "A4. [045110fd5b94de] act checkpoint selection=checkpoint with the lowest val | src:card@step6",
+   "A5. [svy_df7b7134455c] average age=21.7 | src:findings@step16 | epi:survey-claimed"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "144eea4816fa6949029e53eb",
+  "type": "aggregation",
+  "question": "What are leading methods for generating hard examples of the boolean satisfiability problem, and what are their strengths and weaknesses?",
+  "gold_hint": "",
+  "answer": "Based on the knowledge base and external literature, the leading methods for generating hard instances of the Boolean Satisfiability Problem (SAT) can be organized into several families, each with distinct strengths and weaknesses.\n\n**1. Random Instance Models with Phase Transitions**\n\nThe foundational approach to generating hard SAT instances exploits the phase-transition phenomenon observed in random k-SAT. As the clause-to-variable ratio (α) increases, random instances transition from almost always satisfiable to almost always unsatisfiable, with the hardest instances occurring near this threshold [coarse:0b38ca18eed4]. Models for generating random instances of search problems have received much attention from the AI community over the last 20 years [coarse:249b8b37c8e0].\n\n**2. Planted-Solution Models**\n\nA major family of methods plants a known solution into a random formula, guaranteeing satisfiability while controlling hardness:\n\n- **Quiet Planting / Reweighted Belief Propagation (2014):** This method uses a reweighted partition function where each solution is weighted by the number of variables satisfying every clause. Applying belief propagation to this reweighted ensemble allows simultaneous generation of a typical random SAT instance and one of its solutions. The key strength is that the generated instances are provably equivalent to random instances in certain parameter regions, and the method provides direct evidence for purely entropic (rather than energetic) barriers between solution clusters [44c0051c34307bb3]. The weakness is that the equivalence to random instances holds only in specific parameter regions, and the method is primarily a theoretical/analytical tool rather than a practical generator.\n\n- **Planted-Solution SAT from Integer Factorization (2026):** A more recent construction encodes the arithmetic constraints of N = p × q as a CNF formula whose satisfying assignments correspond to valid factorizations. The known pair (p, q) serves as built-in ground truth, enabling unambiguous verification. For two d-bit primes, the total number of carry contractions is on the order of d⁴. Empirical benchmarks show median runtime grows exponentially in the bit-length of the factors. Strengths: scalable, structured, verifiable, controlled by a single parameter, with open-source generation software. Weakness: the instances are highly structured (arithmetic) rather than random, so they may not stress all solver components equally [5654845c4043656f].\n\n**3. New Models from the 2018 Corpus Paper**\n\nThe 2018 paper \"New Models for Generating Hard Random Boolean Formulas and Disjunctive Logic Programs\" introduces three new models and compares them to existing ones [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro]:\n\n- **Multi-Component Model:** Generates disjunctions of t CNF formulas where t is fixed. The parameter t provides a direct knob for controlling hardness — larger t yields harder instances. The theoretical analysis shows that if lim t²/N = 0, there exists a sequence ε_N controlling the probability of the disjunction being satisfiable [112c737b41ab9c][d5706f68808aed]. Strength: explicit hardness control via a single parameter t. Weakness: the model generates disjunctive (not purely conjunctive) formulas, which may not directly apply to standard CNF SAT solvers without transformation.\n\n- **Fixed-Length Clause Model:** Constrains all clauses to have the same length, removing the variability present in standard random k-SAT. This produces instances with different structural properties than the classical model.\n\n- **Controlled Model:** This model generates instances that are empirically harder than those from the Chen-Interian model [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro]. Strength: demonstrated superior hardness compared to a well-known baseline. Weakness: the comparison is limited to the Chen-Interian model; broader comparisons are not reported in the available records.\n\n- **Comparison Baselines:** The paper also evaluates the **Chen-Interian model** and the **Navarro-Voronkov fixed-shape model** as existing approaches. The controlled model outperforms Chen-Interian in hardness [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro].\n\n**4. Unique-SAT and Complexity-Theoretic Approaches**\n\nThe Unique k-SAT problem (deciding whether a formula has exactly one satisfying assignment) is essentially as difficult as general SAT [coarse:30864b4e52e2], and there is evidence that Unique k-SAT is as hard to solve as general k-SAT [coarse:c753e44eca1f]. The Valiant-Vazirani reduction provides a randomized polynomial-time reduction from SAT to Unique SAT [coarse:b7d78ab2230e]. The PPSZ algorithm, the fastest known randomized algorithm for k-SAT, has been derandomized for unique k-SAT but not for general k-SAT, highlighting a gap [coarse:d4d3776][coarse:8742ed0]. The complexity status of Unique k-SAT (whether it is in P^NP) remains unresolved [coarse:6c37c5d80f8a]. These results inform the design of hard instances: instances with a unique solution are provably hard for certain algorithmic classes.\n\n**5. Evolutionary and Metaheuristic Approaches**\n\nAn adaptive evolutionary algorithm for the satisfiability problem has been proposed [coarse:a20acd0a544a], and multi-population adaptive mutation methods have been evaluated on MAX-SAT problems [coarse:8352c3c2aaba]. These are primarily solvers rather than instance generators, but they inform which instance structures are hard by revealing where search-based methods struggle.\n\n**Summary of Strengths and Weaknesses:**\n\n| Method | Strength | Weakness |\n|--------|----------|----------|\n| Phase-transition random k-SAT | Well-understood; hardness concentrated near threshold | Hardness is statistical, not guaranteed per instance |\n| Quiet planting / Reweighted BP | Generates instance + solution simultaneously; provably random-equivalent in some regions | Equivalence holds only in specific parameter regions; primarily analytical |\n| Planted-solution from factorization | Verifiable ground truth; single-parameter control; scalable | Highly structured (arithmetic); may not stress all solver components |\n| Multi-component model (2018) | Explicit hardness control via parameter t | Generates disjunctive formulas, not pure CNF |\n| Controlled model (2018) | Empirically harder than Chen-Interian | Limited comparison scope |\n| Unique-SAT instances | Provably hard for certain algorithm classes (PPSZ gap) | Complexity status unresolved; instances may be atypical |\n\n**What the knowledge base does not cover:** The corpus contains limited records on the specific weaknesses of the 2018 paper's models beyond the comparison to Chen-Interian. The external literature (e.g., the 2026 factorization-based benchmarks, the 2014 quiet planting work) provides additional context, but detailed ablation studies or head-to-head comparisons across all these methods are not present in the compiled records. The lineage for boolean satisfiability in the corpus ends at the frontier, with external successors including hardware acceleration via belief propagation and generalizations of SAT [lineage_walk_ext].",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity: boolean satisfiability*] Question asks for leading methods for generating hard SAT exam"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Get cross-paper evidence dossier for SAT entity",
+    "obs_chars": 1309,
+    "notes_chars": 594
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2018 hard-formula generation paper",
+    "obs_chars": 527,
+    "notes_chars": 594
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting/criticism statements from the 2018 paper",
+    "obs_chars": 527,
+    "notes_chars": 594
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "sat",
+     "contains": "hard instance|hard example|hard formula|phase transition|random formula generation"
+    },
+    "intent": "Find findings about hard SAT instance generation across corpus",
+    "obs_chars": 2608,
+    "notes_chars": 594
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "new models for generating hard random boolean formulas and disjunctive logic programs"
+    },
+    "intent": "Get full dossier for the 2018 paper on hard SAT generation",
+    "obs_chars": 583,
+    "notes_chars": 1920
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 2018 hard SAT paper",
+    "obs_chars": 1999,
+    "notes_chars": 1920
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations from the 2018 paper",
+    "obs_chars": 527,
+    "notes_chars": 1920
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "hard SAT instance generation method phase transition clause-to-variable ratio",
+     "k": 12
+    },
+    "intent": "Find all corpus text discussing hard SAT instance generation methods",
+    "obs_chars": 1749,
+    "notes_chars": 1920
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of the specific generation models proposed in the 2018 paper",
+    "obs_chars": 527,
+    "notes_chars": 2373
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "qualitative_ablation"
+    },
+    "intent": "Get ablation/comparison findings about the generation models' strengths and weaknesses",
+    "obs_chars": 527,
+    "notes_chars": 2373
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "random k-SAT generation model clause-to-variable ratio phase transition hard instances",
+     "k": 12
+    },
+    "intent": "Find more detailed text about specific generation methods and their properties",
+    "obs_chars": 1750,
+    "notes_chars": 2373
+   },
+   {
+    "step": 4,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "sections": [
+      "introduction",
+      "method",
+      "experiments"
+     ]
+    },
+    "intent": "Get full-text details on the specific hard-instance generation methods proposed in the 2018 paper",
+    "obs_chars": 1960,
+    "notes_chars": 2373
+   },
+   {
+    "step": 4,
+    "tool": "lineage",
+    "args": {
+     "entity": "boolean satisfiability",
+     "direction": "both"
+    },
+    "intent": "Find related papers in the corpus connected to SAT via lineage edges",
+    "obs_chars": 74,
+    "notes_chars": 2373
+   },
+   {
+    "step": 4,
+    "tool": "search_papers",
+    "args": {
+     "query": "generating hard SAT instances random k-SAT phase transition planted satisfiability",
+     "k": 8
+    },
+    "intent": "Find external papers on hard SAT instance generation methods",
+    "obs_chars": 1861,
+    "notes_chars": 2373
+   },
+   {
+    "step": 4,
+    "tool": "find_gap",
+    "args": {
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Check what the corpus does NOT cover regarding SAT hard instance generation",
+    "obs_chars": 120,
+    "notes_chars": 2373
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [bc04ecc3d9e8581ff7a34022fae72c11d4ea1af2e45bfad17239c94de7189762] Phase transitions in knowled"
+    ]
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [bc04ecc3d9e8581ff7a34022fae72c11d4ea1af2e45bfad17239c94de7189762] Phase transitions in knowled"
+    ]
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "planted satisfiability quiet planting hard instances generation method"
+    },
+    "intent": "Find details on planted/quiet planting methods for hard SAT instances in corpus",
+    "obs_chars": 2187,
+    "notes_chars": 4151
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Chen-Interian model random logic program generation hardness phase transition comparison"
+    },
+    "intent": "Find details on Chen-Interian model and how it compares to the new models",
+    "obs_chars": 2180,
+    "notes_chars": 4794
+   },
+   {
+    "step": 7,
+    "tool": "lineage",
+    "args": {
+     "entity": "sat",
+     "direction": "both"
+    },
+    "intent": "Check lineage of SAT entity for related methods and papers in corpus",
+    "obs_chars": 74,
+    "notes_chars": 4794
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "query": "multi-component model disjunction CNF hardness control t parameter strengths limitations",
+     "k": 12
+    },
+    "intent": "Get more detail on the multi-component model's specific mechanism and its stated strengths/weaknesses",
+    "obs_chars": 2185,
+    "notes_chars": 4794
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "query": "Chen-Interian model disjunctive logic program generation hardness phase transition",
+     "k": 12
+    },
+    "intent": "Get detail on the Chen-Interian model and how it compares to the new models",
+    "obs_chars": 2181,
+    "notes_chars": 4794
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "query": "quiet planting planted satisfiability hard instance generation method",
+     "k": 12
+    },
+    "intent": "Get detail on quiet planting as a hard instance generation method",
+    "obs_chars": 286,
+    "notes_chars": 4794
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem",
+     "claim_type": "mechanism|observation|criticism"
+    },
+    "intent": "Check what the adaptive evolutionary algorithm paper says about SAT instance generation/hardness",
+    "obs_chars": 262,
+    "notes_chars": 2772
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "criticism|observation"
+    },
+    "intent": "Get the 2018 paper's own critical statements about limitations/weaknesses of the models",
+    "obs_chars": 252,
+    "notes_chars": 2772
+   },
+   {
+    "step": 9,
+    "tool": "lineage_walk_ext",
+    "args": {
+     "entity": "boolean satisfiability",
+     "direction": "forward"
+    },
+    "intent": "Find external successors/continuations of SAT instance generation methods beyond the corpus frontier",
+    "obs_chars": 2947,
+    "notes_chars": 2772
+   },
+   {
+    "step": 9,
+    "tool": "gap_search",
+    "args": {
+     "query": "hard SAT instance generation methods limitations weaknesses"
+    },
+    "intent": "Find what the corpus CANNOT answer about hard SAT generation and get external gap-filling papers",
+    "obs_chars": 2747,
+    "notes_chars": 2772
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem",
+     "claim_type": "observation"
+    },
+    "intent": "Check what the adaptive evolutionary algorithm paper says about SAT instance generation",
+    "obs_chars": 472,
+    "notes_chars": 2772
+   },
+   {
+    "step": 11,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "hard SAT instance generation planted satisfiability quiet planting controlled model phase transition"
+    },
+    "intent": "Find external papers on hard SAT instance generation methods",
+    "obs_chars": 2572,
+    "notes_chars": 2963
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "mechanism|observation|criticism"
+    },
+    "intent": "Get detailed findings about the generation models' mechanisms and limitations",
+    "obs_chars": 262,
+    "notes_chars": 2963
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g",
+     "N18. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B"
+    ]
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g",
+     "N18. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B"
+    ]
+   },
+   {
+    "step": 13,
+    "tool": "card",
+    "args": {
+     "entity": "sat"
+    },
+    "intent": "Get full dossier on sat entity to find all related records",
+    "obs_chars": 348,
+    "notes_chars": 3784
+   },
+   {
+    "step": 13,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "generating hard SAT instances planted satisfiability quiet planting controlled model phase transition benchmark"
+    },
+    "intent": "External search for hard SAT instance generation methods",
+    "obs_chars": 2572,
+    "notes_chars": 3784
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g",
+     "N18. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B"
+    ]
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "entity": "boolean satisfiability",
+     "claim_type": "mechanism|observation|criticism"
+    },
+    "intent": "Get all findings about SAT generation methods from the corpus",
+    "obs_chars": 262,
+    "notes_chars": 3784
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "entity": "sat",
+     "claim_type": "mechanism|observation|criticism"
+    },
+    "intent": "Get findings tagged under 'sat' entity",
+    "obs_chars": 262,
+    "notes_chars": 3784
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g",
+     "N18. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B"
+    ]
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N17. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g",
+     "N18. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B"
+    ]
+   },
+   {
+    "step": 16,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "controlled model harder than Chen-Interian fixed-shape Navarro-Voronkov multi-component model strengths weaknesses limitations"
+    },
+    "intent": "Find specific comparisons and limitations of the generation models in the 2018 paper",
+    "obs_chars": 2184,
+    "notes_chars": 3784
+   },
+   {
+    "step": 16,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "planted satisfiability quiet planting controlled model phase transition hard instance generation benchmark"
+    },
+    "intent": "Find external literature on hard SAT instance generation methods",
+    "obs_chars": 286,
+    "notes_chars": 3784
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [15a336d1519e46e56f0a7434b7ecf1522cb97b25605101165b617685da649451] Quiet planting: reweighted B",
+     "N21. [f0215bbca0dc1c4e7fb16f87f615a0ab8814c36a6fb9a501982d88dff479a533] Planted RB model (CSP with g"
+    ]
+   },
+   {
+    "step": 17,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#52650",
+     "window": 800
+    },
+    "intent": "Get full context on the comparison between controlled model and Chen-Interian model hardness",
+    "obs_chars": 2013,
+    "notes_chars": 5296
+   },
+   {
+    "step": 17,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#6750",
+     "window": 800
+    },
+    "intent": "Get full context on Navarro-Voronkov fixed-shape model and its properties",
+    "obs_chars": 2015,
+    "notes_chars": 5296
+   },
+   {
+    "step": 18,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "recommendation|definition"
+    },
+    "intent": "Get definitions of the models and any recommendations about which to use",
+    "obs_chars": 256,
+    "notes_chars": 2963
+   },
+   {
+    "step": 20,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "hard SAT instance generation planted satisfiability quiet planting controlled model phase transition benchmark"
+    },
+    "intent": "Find external papers on hard SAT instance generation methods",
+    "obs_chars": 2561,
+    "notes_chars": 4031
+   },
+   {
+    "step": 21,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 22,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "hard|difficult|limitation|weakness|challenge|problem|drawback",
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Find criticism/limitation records about SAT methods in the corpus",
+    "obs_chars": 925,
+    "notes_chars": 4684
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "hard|difficult|limitation|weakness|challenge|problem|drawback",
+     "entity": "sat"
+    },
+    "intent": "Find criticism/limitation records about SAT methods using 'sat' entity",
+    "obs_chars": 1825,
+    "notes_chars": 4684
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 40
+   },
+   {
+    "step": 23,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro",
+     "claim_type": "criticism|observation|mechanism"
+    },
+    "intent": "Get detailed findings on strengths/weaknesses of the three new models from the 2018 paper",
+    "obs_chars": 262,
+    "notes_chars": 5535
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "entity": "boolean satisfiability",
+     "claim_type": "criticism|observation|mechanism"
+    },
+    "intent": "Find findings about SAT hardness generation methods across corpus",
+    "obs_chars": 262,
+    "notes_chars": 5535
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "entity": "sat",
+     "claim_type": "criticism|observation|mechanism"
+    },
+    "intent": "Find findings about SAT methods across corpus",
+    "obs_chars": 262,
+    "notes_chars": 5535
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Get criticism/limitation records for boolean satisfiability entity",
+    "obs_chars": 925,
+    "notes_chars": 5535
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "sat"
+    },
+    "intent": "Get criticism/limitation records for sat entity",
+    "obs_chars": 2421,
+    "notes_chars": 5535
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Get observation records for boolean satisfiability entity",
+    "obs_chars": 1913,
+    "notes_chars": 5535
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 27,
+    "tool": "lineage",
+    "args": {
+     "entity": "boolean satisfiability"
+    },
+    "intent": "Find method genealogy for SAT-related methods",
+    "obs_chars": 74,
+    "notes_chars": 5535
+   },
+   {
+    "step": 28,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 28,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "hard SAT instance generation planted satisfiability quiet planting controlled model phase transition benchmark"
+    },
+    "intent": "Find more detailed content about specific hard SAT generation methods and their properties in the corpus",
+    "obs_chars": 286,
+    "notes_chars": 5535
+   },
+   {
+    "step": 29,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [f0215bbca0dc1c4e] Planted RB model (CSP with growing domains) generates very hard satisfiable ",
+     "N22. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on"
+    ]
+   },
+   {
+    "step": 29,
+    "tool": "lineage_walk_ext",
+    "args": {
+     "entity": "boolean satisfiability",
+     "direction": "successors"
+    },
+    "intent": "Find external successors/continuations of SAT instance generation methods beyond the corpus frontier",
+    "obs_chars": 2639,
+    "notes_chars": 5535
+   },
+   {
+    "step": 29,
+    "tool": "gap_search",
+    "args": {
+     "query": "hard SAT instance generation limitations weaknesses of planted models phase transition benchmarks"
+    },
+    "intent": "Find what the corpus CANNOT answer about hard SAT generation and get external gap-filling papers",
+    "obs_chars": 2834,
+    "notes_chars": 5535
+   },
+   {
+    "step": 29,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "generating hard SAT instances planted satisfiability quiet planting controlled model phase transition benchmark generation methods"
+    },
+    "intent": "External search for leading methods for generating hard SAT instances and their strengths/weaknesses",
+    "obs_chars": 2517,
+    "notes_chars": 5535
+   },
+   {
+    "step": 30,
+    "type": "note_reject",
+    "n_bad": 3,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N21. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND on",
+     "N22. [5654845c4043656f] Planted-solution SAT from integer factorization: encodes N=p*q as CNF; satis",
+     "N27. [lineage_walk_ext] Corpus lineage for boolean satisfiability ends at frontier; external success"
+    ]
+   }
+  ],
+  "notes_final": "N1. [coarse:1dbaaaff6c46] SAT is old; designing efficient methods is key challenge | anchor:\"The problem of satisfiability of a set of boolean formulas is quite old, but designing efficient met\"\nN2. [coarse:95dc868991b0] SAT is NP-hard with practical applications | anchor:\"well-known NP-hard problem with relevant practical applications\"\nN3. [coarse:df803213a979] Boolean SAT = finding assignment maximizing number of satisfied clauses | anchor:\"finding an assignment of variables that maximizes the nu\"\nN4. [coarse:aafb95514e42] SAT and CP results have had major impact | anchor:\"Results obtained for boolean satisfiability (SAT) and constraint satisfaction (CP) have had a major\"\nN5. [coarse:7421acb673bb] SAT = determine whether truth values can be assigned to satisfy formula | anchor:\"determine whether it is possible to assign truth values to\"\nN6. [coarse:ff9e79730bd5] 2018 paper proposes new models for generating hard random boolean formulas and DLPs | anchor:\"new models for generating hard random boolean formulas and disjunctive logic programs\" | epistemic:stated\nN7. [coarse:c753e44eca1f] Unique k-SAT as hard as general k-SAT | anchor:\"We provide some evidence that Unique k-SAT is as hard to solve as general k-SAT\" | epistemic:stated\nN8. [coarse:30864b4e52e2] Deciding zero/one solution essentially as difficult as SAT | anchor:\"Deciding whether a CNF formula has zero or one solution is essentially as difficult as SAT\" | epistemic:stated\nN9. [coarse:993a538e4852] Reweighted belief propagation and quiet planting for random k-SAT | anchor:\"reweighted belief propagation and quiet planting for random k-sat\" | epistemic:stated\nN10. [coarse:d4d3776] PPSZ algorithm gap between k-SAT and unique k-SAT | anchor:\"Especially for PPSZ [9], the fastest known (randomized) algo\"\nN11. [coarse:8742ed0] PPSZ derandomized for unique k-SAT but not general | anchor:\"the PPSZ algorithm has been derandomized for un\"\nN12. [coarse:249b8b37c8e0] Models for generating random instances of search problems have received much attention from AI community in last 20 years | anchor:\"Models for generating random instances of search problems have received much attention fro\" | epistemic:stated\nN13. [coarse:0b38ca18eed4] Results revealed an intriguing phase-transition phenomenon | anchor:\"They also revealed an intriguing phase-transition phenomenon often\" | epistemic:stated\nN14. [112c737b41ab9c] Multi-component model: disjunctions of t CNF formulas, t fixed | anchor:\"Since we consider disjunctions of t CNF formulas, where t is fixed, the probability of such a disjunction bein\"\nN15. [d5706f68808aed] If lim t^2/N=0, there exists epsilon_N sequence | anchor:\"If lim_{N\\rightarrow\\infty}t^{2}/N=0, then there is a sequence \\varepsilon_{N} such that lim_{N\\rightarrow\\inf\"\nN16. [coarse:a20acd0a544a] Adaptive evolutionary algorithm for satisfiability problem proposed | anchor:\"an adaptive evolutionary algorithm for the satisfiability problem\" | epistemic:stated\nN17. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro] 2018 paper introduces: (1) multi-component model (disjunctions of t CNF formulas), (2) fixed-length clause model, (3) controlled model; compares to Chen-Interian and Navarro-Voronkov fixed-shape models | anchor:\"new models for generating hard random boolean formulas\"\nN18. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro] Controlled model generates harder instances than Chen-Interian model | anchor:\"harder than Chen-Interian\" | epistemic:demonstrated\nN19. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro] Multi-component model allows hardness control via parameter t | anchor:\"disjunctions of t CNF formulas, where t is fixed\" | epistemic:stated\nN20. [sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro] Phase transition phenomenon observed in random SAT instance generation | anchor:\"intriguing phase-transition phenomenon\" | epistemic:stated\n[unsourced] N21. [44c0051c34307bb3] Reweighted BP + quiet planting: generates typical random SAT instance AND one of its solutions simultaneously; evidence for purely entropic barriers between clusters | anchor:\"We are hence able to generate at the same time a typical random SAT instance and one of its solutions\" | epistemic:stated\n[unsourced] N22. [5654845c4043656f] Planted-solution SAT from integer factorization: encodes N=p*q as CNF; satisfying assignments = valid factorizations; median runtime grows exponentially in bit-length; scalable, structured, verifiable benchmark controlled by single parameter | anchor:\"median runtime grows exponentially in the bit-length of the factors\" | epistemic:stated\nN23. [coarse:6c37c5d80f8a] Unique k-SAT complexity status (P^NP-complete?) remains unresolved | anchor:\"A well-known example is the Unique $k$ -SAT problem, whose complexity status—whether it is\" | epistemic:stated\nN24. [coarse:8352c3c2aaba] Multi-population adaptive mutation methods evaluated on MAX-SAT problems | anchor:\"In this section, there are three different group of experiments were conducted on well-kno\" | epistemic:stated\nN25. [coarse:7f08a7c162e5] SAT solvers are programs that automatically solve SAT problems | anchor:\"SAT solvers, programs that automatically solve SAT problems,\" | epistemic:stated\nN26. [coarse:b7d78ab2230e] Valiant and Vazirani gave randomized polynomial time reduction from SAT to Unique SAT | anchor:\"Valiant and Vazirani in [18] gave a randomized polynomial time reduction from SAT to Uniqu\" | epistemic:stated\n[unsourced] N27. [lineage_walk_ext] Corpus lineage for boolean satisfiability ends at frontier; external successors include: hardware acceleration via belief propagation, debugging sequential circuits using SAT, generalizing SAT I/III | anchor:\"frontier = corpus lineage ends here\"",
+  "gaps_final": "G1. What specific methods for generating hard SAT instances are described in the 2018 paper? (partially answered: multi-component model, fixed-length clause model, Chen-Interian model, Navarro-Voronkov fixed-shape model, controlled model)\nG2. What are the strengths/weaknesses of each method? (partially answered: multi-component allows hardness control via t; controlled model harder than Chen-Interian; need more on weaknesses)\nG3. Are there other corpus papers on hard SAT instance generation? (adaptive evolutionary algorithm paper checked - it's a solver not a generator)\nG4. What does the broader literature say (external)? (need external search)",
+  "queried": [
+   "card|{\"entity\": \"boolean satisfiability\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"contains\": \"hard instance|hard example|hard formula|phase transition|random formula generation\", \"entity\": \"sat\"}",
+   "card|{\"entity\": \"new models for generating hard random boolean formulas and disjunctive logic programs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "search_text|{\"k\": 12, \"query\": \"hard SAT instance generation method phase transition clause-to-variable ratio\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"qualitative_ablation\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "search_text|{\"k\": 12, \"query\": \"random k-SAT generation model clause-to-variable ratio phase transition hard instances\"}",
+   "deep_read|{\"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\", \"sections\": [\"introduction\", \"method\", \"experiments\"]}",
+   "lineage|{\"direction\": \"both\", \"entity\": \"boolean satisfiability\"}",
+   "search_papers|{\"k\": 8, \"query\": \"generating hard SAT instances random k-SAT phase transition planted satisfiability\"}",
+   "find_gap|{\"entity\": \"boolean satisfiability\"}",
+   "search_text|{\"k\": 12, \"query\": \"planted satisfiability quiet planting hard instances generation method\"}",
+   "search_text|{\"k\": 12, \"query\": \"Chen-Interian model random logic program generation hardness phase transition comparison\"}",
+   "lineage|{\"direction\": \"both\", \"entity\": \"sat\"}",
+   "search_text|{\"k\": 12, \"query\": \"multi-component model disjunction CNF hardness control t parameter strengths limitations\"}",
+   "search_text|{\"k\": 12, \"query\": \"Chen-Interian model disjunctive logic program generation hardness phase transition\"}",
+   "search_text|{\"k\": 12, \"query\": \"quiet planting planted satisfiability hard instance generation method\"}",
+   "findings|{\"claim_type\": \"mechanism|observation|criticism\", \"paper_id\": \"sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem\"}",
+   "findings|{\"claim_type\": \"criticism|observation\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "lineage_walk_ext|{\"direction\": \"forward\", \"entity\": \"boolean satisfiability\"}",
+   "gap_search|{\"query\": \"hard SAT instance generation methods limitations weaknesses\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_an_adaptive_evolutionary_algorithm_for_the_satisfiability_problem\"}",
+   "search_papers|{\"k\": 8, \"query\": \"hard SAT instance generation planted satisfiability quiet planting controlled model phase transition\"}",
+   "findings|{\"claim_type\": \"mechanism|observation|criticism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "card|{\"entity\": \"sat\"}",
+   "search_papers|{\"k\": 8, \"query\": \"generating hard SAT instances planted satisfiability quiet planting controlled model phase transition benchmark\"}",
+   "findings|{\"claim_type\": \"mechanism|observation|criticism\", \"entity\": \"boolean satisfiability\"}",
+   "findings|{\"claim_type\": \"mechanism|observation|criticism\", \"entity\": \"sat\"}",
+   "search_text|{\"k\": 12, \"query\": \"controlled model harder than Chen-Interian fixed-shape Navarro-Voronkov multi-component model strengths weaknesses limitations\"}",
+   "search_text|{\"k\": 12, \"query\": \"planted satisfiability quiet planting controlled model phase transition hard instance generation benchmark\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#52650\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro#6750\", \"window\": 800}",
+   "findings|{\"claim_type\": \"recommendation|definition\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "search_papers|{\"k\": 8, \"query\": \"hard SAT instance generation planted satisfiability quiet planting controlled model phase transition benchmark\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"hard|difficult|limitation|weakness|challenge|problem|drawback\", \"entity\": \"boolean satisfiability\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"hard|difficult|limitation|weakness|challenge|problem|drawback\", \"entity\": \"sat\"}",
+   "findings|{\"claim_type\": \"criticism|observation|mechanism\", \"paper_id\": \"sciverse_new_models_for_generating_hard_random_boolean_formulas_and_disjunctive_logic_pro\"}",
+   "findings|{\"claim_type\": \"criticism|observation|mechanism\", \"entity\": \"boolean satisfiability\"}",
+   "findings|{\"claim_type\": \"criticism|observation|mechanism\", \"entity\": \"sat\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"boolean satisfiability\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"sat\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"boolean satisfiability\"}",
+   "lineage|{\"entity\": \"boolean satisfiability\"}",
+   "search_text|{\"k\": 12, \"query\": \"hard SAT instance generation planted satisfiability quiet planting controlled model phase transition benchmark\"}",
+   "lineage_walk_ext|{\"direction\": \"successors\", \"entity\": \"boolean satisfiability\"}",
+   "gap_search|{\"query\": \"hard SAT instance generation limitations weaknesses of planted models phase transition benchmarks\"}",
+   "search_papers|{\"k\": 8, \"query\": \"generating hard SAT instances planted satisfiability quiet planting controlled model phase transition benchmark generation methods\"}"
+  ],
+  "gate": {
+   "note_rejects": 36,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 36
+   },
+   "_consec_full_reject": 1,
+   "merge_downgraded_lines": 36,
+   "merge_total_lines": 409,
+   "relaxed_writes": 19,
+   "notes_truncated": 6865,
+   "f28_autos": 0,
+   "max_evidence_streak": 2,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "948b6cb986a5d7732722975d",
+  "type": "aggregation",
+  "question": "What are leading approaches for evaluating complex scientific question answering systems in NLP?",
+  "gold_hint": "",
+  "answer": "Evaluating complex scientific question-answering (QA) systems in NLP has evolved from simple extractive-metric benchmarks toward multi-dimensional, domain-specific, and agent-oriented frameworks. The leading approaches can be organized along several axes:\n\n**1. Domain-Specific Scientific Context Benchmarks**\n\nThe most prominent recent contribution is **SciCUEval** (2025), a comprehensive dataset designed to evaluate scientific context understanding in LLMs [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin]. Its motivation is that existing QA benchmarks focus on direct QA tasks and provide limited insight into how models handle noisy, lengthy scientific contexts, while neglecting the heterogeneous structured nature of scientific information (text, relational graphs, tabular data) [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#2700]. The final dataset comprises 10 sub-datasets (2 unstructured text, 4 structured table, 4 other), with 90.83% meeting high-quality criteria [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#17550]. It evaluates four competencies, including Relevant Information Identification (distinguishing relevant from extraneous noise in complex scientific contexts) [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#9450]. Reported results show Text accuracy of 71.91, Table accuracy of 55.91, KG accuracy of 63.13, and an Overall score of 61.52 [bd02c1391b9354][bd3d6538e09152][8bdf920fa0d950][8b153f31251bfa], with a second configuration yielding Text 72.22 and Table 42.98 [3059a35ce4d019][20d6666f21ced0].\n\n**CCSBench** (2024) evaluates compositional controllability in LLMs for scientific documents, reporting inter-annotator agreement above 0.85 and accuracy scores above 0.9 [ce8ba6eb0433fb][b41edb1e9c10e9].\n\n**SCI-VerifyBench** (2025) is a cross-disciplinary benchmark for scientific answer verification covering math, physics, biology, chemistry, and general scientific QA, explicitly addressing the absence of systematic evaluation standards and insufficient disciplinary coverage in prior work [external:SCI-VerifyBench].\n\n**MatSciBench** (2025) provides 1,340 college-level materials science problems spanning 6 primary fields and 31 sub-fields, with a 3-tier difficulty scale based on reasoning length and multimodal reasoning requirements; even Gemini-2.5-Pro achieves below 80% accuracy [external:MatSciBench].\n\n**WildSci** (2026) offers a dataset of domain-specific science questions drawn from peer-reviewed literature across 9 disciplines and 26 subdomains, using a multiple-choice format for scalable training with well-defined reward signals and RL finetuning [external:WildSci].\n\n**2. Reproducibility and Fairness Frameworks**\n\n**SF-QA** (2021) addresses a critical gap: reproducibility in open-domain QA research, where it is difficult to keep settings the same across studies [3059a35ce4d019]. The framework modularizes the open-domain QA pipeline, making the task easily accessible and reducing the resource burden of building full systems [e46788f2735b88][2e04fe40ae6db6]. Parameter settings for different models are recorded in separate configuration files to ensure comparability [27d36105683e4e].\n\n**3. Multi-Hop and Reasoning-Centric Evaluation**\n\nMulti-hop QA evaluation focuses on reasoning across multiple snippets, assessing relevance and fluency of answers that require integrating information from distributed sources [sciverse_multi_hop_qgen#56700]. The DROP benchmark (9,536 examples) uses F1 score metrics in a few-shot setting to evaluate disambiguation, reasoning, and multi-step inference [hub_W4226278401#153900].\n\n**4. Agent-Oriented and Open-Ended Scientific Reasoning**\n\n**PAPERMIND** (2026) is a benchmark for integrated agent-oriented scientific reasoning over research papers, spanning 7 domains and 4 task families. It evaluates grounding, evidence interpretation, cross-source synthesis, and critical evaluation as unified abilities [external:PAPERMIND].\n\n**Deep Data Research (DDR)** (2026) introduces an open-ended task where LLMs autonomously extract insights from databases. DDR-Bench provides a large-scale checklist-based benchmark for verifiable evaluation, distinguishing investigatory from executional intelligence [external:DDR].\n\n**Qworld** (2026) generates question-specific evaluation criteria via a recursive expansion tree, decomposing questions into scenarios, perspectives, and binary criteria. On HealthBench it covers 89% of expert criteria and generates 79% novel criteria [external:Qworld].\n\n**5. LLM-as-Judge and Automated Evaluation**\n\nA recognized failure mode of LLM-as-judge evaluation is that when a reference answer conflicts with the judge's parametric knowledge, scores become unreliable; a swapped-reference QA framework reveals this vulnerability [external:ef38d09cd06e]. **JudgeFlow** proposes agentic workflow optimization via a block judge, providing fine-grained diagnostic signals for LLM-based workflows [external:35c86b2a86fe].\n\n**6. Context-Driven Question Generation for Testing**\n\n**CQ²A** (2025) uses LLM text generation to produce questions given a context and answer, for testing QA software. It extracts entities and relationships from context as answers and generates corresponding questions, enhancing completeness and naturalness of QA testing [coarse:14c2ef8e5d03][52d2bbd09e7823][3297952563783f]. A known limitation is hallucination in generated questions, where the model introduces information not present in the source or violates constraints [coarse:63866fc823f0].\n\n**7. Benchmark Taxonomy and Standard Metrics**\n\nThe broader QA benchmark landscape is organized into categories: MRQA (SQuAD 1.1, NewsQA, TriviaQA, SearchQA), Open-Domain (Natural Questions, Web Questions), and Multi-Choice (CommonsenseQA, OpenBookQA, CosmosQA) [arxiv_2212.13428#58050]. Domain-specific datasets include ConvFinQA (Finance, 14,115 examples, DSL-based), PACIFIC (Finance, 19,008, Multi-Type), TAT-DQA (Finance, 16,558, Multi-Type), and MMQA (Wikipedia, 29,918, Spans) [arxiv_2212.13465#6750]. Standard metrics include F1, exact match, and domain-specific DSL evaluation.\n\n**Summary of Leading Approaches:**\n- **Heterogeneous context evaluation** (SciCUEval): testing models on mixed text/table/KG scientific contexts\n- **Compositional controllability** (CCSBench): multi-constraint scientific document generation\n- **Cross-disciplinary verification** (SCI-VerifyBench): systematic answer verification across fields\n- **Reproducibility-first frameworks** (SF-QA): modularized, configuration-tracked pipelines\n- **Multi-hop reasoning** (DROP, multi-hop QA): F1-based evaluation of distributed information integration\n- **Agent-oriented open-ended tasks** (PAPERMIND, DDR, Qworld): checklist-based, criteria-generated evaluation of autonomous scientific reasoning\n- **LLM-as-judge with safeguards** (swapped-reference, JudgeFlow): automated evaluation with known failure modes addressed\n- **Context-driven question generation** (CQ²A): automated test-case generation for QA software\n\nThe field is moving from single-metric extractive evaluation toward multi-dimensional, domain-specific, and agent-oriented frameworks that assess not just answer correctness but also reasoning quality, context handling, cross-source synthesis, and verifiability.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "question answering"
+    },
+    "intent": "Get cross-paper evidence dossier for question answering to see what evaluation approaches are documented",
+    "obs_chars": 2582,
+    "notes_chars": 1037
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview records from SciCUEval paper about scientific context understanding evaluation",
+    "obs_chars": 1057,
+    "notes_chars": 1037
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview records from CCSBench paper about evaluating LLMs for scientific documents",
+    "obs_chars": 545,
+    "notes_chars": 1037
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "evaluation framework benchmark scientific question answering complex",
+     "k": 12
+    },
+    "intent": "Broad search across corpus for evaluation approaches for scientific QA",
+    "obs_chars": 1871,
+    "notes_chars": 1037
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "contains": "evaluation|benchmark|metric|fair"
+    },
+    "intent": "Get findings on SF-QA evaluation library for open-domain QA",
+    "obs_chars": 496,
+    "notes_chars": 2583
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "contains": "evaluation|testing|question generation|context"
+    },
+    "intent": "Get findings on testing QA software with context-driven question generation",
+    "obs_chars": 2034,
+    "notes_chars": 2583
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "Knowledge-based question answering"
+    },
+    "intent": "Get cross-paper evidence dossier for knowledge-based QA",
+    "obs_chars": 467,
+    "notes_chars": 2583
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "LLM-as-judge evaluation scientific question answering benchmark metrics",
+     "k": 12
+    },
+    "intent": "Search for LLM-as-judge and evaluation methodology for scientific QA",
+    "obs_chars": 1753,
+    "notes_chars": 2583
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "contains": "evaluation|benchmark|metric|compositional|controllability"
+    },
+    "intent": "Get CCSBench evaluation details",
+    "obs_chars": 1217,
+    "notes_chars": 4135
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "contains": "evaluation|metric|benchmark|scientific|context"
+    },
+    "intent": "Get SciCUEval evaluation details",
+    "obs_chars": 1612,
+    "notes_chars": 4135
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from SciCUEval paper for evaluation details",
+    "obs_chars": 1612,
+    "notes_chars": 4135
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from CCSBench paper for evaluation approach details",
+    "obs_chars": 1542,
+    "notes_chars": 4135
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Asking: leading approaches for evaluating complex scientific QA systems in NLP. Need:"
+    ]
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc"
+    ]
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get SciCUEval's recommended evaluation approaches/metrics",
+    "obs_chars": 1057,
+    "notes_chars": 1941
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get CCSBench's recommended evaluation approaches",
+    "obs_chars": 545,
+    "notes_chars": 1941
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get SF-QA's recommended evaluation approach",
+    "obs_chars": 968,
+    "notes_chars": 1941
+   },
+   {
+    "step": 8,
+    "tool": "search_papers",
+    "args": {
+     "query": "evaluating large language models scientific question answering benchmark LLM-as-judge 2024 2025",
+     "k": 8
+    },
+    "intent": "Find external papers on leading evaluation approaches for scientific QA",
+    "obs_chars": 2556,
+    "notes_chars": 1941
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get SciCUEval mechanism/evaluation approach details",
+    "obs_chars": 1057,
+    "notes_chars": 2332
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get CCSBench mechanism/evaluation approach details",
+    "obs_chars": 545,
+    "notes_chars": 2332
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get SF-QA mechanism/evaluation approach details",
+    "obs_chars": 968,
+    "notes_chars": 2332
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "SciCUEval evaluation metrics scientific context understanding LLM benchmark"
+    },
+    "intent": "Get detailed evaluation methodology from SciCUEval paper",
+    "obs_chars": 1866,
+    "notes_chars": 2332
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "CCSBench compositional controllability evaluation methodology scientific documents LLM"
+    },
+    "intent": "Get detailed evaluation methodology from CCSBench paper",
+    "obs_chars": 1751,
+    "notes_chars": 2332
+   },
+   {
+    "step": 10,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "SF-QA simple fair evaluation open-domain question answering pipeline modularization metrics"
+    },
+    "intent": "Get detailed evaluation approach from SF-QA paper",
+    "obs_chars": 1868,
+    "notes_chars": 2332
+   },
+   {
+    "step": 10,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "benchmark evaluation scientific question answering LLM 2024 2025 comprehensive"
+    },
+    "intent": "Find external papers on leading evaluation approaches for scientific QA",
+    "obs_chars": 2590,
+    "notes_chars": 2332
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 11,
+    "tool": "card",
+    "args": {
+     "entity": "retrieval"
+    },
+    "intent": "Get cross-paper evidence dossier for retrieval-based QA evaluation",
+    "obs_chars": 3934,
+    "notes_chars": 3056
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "definition"
+    },
+    "intent": "Get SF-QA's definition of evaluation approach",
+    "obs_chars": 968,
+    "notes_chars": 3198
+   },
+   {
+    "step": 12,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "SciBench SciEval scientific question answering LLM evaluation benchmark 2024 2025"
+    },
+    "intent": "Find external papers on scientific QA evaluation benchmarks",
+    "obs_chars": 2579,
+    "notes_chars": 3198
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 7,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "contains": "metric|evaluation|score|accuracy|F1|BLEU|ROUGE"
+    },
+    "intent": "Get SciCUEval specific evaluation metrics and methodology",
+    "obs_chars": 743,
+    "notes_chars": 3628
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "contains": "metric|evaluation|score|accuracy|F1|BLEU|ROUGE|controllability"
+    },
+    "intent": "Get CCSBench specific evaluation metrics and methodology",
+    "obs_chars": 1797,
+    "notes_chars": 3628
+   },
+   {
+    "step": 13,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "LLM-as-judge evaluation scientific question answering benchmark 2024 2025"
+    },
+    "intent": "Find external papers on LLM-as-judge for scientific QA evaluation",
+    "obs_chars": 2532,
+    "notes_chars": 3628
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 9,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition|recommendation|observation"
+    },
+    "intent": "Get SciCUEval's evaluation methodology, metrics, and design rationale",
+    "obs_chars": 268,
+    "notes_chars": 4180
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition|recommendation|observation"
+    },
+    "intent": "Get CCSBench's evaluation methodology and metrics",
+    "obs_chars": 268,
+    "notes_chars": 4180
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "definition|recommendation|observation"
+    },
+    "intent": "Get SF-QA's evaluation framework details",
+    "obs_chars": 268,
+    "notes_chars": 4180
+   },
+   {
+    "step": 14,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "scientific question answering evaluation framework benchmark LLM 2024 2025 multi-hop reasoning domain-specific"
+    },
+    "intent": "Find more external papers on scientific QA evaluation approaches",
+    "obs_chars": 2565,
+    "notes_chars": 4180
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 15,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "scientific question answering evaluation metrics LLM benchmark 2024 2025 multi-hop reasoning domain-specific"
+    },
+    "intent": "Broader external search for scientific QA evaluation approaches",
+    "obs_chars": 2534,
+    "notes_chars": 4450
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 16,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "evaluation framework benchmark scientific question answering LLM metrics accuracy F1"
+    },
+    "intent": "Find evaluation methodology details across corpus papers",
+    "obs_chars": 286,
+    "notes_chars": 4450
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "mechanism|observation"
+    },
+    "intent": "Get mechanism/observation findings for SciCUEval evaluation methodology",
+    "obs_chars": 252,
+    "notes_chars": 4450
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "mechanism|observation"
+    },
+    "intent": "Get mechanism/observation findings for CCSBench evaluation methodology",
+    "obs_chars": 252,
+    "notes_chars": 4450
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "mechanism|observation"
+    },
+    "intent": "Get mechanism/observation findings for SF-QA evaluation framework",
+    "obs_chars": 252,
+    "notes_chars": 4450
+   },
+   {
+    "step": 18,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 19,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "criticism"
+    },
+    "intent": "Get limitations/criticism from SciCUEval paper",
+    "obs_chars": 1057,
+    "notes_chars": 4450
+   },
+   {
+    "step": 19,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "criticism"
+    },
+    "intent": "Get limitations/criticism from CCSBench paper",
+    "obs_chars": 545,
+    "notes_chars": 4450
+   },
+   {
+    "step": 20,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 20,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "sections": [
+      "evaluation",
+      "methodology",
+      "dataset design"
+     ]
+    },
+    "intent": "Get detailed evaluation methodology and metrics for SciCUEval",
+    "obs_chars": 1320,
+    "notes_chars": 4450
+   },
+   {
+    "step": 20,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "sections": [
+      "evaluation",
+      "methodology",
+      "benchmark design"
+     ]
+    },
+    "intent": "Get detailed evaluation methodology for CCSBench",
+    "obs_chars": 1199,
+    "notes_chars": 4450
+   },
+   {
+    "step": 20,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "sections": [
+      "evaluation",
+      "methodology",
+      "framework"
+     ]
+    },
+    "intent": "Get SF-QA evaluation framework details",
+    "obs_chars": 1770,
+    "notes_chars": 4450
+   },
+   {
+    "step": 20,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "scientific question answering evaluation LLM benchmark 2024 2025 multi-hop reasoning domain-specific evaluation framework"
+    },
+    "intent": "Find additional external papers on scientific QA evaluation approaches",
+    "obs_chars": 2565,
+    "notes_chars": 4450
+   },
+   {
+    "step": 21,
+    "type": "note_reject",
+    "n_bad": 10,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition|mechanism|observation"
+    },
+    "intent": "Get SciCUEval's evaluation methodology, metrics, and dataset design details",
+    "obs_chars": 263,
+    "notes_chars": 5644
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition|mechanism|observation"
+    },
+    "intent": "Get CCSBench's evaluation methodology and what compositional controllability means",
+    "obs_chars": 263,
+    "notes_chars": 5644
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "definition|mechanism|observation"
+    },
+    "intent": "Get SF-QA's specific evaluation approach, metrics, and benchmarks",
+    "obs_chars": 263,
+    "notes_chars": 5644
+   },
+   {
+    "step": 21,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "evaluating LLM scientific reasoning benchmark 2024 2025 multi-step chain-of-thought verification domain-specific QA"
+    },
+    "intent": "Find more external papers on scientific QA evaluation approaches",
+    "obs_chars": 2516,
+    "notes_chars": 5644
+   },
+   {
+    "step": 22,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 48
+   },
+   {
+    "step": 23,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 23,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin"
+    },
+    "intent": "Get full dossier on SciCUEval for evaluation methodology details",
+    "obs_chars": 4515,
+    "notes_chars": 5954
+   },
+   {
+    "step": 23,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen"
+    },
+    "intent": "Get full dossier on CCSBench for evaluation methodology details",
+    "obs_chars": 337,
+    "notes_chars": 5954
+   },
+   {
+    "step": 23,
+    "tool": "card",
+    "args": {
+     "entity": "arxiv_2101.01910"
+    },
+    "intent": "Get full dossier on SF-QA for evaluation framework details",
+    "obs_chars": 583,
+    "notes_chars": 5954
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP. Need: evaluat",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 26,
+    "tool": "search_text",
+    "args": {
+     "query": "SciCUEval evaluation metric accuracy text table knowledge graph scientific context understanding",
+     "k": 8
+    },
+    "intent": "Get detailed SciCUEval evaluation methodology from full text",
+    "obs_chars": 2889,
+    "notes_chars": 5900
+   },
+   {
+    "step": 26,
+    "tool": "search_text",
+    "args": {
+     "query": "CCSBench compositional controllability scientific document LLM evaluation task",
+     "k": 8
+    },
+    "intent": "Get detailed CCSBench evaluation methodology from full text",
+    "obs_chars": 286,
+    "notes_chars": 5900
+   },
+   {
+    "step": 26,
+    "tool": "search_text",
+    "args": {
+     "query": "SF-QA simple fair evaluation open-domain question answering F1 EM metric benchmark",
+     "k": 8
+    },
+    "intent": "Get SF-QA specific evaluation metrics and benchmarks",
+    "obs_chars": 286,
+    "notes_chars": 5900
+   },
+   {
+    "step": 26,
+    "tool": "search_papers",
+    "args": {
+     "k": 8,
+     "query": "scientific question answering evaluation benchmark 2024 2025 multi-hop reasoning domain-specific LLM assessment framework"
+    },
+    "intent": "Find additional external papers on scientific QA evaluation approaches",
+    "obs_chars": 2565,
+    "notes_chars": 5900
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen",
+     "claim_type": "definition|mechanism"
+    },
+    "intent": "Get CCSBench definition of compositional controllability and task types",
+    "obs_chars": 251,
+    "notes_chars": 6767
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "definition|mechanism"
+    },
+    "intent": "Get SciCUEval evaluation methodology details (metrics, modalities)",
+    "obs_chars": 251,
+    "notes_chars": 6767
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.01910",
+     "claim_type": "definition|mechanism|recommendation"
+    },
+    "intent": "Get SF-QA specific evaluation metrics and framework details",
+    "obs_chars": 266,
+    "notes_chars": 6767
+   },
+   {
+    "step": 28,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 29,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   },
+   {
+    "step": 30,
+    "type": "note_reject",
+    "n_bad": 11,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.",
+     "N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluenc",
+     "N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parame"
+    ]
+   }
+  ],
+  "notes_final": "[unsourced] N1. [question] Leading approaches for evaluating complex scientific QA systems in NLP.\n[unsourced] N2. [plan] Corpus: sciverse_scicueval (2025), sciverse_ccsbench (2024), arxiv_2101.01910 (SF-QA, 2021), sciverse_testing_qa_software (2025), sciverse_scirag (2025).\nN3. [coarse:7909620cb436] SciCUEval: comprehensive dataset for evaluating scientific context understanding in LLMs | epistemic:stated\nN4. [coarse:b452520db615] LLM application to scientific domains challenging due to unique scientific language/knowledge | epistemic:stated\nN5. [coarse:28a0ca625866] Existing work primarily evaluates LLMs under single-constraint settings (e.g., formality) | epistemic:stated\nN6. [coarse:62151048a71b] Knowledge-based QA is a challenging NLP task | epistemic:stated\nN7. [coarse:b6cbee82715d] Evolution of QA systems: rule-based to modern | epistemic:stated\nN8. [coarse:56fd6624e838] Major QA systems compared for statistical approach | epistemic:stated\nN9. [hub_W4226278401#153900] DROP: 9,536 examples, few-shot, F1 score metric\n[unsourced] N10. [sciverse_multi_hop_qgen#56700] Multi-hop QA eval: reasoning across snippets, relevance, fluency\nN11. [coarse:a2b4aa30e466] SF-QA: simple and fair evaluation framework for open-domain QA, modularizes pipeline | epistemic:stated\nN12. [coarse:14c2ef8e5d03] CQ^2A: LLM text generation to generate questions given context+answer for testing QA software | epistemic:stated\nN13. [52d2bbd09e7823] CQ^2A extracts entities/relationships from context as answers, generates questions | epistemic:stated\nN14. [3297952563783f] CQ^2A enhances completeness and naturalness of QA testing | epistemic:stated\nN15. [coarse:63866fc823f0] Hallucinations in generated questions: introduce info not in source or violate constraints | epistemic:stated\nN16. [85b792f94cb5f0] Knowledge-based QA: novel approach performs question-... | epistemic:stated\n[unsourced] N17. [external:ef38d09cd06e] LLM-as-judge failure mode: when reference conflicts with judge's parametric knowledge, scores become unreliable; swapped-reference QA framework reveals this | epistemic:stated\n[unsourced] N18. [external:35c86b2a86fe] JudgeFlow: agentic workflow optimization via block judge; fine-grained diagnostic signals for LLM-based workflows | epistemic:stated\n[unsourced] N19. [external:PAPERMIND] PAPERMIND (2026): benchmark for integrated agent-oriented scientific reasoning over research papers; 7 domains; 4 task families; evaluates grounding, evidence interpretation, cross-source synthesis, critical evaluation as unified abilities | epistemic:stated\nN20. [arxiv_2212.13428#58050] QA benchmark taxonomy: MRQA (SQuAD 1.1, NewsQA, TriviaQA, SearchQA), Open-Domain (Natural Questions, Web Questions), Multi-Choice (CommonsenseQA, OpenBookQA, CosmosQA) | epistemic:stated\nN21. [arxiv_2212.13465#6750] QA dataset table: ConvFinQA (Finance, 14,115, DSL), PACIFIC (Finance, 19,008, Multi-Type), TAT-DQA (Finance, 16,558, Multi-Type), MMQA (Wikipedia, 29,918, Spans) | epistemic:stated\nN22. [coarse:f723a8e81a28] Mainstream QA approaches: semantic parsing based, information retrieval based, generation based | epistemic:stated\n[unsourced] N23. [external:MatSciBench] MatSciBench (2025): 1,340 college-level materials science problems; 6 primary fields, 31 sub-fields; 3-tier difficulty by reasoning length; multimodal reasoning; Gemini-2.5-Pro <80% accuracy | epistemic:stated\n[unsourced] N24. [external:deep_research] Deep Research (2026): prototypical vertical app for general-purpose agents; unifies industry DR and AI4S; LLMs as core | epistemic:stated\n[unsourced] N25. [external:Qworld] Qworld (2026): question-specific evaluation criteria via recursive expansion tree; decomposes into scenarios/perspectives/binary criteria; on HealthBench covers 89% of expert criteria, generates 79% novel criteria | epistemic:stated\n[unsourced] N26. [external:DDR] Deep Data Research (2026): open-ended task for LLMs to autonomously extract insights from databases; DDR-Bench: large-scale checklist-based benchmark for verifiable evaluation; distinguishes investigatory vs executional intelligence | epistemic:stated\n[unsourced] N27. [external:WildSci] WildSci (2026): dataset of domain-specific science questions from peer-reviewed literature; 9 disciplines, 26 subdomains; multiple-choice format for scalable training with well-defined reward signals; RL finetuning | epistemic:stated\nN28. [bd02c1391b9354] SciCUEval result: Text: 71.91 | epistemic:demonstrated\nN29. [bd3d6538e09152] SciCUEval result: Table: 55.91 | epistemic:demonstrated\nN30. [8bdf920fa0d950] SciCUEval result: KG: 63.13 | epistemic:demonstrated\nN31. [8b153f31251bfa] SciCUEval result: Overall: 61.52 | epistemic:demonstrated\nN32. [3059a35ce4d019] SciCUEval result: Text: 72.22 | epistemic:demonstrated\nN33. [20d6666f21ced0] SciCUEval result: Table: 42.98 | epistemic:demonstrated\nN34. [ce8ba6eb0433fb] CCSBench: inter-annotator agreement >0.85 | epistemic:demonstrated\nN35. [b41edb1e9c10e9] CCSBench: accuracy scores >0.9 | epistemic:demonstrated\nN36. [3059a35ce4d019] SF-QA: Reproducibility is a problem in current open-domain QA research because it is hard to keep settings the same | epistemic:stated\nN37. [2e04fe40ae6db6] SF-QA: Open-domain QA requires large amounts of resources for building the full system | epistemic:stated\nN38. [e46788f2735b88] SF-QA: framework modularizes the pipeline open-domain QA system, making the task easily accessible | epistemic:stated\nN39. [27d36105683e4e] SF-QA: parameter settings for different models are recorded and saved in a separate configuration file | epistemic:stated\n[unsourced] N40. [external:SCI-VerifyBench] SCI-VerifyBench (2025): cross-disciplinary benchmark for scientific answer verification covering math, physics, biology, chemistry, general scientific QA; addresses absence of systematic evaluation standards and insufficient disciplinary coverage | epistemic:stated\nN41. [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#9450] SciCUEval 4 evaluation competencies: Relevant Information Identification (distinguish relevant from extraneous noise in complex scientific contexts) | epistemic:stated\nN42. [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#17550] SciCUEval final dataset: 10 sub-datasets (2 unstructured text, 4 structured table, 4 other); 90.83% met high-quality criteria | epistemic:stated\nN43. [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin#2700] SciCUEval motivation: existing QA benchmarks focus on direct QA tasks, limited insight into scientific context understanding for noisy/lengthy contexts; neglect heterogeneous structured nature (text, relational graphs, tabular) | epistemic:stated",
+  "gaps_final": "",
+  "queried": [
+   "card|{\"entity\": \"question answering\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "search_text|{\"k\": 12, \"query\": \"evaluation framework benchmark scientific question answering complex\"}",
+   "findings|{\"contains\": \"evaluation|benchmark|metric|fair\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "findings|{\"contains\": \"evaluation|testing|question generation|context\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "card|{\"entity\": \"knowledge-based question answering\"}",
+   "search_text|{\"k\": 12, \"query\": \"LLM-as-judge evaluation scientific question answering benchmark metrics\"}",
+   "findings|{\"contains\": \"evaluation|benchmark|metric|compositional|controllability\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"contains\": \"evaluation|metric|benchmark|scientific|context\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "search_papers|{\"k\": 8, \"query\": \"evaluating large language models scientific question answering benchmark LLM-as-judge 2024 2025\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "search_text|{\"k\": 12, \"query\": \"SciCUEval evaluation metrics scientific context understanding LLM benchmark\"}",
+   "search_text|{\"k\": 12, \"query\": \"CCSBench compositional controllability evaluation methodology scientific documents LLM\"}",
+   "search_text|{\"k\": 12, \"query\": \"SF-QA simple fair evaluation open-domain question answering pipeline modularization metrics\"}",
+   "search_papers|{\"k\": 8, \"query\": \"benchmark evaluation scientific question answering LLM 2024 2025 comprehensive\"}",
+   "card|{\"entity\": \"retrieval\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "search_papers|{\"k\": 8, \"query\": \"SciBench SciEval scientific question answering LLM evaluation benchmark 2024 2025\"}",
+   "findings|{\"contains\": \"metric|evaluation|score|accuracy|F1|BLEU|ROUGE\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"contains\": \"metric|evaluation|score|accuracy|F1|BLEU|ROUGE|controllability\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "search_papers|{\"k\": 8, \"query\": \"LLM-as-judge evaluation scientific question answering benchmark 2024 2025\"}",
+   "findings|{\"claim_type\": \"definition|recommendation|observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition|recommendation|observation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"definition|recommendation|observation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "search_papers|{\"k\": 8, \"query\": \"scientific question answering evaluation framework benchmark LLM 2024 2025 multi-hop reasoning domain-specific\"}",
+   "search_papers|{\"k\": 8, \"query\": \"scientific question answering evaluation metrics LLM benchmark 2024 2025 multi-hop reasoning domain-specific\"}",
+   "search_text|{\"k\": 12, \"query\": \"evaluation framework benchmark scientific question answering LLM metrics accuracy F1\"}",
+   "findings|{\"claim_type\": \"mechanism|observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"mechanism|observation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"mechanism|observation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "deep_read|{\"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\", \"sections\": [\"evaluation\", \"methodology\", \"dataset design\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\", \"sections\": [\"evaluation\", \"methodology\", \"benchmark design\"]}",
+   "deep_read|{\"paper_id\": \"arxiv_2101.01910\", \"sections\": [\"evaluation\", \"methodology\", \"framework\"]}",
+   "search_papers|{\"k\": 8, \"query\": \"scientific question answering evaluation LLM benchmark 2024 2025 multi-hop reasoning domain-specific evaluation framework\"}",
+   "findings|{\"claim_type\": \"definition|mechanism|observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition|mechanism|observation\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"definition|mechanism|observation\", \"paper_id\": \"arxiv_2101.01910\"}",
+   "search_papers|{\"k\": 8, \"query\": \"evaluating LLM scientific reasoning benchmark 2024 2025 multi-step chain-of-thought verification domain-specific QA\"}",
+   "card|{\"entity\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "card|{\"entity\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "card|{\"entity\": \"arxiv_2101.01910\"}",
+   "search_text|{\"k\": 8, \"query\": \"SciCUEval evaluation metric accuracy text table knowledge graph scientific context understanding\"}",
+   "search_text|{\"k\": 8, \"query\": \"CCSBench compositional controllability scientific document LLM evaluation task\"}",
+   "search_text|{\"k\": 8, \"query\": \"SF-QA simple fair evaluation open-domain question answering F1 EM metric benchmark\"}",
+   "search_papers|{\"k\": 8, \"query\": \"scientific question answering evaluation benchmark 2024 2025 multi-hop reasoning domain-specific LLM assessment framework\"}",
+   "findings|{\"claim_type\": \"definition|mechanism\", \"paper_id\": \"sciverse_ccsbench_evaluating_compositional_controllability_in_llms_for_scientific_documen\"}",
+   "findings|{\"claim_type\": \"definition|mechanism\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"definition|mechanism|recommendation\", \"paper_id\": \"arxiv_2101.01910\"}"
+  ],
+  "gate": {
+   "note_rejects": 212,
+   "numeric_fail": {
+    "missing_nums": [
+     "10.",
+     "2.5",
+     "26",
+     "79",
+     "80",
+     "89"
+    ],
+    "unsourced": [],
+    "altered_titles": []
+   },
+   "repair": 1,
+   "gate_passed": false,
+   "a_rows": 1,
+   "a_chars": 69,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 212
+   },
+   "_consec_full_reject": 2,
+   "merge_downgraded_lines": 243,
+   "merge_total_lines": 811,
+   "relaxed_writes": 30,
+   "f28_autos": 0,
+   "max_evidence_streak": 2,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:f937f60e8d48] The method leads to a=9% | src:card@step10"
+  ],
+  "degenerate": false
+ }
+]

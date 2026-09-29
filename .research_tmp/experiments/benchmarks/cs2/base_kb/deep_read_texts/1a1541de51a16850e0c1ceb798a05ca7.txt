@@ -1,0 +1,1798 @@
+Finding Representative Group Fairness Metrics Using Correlation Estimations 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below:
+
+ Description: 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ arXiv is now an independent nonprofit! 
+ Learn more 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ License: arXiv.org perpetual non-exclusive license
+ 
+ 
+arXiv:2109.05697v2 [cs.LG] 28 Dec 2022 
+ 
+ 
+ 
+ 2021
+
+ 
+
+# Finding Representative Group Fairness Metrics Using Correlation Estimations
+
+ 
+ 
+ Hadis Anahideh
+ 
+ Email:  hadis@uic.edu 
+ 
+ Affiliation:  Mechanical and Industrial Engineering Department, University of Illinois Chicago, 842 W. Taylor St, Chicago, 60607, IL, USA
+ 
+    
+ Nazanin Nezami
+ 
+ Email:  nnezam2@uic.edu 
+ 
+ Affiliation:  Mechanical and Industrial Engineering Department, University of Illinois Chicago, 842 W. Taylor St, Chicago, 60607, IL, USA
+ 
+    
+ Abolfazl Asudeh
+ 
+ Email:  asudeh@uic.edu 
+ 
+ Affiliation:  Computer Science Department, University of Illinois Chicago, 851 S. Morgan St, Chicago, 60607, IL, USA
+ 
+
+ Abstract 
+ 
+ It is of critical importance to be aware of the historical discrimination embedded in the data and to consider a fairness measure to reduce bias throughout the predictive modeling pipeline. Given various notions of fairness defined in the literature, investigating the correlation and interaction among metrics is vital for addressing the unfairness. Practitioners and data scientists should be able to comprehend each metric and examine their impact on one another given the context, use case, and regulations. Exploring the combinatorial space of different metrics for such examination is burdensome. To alleviate the burden of selecting fairness notions for consideration, we propose a framework that estimates the correlation among fairness notions. Our framework consequently identifies a set of diverse and semantically distinct metrics as representative for a given context. We propose a Monte-Carlo sampling technique for computing the correlations between fairness metrics by indirect and efficient perturbation in the model space. Using the estimated correlations, we then find a subset of representative metrics. The paper proposes a generic method that can generalize to any arbitrary set of fairness metrics. We showcase the validity of the proposal using comprehensive experiments on real-world benchmark datasets.
+
+ 
+ 
+ keywords Fairness,
+Representative notions,
+Monte-Carlo,
+Bootstrapping
+ 
+ 
+
+## 1 Introduction
+
+ 
+ Machine learning (ML) has become one the most applicable and influential tools to support critical decision makings such as college admission, job hiring, loan decisions, criminal risk assessment, etc. ( 1 ) . Widespread applications of ML-based predictive modeling have induced growing concerns regarding social inequities and unfairness in decision-making processes. With fairness being critical in practicing responsible machine learning, fairness-aware learning has been the primary goal in many recent machine learning developments.
+
+ 
+ 
+ Fairness-aware learning can be achieved by pre-processing, in-processing, or post-processing intervention strategies  ( 2 ) .
+Pre-processing strategies involve the fairness measure in the data preparation step to mitigate the potential bias in the input data and produce fair outcomes  ( 3 , 4 , 5 ) . In-process approaches  ( 6 , 7 , 8 ) incorporate fairness in the design of the algorithm to generate a fair outcome. Post-process methods ( 9 , 10 ) , manipulate the model outcome to mitigate unfairness.
+
+ 
+ 
+ Fairness is an abstract term with many definitions.
+The literature on
+ Fairness in ML encompasses more than 21 fairness metrics  ( 11 , 12 ) . 
+On the other hand, impossibility theorems prove that, assuming the existence of bias in the underlying data, it is not possible to fully mitigate all unfairnesses ( 13 , 14 , 15 ) .
+As a result, it is of interest to reduce unfairnesses of a model for the set of relevant measures  ( 16 ) .
+While systems such as [ 17 ] are capable of reducing model unfairness for multiple definitions,
+their time complexity is exponential to the number of fairness constraints; hence those are not practical a set of fairness metrics that is not small  [ 16 ] .
+Although selecting a small subset of relevant fairness metrics is important,
+selecting such a set is not straightforward since
+it is not clear how the fairness metrics interact and whether addressing one will benefit or harm the other.
+ 
+
+ 
+ 
+ Besides, different fairness metrics may be appropriate for different contexts, requiring domain expertise that machine learning practitioners may lack.
+We argue that domain experts may lack the comprehensive domain knowledge required to properly identify all relevant fairness metrics or understand the implications of applying specific fairness metrics.
+Consider an education researcher who is familiar with the types of disparities that influence college attainment. First, identifying and properly defining appropriate notions to capture disparities may still be difficult for them.
+Second, given their limited scope of knowledge, they may overlook some important metrics.
+Third, domain specialists are unable to determine the impact of resolving identified disparities on the developed model and other aspects of fairness that were overlooked.
+ 
+
+ 
+ 
+ While it is not easy for domain experts to specify all relevant measures, they
+should be able to help masking out the irrelevant measures.
+Even after removing irrelevant metrics, data scientists responsible for model building and unfairness reduction may still need to choose or prioritize among many metrics due to the abundance of fairness notions in the literature. 
+More importantly, even if chosen properly, there is no indication that the notions of fairness chosen overlap or are related to one another, which is critical to know when unfairness need to be addressed using the available mitigation strategies.
+ According to our hypothesis, if one can specify the correlations between the relevant fairness metrics, they could indeed group the metrics that are positively correlated in such a way that reducing unfairness for one metric in the group also reduces unfairness for the other metrics in the group.
+As a result, they can now focus on the group representatives. Since some of the representatives may be negatively correlated, reducing unfairness for one group, however, may cause a rise in unfairness in the other. Nevertheless, only focusing on the group representatives, the practitioner is able to balance unfairness among different representatives such that the model is relatively fair for all group representatives. As we previously explained, if the number of metrics is constrained, some algorithms can discover a balanced reduction among all. Alternately, by limiting the range of fairness metrics, the practitioner can achieve a workable balance in the reduction of unfairness by performing a scenario analysis on the extent of the reduction (the allowed unfairness gap threshold) using mitigation strategies for each distinct representative metric. 
+
+ 
+ 
+ Although recent studies have attempted to answer questions such as how to measure fairness and reduce algorithmic bias, little is known about the sufficiency of various fairness notions and their correlations. The correlation between different fairness notions has been shown in  [ 2 ] , where the authors demonstrated an empirical analysis of the effectiveness of the state-of-the-art unfairness mitigation techniques and how addressing one notion affects others. However, only a subset of existing metrics is considered, and there is no recommendation on representative notions.
+ 
+
+ 
+ 
+ Specifying a small set of appropriate fairness metrics to reduce within a specific context is a challenging endeavor that requires a rigorous exploration of the combinatorial space of fairness metrics and their interactions.
+Therefore, in this paper, we aim to elaborate on the sufficiency of different fairness metrics in a given problem by considering their potential overlaps. We develop an automatic tool to guide practitioners in identifying the representative metrics and subsequently use the off-the-shelf tools to reduce unfairness in light of estimated correlations. To evaluate our findings, we conduct comprehensive experiments using real-world benchmark datasets, multiple types of classifiers, and a comprehensive set of fairness metrics. Our experiment results verify the effectiveness of our approach in finding representative metrics. 
+
+ 
+ 
+ In summary, we make the following contributions:
+
+ 
+ 
+ 
+ • 
+ 
+ We propose a framework to detect the potential correlations across fairness metrics that is essential to be aware of in order to audit and mitigate unfairness. 
+
+ 
+
+ • 
+ 
+ By utilizing correlations between metrics, we pose the challenge of identifying a small subset of metrics that properly represent other fairness metrics in a given context (specified by training data and model type).
+Identifying this subset is essential for unfairness reduction because existing solutions are only practical for a limited set of fairness metrics.
+ 
+
+ 
+
+ • 
+ 
+ We design a sampling-based Monte-Carlo method to estimate the correlations between the fairness metrics.
+
+ 
+
+ • 
+ 
+ We develop an efficient approach for sampling models with different fairness metric values, which enables estimating the correlation between the fairness metrics.
+
+ 
+
+ • 
+ 
+ We show, both theoretically and experimentally, that unfairness reduction on a representative metric approximately reduces unfairness on the ones it represents.
+
+ 
+
+ 
+ 
+ 
+ In the following, we first provide a brief explanation of the fairness metrics in Section  2 , then propose our technical solution to identify the representative metrics in Section  3 , and finally show empirical results to support the effectiveness of the proposal in Section  4 .
+
+ 
+ 
+ 
+
+## 2 Fairness Model
+
+ 
+ Consider a training dataset D D consisting of n n data points denoted by the vectors ( X , S , Y ) (X,S,Y) . Let X X be the set of non-sensitive attributes of dimension d d , S S be the set of sensitive attributes specifying the sensitive groups (e.g. gender=female ), and Y Y be the true response variable (label). In a classification setting Y = 1 , … , K Y={1,\dots,K} with K K being the total number of distinct classes.
+Let h h be the classifier function where h : ( X , S ) ⟶ Y h:(X,S)\longrightarrow Y . Let Y ^ \hat{Y} denote the predicted labels in a given test problem.
+Let ℱ \mathcal{F} denotes the set of m m group fairness metrics, ℱ = { f 1 , f 2 , … , f m } \mathcal{F}=\{f_{1},f_{2},\dots,f_{m}\} . Since fairness metrics are defined for each sensitive group, let f j s f_{j}^{s} be the fairness metric j j defined for sensitive group s s .
+
+ 
+ 
+ Most of the existing fairness notions are defined based on the joint distribution of the S S , Y Y and Y ^ \hat{Y} variables, and fall into one of three well-known categories of Independence ( f ⟂ S f\perp\!S ), Separation ( f ⟂ S | Y f\perp\!S|Y ), Sufficiency ( Y ⟂ S | f Y\perp\!S|f ) [ 18 ] . Various fairness metrics have been proposed in the literature, each based on one of the aforementioned categories. Following the literature on defining the fairness metrics and for the ease of explanation let us consider a binary classification h h and a binary sensitive attribute S S 1 1 
+ 1 
+ 
+ 
+ 
+ We use single binary sensitive and label attribute for the simplicity of explanation. The techniques proposed in this paper, however, are not limited to these cases.
+Besides, our techniques are agnostic to the choice of fairness metrics and machine learning tasks.
+ . For the purpose of our analysis, we assume S = 1 S=1 and S = 0 S=0 to represent the Privileged and Unprivileged sensitive groups, respectively. The fairness metrics can be derived by expanding the confusion matrix on the outcome of h h split according to each sensitive attribute value ( 19 ) . Let T ​ P TP (True Positive), F ​ N FN (False Negative), F ​ P FP (False Positive), and T ​ N TN (True Negative) be the elements of a confusion matrix. Given the binary sensitive attribute S = { 0 , 1 } S=\{0,1\} , a split of the confusion matrix on the Privileged group is denoted by T ​ P 1 TP_{1} , F ​ N 1 FN_{1} , F ​ P 1 FP_{1} , and T ​ N 1 TN_{1} , and the total number of observations for the Privileged group is denoted by N 1 N_{1} . Table  1 demonstrates major fairness metrics that we consider in this paper. For instance, Statistical parity (i.e. | P ⁡ ( Y ^ = 1 | S = 1 ) − P ⁡ ( Y ^ = 1 | S = 0 ) | |P(\hat{Y}=1|S=1)-P(\hat{Y}=1|S=0)| ) would be equivalent to T ​ P 1 + F ​ P 1 N 1 = T ​ P 0 + F ​ P 0 N 0 \frac{TP_{1}+FP_{1}}{N_{1}}=\frac{TP_{0}+FP_{0}}{N_{0}} which measures the positive prediction outcome ( Y ^ = 1 \hat{Y}=1 ) among different sensitive groups without considering their true Y Y label. Similarly, Equalized odds (i.e. | P ⁡ ( Y ^ = 1 | Y = y , S = 1 ) − P ⁡ ( Y ^ = 1 | Y = y , S = 0 ) | , ∀ y ∈ { 0 , 1 } |P(\hat{Y}=1|Y=y,S=1)-P(\hat{Y}=1|Y=y,S=0)|,\forall{y\in\{0,1\}} ) can be expressed as F ​ P 0 F ​ P 0 + T ​ N 0 = F ​ P 1 F ​ P 1 + T ​ N 1 \frac{FP_{0}}{FP_{0}+TN_{0}}=\frac{FP_{1}}{FP_{1}+TN_{1}} and T ​ P 0 T ​ P 0 + F ​ N 0 = T ​ P 1 T ​ P 1 + F ​ N 1 \frac{TP_{0}}{TP_{0}+FN_{0}}=\frac{TP_{1}}{TP_{1}+FN_{1}} which emphasizes on positive prediction outcome and measures false positive and true positive rates among sensitive groups.
+ For the detailed definition of other notions, please refer to the prior works ( 11 , 12 , 1 ) . 
+Note that when K 2 K 2 , the fairness metrics can be defined upon multiple confusion matrices split according to a combination of class labels.
+
+ 
+ 
+ Although in this paper we focus on a subset of fairness notions provided in Table  1 to show the empirical results, our proposed framework is a generic method that can incorporate other notions and can be generalized to arbitrary fairness metrics. Note that in this paper we mainly focus on group-based fairness notions and we do not consider individual fairness aspects. Also, the causal fairness is out of the scope of this project. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Fairness Notion 
+ Label 
+ Formulation 
+ 
+ 
+ 
+ Equalized Odds 
+ f1 
+ 1 2 ∗ ( | F ​ P 0 F ​ P 0 + T ​ N 0 − F ​ P 1 F ​ P 1 + T ​ N 1 | + | T ​ P 0 T ​ P 0 + F ​ N 0 − T ​ P 1 T ​ P 1 + F ​ N 1 | ) \frac{1}{2}*(|\frac{FP_{0}}{FP_{0}+TN_{0}}-\frac{FP_{1}}{FP_{1}+TN_{1}}|+|\frac{TP_{0}}{TP_{0}+FN_{0}}-\frac{TP_{1}}{TP_{1}+FN_{1}}|) 
+ 
+ Error difference 
+ f2 
+ F ​ P 0 + F ​ N 0 N 1 + N 0 − F ​ P 1 + F ​ N 1 N 1 + N 0 \frac{FP_{0}+FN_{0}}{N_{1}+N_{0}}-\frac{FP_{1}+FN_{1}}{N_{1}+N_{0}} 
+ 
+ Error ratio 
+ f3 
+ F ​ P 0 + F ​ N 0 N 1 + N 0 F ​ P 1 + F ​ N 0 N 1 + N 0 \frac{\frac{FP_{0}+FN_{0}}{N_{1}+N_{0}}}{\frac{FP_{1}+FN_{0}}{N_{1}+N_{0}}} 
+ 
+ Discovery difference 
+ f4 
+ F ​ P 0 T ​ P 0 + F ​ P 0 − F ​ P 1 T ​ P 1 + F ​ P 1 \frac{FP_{0}}{TP_{0}+FP_{0}}-\frac{FP_{1}}{TP_{1}+FP_{1}} 
+ 
+ Discovery ratio 
+ f5 
+ F ​ P 0 T ​ P 0 + F ​ P 0 F ​ P 1 T ​ P 1 + F ​ P 1 \frac{\frac{FP_{0}}{TP_{0}+FP_{0}}}{\frac{FP_{1}}{TP_{1}+FP_{1}}} 
+ 
+ Predictive Equality 
+ f6 
+ F ​ P 0 F ​ P 0 + T ​ N 0 − F ​ P 1 F ​ P 1 + T ​ N 1 \frac{FP_{0}}{FP_{0}+TN_{0}}-\frac{FP_{1}}{FP_{1}+TN_{1}} 
+ 
+ FPR ratio 
+ f7 
+ F ​ P 0 F ​ P 0 + T ​ N 0 F ​ P 1 F ​ P 1 + T ​ N 1 \frac{\frac{FP_{0}}{FP_{0}+TN_{0}}}{\frac{FP_{1}}{FP_{1}+TN_{1}}} 
+ 
+ False Omission rate (FOR) difference 
+ f8 
+ F ​ N 0 T ​ N 0 + F ​ N 0 − F ​ N 1 T ​ N 1 + F ​ N 1 \frac{FN_{0}}{TN_{0}+FN_{0}}-\frac{FN_{1}}{TN_{1}+FN_{1}} 
+ 
+ False Omission rate (FOR) ratio 
+ f9 
+ F ​ N 0 T ​ N 0 + F ​ N 0 F ​ N 1 T ​ N 1 + F ​ N 1 \frac{\frac{FN_{0}}{TN_{0}+FN_{0}}}{\frac{FN_{1}}{TN_{1}+FN_{1}}} 
+ 
+ Disparate Impact 
+ f10 
+ T ​ P 0 + F ​ P 0 N 0 T ​ P 1 + F ​ P 1 N 1 \frac{\frac{TP_{0}+FP_{0}}{N_{0}}}{\frac{TP_{1}+FP_{1}}{N_{1}}} 
+ 
+ Statistical Parity 
+ f11 
+ T ​ P 0 + F ​ P 0 N 0 − T ​ P 1 + F ​ P 1 N 1 \frac{TP_{0}+FP_{0}}{N_{0}}-\frac{TP_{1}+FP_{1}}{N_{1}} 
+ 
+ Equal Opportunity 
+ f12 
+ T ​ P 0 T ​ P 0 + F ​ N 0 − T ​ P 1 T ​ P 1 + F ​ N 1 \frac{TP_{0}}{TP_{0}+FN_{0}}-\frac{TP_{1}}{TP_{1}+FN_{1}} 
+ 
+ FNR difference 
+ f13 
+ F ​ N 0 F ​ N 0 + T ​ P 0 − F ​ N 1 F ​ N 1 + T ​ P 1 \frac{FN_{0}}{FN_{0}+TP_{0}}-\frac{FN_{1}}{FN_{1}+TP_{1}} 
+ 
+ FNR ratio 
+ f14 
+ F ​ N 0 F ​ N 0 + T ​ P 0 F ​ N 1 F ​ N 1 + T ​ P 1 \frac{\frac{FN_{0}}{FN_{0}+TP_{0}}}{\frac{FN_{1}}{FN_{1}+TP_{1}}} 
+ 
+ Average odd difference 
+ f15 
+ 1 2 ∗ ( F ​ P 0 F ​ P 0 + T ​ N 0 − F ​ P 1 F ​ P 1 + T ​ N 1 + T ​ P 0 T ​ P 0 + F ​ N 0 − T ​ P 1 T ​ P 1 + F ​ N 1 ) \frac{1}{2}*(\frac{FP_{0}}{FP_{0}+TN_{0}}-\frac{FP_{1}}{FP_{1}+TN_{1}}+\frac{TP_{0}}{TP_{0}+FN_{0}}-\frac{TP_{1}}{TP_{1}+FN_{1}}) 
+ 
+ Predictive Parity 
+ f16 
+ T ​ P 0 T ​ P 0 + F ​ P 0 − T ​ P 1 T ​ P 1 + F ​ P 1 \frac{TP_{0}}{TP_{0}+FP_{0}}-\frac{TP_{1}}{TP_{1}+FP_{1}} 
+ 
+ 
+
+ 
+ Table 1: Fairness notions 
+ 
+ 
+ Following the discussion on various fairness metrics, we next present our framework for estimating the correlations between metrics and identifying a small subset of representative metrics in a given context. 
+
+ 
+ 
+ 
+
+## 3 Identifying Representative Fairness Metrics
+
+ 
+ Fairness is an abstract concept with many definitions from different perspectives and in various contexts.
+Besides, the impossibility theorems prove it is not possible to fully satisfy fairness metrics that are mutually exclusive  ( 20 ) .
+As a result, partial mitigation of unfairness is often considered in practice  ( 17 ) .
+
+Still, the variety of definitions, coupled with the correlation and trade-off between them  ( 13 ) , make it overwhelmingly complicated for ordinary users and data scientists to evaluate the fairness of the predictive outcome. 
+
+ 
+ 
+ Therefore, in this section, we aim to determine the correlations between metrics and identify a subset of representatives to facilitate the fairness evaluation and acknowledge the implications of unfairness mitigation for a given context. 
+In particular,
+we use the correlation 2 2 
+ 2 
+ 
+ 
+ 
+ Note that data and model details cause unfairness. The metrics measure unfairness; hence the correlations between them are not causation. between the fairness metrics to identify their similarities 3 3 
+ 3 
+ 
+ 
+ 
+ The correlation measures the strength and the direction of the relationship between two variables. Note that our proposed framework is independent of the choice of similarity and the correlation can be replaced by other metrics such as Kullback-Leibler divergence ( 21 ) . .
+That is, we say a fairness measure f i f_{i} represents a measure f j f_{j} if
+ f i f_{i} and f j f_{j} are highly correlated.
+Given a universe ℱ \mathcal{F} of fairness metrics of interest, we seek to find a subset R ℱ R_{\mathcal{F}} , with a significantly smaller size representing all metrics in ℱ \mathcal{F} .
+
+ 
+ 
+ To this end, we first need to be able to determine the correlations between metrics of fairness for a given context.
+Estimating these correlations is a major challenge we shall resolve in this section.
+While the general ideas proposed in this section are not limited to a specific ML task,
+in this paper
+we focus on classification for developing our techniques. We note that given a classifier,
+one can audit it and compute its (un)fairness with regard to different metrics.
+But single fairness values do not provide enough information to compute correlations.
+On the other hand,
+the FairML approaches are designed to build fair models, as opposed to finding the correlation between different fairness metrics.
+
+ 
+ 
+ Therefore, in the following, we design a Monte-Carlo method  [ 22 , 23 ] for estimating the underlying correlation and trade-offs between fairness metrics.
+Monte-Carlo methods turn out to be both efficient and accurate for such approximations.
+
+ 
+ 
+ After identifying the correlations, we use them to find the set R ℱ R_{\mathcal{F}} of the representative metrics in Section  3.3 .
+
+ 
+ 
+
+### 3.1 Estimating Between Fairness Correlations
+
+ 
+ Monte-Carlo methods use repeated sampling and the central limit theorem for solving deterministic problems  ( 24 ) .
+At a high level, the Monte-Carlo methods work as follows:
+first, they generate a large enough set of random samples; then they use these inputs to estimate aggregate results.
+We use Monte-Carlo methods to estimate correlations between the fairness metrics.
+The major challenge towards developing the Monte-Carlo method is being able to generate a large pool of samples.
+Every sample is a classifier that provides different values for every fairness metric.
+We use a sampling oracle that upon calling it, returns the fairness values for a sampled classifier. We shall provide the details of the oracle in the next subsection.
+
+ 
+ 
+ Correlation is a measure of linear association between two variables f i f_{i} and f j f_{j} . When both variables are random it is referred to as Coefficient of Correlation r r . The correlation model most widely employed to calculate r r is the normal correlation model. The normal correlation model for the case of two variables is based on the bivariate normal distribution  ( 25 ) .
+Having enough repeated sampling ( N 30 N 30 ), we can assume the variables f i f_{i} and f j f_{j} follows the Normal distribution (central limit theorem) with means μ i \mu_{i} and μ j \mu_{j} , and standard deviations of σ i \sigma_{i} and σ j \sigma_{j} , respectively. In a bivariate normal model, the parameter ρ i ​ j \rho_{ij} provides information about
+the degree of the linear relationship between the two variables f i f_{i} and f j f_{j} , which is calculated as ρ i ​ j = σ i ​ j σ i ​ σ j \rho_{ij}=\frac{\sigma_{ij}}{\sigma_{i}\sigma_{j}} . The correlation coefficient takes values between -1 and 1. Note that if two variables are independent σ i ​ j = 0 \sigma_{ij}=0 and subsequently ρ i ​ j = 0 \rho_{ij}=0 . When ρ i ​ j 0 \rho_{ij} 0 , f 1 f_{1} tends to be large when f 2 f_{2} is large, or small when f 2 f_{2} is small. In contrast, when ρ i ​ j 0 \rho_{ij} 0 (i.e. two variables are negatively correlated), f 1 f_{1} tends to be large when f 2 f_{2} is small, or vice versa. ρ i ​ j = 1 \rho_{ij}=1 indicates a perfect direct linear relation and -1 denotes a perfect inverse relation. Since σ i \sigma_{i} is unknown, a point estimator of ρ \rho is required. The estimator is often called the Pearson Correlation Coefficient .
+
+ 
+ 
+ To estimate the correlations, we use the sampling oracle to sample N N classifiers h k , ∀ k = 1 , … , N h_{k},\forall k=1,\dots,N , and to calculate fairness values for each.
+Let f i , k f_{i,k} be fairness metric i i of classifier h k h_{k} , thus the Pearson Correlation Coefficient is defined as follow ∀ i , j = 1 , … , m \forall i,j=1,\dots,m :
+
+ 
+
+ 
+ | 
+ r i ​ j = \displaystyle r_{ij}= | 
+ ∑ k = 1 K ( f i , k s − f ¯ i s ) ​ ( f j , k s − f ¯ j ) ∑ k = 1 K ( f i , k s − f ¯ i ) 2 ​ ∑ k = 1 K ( f j , k s − f ¯ j ) 2 \displaystyle\frac{\sum_{k=1}^{K}(f_{i,k}^{s}-\bar{f}_{i}^{s})(f_{j,k}^{s}-\bar{f}_{j})}{\sum_{k=1}^{K}(f_{i,k}^{s}-\bar{f}_{i})^{2}\sum_{k=1}^{K}(f_{j,k}^{s}-\bar{f}_{j})^{2}} | 
+ | 
+ 
+
+ 
+ 
+ The set of N N samples gives us an unbiased estimation of the correlation between the fairness metrics.
+Still, the estimation variance can be high, affecting our identification of representative fairness metrics.
+To resolve this issue, We design a two-level approach, where the lower level uses N N samples to provide an estimation of the correlation values, and the upper level repeats the correlation estimation process L L times (we use the rule of thumb number L = 30 L=30 in our experiments) to reduce the estimation error.
+In particular,
+ 
+ 
+Let the estimated correlation between a pair of fairness metrics f i f_{i} and f j f_{j} at iteration ℓ \ell be r i ​ j ℓ r^{\ell}_{ij} .
+ 
+Then, the correlation r i ​ j ∗ r^{*}_{ij} is computed as the average of estimations in each round. That is,
+
+ 
+ 
+ 
+
+ 
+ | 
+ ∀ i , j = 1 , … , m : r i ​ j ∗ = 1 L ​ ∑ ℓ = 1 L r i ​ j ℓ \displaystyle\forall i,j=1,\dots,m:~~r^{*}_{ij}=\frac{1}{L}\sum_{\ell=1}^{L}r^{\ell}_{ij} | 
+ | 
+ (1) | 
+ 
+
+ 
+ 
+ Using the central limit theorem, ρ i ​ j \rho_{ij} follows the Normal distribution 𝒩 ⁡ ( ρ i ​ j , σ i ​ j L ) \mathcal{N}\big(\rho_{ij},\frac{\sigma_{ij}}{\sqrt{L}}\big) .
+Given a confidence level α \alpha , the confidence error e e identifies the range [ r i ​ j ∗ − e , r i ​ j ∗ + e ] [r^{*}_{ij}-e,r^{*}_{ij}+e] where
+
+ 
+
+ 
+ | 
+ p ⁡ ( r i ​ j ∗ − e ≤ ρ i ​ j ≤ r i ​ j ∗ + e ) = 1 − α p(r^{*}_{ij}-e\leq\rho_{ij}\leq r^{*}_{ij}+e)=1-\alpha | 
+ | 
+ 
+
+ Using the Z-table,
+while using the sample variance s i ​ j 2 s^{2}_{ij} to estimate σ i ​ j 2 \sigma^{2}_{ij} , the confidence error is computed as
+
+ 
+ 
+ 
+
+ 
+ | 
+ e = Z ⁡ ( 1 − α 2 ) ​ s i ​ j L \displaystyle e=Z(1-\frac{\alpha}{2})\frac{s_{ij}}{\sqrt{L}} | 
+ | 
+ (2) | 
+ 
+
+ The pseudocode of our correlation estimator is provided in Algorithm  1 .
+ At every estimation iteration, the algorithm splits the data into training and test-set. It then groups the data according to their label and demographic group.
+Next, calling the sampling oracle N N times, it finds N N samples of fairness values. To make sure it only considers accurate models, the algorithm rejects the samples corresponding to the models with low accuracy.
+The algorithm then uses the samples of fairness values to estimate the (Pearson) correlations between each pair of fairness metrics.
+Finally, after generating L L estimations of the correlation values, the algorithm aggregates the estimations and computes the estimation errors.
+ 
+
+ 
+ 
+ Algorithm 1 CorrEstimate 
+ 
+ 
+ 1: 
+ 
+ 
+ Data set 𝒟 \mathcal{D} , Fairness notions of interest ℱ = { f 1 ⋯ f m } \mathcal{F}=\{f_{1}\cdots f_{m}\} 
+ 
+ 
+ 
+ 2: 
+ 
+ 
+ O O , target data set
+ 
+ 
+ 
+ 3: 
+ 
+ 
+ for ℓ ← 1 \ell\leftarrow 1 to L L do // number of iterations 
+ 
+ 
+ 
+ 4: 
+ 
+ 
+    ( 𝒯 CLOSE , (\mathcal{T}, test-set OPEN ) ← )\leftarrow split ( 𝒟 ) (\mathcal{D}) // 𝒯 \mathcal{T} is training set 
+ 
+ 
+ 
+ 5: 
+ 
+ 
+    ⟨ 𝒢 0 , 𝒢 1 , 𝒢 2 , 𝒢 3 ⟩ ← ⟨ 𝒯 ⁡ [ S = 0 , Y = 0 ] , 𝒯 ⁡ [ S = 0 , Y = 1 ] , 𝒯 ⁡ [ S = 1 , Y = 0 ] , 𝒯 ⁡ [ S = 1 , Y = 1 ] ⟩ \langle\mathcal{G}_{0},\mathcal{G}_{1},\mathcal{G}_{2},\mathcal{G}_{3}\rangle\leftarrow\langle\mathcal{T}[S=0,Y=0],\mathcal{T}[S=0,Y=1],\mathcal{T}[S=1,Y=0],\mathcal{T}[S=1,Y=1]\rangle 
+ 
+ 
+ 
+ 6: 
+ 
+ 
+    F ← [ ] F\leftarrow[] // Table of fairness values 
+ 
+ 
+ 
+ 7: 
+ 
+ 
+    for i ← 1 i\leftarrow 1 to N N do 
+ 
+ 
+ 
+ 8: 
+ 
+ 
+     A i , F 1 ⋯ F m ← A_{i},F_{1}\cdots F_{m}\leftarrow SamplingOracle ( ⟨ 𝒢 0 , 𝒢 1 , 𝒢 2 , 𝒢 3 ⟩ , ℱ ) (\langle\mathcal{G}_{0},\mathcal{G}_{1},\mathcal{G}_{2},\mathcal{G}_{3}\rangle,\mathcal{F}) 
+ 
+ 
+ 
+ 9: 
+ 
+ 
+     if A i α A_{i} \alpha then continue // reject the model 
+ 
+ 
+ 
+ 10: 
+ 
+ 
+     F i ​ 1 ⋯ F i ​ m ← F 1 ⋯ F m F_{i1}\cdots F_{im}\leftarrow F_{1}\cdots F_{m} 
+   
+ 
+ 
+ 11: 
+ 
+ 
+    c ​ o ​ r ​ r ℓ ← corr_{\ell}\leftarrow corr ( F ) (F) // Pearson correlations 
+ 
+ 
+ 
+ 12: 
+ 
+ 
+ for i , j ← 1 i,j\leftarrow 1 to m m do 
+ 
+ 
+ 
+ 13: 
+ 
+ 
+    c ​ o ​ r ​ r ​ [ i , j ] ← corr[i,j]\leftarrow avg ( c o r r 1 [ i , j ] ⋯ c o r r L [ i , j ] ) (corr_{1}[i,j]\cdots corr_{L}[i,j]) 
+ 
+ 
+ 
+ 14: 
+ 
+ 
+    e ⁡ [ i , j ] ← Z ⁡ ( 1 , α 2 ) e[i,j]\leftarrow Z(1,\frac{\alpha}{2}) stdev ( c o r r 1 [ i , j ] ⋯ c o r r K [ i , j ] ) / L (corr_{1}[i,j]\cdots corr_{K}[i,j])/\sqrt{L} 
+ 
+ 
+ 
+ 15: 
+ 
+ 
+ return ( c ​ o ​ r ​ r , e ) (corr,e) 
+ 
+ 
+ 
+ 
+ 
+ Pearson correlation is a measure that reflects the strength and direction of a linear relationship between two variables and fails to adequately characterize nonlinear or nonmonotonic relationships [ 26 ] . In this paper, identifying the interaction of fairness metrics through estimating the correlation follows the linearity assumption.
+This assumption may not hold when the associated mapping between two fairness metrics is nonlinear since the association between two metrics might change across the domain. However, it still provides a reliable guideline for clustering the metrics for unfairness mitigation. In particular, a small positive/negative or zero correlation designates a weak or no linear relationship, which implies there is no relationship between two metrics or the relationship is not linear. In both cases, the metrics need to be treated separately; thus, it does not change the outcome of our proposal.
+ 
+
+ 
+ 
+ 
+
+### 3.2 Developing the Sampling Oracle
+
+ 
+ Having discussed the estimation of the correlations between the fairness metrics, next we discuss the development details of the sampling oracle.
+Upon calling the oracle, it should draw an iid sample classifier and evaluate it for different fairness metrics.
+Considering the set of fairness metrics of interest ℱ = { f 1 ⋯ f m } \mathcal{F}=\{f_{1}\cdots f_{m}\} , the output of the sampling oracle for the i t ​ h i^{th} sample can be viewed as a vector of values { f 1 ​ i ⋯ f m ​ i } \{f_{1i}\cdots f_{mi}\} , where f j ​ i f_{ji} is the fairness of sampled classifier for metric f j f_{j} .
+Calling the oracle by the correlation estimator N N times forms a table of N N samples where each row contains fairness values (Unfairness gaps) for a sampled classifier (Table  2 ).
+
+ 
+ 
+ Two requirements are important in the development of the sampling oracle. First, since our objective is to find the correlations between the fairness metrics, we would like the
+samples to provide different values for the fairness metrics.
+In other words, the samples should provide randomness over fairness values space.
+Besides, since the correlation estimator calls the oracle many times before it computes the correlations, we want the oracle to be efficient.
+
+ 
+ 
+ Our strategies to satisfy the design requirement for the sampling oracle are based on a simple observation: the performance of a model for a protected group depends on the ratio of samples from that protected group and the distribution of their label values  ( 6 , 17 ) .
+To better explain this, let us consider a binary classifier h h and two groups g 1 g_{1} and g 2 g_{2} .
+Clearly, if all samples in the training data belong to g 1 g_{1} then the model is only trained for g 1 g_{1} , totally ignoring the other group.
+As the ratio of samples from g 2 g_{2} increases in the training data, the model trains better for this group. Specifically,
+since the training error – the average error across training samples – is minimized during the training process, the ratio of g 1 g_{1} to g 2 g_{2} in the training data directly impacts the performance of the model for each of the groups.
+Besides, the other factor that impacts the prediction of the model for a protected group is the ratio of positive to negative samples.
+Therefore, as an indirect method to perturb over the space of fairness values, we consider perturbation over the ratios of the samples from each protected group and label values in the training data.
+
+ 
+ 
+ 
+ 
+ 
+ Sample ID | 
+ f 1 f_{1} | 
+ f 2 f_{2} | 
+ ⋯ \cdots | 
+ f m f_{m} | 
+
+ 
+ 
+ 
+ h 1 h_{1} | 
+ f 11 f_{11} | 
+ f 21 f_{21} | 
+ ⋯ \cdots | 
+ f m ​ 1 f_{m1} | 
+
+ 
+ h 2 h_{2} | 
+ f 12 f_{12} | 
+ f 22 f_{22} | 
+ ⋯ \cdots | 
+ f m ​ 2 f_{m2} | 
+
+ 
+ ⋮ \vdots | 
+ ⋮ \vdots | 
+ ⋮ \vdots | 
+ ⋯ \cdots | 
+ ⋮ \vdots | 
+
+ 
+ h N h_{N} | 
+ f 1 ​ N f_{1N} | 
+ f 2 ​ N f_{2N} | 
+ ⋯ \cdots | 
+ f m ​ N f_{mN} | 
+
+ 
+
+ 
+ Table 2: Table of fairness values for the N N sampled models 
+ 
+ 
+ 
+ Figure 1: Bootstrap Sampling 
+ 
+ 
+ Using this observation, we propose a Bootstrap resampling approach to generate different subsamples from the dataset for the training purpose.
+Moreover, to ensure adequate accuracy over generated models, we consider an accept/reject strategy that rejects models with an accuracy below a certain threshold.
+Bootstrapping is a data-driven statistical inference (standard error and bias estimates, confidence intervals, and hypothesis tests) methodology that could be categorized under the broader class of resampling techniques ( 27 , 28 ) . The core idea of Bootstrapping is similar to random sampling with replacement without further assumptions.
+Let K K be the number of drawn Bootstraps samples. Given the training dataset D D , we aim to construct smaller representative subsets of D D to train the sampled model.
+
+ 
+ 
+ Consider a binary classification problem ( Y ∈ { 0 , 1 } Y\in\{0,1\} ) with two protected groups ( g 1 g_{1} : Group1, g 2 g_{2} : Group2)
+to describe our sampling procedure.
+In order to (indirectly) control the fairness values, we bootstrap different samples ratios from each of the protected groups and label values
+as shown in Figure 1 .
+Let 𝐰 = { w 1 , w 2 , w 3 , w 4 } \mathbf{w}=\{w_{1},w_{2},w_{3},w_{4}\} be the ratios for each of the cells of the table. To generate each sample, we need to draw the vector 𝐰 \mathbf{w} uniformly from the space of possible values for 𝐰 \mathbf{w} . Given that 𝐰 \mathbf{w} represents the ratios from each cell, ∑ i = 1 4 w i = 1 \sum_{i=1}^{4}w_{i}=1 .
+To make sure values in 𝐰 \mathbf{w} are drawn uniformly at random, we first generate four random numbers, each drawn uniformly at random from the range [ 0 , 1 ] [0,1] . Then, we normalize the weights as w i = w i / ∑ i = 1 4 w i w_{i}=w_{i}/\sum_{i=1}^{4}w_{i} .
+We then bootstrap w i × K w_{i}\times K samples from the samples of D D that belong to cell i i of the table to form the bootstrapped dataset B j B_{j} .
+Next, the oracle uses the dataset B j B_{j} to train the sampled classifier h j h_{j} .
+Having trained the classifier h j h_{j} , it next evaluates the model to compute the values f j ​ k f_{jk} , for each fairness metric f k ∈ ℱ f_{k}\in\mathcal{F} , and return the vector { f j ​ 1 , ⋯ , f j ​ m } \{f_{j1},\cdots,f_{jm}\} . Algorithm  2 also returns A A , the sampled model’s accuracy.
+
+ 
+ 
+ The set of samples collected from the sampling oracle then form the table of fairness values shown in Table  2 , which is used to estimate the correlations between the fairness metrics.
+The Pseudocode of our proposed sampling approach is provided in Algorithm  2 .
+ 
+In order to generate a sample vector of fairness values, the algorithm first generates a normalized vector w 1 , ⋯ , w r w_{1},\cdots,w_{r} , where each value w i w_{i} specifies the ratio of samples to be taken from each group 𝒢 i \mathcal{G}_{i} .
+Next, to generate a portion of w i w_{i} of the target size t t -size from 𝒢 i \mathcal{G}_{i} , the algorithm generates w i × t w_{i}\times t -size random indices, each corresponding to a tuple in 𝒢 i \mathcal{G}_{i} .
+After collecting the training data t t -set, the algorithm uses it to train a model. It next evaluates the model using the test-set, computes the fairness measures for each of the metrics, and returns the results.
+ 
+
+ 
+ 
+ Algorithm 2 SamplingOracle 
+ 
+ 
+ 1: 
+ 
+ 
+ ⟨ 𝒢 0 , 𝒢 1 , ⋯ , 𝒢 r ⟩ , ℱ \langle\mathcal{G}_{0},\mathcal{G}_{1},\cdots,\mathcal{G}_{r}\rangle,\mathcal{F} , model-type, t-size, test-set
+ 
+ 
+ 
+ 2: 
+ 
+ 
+ F 1 ⋯ F m F_{1}\cdots F_{m} 
+ 
+ 
+ 
+ 3: 
+ 
+ 
+ for i ← 1 i\leftarrow 1 to r r do 
+ 
+ 
+ 
+ 4: 
+ 
+ 
+    w i ← w_{i}\leftarrow uniform ( 0 , 1 ) (0,1) // random uniform in range [0,1] 
+ 
+ 
+ 
+ 5: 
+ 
+ 
+ w 1 ⋯ w r ← w 1 | 𝐰 | ⋯ w r | 𝐰 | w_{1}\cdots w_{r}\leftarrow\frac{w_{1}}{|\mathbf{w}|}\cdots\frac{w_{r}}{|\mathbf{w}|} // normalize 
+ 
+ 
+ 
+ 6: 
+ 
+ 
+ t-set ← [ ] \leftarrow[] // training set 
+ 
+ 
+ 
+ 7: 
+ 
+ 
+ for i = 1 i=1 to r r do 
+ 
+ 
+ 
+ 8: 
+ 
+ 
+    for j = 1 j=1 to w i × w_{i}\times t-size do 
+ 
+ 
+ 
+ 9: 
+ 
+ 
+    rand-index ← \leftarrow random ( 1 , | 𝒢 i | ) (1,|\mathcal{G}_{i}|) 
+ 
+ 
+ 
+ 10: 
+ 
+ 
+    add 𝒢 i [ \mathcal{G}_{i}[ rand-index ] ] to t-set
+   
+ 
+ 
+ 11: 
+ 
+ 
+ model ← \leftarrow train (t-set, model-type)
+ 
+ 
+ 
+ 12: 
+ 
+ 
+ A ← A\leftarrow evaluate (model, t est-set)
+ 
+ 
+ 
+ 13: 
+ 
+ 
+ for i = 1 i=1 to m m do 
+ 
+ 
+ 
+ 14: 
+ 
+ 
+    F i ← F_{i}\leftarrow audit ( ( model , f i ,f_{i} , t est-set)
+ 
+ 
+ 
+ 15: 
+ 
+ 
+ return A , F 1 ⋯ F m A,F_{1}\cdots F_{m} 
+ 
+ 
+ 
+ 
+ 
+ 
+
+### 3.3 Finding the Representative Fairness Metrics using Correlations
+
+ 
+ To discover the ℛ ℱ \mathcal{R}_{\mathcal{F}} representative subset of fairness metrics that are highly correlated, we utilize the correlation estimation from our proposed Monte-Carlo sampling approach described in the previous sections.
+
+ 
+ 
+ Consider a complete graph of m m vertices (denoting each fairness metric f i ∈ ℱ f_{i}\in\mathcal{F} ), where the weight of an edge ( f i , f j ) (f_{i},f_{j}) between the nodes f i f_{i} and f j f_{j} is equal to their correlations r i ​ j r_{ij} . The goal is to identify the subsets of vertices such that the within subset positive correlations and between subsets negative correlations are maximized.
+This problem is proven to be NP-complete  ( 29 ) .
+ An exact solution for finding the optimal solution needs to evaluate all subsets in the power-set of the relevant metrics.
+As a result, it is inefficient even for tens of metrics.
+Therefore, while we underscore that one can solve the problem optimally ( 30 ) , we use the well-known approximation algorithm proposed in
+ [ 29 ] , which provides a constant approximation ratio for this problem. 
+Considering the complete graph of correlations where the edge weights are in { + , − } \{+,-\} , the algorithm first selects one of the nodes as the pivot, uniformly at random.
+Next, all the nodes that are connected to the pivot with a + + edge are connected to the cluster of the pivot. Next, the algorithm removes the already clustered node from the graph and repeats the same process by selecting the next pivot until all points are clustered.
+
+ 
+ 
+ In order to adapt this algorithm for finding the representative fairness metrics, we consider a threshold τ \tau .
+Then, after selecting the pivot (a fairness metric f i ∈ ℱ f_{i}\in\mathcal{F} ), we connect each fairness metric f j ∈ ℱ f_{j}\in\mathcal{F} to the cluster of f i f_{i} , if r i ​ j ≥ τ r_{ij}\geq\tau .
+Moreover, to find a small subset ℛ ℱ \mathcal{R}_{\mathcal{F}} , we repeat the algorithm multiple times and return the smallest number of subsets.
+For every cluster of metrics, the pivot f i f_{i} is added to the set of representative metrics ℛ ℱ \mathcal{R}_{\mathcal{F}} .
+Considering a positive τ 0 \tau 0 , we make sure that the representative metrics positively correlate with the metrics in their cluster.
+
+ 
+ 
+ The selected representatives can be used by the practitioners in the model development process. There has been extensive research in mitigating the unfairness of ML models using different notions as discussed in Section  5 .
+Using such techniques, the user can mitigate unfairness on the representative metrics.
+Lemma  1 shows that mitigating unfairness on a representative metric approximately mitigates unfairness on the metrics it represents.
+In Section  4 , we demonstrate this phenomenon empirically using different datasets.
+
+ 
+ 
+ Lemma 1 . 
+ 
+ Fairness improvement on a representative metric satisfies an approximation ratio of 1 τ \frac{1}{\tau} over the fairness metrics it represents. 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ Let f ∗ f^{*} be a representative metric for which the unfairness has been reduced.
+Let the unfairness reduction on f ∗ f^{*} after taking an action for unfairness mitigation be ϵ \epsilon . That is,
+ Δ ​ f ∗ = ϵ \Delta f^{*}=\epsilon . The unfairness reduction on f ∗ f^{*} partially reduces the unfairness of metrics f j ∈ C f_{j}\in C represented by it proportional to their correlations, i.e., Δ ​ f j = r i ​ j ​ Δ ​ f ∗ = r i ​ j ​ ϵ \Delta f_{j}=r_{ij}\Delta f^{*}=r_{ij}\epsilon .
+Thus the unfairness for f j f_{j} has been mitigated by an approximation factor of ϵ Δ ​ f j = 1 r i ​ j \frac{\epsilon}{\Delta f_{j}}=\frac{1}{r_{ij}} .
+Since r i ​ j ≥ τ , ∀ f j ∈ C r_{ij}\geq\tau,\forall f_{j}\in C , the approximation over all fairness metrics represented by f ∗ f^{*} is at least 1 τ \frac{1}{\tau} , i.e., 1 r i ​ j ≤ 1 τ \frac{1}{r_{ij}}\leq\frac{1}{\tau} .
+∎ 
+
+ 
+ 
+ 
+ Lemma 2 . 
+ 
+ Increasing the value of τ \tau monotonically increases the number of representative metrics. 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ Given τ 1 τ 2 \tau_{1} \tau_{2} , if r i ​ j ≥ τ 1 r_{ij}\geq\tau_{1} then r i ​ j ≥ τ 2 r_{ij}\geq\tau_{2} . As a result, f i f_{i} and f j f_{j} belong to the same cluster under both scenarios. However, if τ 1 ≤ r i ​ j ≥ τ 2 \tau_{1}\leq r_{ij}\geq\tau_{2} then f i f_{i} and f j f_{j} belong to one cluster under τ 2 \tau_{2} but not τ 1 \tau_{1} . Note that τ 2 ≤ r i ​ j ≥ τ 1 \tau_{2}\leq r_{ij}\geq\tau_{1} cannot happen. Thus, the number of clusters under τ 1 \tau_{1} is always greater than equal of that under τ 2 \tau_{2} .
+∎ 
+
+ 
+ 
+ 
+ Lemmas  1 and  2 show the trade-off between the number of representative metrics and their effectiveness in fairness mitigation.
+On one end, when τ \tau is a large number, unfairness mitigation on representative metrics accurately mitigates unfairness over other metrics as well. But the number of representative metrics in such cases is large.
+On the other hand, when τ \tau is small, the set of representative metrics is small. But since the correlation between the representatives and the metrics they represent are low, mitigation on them is less effective on the other metrics.
+
+ 
+ 
+ We consider τ \tau as a user-specified hyper-parameter.
+However, directly providing τ \tau might not be accessible for the user. Instead, the user can provide the number of representative fairness metrics to be found.
+In such cases, we apply a binary search on the value of τ \tau , to find the corresponding value that returns the user-specified number of representative metrics.
+
+ 
+ 
+ 
+ 
+
+## 4 Experiments
+
+ 
+
+### 4.1 Datasets
+
+ 
+ Our empirical results are based on the benchmark datasets in fair-ML literature 4 4 
+ 4 
+ 
+ 
+ 
+ https://aif360.readthedocs.io/en/latest/ toolkit ( 31 ) :
+
+ 
+ 
+ COMPAS 5 5 
+ 5 
+ 
+ 
+ 
+ ProPublica, https://bit.ly/35pzGFj : published by ProPublica ( 32 ) , this dataset contains information of juvenile felonies
+such as marriage status, race, age, prior convictions , etc.
+We normalized data so that it has zero mean and unit variance.
+We consider race as the sensitive attribute and filtered dataset to black and white defendants. The dataset contains 5,875 records after filtering.
+We use two-year violent recidivism record as the true label of recidivism: Y = 1 Y=1 if the recidivism is greater than zero and Y = 0 Y=0 
+otherwise. We consider race as the sensitive attribute.
+
+ 
+ 
+ Adult 6 6 
+ 6 
+ 
+ 
+ 
+ CI repository, https://bit.ly/2GTWz9Z : contains 45,222 individuals’ income extracted from the 1994 census data with attributes such as age, occupation, education, race, sex, marital-status, native-country, hours-per-week etc. We use income (a binary attribute with values ≥ $ 50 k \geq\$50k and ≤ $ 50 k \leq\$50k ) as the true label Y Y . The attribute sex is considered as the sensitive attribute.
+
+ 
+ 
+ German Credit Data 
+ 7 7 
+ 7 
+ 
+ 
+ 
+ UCI repository, https://bit.ly/36x9t8o : includes 1000 individuals’ credit records containing attributes such as marital status, sex, credit history, employment, and housing status.
+We consider both sex and age as the sensitive attributes, and credit rating (0 for bad customers and 1 for good customers) as the true label, Y Y , for each individual.
+
+ 
+ 
+ Bank marketing 8 8 
+ 8 
+ 
+ 
+ 
+ UCI repository, https://archive.ics.uci.edu/ml/datasets/Bank+Marketing :
+is published by ( 33 ) the data is related to direct marketing campaigns number of phone calls of a Portuguese banking institution. The classification goal is to predict if a client will subscribe to a term deposit (variable Y Y ). The Dataset contains 41188 and 20 attributes that were collected from May 2008 to November 2010. We consider age as the sensitive attribute.
+
+ 
+ 
+ 
+
+### 4.2 Performance Evaluation
+
+ 
+ In order to estimate between-fairness correlations using our proposed Monte-Carlo method, we use N = 1000 N=1000 sampled models for each round and repeat the estimation process for L = 30 L=30 times on each dataset with at least an α = 0.5 \alpha=0.5 accuracy level (threshold to filter out the inaccurate models).
+Our proposed approaches are evaluated using a set of commonly-used classifiers; Logistic Regression ( Logit ), Random Forest ( RF ), K-nearest Neighbor ( KNN )
+, Support Vector Machines ( SVM ) with linear kernel, and Neural Networks ( NN ) with one dense layer. Our proposed framework is agnostic to the type of ML model and can incorporate other classifiers as well. 
+
+ 
+ 
+ Correlation estimation quality: 
+We begin our experiments by evaluating the performance of our correlation estimation method.
+Recall that we designed a Monte-Carlo approach for correlation estimation.
+In every iteration, the algorithm uses the sampling oracle and samples classifiers to evaluate correlations between pairs of fairness notions, for which we use 1000 samples. To investigate the impact of the number of iterations on the estimation variance and confidence error, we vary the number of iterations from L = 2 L=2 to 30. Since the number of estimation pairs are quadratic to | ℱ | |\mathcal{F}| , we decided to (arbitrarily) pick a pair of notions and provide the results for it.
+To be consistent across the experiments, we fixed the pair f 7 f_{7} and f 12 f_{12} for all datasets/models/settings.
+We confirm that the results and findings for other pairs of notions are consistent with what is presented for f 7 f_{7} and f 12 f_{12} .
+Figure 2 provides the results for f 7 f_{7} and f 12 f_{12} for COMPAS (a), Adult (b), Credit (c), Bank (d) datasets.
+Looking at the figure, one can confirm the stable estimation and small confidence error bars, which demonstrate the high accuracy of our estimation.
+Also, as the number of iterations increases, the estimation variance and confidence error significantly decrease.
+
+ 
+ 
+ Impact of data/model on correlation values: 
+In this paper, we propose a framework to identify representative fairness metrics for a given context (data and model).
+The underlying assumption behind this proposal is that correlations are data and model-dependent.
+Having evaluated our correlation estimation quality, in this experiment, we verify that the data/model-dependent assumptions for the correlations are valid.
+To do so, we first fix the dataset to see if the correlations are model-dependent (Figure 3 ) and then fix the model to see if the correlations are data-dependent (Figure 4 ).
+First, we confirm that the results for other datasets/models are consistent with what is presented here.
+Looking at Figure 3 , it is clear that correlations are model-dependent. In particular, NN which is capable of constructing more complex boundaries, resulting in more flexible models with a wide range of fairness values for different metrics. As a result, the correlations between fairness metrics for NN was in general, less than the other models. 
+Similarly, Figure  4 verifies that correlations are data-dependent. This is because different datasets represent different underlying distributions with different properties impacting the fairness values.
+
+ 
+ 
+ Number of representative metrics: 
+Next, we evaluate the impact of the parameter τ \tau , used for identifying the representative metrics, on the number of representatives ℛ ℱ \mathcal{R}_{\mathcal{F}} .
+Figure 5 presents the results for various values of the threshold τ \tau for each ML model for COMPAS, Adult, Credit, Bank datasets.
+The thresholds values are selected as τ ∈ { 0.1 , 0.2 , ⋯ , 0.9 } \tau\in\{0.1,0.2,\cdots,0.9\} .
+Confirming Lemma  2 , we observe that as τ \tau increases the number of subsets increases.
+Besides, as discussed earlier, the number of representatives are model-dependent, and it is relatively larger for NN . 
+In such a situation, the fairness metrics would be less correlated. In general, fairness metrics of linear decision boundaries are more correlated. Although a similar overall pattern can be observed from one dataset to another, the number of the subset of representatives is different. The results indicate that the proposed approach for the estimation of correlation is model-dependent.
+
+ 
+ 
+ In our next experiments, Figure 6 represents the number of representative subsets of fairness metrics, ℛ ℱ \mathcal{R}_{\mathcal{F}} , for different datasets fixing the ML model. We demonstrate that given a model as τ \tau increases the size of ℛ ℱ \mathcal{R}_{\mathcal{F}} increases. The nonlinear models, as expected, require more subsets. The results indicate that the proposed approach for the estimation of correlation is data-dependent.
+
+ 
+ 
+ Figure 7 illustrates examples of clustering graphs of fairness metrics for COMPAS and Credit datasets. Each orange node indicates the representative metrics of each subset, and white nodes having an edge to the representative node show the subsets of highly correlated metrics. We used τ = 0.5 \tau=0.5 to generate the results of this plot. Comparison of Figures (a) and (d) in Figure  7 confirms that the number of representatives obtained with a linear Logit model is smaller compared with RF , which is a non-linear model for Credit dataset. Similarly, comparing Figures (g) and (j) in Figure  7 shows that using a linear model such as SVM leads to a smaller number of representatives compared with RF for the COMPAS dataset. 
+
+ 
+ 
+ The primary goal of our proposed framework is to guide practitioners in performing the mitigation task while being mindful of the correlations between fairness metrics and, consequently, the implications of mitigating one on others.
+Figures  7 (c, f, i, l) present the impact of unfairness mitigation on both within and between cluster fairness metrics based on our estimated correlation values. We use Exponentionated Gradient Reduction  ( 6 , 31 ) as an in-processing approach to mitigate the unfairness of one given representative measure (orange nodes) in different problems and models. We analyzed the impact of mitigation on the highly correlated metrics (within-cluster metrics) and the ones that are either orthogonal or negatively correlated (between-cluster metrics, i.e., other representatives). For example, mitigating unfairness based on the Equal opportunity metric (E-Opp) and Equalized odds difference (odd-dif) in the Credit dataset, shown in Figure  7 (a-c) and (d-f), respectively, results in diminishing unfairness across highly correlated metrics such as Statistical Parity (SP), False negative rate ratio (FNR-rat). However, since other representative metrics are orthogonal or negatively correlated with the considered representative, unfairness mitigation may impact them adversely. 
+ For example, Predictive Parity (PP) and Equalized odd difference (odd-dif) are not correlated (correlation value of 0.02) based on Figure  7 (d-f), hence, mitigating unfairness based on odd-dif does adversely impact the unfairness for PP. 
+In particular, according to the correlation heatmap values, Figure  7 (b), if two measures have a strong negative correlation, such as False negative rate difference (FNR-dif) and Equal opportunity, performing mitigation task on Equal opportunity will exacerbate the resulting unfairness for the other one (e.g., FNR-dif). Similarly, Figure  7 (g-i) and (j-l) indicate bias mitigation results based on the Equal opportunity metric (E-Opp) and Statistical Parity (SP) for the COMPAS dataset. The results are consistent across different models and datasets, indicating that reducing the unfairness for the representative metric induces unfairness reduction among other highly correlated metrics while adversely impacting the unfairness result for the representatives, which have a strong negative correlation. Figure  8 shows some other clustering graph results obtained from applying the proposed framework on other datasets using different models.
+
+ 
+ 
+ In Figure  9 , we studied the impact of the complexity hyperparameters of different ML models on the number of clusters obtained from each model considering the COMPAS and Credit dataset. We performed our analysis on each model under different settings (datasets and hyperparameters). We respectively modified the k k , number of neighbors, for KNN , the kernel type and penalty term for SVM , regularization hyperparamter for Logit , and the number of hidden layers and nodes for NN .
+Our results indicate that more complex models such as NN with several hidden layers and nodes tend to result in a higher number of cluster representatives on average compared with their linear counterparts (e.g., Logit ). 
+
+ 
+ 
+ Figure  10 shows the end-end time for our proposed framework, including data sub-sampling, model training, and fairness evaluation steps on the COMPAS dataset with about 5875 observations. The computation time is proportional to the number of constructed sample models (sample size) for correlation estimation (sample size=1000 in our experiments). Note that using a fixed sample size for sub-sample the training data, our framework is scalable to any larger dataset and will have a similar CPU running time ( 1 1 hr).
+
+ 
+ 
+ 
+ 
+ 
+ (a) COMPAS 
+ 
+ 
+ (b) Adult 
+ 
+ 
+ (c) Credit 
+ 
+ 
+ (d) Bank 
+ 
+ Figure 2: Correlation Estimate for f 7 f_{7} and f 12 f_{12} for different datasets 
+ 
+ 
+ 
+ 
+ 
+ (a) Correlation values for f 7 f_{7} and f 12 f_{12} for COMPAS 
+ 
+ 
+ (b) Correlation values COMPAS dataset with Logit 
+ 
+ 
+ (c) Correlation values COMPAS dataset with NN 
+ 
+ Figure 3: Using COMPAS data set to illustrate that Correlations are model dependent. 
+ 
+ 
+ 
+ 
+ 
+ (a) Correlation values for f 7 f_{7} and f 12 f_{12} for Logit 
+ 
+ 
+ (b) Correlation values Credit dataset with Logit 
+ 
+ 
+ (c) Correlation values Adult dataset with Logit 
+ 
+ Figure 4: Using Logistic Regression to illustrate that Correlations are data dependent. 
+ 
+ 
+ 
+ 
+ 
+ (a) COMPAS 
+ 
+ 
+ (b) Adult 
+ 
+ 
+ (c) Credit 
+ 
+ 
+ (d) Bank 
+ 
+ Figure 5: Number of representative subsets given a dataset using different models 
+ 
+ 
+ 
+ 
+ 
+ (a) Logit 
+ 
+ 
+ (b) KNN 
+ 
+ 
+ (c) SVM 
+ 
+ 
+ (d) NN 
+ 
+ Figure 6: Number of representative subsets given a model using different dataset 
+ 
+ 
+ 
+ 
+ 
+ (a) Credit-Logit 
+ 
+ 
+ (b) Correlation values 
+ 
+ 
+ (c) Unfairness Mitigation 
+ 
+ 
+ (d) Credit-RF 
+ 
+ 
+ (e) Correlation values 
+ 
+ 
+ (f) Unfairness Mitigation 
+ 
+ 
+ (g) COMPAS-RF 
+ 
+ 
+ (h) Correlation values 
+ 
+ 
+ (i) Unfairness Mitigation 
+ 
+ 
+ (j) COMPAS-SVM 
+ 
+ 
+ (k) Correlation values 
+ 
+ 
+ (l) Unfairness Mitigation 
+ 
+ Figure 7: Graph illustration of identified subset of fairness representatives, correlation heatmap, and bias mitigation (Exponentiated Gradient Reduction) impact on Intra-cluster and within-cluster metrics 
+ 
+ 
+ 
+ 
+ 
+ (a) COMPAS-NN 
+ 
+ 
+ (b) Adult-SVM 
+ 
+ 
+ (c) Bank-KNN 
+ 
+ Figure 8: Graph illustration of identified subset of fairness representatives 
+ 
+ 
+ Figure 9: Number of identified fairness representatives by different models 
+ 
+ 
+ Figure 10: End-end time of proposed approach across different models and sample size on COMPAS data set 
+ 
+ 
+ 
+ 
+
+## 5 Related work
+
+ 
+ Algorithmic fairness has been studied extensively in recent years ( 34 , 35 ) . Various fairness metrics have been defined in the literature to address the inequalities of algorithmic decision-making from different perspectives. [ 18 ] and [ 12 ] define different fairness notions in detail.
+The majority of works focus on the fairness consideration in different stages of predictive modeling including pre-processing ( 4 , 3 , 5 ) , in-processing ( 36 , 8 , 37 ) , and post-processing ( 38 , 4 , 39 , 9 ) to mitigate the outcome bias. Furthermore, the proposed interventions are tied to a specific fairness notion; statistical parity ( 36 ) , equality of opportunity ( 9 ) , disparate impact ( 4 ) , etc.
+
+ 
+ 
+ A few recent works discuss the challenge of choosing the appropriate fairness metric for bias mitigation considerations.
+ [ 1 ] surveys notions of fairness and discusses the subjectivity of different notions for a set of real-world scenarios.
+The challenges about a growing pool of fairness metrics for unfairness mitigation and some aspects of the relationships between fairness metrics are highlighted in [ 40 ] with
+respect to the distinctions individual vs. group and observational vs. causality-based. As a result, the authors highly promote quantitative research for fairness metric assessment for bias mitigation. Building on previous works ( 13 , 41 ) , [ 14 ] provides a comparative using mathematical representations to discuss the trade-off between some of the common notions of fairness. In [ 2 ] Friedler et al. studied the effectiveness of fairness mitigation strategies proposed in the literature and showed the correlation between fairness metrics. To the best of our knowledge, none of the existing work proposed an automated framework to identify a representative subset of fairness metrics given a dataset and a model type. We addressed this gap in the literature and proposed an effective framework to discover the representative fairness metrics and facilitate the fairness metric selection and unfairness mitigation process for data scientists. 
+
+ 
+ 
+ 
+
+## 6 Final Remarks
+
+ 
+ The abundance, trade-offs, and details of fairness metrics are major challenges towards responsible practices of machine learning for the ordinary data scientists.
+ 
+In particular, since completely mitigating unfairness from the perspective of all fairness measures might be impossible, it is of interest to instead reduce unfairnesses. While existing fair ML systems enable specifying multiple fairness constraints, they fail in practice when the number of fairness constrains is not small.
+As a result, in order to balance unfairness among different metrics, it is critical to identify their correlations, and to select a small subset of representative ones to focus on.
+ 
+To alleviate the overwhelming task of selecting a subset of fairness measures to consider for a context (a data set and a model type), we proposed a framework that, given a set of fairness notions of interest, estimates the correlations between them and identifies a subset of notions that represent others.
+ 
+Our goal in this paper is not to design new techniques for fair ML but to specify a subset of metrics that represent others.
+The outcome of our proposal provides an insight into the set of representative metrics that, if the model unfairness is balanced between those, the total unfairness from different perspectives (various notions) is balanced.
+ 
+
+ 
+ 
+ We conducted comprehensive experiments using benchmark data sets and
+different classification models to evaluate the our approach.
+First, our experiments verified the effectiveness of our approach in finding correlations, returning robust and low-variance estimations.
+Next, we observed in the experiments that correlation values between different fairness metrics are model-type and data-dependent. Finally, our approach could specify a subset of representative metrics.
+
+ 
+ 
+ While the general approach proposed in this model can be applied to other ML tasks, our focus in this paper was on classification. Extending our findings for other tasks such as regression is an interesting direction for future work.
+Another interesting direction for future work is to study the dynamic systems and the impact of data distribution drift on the correlations and the set of representative measures.
+
+ 
+ 
+ 
+
+## 7 Application in Higher Education
+
+ 
+ The Education Longitudinal Study (ELS:2002) dataset, is a longitudinal study of 10th graders in 2002 and 12th graders in 2004 that was designed to collect data on the students who were tracked throughout their secondary and postsecondary education. In this study, we concentrate on a selected subset of the available attributes and discard observations with a large number of missing attributes.  We consider the variable highest level of degree as an indicator of students success and  construct a binary classification problem by classifying students with a college degree (BS degree and higher) as the favorable outcome (label=1) and others as the unfavorable outcome (label=0). The sensitive attribute in this case is considered to be the attribute race.
+
+ 
+ 
+ 
+ 
+ 
+ (a) ELS-Logit 
+ 
+ 
+ (b) ELS-SVM 
+ 
+ 
+ (c) ELS-RF 
+ 
+ 
+ (d) ELS-KNN 
+ 
+ 
+ (e) ELS-NN 
+ 
+ Figure 11: Graph illustration of identified subset of fairness representatives for ELS dataset 
+ 
+ 
+ 
+
+## 8 Compliance with Ethical Standards
+
+ 
+ Funding: Hadis Anahideh and Nazanin Nezami were funded in part by Institute of Education Sciences (R305D220055). Abolfazl Asudeh was supported in part by NSF grant 2107290.
+ Ethical approval: This article does not contain any studies with human participants or animals performed by any of the authors.
+
+ 
+ 
+ 
+
+## References
+
+ 
+ 
+ (1) 
+ 
+Makhlouf, K.,
+Zhioua, S.,
+Palamidessi, C.:
+On the applicability of machine learning fairness notions.
+ACM SIGKDD Explorations Newsletter
+ 23 (1),
+14–23
+(2021)
+
+ 
+
+ 
+ (2) 
+ 
+Friedler, S.A.,
+Scheidegger, C.,
+Venkatasubramanian, S.,
+Choudhary, S.,
+Hamilton, E.P.,
+Roth, D.:
+A comparative study of fairness-enhancing interventions in machine
+learning.
+In: FAT*
+(2019)
+
+ 
+
+ 
+ (3) 
+ 
+Kamiran, F.,
+Calders, T.:
+Data preprocessing techniques for classification without
+discrimination.
+Knowledge and Information Systems
+ 33 (1),
+1–33
+(2012)
+
+ 
+
+ 
+ (4) 
+ 
+Feldman, M.,
+Friedler, S.A.,
+Moeller, J.,
+Scheidegger, C.,
+Venkatasubramanian, S.:
+Certifying and removing disparate impact.
+In: SIGKDD,
+pp. 259–268
+(2015).
+ACM
+
+ 
+
+ 
+ (5) 
+ 
+Calmon, F.,
+Wei, D.,
+Vinzamuri, B.,
+Ramamurthy, K.N.,
+Varshney, K.R.:
+Optimized pre-processing for discrimination prevention.
+In: Advances in Neural Information Processing Systems,
+pp. 3992–4001
+(2017)
+
+ 
+
+ 
+ (6) 
+ 
+Agarwal, A.,
+Beygelzimer, A.,
+Dudík, M.,
+Langford, J.,
+Wallach, H.:
+A reductions approach to fair classification.
+In: ICML,
+pp. 60–69
+(2018)
+
+ 
+
+ 
+ (7) 
+ 
+Celis, L.E.,
+Huang, L.,
+Keswani, V.,
+Vishnoi, N.K.:
+Classification with fairness constraints: A meta-algorithm with
+provable guarantees.
+In: Proceedings of the Conference on Fairness, Accountability, and
+Transparency,
+pp. 319–328
+(2019)
+
+ 
+
+ 
+ (8) 
+ 
+Zafar, M.B.,
+Valera, I.,
+Rodriguez, M.G.,
+Gummadi, K.P.:
+Fairness constraints: Mechanisms for fair classification.
+arXiv preprint arXiv:1507.05259
+(2015)
+
+ 
+
+ 
+ (9) 
+ 
+Hardt, M.,
+Price, E.,
+Srebro, N.:
+Equality of opportunity in supervised learning.
+Advances in neural information processing systems
+ 29 ,
+3315–3323
+(2016)
+
+ 
+
+ 
+ (10) 
+ 
+Kamiran, F.,
+Calders, T.,
+Pechenizkiy, M.:
+Discrimination aware decision tree learning.
+In: ICDM,
+pp. 869–874
+(2010).
+IEEE
+
+ 
+
+ 
+ (11) 
+ 
+Narayanan, A.:
+Translation tutorial: 21 fairness definitions and their politics.
+In: Proc. Conf. Fairness Accountability Transp., New York, USA,
+vol. 1170
+(2018)
+
+ 
+
+ 
+ (12) 
+ 
+Verma, S.,
+Rubin, J.:
+Fairness definitions explained.
+In: 2018 Ieee/acm International Workshop on Software Fairness
+(fairware),
+pp. 1–7
+(2018).
+IEEE
+
+ 
+
+ 
+ (13) 
+ 
+Kleinberg, J.,
+Mullainathan, S.,
+Raghavan, M.:
+Inherent trade-offs in the fair determination of risk scores.
+arXiv preprint arXiv:1609.05807
+(2016)
+
+ 
+
+ 
+ (14) 
+ 
+Garg, P.,
+Villasenor, J.,
+Foggo, V.:
+Fairness metrics: A comparative analysis.
+In: Big Data,
+pp. 3662–3666
+(2020).
+IEEE
+
+ 
+
+ 
+ (15) 
+ 
+Bakalar, C.,
+Barreto, R.,
+Bergman, S.,
+Bogen, M.,
+Chern, B.,
+Corbett-Davies, S.,
+Hall, M.,
+Kloumann, I.,
+Lam, M.,
+Candela, J.Q., et al.:
+Fairness on the ground: Applying algorithmic fairness approaches to production
+systems.
+arXiv preprint arXiv:2103.06172
+(2021)
+
+ 
+
+ 
+ (16) 
+ 
+Zhang, H.,
+Shahbazi, N.,
+Chu, X.,
+Asudeh, A.:
+Fairrover: explorative model building for fair and responsible machine
+learning.
+In: Proceedings of the Fifth Workshop on Data Management for
+End-To-End Machine Learning,
+pp. 1–10
+(2021)
+
+ 
+
+ 
+ (17) 
+ 
+Zhang, H.,
+Chu, X.,
+Asudeh, A.,
+Navathe, S.B.:
+Omnifair: A declarative system for model-agnostic group fairness in
+machine learning.
+In: SIGMOD,
+pp. 2076–2088
+(2021)
+
+ 
+
+ 
+ (18) 
+ 
+Barocas, S.,
+Hardt, M.,
+Narayanan, A.:
+Fairness in machine learning.
+Nips tutorial
+ 1 ,
+2017
+(2017)
+
+ 
+
+ 
+ (19) 
+ 
+Kim, J.S.,
+Chen, J.,
+Talwalkar, A.:
+Fact: A diagnostic for group fairness trade-offs.
+In: ICML,
+pp. 5264–5274
+(2020).
+PMLR
+
+ 
+
+ 
+ (20) 
+ 
+Friedler, S.A.,
+Scheidegger, C.,
+Venkatasubramanian, S.:
+On the (im) possibility of fairness.
+CoRR, abs/1609.07236
+(2016)
+
+ 
+
+ 
+ (21) 
+ 
+Thomas, M.,
+Joy, A.T.:
+Elements of information theory.
+Wiley-Interscience
+(2006)
+
+ 
+
+ 
+ (22) 
+ 
+Robert, C.P.:
+Monte carlo methods.
+Wiley Online Library
+(2004)
+
+ 
+
+ 
+ (23) 
+ 
+Hickernell, F.J.,
+Jiang, L.,
+Liu, Y.,
+Owen, A.B.:
+Guaranteed conservative fixed width confidence intervals via Monte Carlo
+sampling.
+Springer
+(2013)
+
+ 
+
+ 
+ (24) 
+ 
+Durrett, R.:
+Probability: theory and examples.
+Cambridge university press
+(2010)
+
+ 
+
+ 
+ (25) 
+ 
+Neter, J.,
+Kutner, M.H.,
+Nachtsheim, C.J.,
+Wasserman, W., et al.:
+Applied linear statistical models
+(1996)
+
+ 
+
+ 
+ (26) 
+ 
+Schober, P.,
+Boer, C.,
+Schwarte, L.A.:
+Correlation coefficients: appropriate use and interpretation.
+Anesthesia Analgesia
+ 126 (5),
+1763–1768
+(2018)
+
+ 
+
+ 
+ (27) 
+ 
+Efron, B.,
+Tibshirani, R.J.:
+An introduction to the bootstrap.
+CRC press
+(1994)
+
+ 
+
+ 
+ (28) 
+ 
+Hesterberg, T.:
+Bootstrap.
+Wiley Interdisciplinary Reviews: Computational Statistics
+ 3 (6),
+497–526
+(2011)
+
+ 
+
+ 
+ (29) 
+ 
+Bansal, N.,
+Blum, A.,
+Chawla, S.:
+Correlation clustering.
+Machine learning
+ 56 (1),
+89–113
+(2004)
+
+ 
+
+ 
+ (30) 
+ 
+Queiroga, E.,
+Subramanian, A.,
+Figueiredo, R.,
+Frota, Y.:
+Integer programming formulations and efficient local search for
+relaxed correlation clustering.
+Journal of Global Optimization
+ 81 (4),
+919–966
+(2021)
+
+ 
+
+ 
+ (31) 
+ 
+Bellamy, R.K.E.,
+Dey, K.,
+Hind, M.,
+Hoffman, S.C.,
+Houde, S.,
+Kannan, K.,
+Lohia, P.,
+Martino, J.,
+Mehta, S.,
+Mojsilovic, A.,
+Nagar, S.,
+Ramamurthy, K.N.,
+Richards, J.,
+Saha, D.,
+Sattigeri, P.,
+Singh, M.,
+Varshney, K.R.,
+Zhang, Y.:
+AI Fairness 360: An Extensible Toolkit for Detecting, Understanding, and
+Mitigating Unwanted Algorithmic Bias
+(2018).
+ https://arxiv.org/abs/1810.01943 
+
+ 
+
+ 
+ (32) 
+ 
+Angwin, J.,
+Larson, J.,
+Mattu, S.,
+Kirchner, L.:
+Machine bias: Risk assessments in criminal sentencing.
+ProPublica
+(2016)
+
+ 
+
+ 
+ (33) 
+ 
+Moro, S.,
+Cortez, P.,
+Rita, P.:
+A data-driven approach to predict the success of bank telemarketing.
+Decision Support Systems
+ 62 ,
+22–31
+(2014)
+
+ 
+
+ 
+ (34) 
+ 
+Corbett-Davies, S.,
+Pierson, E.,
+Feller, A.,
+Goel, S.,
+Huq, A.:
+Algorithmic decision making and the cost of fairness.
+In: Proceedings of the 23rd Acm Sigkdd International Conference on
+Knowledge Discovery and Data Mining,
+pp. 797–806
+(2017)
+
+ 
+
+ 
+ (35) 
+ 
+Kleinberg, J.,
+Ludwig, J.,
+Mullainathan, S.,
+Rambachan, A.:
+Algorithmic fairness.
+In: Aea Papers and Proceedings,
+vol. 108,
+pp. 22–27
+(2018)
+
+ 
+
+ 
+ (36) 
+ 
+Calders, T.,
+Verwer, S.:
+Three naive bayes approaches for discrimination-free classification.
+Data Mining and Knowledge Discovery
+ 21 (2),
+277–292
+(2010)
+
+ 
+
+ 
+ (37) 
+ 
+Asudeh, A.,
+Jagadish, H.V.,
+Stoyanovich, J.,
+Das, G.:
+Designing fair ranking schemes.
+In: SIGMOD
+(2019).
+ACM
+
+ 
+
+ 
+ (38) 
+ 
+Pleiss, G.,
+Raghavan, M.,
+Wu, F.,
+Kleinberg, J.,
+Weinberger, K.Q.:
+On fairness and calibration.
+In: Advances in Neural Information Processing Systems,
+pp. 5680–5689
+(2017)
+
+ 
+
+ 
+ (39) 
+ 
+Stoyanovich, J.,
+Yang, K.,
+Jagadish, H.V.:
+Online set selection with fairness and diversity constraints.
+In: EDBT
+(2018)
+
+ 
+
+ 
+ (40) 
+ 
+Castelnovo, A.,
+Crupi, R.,
+Greco, G.,
+Regoli, D.:
+The zoo of fairness metrics in machine learning.
+arXiv preprint arXiv:2106.00467
+(2021)
+
+ 
+
+ 
+ (41) 
+ 
+Chouldechova, A.:
+Fair prediction with disparate impact: A study of bias in recidivism
+prediction instruments.
+Big data
+ 5 (2),
+153–163
+(2017)

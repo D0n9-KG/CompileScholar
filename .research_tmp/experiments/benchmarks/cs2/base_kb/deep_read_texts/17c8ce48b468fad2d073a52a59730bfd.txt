@@ -1,0 +1,459 @@
+# Multi-Hop Question Generation via Dual-Perspective Keyword Guidance
+
+Maodong Li $^{1}$ , Longyin Zhang $^{2}$ , Fang Kong $^{1*}$
+
+<sup>1</sup>School of Computer Science and Technology, Soochow University, China
+
+$^{2}$ Institute for Infocomm Research, A*STAR, Singapore
+
+{20234227022@stu,kongfang}@suda.edu.cn zhang_longyin@i2r.a-star.edu.sg
+
+# Abstract
+
+Multi-hop question generation (MQG) aims to generate questions that require synthesizing multiple information snippets from documents to derive target answers. The primary challenge lies in effectively pinpointing crucial information snippets related to question-answer (QA) pairs, typically relying on keywords. However, existing works fail to fully utilize the guiding potential of keywords and neglect to differentiate the distinct roles of question-specific and document-specific keywords.
+
+To address this, we define dual-perspective keywords—question and document keywords—and propose a Dual-Perspective Keyword-Guided (DPKG) framework, which seamlessly integrates keywords into the multi-hop question generation process. We argue that question keywords capture the questioner's intent, whereas document keywords reflect the content related to the QA pair. Functionally, question and document keywords work together to pinpoint essential information snippets in the document, with question keywords required to appear in the generated question.
+
+The DPKG framework consists of an expanded transformer encoder and two answer-aware transformer decoders for keyword and question generation, respectively. Extensive experiments demonstrate the effectiveness of our work, showcasing its promising performance and underscoring its significant value in the MQG task.
+
+# 1 Introduction
+
+Question generation (QG) is the task of generating questions based on given documents and target answers (Zhang et al., 2021; Ushio et al., 2023). It is a vital area in natural language processing (NLP), with considerable potential for applications in automated question answering, reading comprehension, and related fields (Liang et al., 2023; Guo et al.,
+
+![](dt=2026-05-29/ht=08/3dee7fc147b71e43946a6ed5f7f4a6cdd3c82068404d5d12f979f49d0923e39e.jpg)
+
+![](dt=2026-05-29/ht=08/6058586697c2becf0187f06e292711a339a24bfff48dd89b446b77addece98db.jpg)
+
+2024). Compared to the QG task, multi-hop question generation (MQG) aims to generate questions that require synthesizing multiple information snippets from documents to derive target answers, making it more representative of real-world scenarios (Fei et al., 2021, 2022a; Chen et al., 2023).
+
+The primary challenge in MQG is effectively pinpointing crucial information snippets related to question-answer (QA) pairs in documents, a task that many studies have approached using keywords (Xia et al., 2023; Ding et al., 2024; Liu et al., 2024a; Fazili et al., 2024). However, current research does not fully leverage the guiding potential of keywords. Some studies focus exclusively on document-specific keywords (Su et al., 2020; Cao and Wang, 2021), while others, including more recent, higher-performing models (Fei et al., 2022a,b) consider constraints on question-specific keywords during question generation. According to our un
+
+arXiv:2505.15299v2 [cs.CL] 3 Jun 2025
+
+*Corresponding author
+
+1
+
+derstanding, as illustrated in Figure 1(a), question keywords reflect the questioner's intent, whereas document keywords reflect the content related to the QA pair in documents. Functionally, question and document keywords work together to pinpoint essential information snippets in the document, with question keywords required to appear in the generated question. However, existing studies overlook the distinction between the two keyword types, which poses a challenge to further improving performance (Fei et al., 2022a; Xia et al., 2023; Ding et al., 2024).
+
+To break through the above limitation, we define dual-perspective keywords: question keywords, which capture the intent of the questioner, and document keywords, which reflect the content related to the QA pair in documents (Figure 1(a)). Based on this, we further propose a Dual-Perspective Keyword-Guided (DPKG) framework, which seamlessly integrates keywords into the multi-hop question generation process (Figure 1(b)).
+
+The framework clarifies essential information snippets by differentiating the two categories of keywords and ensures that specific keywords appear in the generated question, aligning closely with natural human intuition. More specifically, the DPKG framework consists of three main components: (1) an expanded transformer encoder that processes the document and target answer; (2) a decoder that generates dual-perspective keywords; and (3) another decoder that generates multi-hop questions by leveraging crucial information snippets pinpointed by keywords.
+
+This framework tackles MQG challenges and aligns with practical requirements. Our contributions are as follows:
+
+# 2 Related Work
+
+Question generation (QG), also known as shallow QG, involves generating questions based on given documents and target answers. Early approaches to QG were rule-based (Heilman and Smith, 2010; Chali and Hasan, 2012; Mazidi and Nielsen, 2014), but their performance was limited. As the field advanced, attention-based sequence-to-sequence architectures gained popularity (Du et al., 2017; Zhou et al., 2018; Sun et al., 2018; Song et al., 2018). Some studies emphasized feature-rich encoders to capture more contextual information (Zhou et al., 2018; Sun et al.
+
+, 2018), and answer-aware features were introduced to extract additional information (Sun et al., 2018; Song et al., 2018). To address the challenge posed by long passages, a maxout pointer mechanism was developed (Zhao et al., 2018). Moreover, reinforcement learning (RL) has been applied in a graph-to-sequence model (G2S) for question generation (Chen et al., 2020, 2023). All of these studies focus on shallow QG, with the SQuAD dataset (Rajpurkar et al., 2016) being the most commonly used benchmark.
+
+Multi-hop question generation (MQG) focuses on generating questions that synthesize multiple information snippets from documents to derive target answers. Compared to shallow QG, MQG is more demanding and has garnered significant attention in recent years (Su et al., 2020; Fei et al., 2021, 2022a; Chen et al., 2023; Ding et al., 2024). In the early stages of MQG, graph neural networks (GNNs) were integrated into multi-hop reasoning steps to facilitate question generation (Su et al., 2020; Pan et al., 2020).
+
+However, with the evolution of transformer-based architectures, transformers have been demonstrated to outperform GNNs in this task (Vaswani, 2017; Su et al., 2022). To further enhance the performance of pre-trained language models (PLMs) in multi-hop question generation, researchers have incorporated mechanisms such as additional question-answer modules and multi-level content planning (Su et al., 2022; Xia et al., 2023).
+
+Numerous studies have also explored auxiliary tasks, proposing methods like order-agnostic learning and sequential rewriting to improve question quality (Murakhovs'ka et al., 2022; Kim et al., 2024; Hwang et al., 2024). More recently, question-specific keywords have been utilized during decoding to enhance high-quality generation (Fei et al., 2022a), and Ding et al. (2024) supported multi-hop question generation by identi
+
+$^{1}$ https://github.com/imaodong/DPKG
+
+2
+
+fying salient, related keywords or sentences. However, they do not fully harness the guiding potential of keywords, which limits improvements in generation performance.
+
+# 3 Methodology
+
+# 3.1 Task Formulation
+
+Assume a MQG dataset $U = \{D, A, Q\}_{N}^{i=1}$ , where $D^i$ denotes contextual documents, $A^i$ represents a target answer, and $N$ is the number of samples. The task is to generate a multi-hop question $Q^i$ based on $D^i$ and $A^i$ . We extend the dataset to $U = \{D, A, Q, K\}_{N}^{i=1}$ , where $K^i$ is a keyword sequence consisting of two sets: $K_{j=1:M_i^q}^q$ and $K_{j=1:M_i^d}^d$ , representing question keywords and document keywords annotated with SpaCy (see §4.1 for details). Here, $M_i^q$ and $M_i^d$ indicate the number of question keywords and document keywords, respectively.
+
+The updated task now includes two primary objectives: (1) generating keywords, $K^i = f_{\theta_1}(D^i, A^i)$ ; and (2) generating multi-hop question, $Q^i = f_{\theta_2}(D^i, A^i, K^i)$ , where $\theta_1$ and $\theta_2$ are model parameters.
+
+# 3.2 DPKG Framework
+
+In this subsection, we introduce the DPKG framework in detail, which seamlessly integrates keywords into the multi-hop question generation process. As illustrated in Figure 2, the DPKG framework consists of an expanded transformer encoder and two answer-aware transformer decoders, designated for keyword generation and question generation, respectively. Additionally, inspired by the success of previous prompt-based approaches, we adopt a similar method for this task. We prepend an additional prefix defined as follows: $D^{i} = \text{"Document:"} + D^{i}$ , $A^{i} = \text{"Answer:"} + A^{i}$ , and $Q^{i} = \text{"Question:"} + Q^{i}$ .
+
+As illustrated in Figure 2(a), this is an expansion of the transformer encoder (Vaswani, 2017), which encodes three components and produces the corresponding hidden states:
+
+$$
+H _ {d o c} ^ {i}, H _ {a n s} ^ {i}, H _ {d a} ^ {i} = \operatorname {E n c o d e r} _ {a} ([ D ^ {i}, A ^ {i}, D ^ {i}; A ^ {i} ]) \tag {1}
+$$
+
+where $H_{doc}^{i}$ and $H_{ans}^{i}$ represent document states and answer states, respectively. $H_{da}^{i}$ denotes document-answer states, and [;] denotes concatenation. Notably, we modify the internal structure of the transformer encoder to ensure that, when
+
+encoding the three input components simultaneously, each part remains independent, except for the shared self-attention mechanism. We encode the document and answer separately to facilitate the subsequent computation of answer-aware states. In Figure 2, (b) and (c) are identical, except (c) incorporates an additional vanilla BART encoder (Lewis et al., 2020) to encode keywords. Although structurally similar, they are independent because of their distinct tasks. Specifically, (b) generates keywords based on the document and answer, while (c) leverages the keywords to pinpoint essential information snippets related to QA pairs in the document and generate multi-hop questions. Formalizing these processes:
+
+$$
+K ^ {i} = D e c o d e r _ {b} (H _ {d o c} ^ {i}, H _ {a n s} ^ {i}, H _ {d a} ^ {i}) \qquad (2)
+$$
+
+$$
+Q ^ {i} = D e c o d e r _ {c} \left(H _ {d o c} ^ {i}, H _ {a n s} ^ {i}, H _ {d a} ^ {i}, E \left(K ^ {i}\right)\right) (3)
+$$
+
+where $E(\cdot)$ denotes the vanilla BART encoder and $K^i$ represents the $i$ -th keyword sequence. Additionally, we have modified the transformer decoder by incorporating an answer-aware attention mechanism to enhance answer-awareness in the generation of both keywords and questions.
+
+# 3.3 Answer-aware Attention Mechanism and Fusion Module
+
+It is worth noting that (b) and (c) in Figure 2 are similar processes to each other, with (b) used to generate keywords and (c) used to generate questions. Here, we use (b) as an illustrative example. Assume that in the previous step, we obtain the keyword representation, denoted as $H_{k}^{t - 1}$ . The answer-aware attention mechanism (Wang et al., 2024) is formalized as follows:
+
+$$
+H _ {a} = \operatorname {s o f t m a x} \left(\frac {H _ {k} ^ {t - 1} H _ {d o c} ^ {T}}{\sqrt {d}} \odot K _ {\text {w e i g h t}}\right) H _ {d o c} \tag {4}
+$$
+
+$$
+K _ {\text {w e i g h t}} = \text {M e a n P o o l i n g} \left(\frac {H _ {\text {d o c}} H _ {\text {a n s}} ^ {T}}{\sqrt {d}}\right) \tag {5}
+$$
+
+where $d$ represents the hidden size and $\odot$ denotes element-wise multiplication. We argue that $K_{weight}$ encapsulates the relationship between the document and the answer. By applying the softmax function, we quantify these interconnections. Finally, we take the dot product with $H_{doc}$ and derive the answer-aware states, denoted as $H_{a}$ . Correspondingly, in the cross-attention mechanism (Vaswani, 2017), we also obtain hidden states, denoted by $H_{h}$ . Next, we apply the fusion module to
+
+3
+
+![](dt=2026-05-29/ht=08/8a8fc0077186b9094ccd12f64cc123cbf952ea22d4a21a9003792cbfff4f6386.jpg)
+
+combine the states of $H_{a}$ and $H_{h}$ , producing the keyword representation $H_{k}^{t}$ in the following step. The fusion module operates as follows:
+
+$$
+H _ {k} ^ {t} = \text {g a t e} \odot H _ {a} + (1 - \text {g a t e}) \odot H _ {h} \quad (6)
+$$
+
+$$
+\operatorname {g a t e} = \operatorname {s i g m o i d} \left(\left[ H _ {a}; H _ {h} \right]\right) \tag {7}
+$$
+
+# 3.4 Keyword Guidance
+
+The keyword guidance concept of DPKG integrates keywords into the multi-hop question generation process by pinpointing crucial information snippets related to QA pairs in the documents and specifying the question keywords that must appear in the generated questions. Our keyword guidance approach is grounded in two primary principles: First, after generating keywords, they are encoded by the BART encoder and aggregated with $H_{da}^{i}$ to form new states, seamlessly incorporating keywords into the question generation process. This integration enables the identification of crucial information snippets and ensures the inclusion of specific keywords in the generated question, as shown in Figure 2. Second, keyword generation and question generation are jointly trained using a shared, expanded
+
+transformer encoder, which allows for deep integration of representations from both tasks.
+
+There are two modes when using dual-perspective keywords in the DPKG framework: (1) In hard mode, special prefixes <ques> or <doc> are added to each keyword to indicate whether it is a question or document keyword. (2) In soft mode, no special prefixes are added; instead, the framework dynamically identifies each keyword's role (question or document) during question generation. This means that, in hard mode, the recognition of the two types of keywords occurs during the keyword generation process, whereas in soft mode, the identification happens during question generation.
+
+The soft mode has already achieved impressive performance in other areas of NLP (Liu et al., 2024a). The keywords in this paper are presented sequentially. In hard mode, the keyword sequence is defined as $K^{i} = \langle \text{ques} \rangle K_{j=1:M_{i}^{q}}^{q} \langle \text{doc} \rangle K_{j=1:M_{i}^{d}}^{d}$ ; while in soft mode, it is defined as $K^{i} = K_{j=1:M_{i}^{q}}^{q} K_{j=1:M_{i}^{d}}^{d}$ , where the framework dynamically identifies each keyword's role (question or document) during
+
+4
+
+multi-hop question generation.
+
+# 3.5 Training Loss
+
+We present a joint training approach for keyword and multi-hop question generation. During training, keyword and question generation are trained in a pipeline fashion, where ground-truth keywords are used for question generation. In the inference phase, keywords are first generated and then used for question generation, creating a gap between training and inference. To bridge this gap, we introduce a novel loss function, defined as follows:
+
+$$
+\mathcal {L} _ {3} = \left\| F _ {k} - F _ {g} \right\| _ {2} \tag {8}
+$$
+
+$$
+F _ {k} = \operatorname {A v g P o o l i n g} \left(H _ {k} ^ {t}\right) \tag {9}
+$$
+
+$$
+F _ {g} = \operatorname {A v g P o o l i n g} (E (g)) \tag {10}
+$$
+
+where $g$ denotes the ground-truth keywords. This implies that, during joint training, we aim for the ground-truth keyword representations used in multi-hop question generation to closely resemble the generated keyword representations, thereby minimizing this gap. In joint training, the loss for keyword generation is denoted as $\mathcal{L}_1$ , while the loss for question generation is denoted as $\mathcal{L}_2$ . Both losses are computed using cross-entropy. The final loss is expressed as follows:
+
+$$
+\mathcal {L} = \beta_ {1} \mathcal {L} _ {1} + \beta_ {2} \mathcal {L} _ {2} + \beta_ {3} \mathcal {L} _ {3} \tag {11}
+$$
+
+where $\beta_{1},\beta_{2}$ and $\beta_{3}$ are hyperparameters $^2$
+
+# 4 Experiments
+
+# 4.1 Dataset
+
+We conduct experiments on a common MQG dataset, HotpotQA (Yang et al., 2018), which consists of two settings: supporting fact (SF) and full document context (Full). In the SF setting, only the sentences containing supporting facts for the answers are provided, whereas in the Full setting, several paragraphs from different documents are presented, which offers a more challenging evaluation of the model's capabilities. Since the original test set is not publicly available, we use the split version provided by (Fei et al., 2022a). We annotate question keywords and document keywords in the HotpotQA dataset using SpaCy $^{3}$ . During this process, we focus exclusively on sentences relevant to both answers and questions to ensure
+
+![](dt=2026-05-29/ht=08/495e7825a6a3dcd80b52dffaf63017db133b85c886d2facd79c05e06cc63a1ca.jpg)
+
+![](dt=2026-05-29/ht=08/4e7eb4b907e9c4973e0cf4b8c1bc238cecd3eed6a6681ae282d13e536756e033.jpg)
+
+Table 1: Statistics of HotpotQA, where "Sam." denotes "Sample," "Qes." denotes "Question keyword," and "Doc." denotes "Document keyword."
+
+![](dt=2026-05-29/ht=08/f437cc5c7be18f725760feda061dfc8ff12056c53d285a790c80fae02a1a81b5.jpg)
+
+<table><tr><td></td><td>#Sam.</td><td colspan="2">#Qes.</td><td colspan="3">#Doc.</td></tr><tr><td></td><td></td><td>Min.</td><td>Max.</td><td>Avg.</td><td>Min.</td><td>Max.</td></tr><tr><td>Train</td><td>89947</td><td>1</td><td>38</td><td>6</td><td>0</td><td>90</td></tr><tr><td>Dev</td><td>500</td><td>1</td><td>21</td><td>6</td><td>1</td><td>36</td></tr><tr><td>Test</td><td>7405</td><td>1</td><td>20</td><td>5</td><td>0</td><td>55</td></tr></table>
+
+that extracted keywords are directly related to them. Entities or phrases, drawn from both relevant sentences and questions, serve as keywords. Figure 3(a) illustrates our process of annotating keywords in detail. Notably, we observe that interrogative words (such as "what," "how," and so on) play a crucial role in the questioning process; therefore, we treat them as question keywords. Through this process, we effectively construct both question and document keywords, ensuring that both types align with the description provided. The details of the keyword statistics are provided in Table 1.
+
+However, in Figure 3(a), it is found that a portion is marked as "Not utilized," which means that we do not adopt this portion's keywords. This is because, after questioners view the answer and the document, they will pinpoint the crucial answer-related information snippets in the document while selecting the keywords from those snippets that are relevant to the question (i.e., keywords that must appear in the generated question). Hence, both question and document keywords should be included in the document. This is an intuitive explanation, and empirical explanations are offered in Appendix B.
+
+# 4.2 Baselines and Evaluation Metrics
+
+In our experiments, we compare several advanced models from recent years: BART (Lewis et al., 2020), an encoder-decoder pre-trained model designed for natural language generation; MulQG
+
+2Experimental details are in Appendix A.
+
+$^3$ https://spacy.io/. We utilize the en_core_web_sm model.
+
+5
+
+Table 2: Performance comparison between DPKG and baselines. Bold text highlights the best results, while underlined text indicates the second-best. "B4" denotes "BLEU-4," "MTR" denotes "METEOR," and "R-L" denotes "ROUGE-L."
+
+![](dt=2026-05-29/ht=08/1eb3d764f4b2cce2ba605920ec1bd0c13d30c868dc433211a6dbe83fe7041d71.jpg)
+
+<table><tr><td rowspan="2">Model</td><td colspan="3">Support Fact Sentences (SF)</td><td colspan="3">Full Document Context (Full)</td></tr><tr><td>B4</td><td>MTR</td><td>R-L</td><td>B4</td><td>MTR</td><td>R-L</td></tr><tr><td>BART (Lewis et al., 2020)</td><td>20.39</td><td>23.46</td><td>37.23</td><td>16.77</td><td>20.07</td><td>33.69</td></tr><tr><td>MulQG (Su et al., 2020)</td><td>-</td><td>-</td><td>-</td><td>15.20</td><td>20.51</td><td>35.30</td></tr><tr><td>CQG (Fei et al., 2022a)</td><td>25.09</td><td>27.45</td><td>41.83</td><td>21.46</td><td>24.97</td><td>39.61</td></tr><tr><td>MixQG (Murakhovs&#x27;ka et al., 2022)</td><td>25.45</td><td>26.36</td><td>43.21</td><td>22.13</td><td>23.78</td><td>41.21</td></tr><tr><td>QA4QG-large (Su et al., 2022)</td><td>25.70</td><td>27.44</td><td>46.48</td><td>21.21</td><td>25.53</td><td>42.44</td></tr><tr><td>E2EQR (Hwang et al., 2024)</td><td>21.73</td><td>27.47</td><td>41.34</td><td>-</td><td>-</td><td>-</td></tr><tr><td>SGCM (Ding et al., 2024)</td><td>26.16</td><td>28.51</td><td>44.06</td><td>22.61</td><td>26.04</td><td>40.61</td></tr><tr><td>(Ours) TS-BART</td><td>25.59</td><td>27.21</td><td>44.68</td><td>19.89</td><td>22.28</td><td>41.33</td></tr><tr><td>(Ours) DPKG\( _{hard} \)</td><td>26.80</td><td>27.87</td><td>46.50</td><td>22.74</td><td>24.90</td><td>43.29</td></tr><tr><td>(Ours) DPKG\( _{soft} \)</td><td>26.19</td><td>28.51</td><td>46.36</td><td>23.33</td><td>25.21</td><td>43.18</td></tr></table>
+
+(Su et al., 2020), which incorporates graph neural networks into multi-hop reasoning to facilitate question generation; DP-Graph (Pan et al., 2020), a generative model based on Graph2Seq to generate questions; CQG (Fei et al., 2022a), a model that controls key entities during decoding to ensure high-quality generation; MixQG (Murakhovs'ka et al., 2022), a generative model trained on diverse question-answering datasets with various answer types; QA4QG (Su et al., 2022), an enhanced version of BART augmented with a QA module to further constrain generation; E2EQR (Hwang et al.
+
+, 2024), an end-to-end question rewriting model that increases question complexity through sequential rewriting; SGCM (Ding et al., 2024), which supports question generation by identifying salient and relevant sentences. In addition, we introduce TS-BART (Two-stage-BART). In the first stage, BART is fine-tuned to generate dual-perspective keywords; in the second stage, these keywords are integrated into the same BART to generate multihop questions. TS-BART is designed to further validate the effectiveness of both the dual-perspective keywords and the overall DPKG framework.
+
+In line with previous studies, we primarily evaluate the DPKG framework using BLEU-4 (Papineni et al., 2002), METEOR (Banerjee and Lavie, 2005), ROUGE-L (Lin, 2004), and BERTScore (Zhang et al., 2020).
+
+# 4.3 Results and Analysis
+
+Our comparison between the DPKG framework and advanced MQG models is presented in Table 2. In the SF setting, $\mathrm{DPKG}_{\text {hard }}$ achieves the highest BLEU-4 score of 26.80 and ROUGE-L score of 46.50, while $\mathrm{DPKG}_{\text {soft }}$ attains the best METEOR score of 28.51. Both $\mathrm{DPKG}_{\text {hard }}$ and $\mathrm{DPKG}_{\text {soft }}$ achieve results comparable to current
+
+leading levels. In the Full setting, DPKG $_{hard}$ achieves the highest ROUGE-L score of 43.29, while DPKG $_{soft}$ achieves the highest BLEU-4 score of 23.33. DPKG $_{hard}$ and DPKG $_{soft}$ secure the best or second-best performance on BLEU-4 and ROUGE-L, although their performance on METEOR is slightly worse. Across the six evaluation metrics, DPKG $_{hard}$ and DPKG $_{soft}$ rank first or second in most cases, especially in BLEU-4 and ROUGE-L. These results demonstrate that the DPKG framework excels at local matching and capturing long-range semantic dependencies, as reflected in its higher BLEU-4 and ROUGE-L scores.
+
+On the whole, the DPKG framework demonstrates promising performance compared to recent advanced models, achieving state-of-the-art (SOTA) results in most cases. Notably, it outperforms the representative model CQG, which relies on question keywords during the generation process, thereby highlighting the positive impact of dual-perspective keywords in guiding multi-hop question generation. Although TS-BART demonstrates competitive results in the SF setting, its performance in the Full setting is relatively weaker.
+
+Nevertheless, it still outperforms BART by a large margin, further demonstrating the advantages of dual-perspective keywords and the overall effectiveness of the DPKG framework. These results underscore the feasibility and value of our dual-perspective keywords and the DPKG framework for the MQG task. It is worth noting that in the SF setting, $\mathrm{DPKG}_{\text {hard }}$ slightly outperforms $\mathrm{DPKG}_{\text {soft }}$ , while in the Full setting, $\mathrm{DPKG}_{\text {soft }}$ slightly outperforms $\mathrm{DPKG}_{\text {hard }}$ .
+
+This suggests that the role of keyword-guided question generation differs between the two modes, and we will analyze the effects of different keywords on question generation performance in detail in the next subsection.
+
+6
+
+Table 3: Effect of different keywords on question generation performance. "BS" denotes "BERTScore."
+
+![](dt=2026-05-29/ht=08/69c5343dbf5ff43f49e62d3848efab918ca6ad8a95a129727e86ccf4e01ab94f.jpg)
+
+<table><tr><td></td><td colspan="5">w/ generated keywords (w/ gk)</td><td colspan="4">w/ ground-truth keywords (w/ gt)</td></tr><tr><td rowspan="2">Model</td><td colspan="9">Support Fact Sentences (SF)</td></tr><tr><td>KP</td><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td></tr><tr><td>DPKGhard</td><td>88.13</td><td>26.80</td><td>27.87</td><td>46.50</td><td>54.14</td><td>39.08</td><td>35.80</td><td>62.61</td><td>67.34</td></tr><tr><td>DPKGsoft</td><td>88.86</td><td>26.19</td><td>28.51</td><td>46.36</td><td>54.05</td><td>39.22</td><td>34.58</td><td>61.98</td><td>66.51</td></tr><tr><td>DPKG_D</td><td>87.05</td><td>23.95</td><td>25.20</td><td>45.62</td><td>52.88</td><td>27.04</td><td>27.33</td><td>47.88</td><td>55.30</td></tr><tr><td>DPKG_Q</td><td>79.36</td><td>25.77</td><td>27.24</td><td>45.16</td><td>53.24</td><td>38.24</td><td>36.41</td><td>57.57</td><td>65.03</td></tr><tr><td></td><td colspan="9">Full Document Context (Full)</td></tr><tr><td>DPKGhard</td><td>85.39</td><td>22.74</td><td>24.90</td><td>43.29</td><td>50.68</td><td>37.67</td><td>33.28</td><td>60.63</td><td>65.35</td></tr><tr><td>DPKGsoft</td><td>86.74</td><td>23.33</td><td>25.21</td><td>43.18</td><td>50.26</td><td>35.90</td><td>32.06</td><td>59.68</td><td>64.06</td></tr><tr><td>DPKG_D</td><td>84.53</td><td>18.62</td><td>20.83</td><td>41.52</td><td>48.19</td><td>20.20</td><td>21.91</td><td>42.97</td><td>49.88</td></tr><tr><td>DPKG_Q</td><td>77.85</td><td>21.52</td><td>23.92</td><td>42.53</td><td>49.90</td><td>34.24</td><td>32.64</td><td>55.61</td><td>62.95</td></tr></table>
+
+![](dt=2026-05-29/ht=08/8a65525789c93cc12f207775e2ff814058518b6bafb52d71a711c50eb8734707.jpg)
+
+# 4.4 Effect of Different Keywords on Results
+
+In this subsection, we examine the effects of different keywords on multi-hop question generation performance. In addition to DPKG<sub>hard</sub> and DPKG<sub>soft</sub>, we introduce two new model variants: DPKG_D, which uses only document keywords in the DPKG framework, and DPKG_Q, which uses only question keywords. Table 3 shows the performance of these model variants. "KP" in the table denotes keyword generation performance, evaluated using BERTScore. We evaluate DPKG's question generation performance using self-generated keywords ("w/ generated keywords," abbreviated as "w/ gk") and ground-truth keywords ("w/ ground-truth keywords," abbreviated as "w/ gt"). This al
+
+lows us to assess its ability to generate questions in practice and evaluate the effectiveness of keyword-guided question generation.
+
+As shown in Table 3, the question generation performance of DPKG_Q significantly surpasses that of DPKG_D in both the SF and Full settings, despite its slightly lower keyword generation performance. Furthermore, when ground-truth keywords are used, DPKG_Q still outperforms DPKG_D. This reveals that question keywords tend to capture richer information than document keywords in question generation. The keyword generation performance of DPKG_D and DPKG_Q is lower than that of DPKG_hard and DPKGsoft, indicating that considering both types of keywords improves keyword generation performance. While DPKG_Q has
+
+7
+
+a relatively lower keyword generation performance, its question generation performance remains competitive. However, this does not imply that considering only question keywords is better than considering both, as even with ground-truth keywords, DPKG<sub>hard</sub> and DPKG<sub>soft</sub> consistently outperform DPKG_Q. DPKG<sub>hard</sub> and DPKG<sub>soft</sub> rank first or second in nearly all cases, demonstrating that guidance from dual-perspective keywords significantly enhances question generation performance.
+
+With generated keywords, $\mathrm{DPKG}_{\text {hard }}$ generally outperforms $\mathrm{DPKG}_{\text {soft }}$ in the SF setting, except for its marginally worse performance on METEOR. Conversely, $\mathrm{DPKG}_{\text {soft }}$ performs particularly well in the Full setting, especially on BLEU-4 and METEOR. In terms of keyword generation performance, $\mathrm{DPKG}_{\text {soft }}$ slightly exceeds $\mathrm{DPKG}_{\text {hard }}$ particularly in the Full setting.
+
+This suggests that $\mathrm{DPKG}_{\text {soft }}$ excels with generated questions mainly due to its superior keyword generation performance. However, $\mathrm{DPKG}_{\text {hard }}$ still achieves the best performance in the SF setting, despite its slightly lower keyword generation performance. With ground-truth keywords, $\mathrm{DPKG}_{\text {hard }}$ consistently and significantly outperforms $\mathrm{DPKG}_{\text {soft }}$ . These results highlight that dual-perspective keywords offer more powerful guidance in hard mode than in soft mode.
+
+Moreover, the superior performance of DPKG<sub>hard</sub> with ground-truth keywords, especially in the Full setting, highlights the ability of dual-perspective keywords to effectively pinpoint crucial information snippets in long documents with abundant noise. Hard mode incorporates special prefixes to indicate each keyword's role during keyword generation, making the process more challenging. This explains why keyword generation performance is slightly worse in hard mode compared to soft mode.
+
+In contrast, soft mode requires identifying each keyword's role and generating questions during question generation, which provides weaker guidance than hard mode. These analyses demonstrate the importance of further improving keyword generation performance in hard mode to enhance question generation performance. We also investigate the performance of large language models (LLMs) on multi-hop question generation, as shown in Appendix C.
+
+# 4.5 Ablation Study
+
+In this subsection, we conduct an ablation study to verify the effectiveness of each mechanism in
+
+Table 4: Ablation study.
+
+![](dt=2026-05-29/ht=08/53cd572a3638db0a08a0116d12140a06cdda2a9142f02a294b2907853b680beb.jpg)
+
+<table><tr><td rowspan="2">Model</td><td colspan="4">Support Fact Sentences (SF)</td></tr><tr><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td></tr><tr><td>DPKGhard</td><td>26.80</td><td>27.87</td><td>46.50</td><td>54.14</td></tr><tr><td>w/o L3</td><td>24.74</td><td>27.83</td><td>45.08</td><td>52.93</td></tr><tr><td>w/o AA</td><td>24.83</td><td>27.80</td><td>45.09</td><td>52.94</td></tr><tr><td>DPKGsoft</td><td>26.19</td><td>28.51</td><td>46.36</td><td>54.05</td></tr><tr><td>w/o L3</td><td>24.59</td><td>27.56</td><td>44.93</td><td>52.68</td></tr><tr><td>w/o AA</td><td>24.84</td><td>27.28</td><td>44.82</td><td>52.65</td></tr><tr><td></td><td colspan="4">Full Document Context (Full)</td></tr><tr><td>DPKGhard</td><td>22.74</td><td>24.90</td><td>43.29</td><td>50.68</td></tr><tr><td>w/o L3</td><td>21.16</td><td>23.90</td><td>42.01</td><td>49.61</td></tr><tr><td>w/o AA</td><td>21.70</td><td>24.31</td><td>42.15</td><td>49.57</td></tr><tr><td>DPKGsoft</td><td>23.33</td><td>25.21</td><td>43.18</td><td>50.26</td></tr><tr><td>w/o L3</td><td>21.42</td><td>24.04</td><td>41.77</td><td>49.20</td></tr><tr><td>w/o AA</td><td>22.41</td><td>24.89</td><td>42.59</td><td>50.05</td></tr></table>
+
+the DPKG framework, as shown in Table 4. We examine the following mechanisms in the ablation experiments: (1) without the $\mathcal{L}_3$ loss ( $\mathbf{w} / \mathbf{o}\mathcal{L}_3$ ); and (2) without the answer-aware attention mechanism ( $\mathbf{w} / \mathbf{o}\mathbf{A}\mathbf{A}$ ). From the results in Table 4, we observe that both $\mathcal{L}_3$ and the answer-aware attention mechanism significantly contribute to the performance of DPKG $_{\text{hard}}$ and DPKG $_{\text{soft}}$ in both the SF and Full settings.
+
+These findings demonstrate that $\mathcal{L}_3$ effectively bridges the gap discussed in §3.5, while the answer-aware attention mechanism, as detailed in §3.3, enhances the quality of the generated questions. The synergistic interaction of DPKG's mechanisms further elevates overall performance.
+
+# 4.6 Case Study
+
+To present the quality of multi-hop question generation across different models and to emphasize the role of keywords in guiding this process, we conduct a case study. We focus on $\mathrm{DPKG}_{\text {hard }}$ , $\mathrm{DPKG}_{\text {soft }}$ , and BART, with BART being unguided by keywords. The case is presented in Figure 4.
+
+It is clear that BART, lacking keyword guidance, generates questions of lower quality. In contrast, both DPKG $_{hard}$ and DPKG $_{soft}$ benefit from keyword guidance and produce higher-quality questions. Specifically, in hard mode, question keywords directly specify terms that should appear in the question, while both question and document keywords work together to pinpoint essential information snippets related to the QA pair in the document, resulting in more concise and clearer questions. In soft mode, DPKG dynamically identifies each keyword's role during question generation, leading to more flexible questions. While both DPKG $_{hard}$ and DPKG $_{soft}$ have their unique
+
+8
+
+characteristics, they pinpoint the same crucial information snippets in the document. Overall, compared with the model without keyword guidance, the DPKG framework generates more understandable and answerable questions, demonstrating the effectiveness of both the DPKG framework and dual-perspective keywords. We also conduct extended analytical experiments; see Appendix D for details.
+
+# 5 Conclusion
+
+In this paper, we define dual-perspective keywords: question keywords, which capture the questioner's intent, and document keywords, which reflect the content related to QA pairs in documents. Furthermore, we propose a DPKG framework that seamlessly integrates keywords into the multi-hop question generation process. We analyze the role of different keywords in guiding question generation and demonstrate that dual-perspective keywords are effective, especially in hard mode, providing more powerful guidance. Extensive experiments demonstrate the effectiveness of our work, showcasing its promising performance and underscoring its significant value in the MQG task.
+
+# Limitations
+
+We categorize keywords into question keywords and document keywords and propose a DPKG framework to seamlessly integrate them into the multi-hop question generation process. Although extensive experiments have demonstrated the effectiveness of our work, several limitations remain, such as the limited performance of the proposed keywords in guiding large language models (LLMs) for multi-hop question generation (Appendix C). This is because multi-hop question generation requires not only a better understanding of semantics but also alignment with the answers.
+
+LLMs are often prone to hallucinations, and recent studies have shown that training dedicated PLMs can achieve better results than using large models (Ushio et al., 2023; Liu et al., 2024b). Eliminating hallucinations when prompting LLMs to generate multi-hop questions will be an interesting challenge. Additionally, the focus of our study is on MQG, also known as deep question generation (DQG) (Pan et al., 2020; Fei et al., 2022a; Xia et al., 2023). Suitable datasets for this research are limited, highlighting the need to develop new, appropriate datasets, which is highly meaningful.
+
+# References
+
+9
+
+10
+
+11
+
+Table 5: Statistics of HotpotQA (version 2), where "Sam." denotes "Sample," "Qes." denotes "Question keyword," and "Doc." denotes "Document keyword."
+
+![](dt=2026-05-29/ht=08/a15481685adbe6cc0785523638d88a3e6d423f90b4ad82ff8391bcd0dbbcdfca.jpg)
+
+<table><tr><td></td><td>#Sam.</td><td colspan="2">#Qes.</td><td colspan="3">#Doc.</td></tr><tr><td></td><td></td><td>Min.</td><td>Max.</td><td>Avg.</td><td>Min.</td><td>Max.</td></tr><tr><td>Train</td><td>89947</td><td>1</td><td>52</td><td>9</td><td>0</td><td>96</td></tr><tr><td>Dev</td><td>500</td><td>2</td><td>45</td><td>8</td><td>2</td><td>43</td></tr><tr><td>Test</td><td>7405</td><td>1</td><td>24</td><td>8</td><td>0</td><td>63</td></tr></table>
+
+# A Experimental Details
+
+We employ AdamW as the optimizer, incorporating warmup and gradient clipping techniques. The batch size is set to 8, with a learning rate of $1 \times 10^{-5}$ . Training is conducted for 50 epochs with an early stopping strategy. The hyperparameters $\beta_{1}, \beta_{2},$ and $\beta_{3}$ are all set to 1.0, and the beam size is 8. All experiments are performed on a GeForce RTX 3090 GPU.
+
+In our DPKG framework, the encoder and decoder are modified based on the transformer architecture, with most of their parameters being compatible with BART's pre-trained model. Therefore, during training, we load the parameters compatible with BART's pre-trained model ${}^{4}$ ,initialize the incompatible parameters with a mean of 0 and a variance of 0.02,and then fine-tune all parameters. Additionally, it is worth noting that the hyperparameter settings not discussed in this paper are identical to those of BART-base, including the number of encoder and decoder layers, among others.
+
+# B Exploring Different Data Annotation Methods
+
+In this paper, we use the method shown in Figure 3(a) to annotate question keywords and document keywords. However, a question arises: why is there a "Not utilized" portion? While we provide an intuitive explanation in the main text, this subsection offers an empirical explanation.
+
+We consider the "Not utilized" portion in Figure 3(a) as the question keywords. In this way, question keywords are extracted from the question, and document keywords are extracted from the relevant sentences. Question keywords and document keywords are independent, with no overlap. Additionally, interrogative words (such as "what," "how," and so on) are treated as question keywords. The statistics for version 2 annotations are shown in Table 5. We observe that the number of question
+
+keywords and document keywords in this version has increased significantly compared to those in Table 1. We use the annotated dataset here and adopt the hard mode of DPKG, with the new model called $\mathrm{DPKG}_{v2}$ . The performance comparison with $\mathrm{DPKG}_{hard}$ and $\mathrm{DPKG}_{soft}$ is shown in Table 6.
+
+From the results in Table 6, it is worth noting that the multi-hop question generation performance of $\mathrm{DPKG}_{v2}$ with generated keywords is significantly worse than that of $\mathrm{DPKG}_{hard}$ and $\mathrm{DPKG}_{soft}$ , especially in the Full setting. The performance of keyword generation remains poor. These results indicate that increasing the number of keywords hinders the performance of keyword generation and further inhibits the improvement of question generation performance.
+
+$\mathrm{DPKG}_{v2}$ performs significantly better under ground-truth keywords, outperforming both $\mathrm{DPKG}_{hard}$ and $\mathrm{DPKG}_{soft}$ . This is intuitive, as both the question and document keywords in this annotation method provide more detailed information. For example, when generating the question, all terms related to it are included (with the "Not utilized" portion treated as question keywords). In summary, while this annotation method provides more information, its practical performance is often unsatisfactory.
+
+The data annotation method used in the main text strikes a trade-off: it achieves SOTA performance in practice while also providing valuable information. This empirically explains why the "Not utilized" portion is included in the annotated approach of our main text.
+
+# C Results of Large Language Models on Question Generation
+
+# C.1 Results of Prompting Large Language Models
+
+In this subsection, we examine the performance of large language models (LLMs) prompted by keywords on multi-hop question generation. Specifically, to explore the guiding role of dual-perspective keywords, we conduct experiments using ground-truth keywords. Our primary focus is the Qwen-Plus model $^{5}$ , which performs well in English and understands prompt instructions. We evaluate its question generation capabilities in both zero-shot and one-shot settings, using the prompt template illustrated in Figure 5. The experimental results are presented in Table 7, where "w/o keyword guidance" means no keyword guidance, and
+
+<sup>4</sup>https://huggingface.co/facebook/bart-base
+
+<sup>5</sup>https://bailianconsole.aliyun.com
+
+12
+
+Table 6: Performance comparison. Bold text highlights the best results, while underlined text indicates the second-best. "B4" denotes "BLEU-4," "MTR" denotes "METEOR," "R-L" denotes "ROUGE-L," "BS" denotes "BERTScore" and "KP" stands for "keyword generation performance."
+
+![](dt=2026-05-29/ht=08/6d26754f252e09286404162759df0047a2c686915706dd8d0e1e3845f5543aec.jpg)
+
+<table><tr><td></td><td colspan="5">w/ generated keywords (w/ gk)</td><td colspan="4">w/ ground-truth keywords (w/ gt)</td></tr><tr><td rowspan="2">Model</td><td colspan="9">Support Fact Sentences (SF)</td></tr><tr><td>KP</td><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td></tr><tr><td>DPKGhard</td><td>88.13</td><td>26.80</td><td>27.87</td><td>46.50</td><td>54.14</td><td>39.08</td><td>35.80</td><td>62.61</td><td>67.34</td></tr><tr><td>DPKGsoft</td><td>88.86</td><td>26.19</td><td>28.51</td><td>46.36</td><td>54.05</td><td>39.22</td><td>34.58</td><td>61.98</td><td>66.51</td></tr><tr><td>DPKGv2</td><td>86.38</td><td>25.79</td><td>26.95</td><td>45.94</td><td>53.34</td><td>52.34</td><td>42.73</td><td>76.09</td><td>78.31</td></tr><tr><td></td><td colspan="9">Full Document Context (Full)</td></tr><tr><td>DPKGhard</td><td>85.39</td><td>22.74</td><td>24.90</td><td>43.29</td><td>50.68</td><td>37.67</td><td>33.28</td><td>60.63</td><td>65.35</td></tr><tr><td>DPKGsoft</td><td>86.74</td><td>23.33</td><td>25.21</td><td>43.18</td><td>50.26</td><td>35.90</td><td>32.06</td><td>59.68</td><td>64.06</td></tr><tr><td>DPKGv2</td><td>83.48</td><td>18.40</td><td>21.05</td><td>41.53</td><td>47.98</td><td>51.77</td><td>42.45</td><td>75.44</td><td>77.73</td></tr></table>
+
+Figure 5: Prompt template.
+
+![](dt=2026-05-29/ht=08/bd34b2ca95ba2f0fecbe4ae35bd2787f89aa7edd2e21118b91a74ee33a10ab7e.jpg)
+
+<table><tr><td>Prompt (w/ keyword guidance)</td></tr><tr><td>You are very good at multi-hop question generation. Multi-hop question generation (MQG) aims to generate questions that require synthesizing multiple information snippets in documents to derive answers. Document: {}; Answer: {}; Question keywords: {}; Document keywords: {}. Important Note:(1) It is known that question keywords must appear in the generated question, and both question keywords and document keywords can help identify snippets related to question-answer pairs.(2) You only need to output the generated question without any redundant information.Task: You need to use these snippets to generate a multi-hop question that matches the answer.</td></tr><tr><td>Prompt (w/o keyword guidance)</td></tr><tr><td>You are very good at multi-hop question generation. Multi-hop question generation (MQG) aims to generate questions that require synthesizing multiple information snippets in documents to derive answers.Document: {}; Answer: {}. Important Note: You only need to output the generated question without any redundant information.Task: You need to use these snippets to generate a multi-hop question that matches the answer.</td></tr></table>
+
+"w/ keyword guidance" refers to dual-perspective keyword guidance.
+
+According to the results in Table 7, we find that under the guidance of dual-perspective keywords, the quality of LLM-generated questions has greatly improved, and the performance of Qwen-Plus in
+
+the one-shot setting has significantly outperformed that in the zero-shot setting. These results show that keyword guidance improves question generation performance and demonstrate the effectiveness of the dual-perspective keywords proposed in this paper. However, the performance of Qwen-Plus in
+
+13
+
+Table 7: Performance comparison between the DPKG framework and prompting LLMs on multi-hop question generation.
+
+![](dt=2026-05-29/ht=08/26682f5d63f4ffdfdf870e7289d803fd3bb8de96606850d08a4b7a7ae47ab39e.jpg)
+
+<table><tr><td rowspan="2">Model</td><td colspan="4">Support Fact Sentences (SF)</td></tr><tr><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td></tr><tr><td colspan="5">w/o keyword guidance</td></tr><tr><td>Qwen-plus w/ zero-shot</td><td>13.60</td><td>19.56</td><td>33.88</td><td>41.92</td></tr><tr><td>w/ one-shot</td><td>14.97</td><td>20.68</td><td>34.42</td><td>42.87</td></tr><tr><td colspan="5">w/ keyword guidance</td></tr><tr><td>Qwen-plus w/ zero-shot</td><td>20.35</td><td>25.44</td><td>44.28</td><td>52.07</td></tr><tr><td>w/ one-shot</td><td>22.81</td><td>27.57</td><td>46.46</td><td>54.47</td></tr><tr><td>DPKGhard</td><td>39.08</td><td>35.80</td><td>62.61</td><td>67.34</td></tr><tr><td>DPKGsoft</td><td>39.22</td><td>34.58</td><td>61.98</td><td>66.51</td></tr><tr><td colspan="5">Full Document Context (Full)</td></tr><tr><td colspan="5">w/o keyword guidance</td></tr><tr><td>Qwen-plus w/ zero-shot</td><td>10.62</td><td>16.82</td><td>30.34</td><td>38.11</td></tr><tr><td>w/ one-shot</td><td>11.17</td><td>17.37</td><td>30.39</td><td>38.18</td></tr><tr><td colspan="5">w/ keyword guidance</td></tr><tr><td>Qwen-plus w/ zero-shot</td><td>18.77</td><td>24.14</td><td>42.71</td><td>50.52</td></tr><tr><td>w/ one-shot</td><td>20.91</td><td>26.18</td><td>44.88</td><td>52.70</td></tr><tr><td>DPKGhard</td><td>37.67</td><td>33.28</td><td>60.63</td><td>65.35</td></tr><tr><td>DPKGsoft</td><td>35.90</td><td>32.06</td><td>59.68</td><td>64.06</td></tr></table>
+
+all cases still lags behind that of the DPKG framework proposed in this paper. This is because multi-hop question generation requires not only a better understanding of semantics but also alignment with the answers. LLMs are often prone to hallucinations. Although hallucinations are somewhat mitigated under the guidance of keywords, they remain prevalent. Some studies have shown that training dedicated PLMs can achieve better results than prompting large models (Ushio et al., 2023; Liu et al., 2024b).
+
+Overall, we find that the dual-perspective keywords presented in this paper effectively prompt LLMs, though they are less effective than the dedicated DPKG framework. These results highlight the urgent need for a framework that effectively prompts LLMs using keywords and eliminates hallucinations when generating multi-hop questions.
+
+# C.2 Results of Fine-tuned Large Language Models
+
+In this subsection, we evaluate the performance of fine-tuned LLMs for multi-hop question generation.
+
+Table 8: Performance comparison between the DPKG framework and fine-tuned LLMs on multi-hop question generation.
+
+![](dt=2026-05-29/ht=08/04a16953c96cac0b50bb3aa82e770c41d706da0cf28ea39fc2e6910be6b11214.jpg)
+
+<table><tr><td rowspan="2">Model</td><td>B4</td><td>MTR</td><td>R-L</td><td>BS</td></tr><tr><td colspan="4">Support Fact Sentences (SF)</td></tr><tr><td>Llama-3.1-8B (Lora)</td><td>25.29</td><td>26.68</td><td>46.73</td><td>54.63</td></tr><tr><td>DPKGhard</td><td>26.80</td><td>27.87</td><td>46.50</td><td>54.14</td></tr><tr><td>DPKGsoft</td><td>26.19</td><td>28.51</td><td>46.36</td><td>54.05</td></tr><tr><td></td><td colspan="4">Full Document Context (Full)</td></tr><tr><td>Llama-3.1-8B (Lora)</td><td>22.49</td><td>24.67</td><td>44.38</td><td>51.98</td></tr><tr><td>DPKGhard</td><td>22.74</td><td>24.90</td><td>43.29</td><td>50.68</td></tr><tr><td>DPKGsoft</td><td>23.33</td><td>25.21</td><td>43.18</td><td>50.26</td></tr></table>
+
+Specifically, we use Llama-3.1-8B $^{6}$ (abbreviated as Llama), fine-tuned via the LoRA method. The results of the experiment are displayed in Table 8.
+
+It can be seen from Table 8 that in both the SF and Full settings, Llama's performance on BLEU-4 and METEOR is inferior to that of the DPKG framework, while it performs better on ROUGE-L and BERTScore. Although Llama has a large number of parameters, it does not demonstrate stronger performance compared to the DPKG framework. On the one hand, this highlights the difficulty of the MQG task; on the other, it underscores the effectiveness of the dual-perspective keywords and the DPKG framework. These findings again suggest the challenges large models face in generating multi-hop questions — a problem that remains to be addressed in future research.
+
+# D Extended Analysis
+
+# D.1 Additional Case Analysis
+
+We provide a more detailed analysis here. We have previously examined the specific case of keyword-guided multi-hop question generation (see section 4.6). In this section, we present another concrete example.
+
+As you can see from Table 9, DPKG $_{hard}$ and DPKG $_{soft}$ pinpoint the same essential information snippets. While they identify different question keywords, the resulting questions are multi-hop and contain a wealth of information that can be understood and answered. The table contains rich information, and we use different colors to highlight it. We observe that the same words may be assigned different roles in different modes, which affects the resulting question. For example, "Trig
+
+$^{6}$ https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+
+14
+
+Table 9: Another case: The red represents the question keywords in hard mode, while the blue represents those in soft mode. The purple indicates the document keywords, and the underlined text highlights essential information snippets.
+
+![](dt=2026-05-29/ht=08/c2843b6b02fed89deb041df2e31e450ddd370c11d53827da944a89d7eca32a6a.jpg)
+
+<table><tr><td>Document</td><td>Dana Brunetti (born June 11, 1973) is an American film producer and social networking entrepreneur. He is the president of Kevin Spacey&#x27;s production company, Trigger Street Productions. In 2016, he became the presidents of Relativity Media with Kevin Spacey taking on a chairman position.
+Kevin Spacey Fowler, KBE (born July 26, 1959) is an American actor, film director, producer, screenwriter, and singer. He began his career as a stage actor during the 1980s before obtaining supporting roles in film and television. He gained critical acclaim in the early 1990s that culminated in his first Academy Award for Best Supporting Actor for the neo-noir crime thriller &quot;The Usual Suspects&quot; (1995), and an Academy Award for Best Actor for midlife crisis-themed drama &quot;American Beauty&quot; (1999).</td></tr><tr><td>DPKGhard</td><td>When was the American actor, film director, producer, screenwriter, and singer born who&#x27;s production company is Trigger Street Productions?</td></tr><tr><td>Document</td><td>Dana Brunetti (born June 11, 1973) is an American film producer and social networking entrepreneur. He is the president of Kevin Spacey&#x27;s production company, Trigger Street Productions. In 2016, he became the presidents of Relativity Media with Kevin Spacey taking on a chairman position.
+Kevin Spacey Fowler, KBE (born July 26, 1959) is an American actor, film director,producer, screenwriter, and singer. He began his career as a stage actor during the 1980s before obtaining supporting roles in film and television. He gained critical acclaim in the early 1990s that culminated in his first Academy Award for Best Supporting Actor for the neo-noir crime thriller &quot;The Usual Suspects&quot; (1995), and an Academy Award for Best Actor for midlife crisis-themed drama &quot;American Beauty&quot; (1999)</td></tr><tr><td>DPKGsoft</td><td>Dana Brunetti is the president of a production company owned by an American actor, film director, producer, screenwriter, and singer, born on what date?</td></tr><tr><td>BART</td><td>Dana Brunetti is the president of the production company of an American actor born on what date?</td></tr><tr><td>Ground-truth</td><td>When was the American actor, film director which Dana Brunetti is the president of his company born</td></tr></table>
+
+ger Street Productions" is identified as a question keyword in hard mode and as a document keyword in soft mode. There are many more cases like this, which demonstrate that hard mode and soft mode have their own characteristics, as we discussed in section 4.6. In addition, we find that the questions generated by BART are more straightforward, contain less multi-hop information, and are not as rich as DPKG $_{hard}$ and DPKG $_{soft}$ . This is mainly because BART does not have keyword guidance, does not know what is essential, and can simply generate questions through the mappings it learns during training.
+
+In short, through the analysis of the above cases, we gain a more intuitive understanding of the necessity of keyword-guided multi-hop question genera
+
+tion, especially the two types of keywords proposed in this paper. The two modes of the framework proposed here each have their own characteristics, revealing their significant value in the MQG task.
+
+# D.2 Results of Generated Questions on QA
+
+To further verify the validity of the generated questions, we evaluate them using a question-answering (QA) system. Specifically, we use Qwen-plus $^{7}$ as our QA system, to which we input the generated questions and obtain answers. The evaluation metrics we adopt are Exact Match (EM) and F1 score (F1). The results of the experiment are shown in Table 10. From the experimental results, we can see that even Ground-truth does not achieve strong per
+
+<sup>7</sup>https://baiian console.aliyun.com
+
+15
+
+![](dt=2026-05-29/ht=08/8841d0472020994771725ff777d1215b7a8305d62ab87b1ba37fb61e5b4798e5.jpg)
+
+<table><tr><td rowspan="2">Model</td><td colspan="2">SF</td><td colspan="2">Full</td></tr><tr><td>EM</td><td>F1</td><td>EM</td><td>F1</td></tr><tr><td>BART</td><td>54.71</td><td>70.43</td><td>54.86</td><td>69.28</td></tr><tr><td>DPKGhard</td><td>58.76</td><td>73.65</td><td>56.31</td><td>71.05</td></tr><tr><td>DPKGsoft</td><td>57.19</td><td>72.21</td><td>56.79</td><td>70.99</td></tr><tr><td>Ground-truth</td><td>63.24</td><td>79.02</td><td>61.63</td><td>77.29</td></tr></table>
+
+Table 10: Results of generated questions on the QA system. "Ground-truth" indicates the use of gold-standard questions.
+
+Table 11: Human evaluation results. "Average" denotes the average of complexity, relevance, and fluency. "Ground-truth" indicates the use of gold-standard questions.
+
+![](dt=2026-05-29/ht=08/33527af51175291c7951976c0c8d48e9d166fe8e483e2e5d2f7e93003ed12b07.jpg)
+
+<table><tr><td>Model</td><td>Complexity</td><td>Relevance</td><td>Fluency</td><td>Average</td></tr><tr><td>BART</td><td>3.17</td><td>3.28</td><td>3.24</td><td>3.23</td></tr><tr><td>TS-BART</td><td>3.68</td><td>3.75</td><td>3.62</td><td>3.68</td></tr><tr><td>DPKGhard</td><td>4.54</td><td>4.55</td><td>4.50</td><td>4.53</td></tr><tr><td>DPKGsoft</td><td>4.53</td><td>4.57</td><td>4.56</td><td>4.55</td></tr><tr><td>Ground-truth</td><td>4.94</td><td>4.97</td><td>4.92</td><td>4.94</td></tr></table>
+
+formance, which may be related to the limitations of the QA system itself. Overall, the DPKG framework achieves competitive results, significantly outperforming BART, though still lagging behind the Ground-truth. These results further validate the effectiveness of the DPKG framework from the perspective of question answering.
+
+# D.3 Human Evaluation
+
+While automatic evaluation offers valuable insights into model performance, n-gram-based metrics have inherent limitations. Therefore, we conduct a human evaluation by randomly selecting 50 questions from the generated set in the Full setting. Based on experimental results, we evaluate the following representative models: (1) DPKG $_{hard}$ ; (2) DPKGSoft; (3) TS-BART; and (4) BART.
+
+Three crowdsourced workers rate each sample on a scale from 1 (poor) to 5 (good) across three key dimensions: (i) complexity, which assesses whether the question requires reasoning across multiple snippets in the document; (ii) relevance, which determines if the question is answerable and contextually appropriate; and (iii) fluency, which evaluates whether the question adheres to grammatical rules and maintains coherent logic. We summarize and average the workers' ratings, presenting the results in Table 11.
+
+According to the results displayed in Table 11, the DPKG framework has achieved very promis
+
+ing results compared with BART and TS-BART. Specifically, BART is a vanilla model that does not use dual-perspective keywords, while TS-BART first uses vanilla BART to generate the keywords, and then reuses it to generate questions guided by those keywords. TS-BART outperforms BART in both automatic and human evaluations, fully demonstrating the guiding role of dual-perspective keywords. The DPKG framework outperforms TS-BART, further confirming its overall effectiveness. $\mathrm{DPKG}_{\text {hard }}$ performs slightly worse than $\mathrm{DPKG}_{\text {soft }}$ .
+
+$\mathrm{DPKG}_{\text {hard }}$ and $\mathrm{DPKG}_{\text {soft }}$ perform comparably in terms of Complexity and Relevance, while $\mathrm{DPKG}_{\text {soft }}$ shows slightly better performance in Fluency. These results indicate that the questions generated by $\mathrm{DPKG}_{\text {soft }}$ are more fluent in the Full setting, which is consistent with the automatic evaluation results. All in all, the human evaluation results further demonstrate the effectiveness of the dual-perspective keywords and the DPKG framework.
+
+# E Generalization to Other Datasets
+
+To further verify the effectiveness of the DPKG framework, we also use another common dataset, MusiQue-2hop (Trivedi et al., 2022), and follow the same keyword annotation procedure for questions and documents as inHotpotQA. Notably, since the test set of MusiQue-2hop is not publicly available, we construct a custom split. Table 12 provides detailed keyword statistics for MusiQue-2hop. We conduct two types of experiments: comparing our results with current advanced models, and verifying the generated questions using a QA system.
+
+For the comparative evaluation, our baselines include—in addition to CQG, MulQG, and E2EQR—DP-Graph (Pan et al., 2020), a generative Graph2Seq-based question generation model. For the QA evaluation, we use Qwen-plus as our QA system, into which we input the generated questions to obtain answers. Table 13 shows the results of the comparative evaluation, while Table 14 presents the QA evaluation results.
+
+Table 13 shows that the DPKG framework achieves the best performance compared to other models, indicating its effectiveness. More specifically, $\mathrm{DPKG}_{\text {soft }}$ performs slightly better than $\mathrm{DPKG}_{\text {hard }}$ , consistent with our earlier conclusion. Table 14 shows that Ground-truth does not perform strongly, which may be due to the limitations of the QA system. Although $\mathrm{DPKG}_{\text {soft }}$ performs slightly
+
+16
+
+Table 12: Statistics of MusiQue-2hop, where "Sam." denotes "Sample," "Qes." denotes "Question keyword," and "Doc." denotes "Document keyword."
+
+![](dt=2026-05-29/ht=08/d04396b3d12eb8d84000e79cdf41062e73ec2e701346f58b4324d5bdfe87c9b7.jpg)
+
+<table><tr><td></td><td>#Sam.</td><td colspan="3">#Qes.</td><td colspan="3">#Doc.</td></tr><tr><td></td><td></td><td>Min.</td><td>Max.</td><td>Avg.</td><td>Min.</td><td>Max.</td><td>Avg.</td></tr><tr><td>Train</td><td>13124</td><td>1</td><td>12</td><td>3</td><td>3</td><td>170</td><td>24</td></tr><tr><td>Dev</td><td>1252</td><td>1</td><td>11</td><td>3</td><td>4</td><td>134</td><td>24</td></tr><tr><td>Test</td><td>1252</td><td>1</td><td>9</td><td>3</td><td>4</td><td>134</td><td>24</td></tr></table>
+
+Table 13: Performance comparison between DPKG and baselines on MusiQue-2hop.
+
+![](dt=2026-05-29/ht=08/6f6f8c22f250b73c2bae066dd4083903d4be26acd3ffadb491e2db9e4e3f849b.jpg)
+
+<table><tr><td>Model</td><td>B4</td><td>MTR</td><td>R-L</td></tr><tr><td>DP-Graph (Pan et al., 2020)</td><td>5.14</td><td>10.80</td><td>28.69</td></tr><tr><td>CQG (Fei et al., 2022a)</td><td>9.64</td><td>16.20</td><td>33.98</td></tr><tr><td>MulQG (Su et al., 2020)</td><td>9.56</td><td>15.41</td><td>37.18</td></tr><tr><td>E2EQR (Hwang et al., 2024)</td><td>20.33</td><td>25.64</td><td>44.01</td></tr><tr><td>(Ours) DPKGhard</td><td>28.33</td><td>27.77</td><td>51.93</td></tr><tr><td>(Ours) DPKGsoft</td><td>29.03</td><td>28.14</td><td>52.38</td></tr></table>
+
+Table 14: Results of generated questions evaluated by the QA system on MusiQue-2hop. "Ground-truth" indicates the use of gold-standard questions.
+
+![](dt=2026-05-29/ht=08/e1a135ff4ca4d051381b185594a983a1a2dcb4e92a6f681e5daef70d6e6918ed.jpg)
+
+<table><tr><td>Model</td><td>EM</td><td>F1</td></tr><tr><td>DPKGhard</td><td>41.45</td><td>50.95</td></tr><tr><td>DPKGsoft</td><td>41.53</td><td>50.93</td></tr><tr><td>Ground-truth</td><td>58.79</td><td>71.42</td></tr></table>
+
+better than $\mathrm{DPKG}_{\text {hard }}$ on n-gram-based metrics, $\mathrm{DPKG}_{\text {hard }}$ slightly outperforms $\mathrm{DPKG}_{\text {soft }}$ on the QA system. This suggests that the QA system itself has some level of semantic understanding. This also highlights the limitations of n-gram-based metrics and the necessity of using the QA system to evaluate the generated questions. To sum up, the experiments on the MusiQue-2hop further demonstrate the effectiveness and generalizability of the DPKG framework.
+
+17

@@ -1,0 +1,162 @@
+# DocSpiral: A Platform for Integrated Assistive Document Annotation through Human-in-the-Spiral
+
+Qiang Sun $^{1*}$ , Sirui Li $^{2}$ , Tingting Bi $^{3}$ , Du Huynh $^{1}$ , Mark Reynolds $^{1}$ , Yuanyi Luo $^{4}$ , Wei Liu $^{1*}$ $^{1}$ The University of Western Australia, Perth, WA, Australia, $^{2}$ Murdoch University, Perth, WA, Australia, $^{3}$ The University of Melbourne, Melbourne, VIC, Australia, $^{4}$ Sinograin Chengdu Storage Research Institute Co., Ltd., Chengdu 610091, China  
+*Correspondence: pascal.sun@research.uwa.edu.au, wei.liu@uwa.edu.au
+
+# Abstract
+
+Acquiring structured data from domain-specific, image-based documents—such as scanned reports—is crucial for many downstream tasks but remains challenging due to document variability. Many of these documents exist as images rather than as machine-readable text, which requires human annotation to train automated extraction systems. We present DocSpiral, the first Human-in-the-Spiral assistive document annotation platform, designed to address the challenge of extracting structured information from domain-specific, image-based document collections.
+
+Our spiral design establishes an iterative cycle in which human annotations train models that progressively require less manual intervention. DocSpiral integrates document format normalization, comprehensive annotation interfaces, evaluation metrics dashboard, and API endpoints for the development of AI / ML models into a unified workflow. Experiments demonstrate that our framework reduces annotation time by at least $41\%$ while showing consistent performance gains across three iterations during model training.
+
+By making this annotation platform freely accessible, we aim to lower barriers to AI/ML models development in document processing, facilitating the adoption of large language models in image-based, document-intensive fields such as geoscience and healthcare. The system is freely available at: https://app.ai4wa.com. The demonstration video is available: https://app.ai4wa.com/docs/docspiral/demo.
+
+# 1 Introduction
+
+Unstructured data are information that does not adhere to a predefined data model or format, such as free text, images, audio, video, and social media content, etc. (Nick-Barney, 2025). Unstructured data are widely believed to form $80\% -90\%$ of the world's global data assets (Heeg, 2023). Due to the sheer complexity of dealing with such data,
+
+unstructured data are often referred to as "dark data" and are significantly underutilized. To unlock the wealth of valuable knowledge hidden in unstructured data, various techniques such as knowledge graph constructions and Retrieval Augmented Generation (RAG (Stewart and Liu, 2020)) can be employed, provided that the documents are first processed to extract relevant textual data.
+
+![](dt=2026-05-26/ht=21/c8bfb0a61aece79f819abe7b197e01f8a13ccd84c57e73389470a3c0efd53988.jpg)
+
+Most existing document processing frameworks (Faysse et al., 2025; Shen et al., 2021; Wang et al., 2024) rely on general purpose pipelines that convert raw documents into machine-readable semi-structured formats (e.g. markdown, JSON) suitable for machine consumption. However, these pipelines face significant challenges when applied to domain-specific document collections, which often contain specialized terminology, unique layouts, and field-specific visual elements such as maps (Zhao et al., 2024a; Riedler and Langer, 2024; Fan et al., 2024). Firstly, traditional document processing systems often struggle to extract information accurately from such complex
+
+arXiv:2505.03214v1 [cs.SE] 6 May 2025
+
+Table 1: Comparison of Document Annotation Tools. Due to the emergence of LLM and RAG technologies still being a recent development, tools supporting figure, formula, and table understanding capabilities remain scarce. (Ann. $\Rightarrow$ Annotation, Conv. $\Rightarrow$ Conversion: transforming data from image to another while preserving complete factual content without interpretation, Und. $\Rightarrow$ Understanding: generating descriptive text based on a given image, involving interpretation, meaning inference, pattern recognition, and subjective judgment about data implications.)
+
+![](dt=2026-05-26/ht=21/ba68f2e435104d0e6ff46216cbbd77f4e9335d6c2a47355b57b7f6aff9f8293f.jpg)
+
+<table><tr><td rowspan="2">Tool</td><td rowspan="2">Reference</td><td rowspan="2">Open Access</td><td rowspan="2">Layout Ann.</td><td rowspan="2">OCR Ann.</td><td colspan="2">Figure</td><td colspan="2">Formula</td><td colspan="2">Table</td></tr><tr><td>Conv.</td><td>Und.</td><td>Conv.</td><td>Und.</td><td>Conv.</td><td>Und.</td></tr><tr><td>ABBYY FineReader</td><td>(ABBYY, 1993)</td><td>No</td><td>×</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>✓</td><td>✓</td></tr><tr><td>Transkribus</td><td>(READ-COOP SCE, 2013)</td><td>No</td><td>×</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>✓</td><td>×</td></tr><tr><td>Coco Annotator</td><td>(Brooks, 2019)</td><td>Yes</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>PDFAnno</td><td>(Shindo et al., 2018)</td><td>Yes</td><td>×</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>Label Studio</td><td>(Tkachenko et al., 2020)</td><td>Partially</td><td>✓</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>PPOCRLabelv2</td><td>(PFCCLab, 2020)</td><td>Yes</td><td>✓</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>✓</td><td>✓</td></tr><tr><td>PAWLS</td><td>(Neumann et al., 2021)</td><td>Yes</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>Tagtog</td><td>(TagTog team, 2023)</td><td>No</td><td>×</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>Prodigy</td><td>(Explosion AI, 2023)</td><td>No</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>Callico</td><td>(Kermorvant et al., 2024)</td><td>No</td><td>×</td><td>✓</td><td>✓</td><td>✓</td><td>×</td><td>×</td><td>×</td><td>×</td></tr><tr><td>DocSpiral</td><td>Ours</td><td>Yes</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr></table>
+
+sources, creating barriers to knowledge utilization in fields such as geoscience, and healthcare (Zhu et al., 2024). The high variability and complexity of domain-specific documents necessitate human expertise to guide and refine automated processing systems. Secondly, in specialized domains, a significant portion of valuable documents exist as scanned PDFs rather than digital formats. For example, Western Australia's Mineral Exploration Reports $^{1}$ , dating back to 1888, consist primarily of handwritten and printed documents that were later scanned into PDFs (Riganti et al., 2015).
+
+This poses challenges for automated processing, as these documents require layout analysis, optical character recognition (OCR), and figure/table/formula processing before they can be utilised in AI-driven applications. Thirdly, existing annotation tools have significant limitations for document processing tasks. Classical tools such as COCO Annotator (Brooks, 2019) were primarily designed for image annotation and lack optimization. Although PAWLS (Neumann et al., 2021) offers more specialized PDF labeling capabilities, it still suffers from rigid annotation schema.
+
+Currently, there is no comprehensive document annotation system that can efficiently support the entire document annotation pipeline. Due to the diversity of output structures for figure/table/formula processing, we also need such systems capable of addressing the dynamic complexity of these tasks through features like dynamic annotation form generation.
+
+To address these challenges, we introduce Doc-Spiral, the first Human-in-the-Spiral assistive document annotation platform designed to facilitate
+
+domain-specific document processing. As shown in Figure 1, our system first converts various document formats to standardized PDF format through the Anything2PDF module. This unified format enables integration with layout analysis models like DocLayout-YOLO as Baseline Models, which predict bounding boxes using a generic layout schema (Zhao et al., 2024d). Based on bounding-box labels, specialized downstream processing (OCR, Figure/Table/Formula processing) is triggered using the corresponding Baseline Models.
+
+Our human-in-the-spiral approach, supported by an interactive interface, allows experts to review, verify, and annotate model output. The annotated data are then used to train or fine-tune to obtain Progressive Models that better meet user requirements. Unlike existing tools such as COCO Annotator (Brooks, 2019), our system leverages pretrained models for initial annotation, significantly reducing the manual labeling workload. Users can focus primarily on corrections through an intuitive web-based interface, which leads to at least $41\%$ time reduction, and in some cases up to $75\%$ .
+
+Our work makes three key contributions:
+
+$^{1}$ https://www.dmp.wa.gov.au/WAMEX-Minerals-Exploration-1476.aspx
+
+cles. This process progressively reduces annotation effort while improving model performance.
+
+- Open and Deployable Solution - We make Doc-Spiral freely accessible to researchers while also offering deployable solutions for organizations with privacy constraints, thereby removing barriers to LLM adoption in specialized domains.
+
+# 2 Related Work
+
+Existing annotation tools Comprehensive document annotation requires support for various tasks, including Layout detection outputs bounding boxes with category labels (content, title, figure, table, formula, footnote, etc); OCR requires accurate text transcriptions of segmented images; Table processing includes both structural conversion (to LaTeX (Xia et al., 2024), HTML (Wan et al., 2024), JSON (Ali Khandokar and Deshpande, 2025)) and semantic understanding (Zhao et al.
+
+, 2024c) for RAG systems as explained in Table 1; Formula processing is similar to table processing with structural conversion typically outputting LaTeX (Xia et al., 2025); Figure processing prioritizes understanding visual elements over conversion due to representation diversity and difficulty (Zhao et al., 2024b). Tools such as LayoutParser (Shen et al., 2021), MinerU (Wang et al.
+
+, 2024), and Dcling (Team, 2024) provide the ability to integrate with parts or all of these specialized models to build an end-to-end pipeline; however, when errors occur, these tools lack mechanisms that allow users to fix specific problems or improve individual models at intermediate stages.
+
+No existing annotation tool fully addresses these needs, as illustrated in Table 1, particularly for semantic understanding annotation of formulas, tables, and figures. Commercial solutions such as Tagtog (TagTog team, 2023), Callico (Kermorvant et al., 2024), and Prodigy (Explosion AI, 2023) offer partial capabilities. Although there are specialized tools for individual tasks (Huynh et al., 2022; giplab, 2019), the research community lacks a unified system that integrates these capabilities into a cohesive pipeline that facilitates human intervention for error correction and iterative model improvement throughout the entire document processing workflow, to produce structured high-quality outputs from unreconstructed data formats.
+
+Human role in annotation systems Traditional annotation pipelines follow a human-off-the-loop paradigm, where annotators exhaustively
+
+label data offline before model training or finetuning (Tkachenko et al., 2020; Kermorvant et al., 2024; Explosion AI, 2023; Neumann et al., 2021). While effective, this approach is labour-intensive and impractical for large or continuously evolving datasets (Wu et al., 2022; Pena et al., 2024).
+
+Instead, our document processing framework shifts towards a human-in-the-loop approach (Nahavandi, 2017), using baseline models or LLMs for assistive annotations—such as figure understanding or layout detection—while humans intervene selectively for validation and correction.
+
+Building on this, we introduce the human-in-the-spiral framework, where new data is first processed by prior models, then undergoes targeted expert review, followed by iterative model enhancement (as shown in Figure 1). This positive feedback loop improves model performance in an upward spiral while minimizing manual annotation.
+
+# 3 System design and implementation
+
+# 3.1 Requirement analysis
+
+We present DocSpiral, a web-based document processing pipeline initiated from document layout detection (Huang et al., 2022). Its primary objective is to enable efficient review and annotation of model outputs, generating high-quality annotated data for iterative models improvement. This approach enhances downstream tasks, such as knowledge graph construction and RAG applications, in specialized domains like geology and healthcare, where valuable documents are often paper-based, or in scanned images with a rich mix of multimodal contents, such as photos, maps, charts, and tables.
+
+To ensure usability and adaptability, the system minimizes human effort, incorporates automatic evaluation metrics dashboard generation, and maintains a modular structure for extensibility. It supports agile methodologies, allowing researchers to rapidly develop and refine different document processing models in response to the fast paced GenAI challenges. As shown in Figure 1, DocSpiral consists of three integrated modules:
+
+AI/ML Models Enhancement supports continuous models enhancement through data download and result submission API endpoints, and automatic evaluation metrics dashboard generation (latency and accuracy).
+
+![](dt=2026-05-26/ht=21/bb45bc86574fc2d7b4aef7158f341c3facb570adf1d077ef1752f9c9890ca3ec.jpg)
+
+# 3.2 System design
+
+The software stack of DocSpiral is illustrated in Figure 2, which consists of three main layers:
+
+Additionally, we have developed a Python package that interacts with the platform via API calls to run baseline models and report results. Researchers can extend these functionalities by creating their own packages to download documents and annotated data, train models, perform inference using the Progressive Models, and submit results through
+
+the RESTful endpoints. The system is deployed in the Amazon Web Services (AWS) for scalable and secure infrastructure.
+
+# 3.3 Implementation
+
+![](dt=2026-05-26/ht=21/7b43c6b0646427c44b5f9e3941a699f1228dbafa71dba3c9171b5d0f0f951fac.jpg)
+
+a.) Documents Uploading: Users start by registering an account, creating a project within DocSpiral, and uploading documents through the interface shown in Figure 3. PDF files undergo immediate layout detection process, while other formats are first converted to PDF via Anything2PDF. Uploaded documents can be managed within the platform, and users can track the processing progress of each document. The system assigns the following status values: $①$ Uploaded $②$ Layout detection completed $③$ Human-reviewed layout $④$ OCR and processing of figures, tables, and formulas completed $⑤$ Human-reviewed model outputs from previous step.
+
+Once a document reaches status $②$ or higher, the layout "eye" icon becomes clickable for review. Similarly, the OCR column becomes interactive once the document reaches status $④$ or above.
+
+b.) Layout Detection Annotation: We use DocLayout-YOLO (Zhao et al., 2024d) as baseline model for layout detection. You can speficy your own baseline model when you use DocSpiral. This model treats each PDF page as an image and outputs bounding boxes for detected layout elements along with their corresponding labels. The data of the bounding box are represented as $[x_{min}, y_{min}, width, height]$ in normalized coordinates. Document layouts vary significantly across domains, making it difficult to develop a
+
+$^{2}$ https://nextjs.org/
+
+3https://hasura.io/
+
+<sup>4</sup>https://www.djangoproject.com/
+
+<sup>5</sup>https://aws.amazon.com/
+
+<https://www.postgresql.org/>
+
+![](dt=2026-05-26/ht=21/766411a7218bf430c539e8ce1120c8b3087a20193c4140a48781a7a5d2db028a.jpg)
+
+universal layout detection model. For example, our baseline model supports only a limited set of labels—content, title, figure, table, formula, footnote—and struggles with complex layouts, such as PDF forms in hospital, you may want to define a label for patient name. To address this, our system enables domain-specific customization: (1) users can define their custom layout schema with hierarchies and (2) refine annotations by reclassifying, removing or adding bounding boxes with labels (Figure 4).
+
+![](dt=2026-05-26/ht=21/371a63a3d73749289548589f25de8edd50d5cb32decceb255061e3b28068618f.jpg)
+
+c.) OCR Annotation: After reviewing the layout detection results, users can save and trigger downstream processing, including the OCR process. We use PaddleOCR (PFCCLab, 2020) as the baseline OCR model for its strong performance, multilingual support, and ease of use. OCR results for each layout block appear in a table alongside their labels. The interface enables interactive navigation: clicking a bounding box in the PDF viewer scrolls the
+
+table to the corresponding row, while selecting a table row highlights the relevant section in the PDF viewer. Users can edit incorrect text directly, with changes auto-saving, as shown in Figure 5.
+
+d.) Table, Formula and Figure Annotation: There are several models that process table images to output diverse formats for different purposes. We support multiple formats for table conversion (HTML (Smock et al., 2023), LaTeX (Xia et al., 2024), JSON (Ali Khandokar and Deshpande, 2025)) using various baselines: Pix2Text for HTML, StructEqTable for LaTeX, and a vision LLM agent for JSON extraction. For formula conversion, we output LaTeX using Pix2Text, while figure understanding leverages a vision LLM to generate descriptive text.
+
+![](dt=2026-05-26/ht=21/808fcfb9f13b6718c9f32e00952cfe7231e9ca49b34e5ce0f4957668fe3747e0.jpg)
+
+![](dt=2026-05-26/ht=21/f974f326ea98c64bccd9401a19b96f4700c4b46f8a5b90a10fb7ac4c067c9714.jpg)
+
+![](dt=2026-05-26/ht=21/a8de1eccb8173811ef77d1153a165ba76b4558cc3fcbd3e8a01761142088773e.jpg)
+
+![](dt=2026-05-26/ht=21/22c104852dea84e5df5451aa79873afedde21fed08c9822963cf7397a6b157e3.jpg)
+
+When users click on a Figure, Formula or Table row, a corresponding annotation interface appears (Figure 6). Since models for different purposes require different output formats for figures, formulas, and tables, we implemented a dynamic, flexible annotation interface through our annotation form generation feature: users define their Focused Model and form schemas in settings (Figure 7), and the interface generates appropriate input fields based on the schema of the selected model.
+
+For example, selecting the html model for table annotation creates a TextView field named output, while switching to html_json generates input fields for rows, caption, etc. Model outputs are prepopulated when possible to reduce manual effort. The JSON Editor mode allows users to examine all model outputs for better observability and to inform better annotation form schema design.
+
+For improved efficiency, DocSpiral supports bulk annotation of figures, tables, and formulas across projects via buttons in Figure 3. Users can also upload standalone images for direct annotation without starting from PDF layout detection.
+
+![](dt=2026-05-26/ht=21/f7e1750aeb2e40a7196131922e37625b632e8292128eb714b9c16b9130766319.jpg)
+
+e.) Metrics Dashboard Generation: DocSpiral tracks objective measures (mAP for layout detection, CER/WER for OCR) and records latency for all model runs. For subjective outputs (figures, formulas, and tables processing), we implement human satisfaction ratings feature to quantify model-human alignment (Figure 7 left and middle). A centralized dashboard (exemplified in Figure 8) aggregates these metrics to monitor model performance and annotation progress. Other evaluation metrics can be added based on user feedback.
+
+f.) Model Development Support: Raw data (PDFs, figures, tables, and formulas) and annotations are securely accessible via authenticated RESTful endpoints, together with submission of models outputs. Detailed instructions are available from DocSpiral documentation.
+
+# 4 System evaluation
+
+We quantitatively evaluated DocSpiral's efficiency through an annotation experiment with 90 diverse document pages. Baseline model-assisted annotation reduced processing time from 28.4s to 16.7s per page compared to manual annotation, yielding a $41\%$ overall time reduction. For low-quality scanned PDFs, time reduced by $75\%$ .
+
+Table 2: Faster-RCNN Training Performance
+
+![](dt=2026-05-26/ht=21/24c5a238ab6bfa504d8c5c9d5d9d80b3575e222767d80e86696f33b6c88240e1.jpg)
+
+<table><tr><td>Metric</td><td>Initial</td><td>1st</td><td>2nd</td><td>3rd</td></tr><tr><td>mAP (%)</td><td>0.053</td><td>0.12</td><td>0.21</td><td>0.33</td></tr></table>
+
+We identify three promising pathways for model spiral evolution: (1) Traditional rule-based solutions benefit from improved observability, enabling targeted fixes such as removing footnotes in specific locations; (2) Deep learning models like Faster-RCNN (Ren et al., 2016) can be fine-tuned or redesigned and trained using annotated data; (3) Large language models (LLMs) can be fine-tuned for better domain-specific alignment in figure, table and formula understanding. We experiment with Faster-RCNN training for layout detection over three iterative cycles, each adding 100 new pages of data, demonstrated progressive performance gains (Table 2), validating our methodology.
+
+# 5 Conclusion
+
+This paper presents DocSpiral, the first integrated assistive document annotation platform through Human-in-the-Spiral for extracting structured information from domain-specific, image-based unstructured documents. Our system introduces three key innovations: comprehensive annotation interfaces supporting the entire document processing pipeline, a customizable hierarchical layout schema, and dynamic annotation form generation for figures, formulas, and tables.
+
+Experiments demonstrate that our approach reduces annotation time by at least $41\%$ while showing consistent performance gains across iterations. In summary, the human-in-the-spiral approach establishes an iterative cycle where human annotations and model performance reinforce each other, progressively reducing manual effort and enhancing model performance. By making this platform freely accessible, we aim to lower barriers to AI/ML model development in document-intensive fields.
+
+We continue to improve the system based on user feedback and plan to open-source it once functionality stabilizes.
+
+# References

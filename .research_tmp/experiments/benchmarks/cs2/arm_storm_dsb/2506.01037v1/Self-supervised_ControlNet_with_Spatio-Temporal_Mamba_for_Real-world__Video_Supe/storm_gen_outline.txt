@@ -1,0 +1,56 @@
+# Overview
+## Abstract
+## Key Contributions
+# Background
+## Video Super-Resolution
+### Traditional Methods
+### Deep Learning Approaches
+### Challenges in Real-World Scenarios
+## ControlNet
+## Mamba Architecture
+### State Space Models
+### Spatio-Temporal Modeling
+# Methodology
+## Framework Architecture
+### Integration into Latent Diffusion Models
+### Video State-Space Block
+#### 3D Selective Scan Module
+#### Linear-Time Temporal Dependency Modeling
+### Self-Supervised ControlNet
+#### Degradation-Insensitive Feature Extraction
+#### Contrastive Learning Mechanism
+#### High-Resolution Feature Guidance
+## Self-Supervised Learning Strategy
+### Objective Function
+### Role of High-Resolution Features
+## Training Procedure
+### Data Preprocessing
+### Optimization Details
+# Experimental Setup
+## Datasets
+### Training Data
+### Evaluation Benchmarks
+## Implementation Details
+### Hardware Configuration
+### Hyperparameters
+## Baselines
+### State-of-the-Art Video Super-Resolution Models
+### ControlNet Variants
+# Results
+## Quantitative Evaluation
+### PSNR and SSIM Metrics
+### Comparison with Baselines
+## Qualitative Analysis
+### Visual Comparisons
+### Artifact Reduction
+### Temporal Consistency Analysis
+## Ablation Studies
+### Impact of Mamba Block
+### Effect of Self-Supervision
+### ControlNet Weight Analysis
+# Discussion
+## Advantages over Existing Methods
+### Computational Efficiency
+### Mitigation of Diffusion Randomness
+## Limitations
+## Future Work

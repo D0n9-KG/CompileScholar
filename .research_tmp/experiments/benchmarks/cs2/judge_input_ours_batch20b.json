@@ -1,0 +1,1273 @@
+[
+ {
+  "qid": "5079291508735025cf2643c7",
+  "question": "I want to measure the distance between two Bluetooth devices (A Master and a slave) using the corresponding RSSI value. Is there any algorithm or popular approach that maps RSSI values directly to distance?",
+  "sections": [
+   {
+    "title": "Fundamental Principles and Limitations",
+    "text": "Received Signal Strength Indicator (RSSI) quantifies the actual signal power received by a device, typically expressed in decibel milliwatts (dBm) [1]. While RSSI can measure the distance between a transmitter and receiver based on the difference between transmitted and received signal power [1], it does not provide an exact distance measurement. Instead, it offers an approximation that relies on specific propagation models to convert signal strength into spatial data [1]. It is noted that some literature does not strictly distinguish between receive power, pathloss, and RSSI, which can complicate precise modeling.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Two propagation models have been generally used to convert the RSSI to distance: the free-space models and the log-normal models.",
+       "This measure can be used to measure the distance between transmitter and receiver devices, based on the transmitted and received signal power differences.",
+       "RSSI is the calculation of real signal power received by a receiver and is typically expressed in decibel milliwatts (dBm) [10].",
+       "In geometric approaches, distances are calculated from the RSSI values using an adequate model."
+      ],
+      "title": "indoor 2d positioning method for mobile robots based on the fusion of rssi and magnetometer fingerprints",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Propagation and Geometric Models",
+    "text": "Two primary propagation models are generally used to convert RSSI to distance: free-space models and log-normal models [1]. In a pure free-space scenario, power loss is proportional to the square of the distance (d) between the transmitter and receiver [3]. More generally, this pathloss is modeled as d raised to the power of n_PL, where n_PL is a pathloss coefficient that depends on the specific environment and whether a line-of-sight (LOS) connection exists [3]. Geometric approaches utilize these adequate models to calculate distances directly from RSSI values [1]. Alternatively, a Signal Propagation Model can predict distance by performing a power regression against a known table of distances and corresponding RSSI values [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "To predict distance from signal strength (RSSI), the Signal Propagation Model was used based on a power regression against a known table of distances/RSSI values."
+      ],
+      "title": "a hybrid indoor positioning system based on visible light communication and bluetooth rss trilateration",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Two propagation models have been generally used to convert the RSSI to distance: the free-space models and the log-normal models.",
+       "This measure can be used to measure the distance between transmitter and receiver devices, based on the transmitted and received signal power differences.",
+       "RSSI is the calculation of real signal power received by a receiver and is typically expressed in decibel milliwatts (dBm) [10].",
+       "In geometric approaches, distances are calculated from the RSSI values using an adequate model."
+      ],
+      "title": "indoor 2d positioning method for mobile robots based on the fusion of rssi and magnetometer fingerprints",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "In the case of a pure ”free-space” scenario, this power loss is proportional to the square of the TX-RX distance d d ; more generally it can be modeled as d n PL d^{n_{\\rm PL}} , where the pathloss coefficient n PL n_{\\rm PL} depends on the environment and whether a LOS connection exists between TX and RX.",
+       "The work in [ 287 ] suggests using both the Euclidean distance and the cosine similarity between the RSSI values as a similarity metric, which they also use to construct the weights for a WKNN."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "II-B 2 Small Scale vs Large Scale Fading",
+         "chunk_id": "arxiv_2012.11171#c21",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "System Implementations and Algorithms",
+    "text": "Various systems and algorithms employ RSSI for distance estimation. RADAR, developed at Microsoft, uses RSSI to estimate distance [4]. Similarly, iBeacons utilize this approach for distance estimation. For more complex positioning, RSSI fingerprinting involves comparing RSSI vectors using Euclidean distance. Another method, Ordinal UNLOC, operates without the need for calibration, unlike traditional methods. In the context of weighted k-nearest neighbors (WKNN), research suggests using both Euclidean distance and cosine similarity between RSSI values as a similarity metric to construct weights [3]. While the Capon beamformer uses steering vectors and covariance matrices for spatial and frequency domain characteristics, this is distinct from simple RSSI-based ranging.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "In the case of a pure ”free-space” scenario, this power loss is proportional to the square of the TX-RX distance d d ; more generally it can be modeled as d n PL d^{n_{\\rm PL}} , where the pathloss coefficient n PL n_{\\rm PL} depends on the environment and whether a LOS connection exists between TX and RX.",
+       "The work in [ 287 ] suggests using both the Euclidean distance and the cosine similarity between the RSSI values as a similarity metric, which they also use to construct the weights for a WKNN."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "II-B 2 Small Scale vs Large Scale Fading",
+         "chunk_id": "arxiv_2012.11171#c21",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "RADAR, developed at Microsoft, uses RSSI to estimate the distance [5]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Accuracy and Error Reduction",
+    "text": "RSSI-only methods often suffer from large-ranging errors because they rely on fixed parameters within the path loss model. To mitigate this, optimization methods that combine RSSI with Packet Delivery Ratio (PDR) have been shown to reduce the Mean Absolute Error (MAE) by up to 0.51 meters. This highlights that while direct mapping is possible, combining multiple metrics or optimizing model parameters is necessary for higher precision in practical applications.",
+    "citations": []
+   }
+  ],
+  "diag": {
+   "n_claims_input": 17,
+   "n_claims_usable": 17,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C15",
+     "sentence": "It is noted that some literature does not strictly distinguish between receive power, pathloss, and RSSI, which can complicate precise modeling ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "While RSSI can measure the distance between a transmitter and receiver based on the difference between transmitted and received signal power [C1], it does not provide an exact distance measurement ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "While the Capon beamformer uses steering vectors and covariance matrices for spatial and frequency domain characteristics, this is distinct from simple RSSI-based ranging ."
+    },
+    {
+     "cid": "C10",
+     "sentence": "Another method, Ordinal UNLOC, operates without the need for calibration, unlike traditional methods ."
+    },
+    {
+     "cid": "C14",
+     "sentence": "For more complex positioning, RSSI fingerprinting involves comparing RSSI vectors using Euclidean distance ."
+    },
+    {
+     "cid": "C9",
+     "sentence": "Similarly, iBeacons utilize this approach for distance estimation ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "This highlights that while direct mapping is possible, combining multiple metrics or optimizing model parameters is necessary for higher precision in practical applications ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "51 meters ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "RSSI-only methods often suffer from large-ranging errors because they rely on fixed parameters within the path loss model ."
+    }
+   ],
+   "word_count": 376,
+   "n_sections": 4,
+   "n_citations": 4,
+   "record_level": 4,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "8f5a6ec4ad13c0b7881a9af2",
+  "question": "In auditory speech perception using iEEG, I will use Temporal Response Function (TRF) to determine correlations between stimulus characteristics (variations in the acoustic signal envelope, for example) and characteristics of recorded neuronal activity. I would like to fully understand the different stages of data processing carried out, as well as the reasoning and hypotheses behind them.",
+  "sections": [
+   {
+    "title": "Theoretical Foundations and Hypotheses",
+    "text": "The Temporal Response Function (TRF) framework posits that the brain processes speech through ascending stages, where emergent features evolve from acoustic to sentence-level linguistic representations as incremental steps [3]. This approach addresses the limitations of traditional EEG methods, which fail to provide a comprehensive measure of how the brain tracks multidimensional prosodic aspects over time [1]. By measuring neural entrainment to the speech envelope, researchers can target prosodic processing, a domain that remains underutilized in the literature [1]. Prosodic cues, which communicate information through acoustic correlates such as duration, amplitude, and fundamental frequency, are indispensable for comprehending messages, recognizing emotion, and parsing syntax [1]. These cues may scaffold linguistic processing by supporting neural synchronization to the speech envelope [1]. The extraction of amplitude modulation (AM) information is considered a fundamental procedure within the auditory neural architecture [1], and the auditory cortex is particularly adept at rapidly processing spectro-temporal changes in temporal fine structure [1]. Furthermore, neural tracking of the temporal envelope has been applied to study speech segmentation, where the envelope is mapped onto neural activity [2]. Exaggerated speech signals, characterized by louder, longer, and higher-pitched stressed syllables, facilitate the segmentation of speech into syllable units and the disentangling of word boundaries [1]. This framework is also relevant for clinical populations; for instance, the prosodic phrasing hypothesis suggests that children with developmental language disorder (DLD) have difficulty detecting rhythmic patterns due to impaired sensitivity to amplitude rise time and sound duration [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The prosodic phrasing hypothesis [146] suggests that children with DLD have difficulty detecting rhythmic patterns in speech, particularly related to impaired sensitivity to amplitude rise time [147] and sound duration [126]",
+       "The exaggerated speech signal creates louder, longer, and higher pitch stressed syllables [24], which facilitates segmenting the speech into syllable components and disentangling word boundaries [25,26].",
+       "The auditory cortex is particularly adept at rapidly processing spectro-temporal changes in the temporal fine structure [36]",
+       "It has been suggested that the extraction of AM information is a fundamental procedure within the neural architecture of the auditory system [35].",
+       "Prosodic cues may offer a foundation for supporting neural synchronization to the speech envelope, which scaffolds linguistic processing.",
+       "Prosodic fluctuations are responsible for communicating a wealth of information, primarily through acoustic correlates such as duration, amplitude, and fundamental frequency.",
+       "measuring neural entrainment to the speech envelope is an excellent way to target prosodic processing, yet this has been underutilized in the literature.",
+       "While these techniques are important for determining brain responses to prosodic features, they do not provide a comprehensive measure of how the brain tracks and encodes the multidimensional aspects of prosody over time.",
+       "In the backward direction, recording channels are weighted based on the information that they provide for the reconstruction [77], which removes inter-channel redundancies",
+       "one issue with a simple cross-correlation between envelope and neural response is that temporal smearing (from averaging across time points) will create noise in the correlation function [71]",
+       "Forward modeling describes the mapping of a speech stimulus to a neural network [68,75,76] using a TRF that represents the linear transformation that generated the observed neural signal [77]"
+      ],
+      "title": "pushing the envelope: developments in neural entrainment to speech and the biological underpinnings of prosody perception",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5. Developmental and Clinical Relevance of Envelope Entrainment",
+         "chunk_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog#c7",
+         "char_start": 25832
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Neural/cortical tracking of the temporal envelope of speech has been used to study segmentation of speech (Ding et al., 2016; Ding & Simon, 2014), where the temporal envelope of speech is mapped on to the neural electroencephalography (EEG) to derive a correlation metric.",
+       "The envelope to EEG mapping across various time lags yields the Temporal Response Function (TRF), which has peaks similar to the event-related potentials obtained for auditory stimuli (Fiedler et al., 2017, 2019)."
+      ],
+      "title": "effects of task demands on neural correlates of acoustic and semantic processing in challenging listening conditions",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "We hypothesize that the ascending brain processing stages will show emergent features, from acoustic to sentence-level linguistic, as incremental steps in the processing of the speech occurs.",
+       "Analogous to event related potentials (ERPs), the TRF is a continuous signal which exhibits the neural encoding of speech feature over time (typically over hundreds of milliseconds), where peaks of different latencies indicate separate processing stages."
+      ],
+      "title": "neural dynamics of the processing of speech features: evidence for a progression of features from acoustic to sentential processing",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Mathematical Modeling and Estimation",
+    "text": "The TRF is defined as an unknown, channel-specific filter that describes the linear transformation of the ongoing stimulus into ongoing EEG activity [1] [5]. In this forward modeling approach, the instantaneous neural activity r(t,n) is modeled as the convolution of the acoustic stimulation s(t), specifically the speech envelope, with this unknown channel-specific TRF [5]. The mapping of the speech stimulus to the neural network via this linear transformation allows for the identification of neural signals related to auditory processing, effectively acting as an additional preprocessing stage [4]. The TRF is a continuous signal that exhibits the neural encoding of speech features over time, typically spanning hundreds of milliseconds [3]. Peaks of different latencies within this signal indicate separate processing stages, analogous to event-related potentials (ERPs) [3] [2]. To estimate the model weights, the mean absolute difference between the actual neural response r(t) and the predicted response r̂(t) is minimized, where the prediction error is denoted as ε(t). This method solves the issue of temporal smearing, which creates noise in simple cross-correlation functions due to averaging across time points [1]. In the backward direction, recording channels are weighted based on the information they provide for reconstruction, which removes inter-channel redundancies [1]. The fine-grained time resolution provided by techniques like MEG offers insight into the temporal progression of these cascading neural processes.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The prosodic phrasing hypothesis [146] suggests that children with DLD have difficulty detecting rhythmic patterns in speech, particularly related to impaired sensitivity to amplitude rise time [147] and sound duration [126]",
+       "The exaggerated speech signal creates louder, longer, and higher pitch stressed syllables [24], which facilitates segmenting the speech into syllable components and disentangling word boundaries [25,26].",
+       "The auditory cortex is particularly adept at rapidly processing spectro-temporal changes in the temporal fine structure [36]",
+       "It has been suggested that the extraction of AM information is a fundamental procedure within the neural architecture of the auditory system [35].",
+       "Prosodic cues may offer a foundation for supporting neural synchronization to the speech envelope, which scaffolds linguistic processing.",
+       "Prosodic fluctuations are responsible for communicating a wealth of information, primarily through acoustic correlates such as duration, amplitude, and fundamental frequency.",
+       "measuring neural entrainment to the speech envelope is an excellent way to target prosodic processing, yet this has been underutilized in the literature.",
+       "While these techniques are important for determining brain responses to prosodic features, they do not provide a comprehensive measure of how the brain tracks and encodes the multidimensional aspects of prosody over time.",
+       "In the backward direction, recording channels are weighted based on the information that they provide for the reconstruction [77], which removes inter-channel redundancies",
+       "one issue with a simple cross-correlation between envelope and neural response is that temporal smearing (from averaging across time points) will create noise in the correlation function [71]",
+       "Forward modeling describes the mapping of a speech stimulus to a neural network [68,75,76] using a TRF that represents the linear transformation that generated the observed neural signal [77]"
+      ],
+      "title": "pushing the envelope: developments in neural entrainment to speech and the biological underpinnings of prosody perception",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5. Developmental and Clinical Relevance of Envelope Entrainment",
+         "chunk_id": "sciverse_pushing_the_envelope_developments_in_neural_entrainment_to_speech_and_the_biolog#c7",
+         "char_start": 25832
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "We hypothesize that the ascending brain processing stages will show emergent features, from acoustic to sentence-level linguistic, as incremental steps in the processing of the speech occurs.",
+       "Analogous to event related potentials (ERPs), the TRF is a continuous signal which exhibits the neural encoding of speech feature over time (typically over hundreds of milliseconds), where peaks of different latencies indicate separate processing stages."
+      ],
+      "title": "neural dynamics of the processing of speech features: evidence for a progression of features from acoustic to sentential processing",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Neural/cortical tracking of the temporal envelope of speech has been used to study segmentation of speech (Ding et al., 2016; Ding & Simon, 2014), where the temporal envelope of speech is mapped on to the neural electroencephalography (EEG) to derive a correlation metric.",
+       "The envelope to EEG mapping across various time lags yields the Temporal Response Function (TRF), which has peaks similar to the event-related potentials obtained for auditory stimuli (Fiedler et al., 2017, 2019)."
+      ],
+      "title": "effects of task demands on neural correlates of acoustic and semantic processing in challenging listening conditions",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "This analysis identifies neural signals related to auditory processing and therefore acts as an additional preprocessing stage.",
+       "We chose minimal preprocessing on the EEG signal (for example, excluding common preprocessing steps like independent component analysis) as the data would be further processed using the Temporal Response Function (TRF; see below).",
+       "A similar preprocessing pipeline has been selected for a variety of studies that use the TRF to investigate auditory processing in the brain (Di Liberto et al., 2015; O'Sullivan et al., 2015; Crosse et al., 2016b)."
+      ],
+      "title": "semantic context enhances the early auditory encoding of natural speech",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "According to this, the instantaneous neural activity $r(t,n)$ ( $t = 1\\ldots T$ denotes points in time and $n = 1\\ldots N$ denotes EEG channels) is the result of a convolution of the acoustic stimulation $s(t)$ , that is, the speech envelope, with an unknown, channel-specific temporal response function (TRF) $w(\\tau ,n)$ .",
+       "The TRF can be seen as a filter describing the transformation of the ongoing stimulus to the ongoing EEG activity.",
+       "testing the limits of the stimulus reconstruction approach: auditory attention decoding in a four-speaker free field environment"
+      ],
+      "title": "testing the limits of the stimulus reconstruction approach: auditory attention decoding in a four-speaker free field environment",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Data Processing and Validation Pipeline",
+    "text": "Invasive EEG (iEEG) data, acquired using subdural electrode grids or depth electrodes, differs from typical scalp EEG (10-20 system). A similar preprocessing pipeline has been selected for a variety of studies using TRF to investigate auditory processing [4]. Researchers often choose minimal preprocessing on the EEG signal, excluding common steps like independent component analysis (ICA), because the data will be further processed using the TRF [4]. In specific implementations, data analyses are performed in mne-python 0.23.0 and eelbrain 0.36, where flat channels are excluded and environmental magnetic interferences are suppressed using temporal signal space separation (tSSS). For validation, a 4-fold cross-validation strategy is employed; for each testing fold, the remaining three partitions serve as validation sets to generate three TRFs, which are then averaged to one TRF per fold. Prediction accuracy is computed against the testing set, and both TRFs and accuracies are further averaged across folds. To ensure unbiased comparison, TRFs are generated from the same number of predictors, and peaks are identified and compared across passage types using repeated measures ANOVA and FDR-corrected t-tests. Experimental configurations typically involve specific numbers of blocks, total trials per participant, trials per passage type, and stimulus passage durations, with inclusion criteria often requiring at least 70% correct on comprehension questions [C7-C11, C31]. Stimulus delivery levels are also controlled. Other iEEG processing examples include using power spectral density (PSD) over 3-second windows per channel pair as input to a two-state Hidden Markov Model (HMM) for mapping iEEG to normal or peri-ictal states, with parameters estimated via Baum-Welch. Alternatively, feature extraction may involve a 7-level stationary wavelet transform (SWT) leading to codebook vector quantization, using Baum-Welch for parameter estimation and Viterbi for recognition. The stimulus reconstruction approach has also been tested in four-speaker free field environments for auditory attention decoding [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "According to this, the instantaneous neural activity $r(t,n)$ ( $t = 1\\ldots T$ denotes points in time and $n = 1\\ldots N$ denotes EEG channels) is the result of a convolution of the acoustic stimulation $s(t)$ , that is, the speech envelope, with an unknown, channel-specific temporal response function (TRF) $w(\\tau ,n)$ .",
+       "The TRF can be seen as a filter describing the transformation of the ongoing stimulus to the ongoing EEG activity.",
+       "testing the limits of the stimulus reconstruction approach: auditory attention decoding in a four-speaker free field environment"
+      ],
+      "title": "testing the limits of the stimulus reconstruction approach: auditory attention decoding in a four-speaker free field environment",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "This analysis identifies neural signals related to auditory processing and therefore acts as an additional preprocessing stage.",
+       "We chose minimal preprocessing on the EEG signal (for example, excluding common preprocessing steps like independent component analysis) as the data would be further processed using the Temporal Response Function (TRF; see below).",
+       "A similar preprocessing pipeline has been selected for a variety of studies that use the TRF to investigate auditory processing in the brain (Di Liberto et al., 2015; O'Sullivan et al., 2015; Crosse et al., 2016b)."
+      ],
+      "title": "semantic context enhances the early auditory encoding of natural speech",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 39,
+   "n_claims_usable": 39,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C15",
+     "sentence": "The fine-grained time resolution provided by techniques like MEG offers insight into the temporal progression of these cascading neural processes ."
+    },
+    {
+     "cid": "C16",
+     "sentence": "To estimate the model weights, the mean absolute difference between the actual neural response r(t) and the predicted response r̂(t) is minimized, where the prediction error is denoted as ε(t) ."
+    },
+    {
+     "cid": "C29",
+     "sentence": "Alternatively, feature extraction may involve a 7-level stationary wavelet transform (SWT) leading to codebook vector quantization, using Baum-Welch for parameter estimation and Viterbi for recognitio"
+    },
+    {
+     "cid": "C28",
+     "sentence": "Other iEEG processing examples include using power spectral density (PSD) over 3-second windows per channel pair as input to a two-state Hidden Markov Model (HMM) for mapping iEEG to normal or peri-ic"
+    },
+    {
+     "cid": "C12",
+     "sentence": "Stimulus delivery levels are also controlled ."
+    },
+    {
+     "cid": "C13",
+     "sentence": "To ensure unbiased comparison, TRFs are generated from the same number of predictors, and peaks are identified and compared across passage types using repeated measures ANOVA and FDR-corrected t-tests"
+    },
+    {
+     "cid": "C17",
+     "sentence": "Prediction accuracy is computed against the testing set, and both TRFs and accuracies are further averaged across folds ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "For validation, a 4-fold cross-validation strategy is employed; for each testing fold, the remaining three partitions serve as validation sets to generate three TRFs, which are then averaged to one TR"
+    },
+    {
+     "cid": "C30",
+     "sentence": "36, where flat channels are excluded and environmental magnetic interferences are suppressed using temporal signal space separation (tSSS) ."
+    },
+    {
+     "cid": "C27",
+     "sentence": "Invasive EEG (iEEG) data, acquired using subdural electrode grids or depth electrodes, differs from typical scalp EEG (10-20 system) ."
+    }
+   ],
+   "word_count": 759,
+   "n_sections": 3,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "b9ecca8a0858c732a3bced34",
+  "question": "In robotics, what are the leading methods for learning terrain traversibility costs automatically from robot experience?",
+  "sections": [
+   {
+    "title": "Experience-Based Autonomous Learning",
+    "text": "A primary approach involves robots autonomously determining which terrains are traversable based on prior navigation experience, without relying on external sources [3]. This experiential learning framework addresses robotic navigation by learning how to traverse real-world environments directly from real-world data [2]. The process is structured into two levels: a low level that deals with local traversibility and a high level that determines which paths are more likely to lead to the destination [2]. A key motivation for this approach is that it is difficult to accurately estimate a terrain's actual cost until the robot traverses it itself, highlighting the importance of learning from previous experience [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We highlight the importance of learning from previous experience as it's difficult to accurately estimate the terrain's actual cost until we traverse it ourselves.",
+       "To estimate terrain traversability cost, the robot needs to fuse color data (terrain texture), depth data (identifying non-traversable regions like obstacles), and proprioceptive feedback (implicitly encoding the physics) in real time and the real world."
+      ],
+      "title": "traversability-aware legged navigation by learning from real-world visual data",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The low level deals with local traversibility, while the high level aims to determine which paths are more likely to lead to the destination.",
+       "We discussed how experiential learning can be used to address robotic navigation problems by learning how to traverse real-world environments from real-world data."
+      ],
+      "title": "learning robotic navigation from experience: principles, methods and recent results",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.06759",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "This paper introduces a novel experience-based method that allows robots to autonomously learn which terrains are traversable based on prior navigation experience, without relying on exten"
+      ],
+      "title": "i move therefore i learn: experience-based traversability in outdoor robotics",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Proprioceptive and Energy-Based Metrics",
+    "text": "Several methods utilize robot proprioceptive features to characterize specific traversal costs. Faigl and Prágr use these features to define three costs: mean instantaneous power consumption, mean forward velocity, and attitude stability, which are then attached to exteroceptive features for regression [5]. In a related unsupervised approach, Faigl and Prágr adopt a method for traversability cost maps regression [4]. Similarly, self-organizing maps are proposed to predict these same three traversal costs—instantaneous power consumption, maximum achievable forward velocity, and attitude stability—based on terrain morphology and appearance captured by an RGB-D camera [4]. During the learning phase, the predicting model is fed with the traversal costs actually experienced by the robot during traversal to refine these estimates [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Furthermore, during the learning phase the predicting model is also fed with the traversal costs actually experienced by the robot during the traversal.",
+       "In particular self-organizing maps are proposed, to predict three traversal costs, i.e., instantaneous power consumption, maximum achievable forward velocity, and attitude stability, based on the morphology and the appearance of the terrain, acquired through an RGB-D camera.",
+       "Beyond LfD methods, an unsupervised method is adopted by Faigl and Prágr [34] for traversability cost maps regression."
+      ],
+      "title": "learning-based methods of perception and navigation for ground vehicles in unstructured environments: a review",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Similarly, Faigl and Prágr [13] also use robot proprioceptive features to characterize three traversal costs, i.e., mean instantaneous power consumption, mean forward velocity and attitude stability, and attach those costs to the corresponding exteroceptive features for regression.",
+       "Later, a neural network is proposed to take variable-length signals such as forces and torques and output terrain classes for robot localization [24].",
+       "Bednarek et al. [23] propose to use machine learning methods for tactile terrain classification."
+      ],
+      "title": "energy-based legged robots terrain traversability modeling via deep inverse reinforcement learning",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.03034",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Multimodal Sensor Fusion",
+    "text": "To estimate terrain traversability cost in real time, robots can fuse color data representing terrain texture, depth data for identifying non-traversable regions like obstacles, and proprioceptive feedback that implicitly encodes the physics of interaction [1]. Combining all these modalities allows for a better model of the robot's perception, which is a key factor in assessing traversability costs to different terrain areas [6]. This multimodal perception can be connected to learning processes, enabling the automatic discovery of mappings between terrain features and corresponding costs [6]. Future work in this domain aims to incorporate a gait modality to further improve traversability cost assessment [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Getting more into the problem of traversability cost estimation in the future work, we would like to take into account another modality—a gait modality.",
+       "Moreover, the perception can be connected to learning and mapping between the terrain features and corresponding costs can be found automatically.",
+       "Combined all modalities together, we can better model the perception of the robot which is a key factor in assessing the traversability costs to different terrain areas."
+      ],
+      "title": "on traversability cost evaluation from proprioceptive sensing for a crawling robot",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "We highlight the importance of learning from previous experience as it's difficult to accurately estimate the terrain's actual cost until we traverse it ourselves.",
+       "To estimate terrain traversability cost, the robot needs to fuse color data (terrain texture), depth data (identifying non-traversable regions like obstacles), and proprioceptive feedback (implicitly encoding the physics) in real time and the real world."
+      ],
+      "title": "traversability-aware legged navigation by learning from real-world visual data",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Tactile and Neural Network Approaches",
+    "text": "Machine learning methods are also applied to tactile terrain classification, as proposed by Bednarek et al. [5]. In a subsequent development, a neural network is proposed to take variable-length signals, such as forces and torques, and output terrain classes for robot localization [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Similarly, Faigl and Prágr [13] also use robot proprioceptive features to characterize three traversal costs, i.e., mean instantaneous power consumption, mean forward velocity and attitude stability, and attach those costs to the corresponding exteroceptive features for regression.",
+       "Later, a neural network is proposed to take variable-length signals such as forces and torques and output terrain classes for robot localization [24].",
+       "Bednarek et al. [23] propose to use machine learning methods for tactile terrain classification."
+      ],
+      "title": "energy-based legged robots terrain traversability modeling via deep inverse reinforcement learning",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.03034",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 15,
+   "n_claims_usable": 15,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 366,
+   "n_sections": 4,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "e458a18949d8b51f3a463419",
+  "question": "In recommendation systems, how are new methods that optimize diversity typically evaluated?",
+  "sections": [
+   {
+    "title": "Multi-Dimensional Evaluation Frameworks",
+    "text": "Assessing recommendation systems requires moving beyond traditional accuracy metrics like RMSE and P@N to include diversity, novelty, and serendipity. These newer concepts are considered orthogonal to accuracy and have been shown to increase user satisfaction [2]. Recent reviews emphasize evaluating performance from multiple perspectives, including accuracy, diversity, and novelty, while analyzing the advantages, disadvantages, and applicable environments of specific metrics [1]. Furthermore, predictions regarding the future development direction of these evaluation metrics are part of the ongoing scholarly discourse [1]. In graph neural network-based systems, beyond-accuracy aspects such as diversity, serendipity, and fairness are recognized as key influencers of user engagement, highlighting the critical accuracy-diversity trade-off.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper summarizes and reviews the latest research progress on the evaluation metrics of the recommendation system, expounds from multiple perspectives such as accuracy, diversity, novelty, and conducts an in-depth analysis of their respective advantages and disadvantages and applicable environments, focuses on the three levels of recommended diversity and evaluation criteria, and makes predict"
+      ],
+      "title": "evaluation metrics for personalized recommendation systems",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Approaches such as diversity (e.g., [2]), novelty (e.g., [21]), and serendipity, which are thought to be orthogonal to the traditional accuracy-based evaluation measures, have been found to increase user satisfaction [33]."
+      ],
+      "title": "title:improving reachability and navigability in recommender systems",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Hierarchical Diversity Objectives",
+    "text": "Diversity is conceptualized at three distinct levels: user-level, item-level, and system-level [1]. A significant finding is that systems optimized for user- or item-level diversity do not necessarily perform well in system-level diversity [4]. This discrepancy motivates the development of new objectives that combine all three considerations to ensure holistic performance [4]. At the system level, metrics like P-Coverage focus on measuring the fraction of items recommended, a factor closely related to cold-start issues. Additionally, Adomavicius and Kwon utilized the total number of different items recommended across all users as an aggregate diversity measure to evaluate algorithms [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Adomavicius and Kwon [82] used the total number of different items recommended across all users as an aggregate diversity measure to measure the recommendation algorith",
+       "Another way is to measure the value of inserting a new item to the list of recommendation, as done by Ziegler et al. [81].",
+       "Most of the methods proposed to evaluate diversity use item-item similarity based on the item content to form item neighborhoods, then measures the min, max, sum or average distance between pairs of items."
+      ],
+      "title": "new insights towards developing recommender systems",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "However, systems that optimize for user- or item-level diversity do not necessarily score well in system-level diversity, motivating the need for a new objective that combines all of these considerations.",
+       "We do not address this meta concern in any detail, so our targeted approach wil"
+      ],
+      "title": "a new system-wide diversity measure for recommendations with efficient algorithms",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1812.03030",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper summarizes and reviews the latest research progress on the evaluation metrics of the recommendation system, expounds from multiple perspectives such as accuracy, diversity, novelty, and conducts an in-depth analysis of their respective advantages and disadvantages and applicable environments, focuses on the three levels of recommended diversity and evaluation criteria, and makes predict"
+      ],
+      "title": "evaluation metrics for personalized recommendation systems",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Metric Taxonomies and Calculation Methods",
+    "text": "Diversity metrics are often categorized into relevance-oblivious and relevance-aware types, with specific measures including NRBP, nDCU@K, M-IA, D-M, and D#-M. Common calculation methods involve using item-item similarity based on content to form neighborhoods, then measuring the min, max, sum, or average distance between item pairs [3]. Another approach, proposed by Ziegler et al., measures the value of inserting a new item into the recommendation list [3]. ILAD and ILMD are defined as the mean and minimum dissimilarity of all pairs within a list, respectively. A framework by Clarke et al. systematically rewards novelty and diversity, originally designed for information retrieval systems [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Clarke et al. [17] present a framework that systematically rewards novelty and diversity for measuring information retrieval systems"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "II Diversity in Search",
+         "chunk_id": "arxiv_2212.14464#c4",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Adomavicius and Kwon [82] used the total number of different items recommended across all users as an aggregate diversity measure to measure the recommendation algorith",
+       "Another way is to measure the value of inserting a new item to the list of recommendation, as done by Ziegler et al. [81].",
+       "Most of the methods proposed to evaluate diversity use item-item similarity based on the item content to form item neighborhoods, then measures the min, max, sum or average distance between pairs of items."
+      ],
+      "title": "new insights towards developing recommender systems",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Optimization Strategies and Experimental Validation",
+    "text": "To balance accuracy and diversity, multi-objective optimization techniques such as NNIA, AMOSA, and NSGA-II are employed. A typical three-stage process involves generating top-k items via item-CF, creating bi-objective Pareto top-s lists, and re-ranking the results. Diversification strategies often rely on contextual or semantic information, such as item-item similarities and user-generated tags [7]. Various strategies have been introduced to diversify recommendation lists [7]. Experimental results indicate that applying these diversification scenarios improves diversity measures in session-based recommender systems, validated across four news datasets [6]. However, some studies do not address the meta-concern that increasing diversity might alter user behavior and lead to polarization [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "However, systems that optimize for user- or item-level diversity do not necessarily score well in system-level diversity, motivating the need for a new objective that combines all of these considerations.",
+       "We do not address this meta concern in any detail, so our targeted approach wil"
+      ],
+      "title": "a new system-wide diversity measure for recommendations with efficient algorithms",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1812.03030",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "The results of applying the proposed scenarios show that these diversification scenarios improve the diversity measures in these session-based recommender systems based on four news datasets."
+      ],
+      "title": "Diversification in Session-based News Recommender Systems",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2102.03265",
+       "authors": [
+        "Alireza Gharahighehi and Celine Vens"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Concerning this issue, different strategies have been introduced for diversification of recommendation lists [6, 38].",
+       "Typically, these models addressed the problem based on contextual or semantic information resources; for example, item-item similarities and user generated tags can be used to answer this problem [38, 39]."
+      ],
+      "title": "a probabilistic model to resolve diversity–accuracy challenge of recommendation systems",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": "1501.01996",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 21,
+   "n_claims_usable": 21,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C21",
+     "sentence": "In graph neural network-based systems, beyond-accuracy aspects such as diversity, serendipity, and fairness are recognized as key influencers of user engagement, highlighting the critical accuracy-div"
+    },
+    {
+     "cid": "C20",
+     "sentence": "Assessing recommendation systems requires moving beyond traditional accuracy metrics like RMSE and P@N to include diversity, novelty, and serendipity ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "At the system level, metrics like P-Coverage focus on measuring the fraction of items recommended, a factor closely related to cold-start issues ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "ILAD and ILMD are defined as the mean and minimum dissimilarity of all pairs within a list, respectively ."
+    },
+    {
+     "cid": "C17",
+     "sentence": "Diversity metrics are often categorized into relevance-oblivious and relevance-aware types, with specific measures including NRBP, nDCU@K, M-IA, D-M, and D#-M ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "A typical three-stage process involves generating top-k items via item-CF, creating bi-objective Pareto top-s lists, and re-ranking the results ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "To balance accuracy and diversity, multi-objective optimization techniques such as NNIA, AMOSA, and NSGA-II are employed ."
+    }
+   ],
+   "word_count": 408,
+   "n_sections": 4,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "d521598603fbab74a6c13d58",
+  "question": "Is it possible to get frequency domain information in a fenquency band beyond the limitation of nyquist theory?",
+  "sections": [
+   {
+    "title": "Theoretical Foundations and Limitations",
+    "text": "The Nyquist-Shannon sampling theorem traditionally dictates that the sampling frequency must not be less than twice the maximum frequency of the signal to be recorded [2]. This principle establishes that a function containing no frequencies above half the sampling rate can be perfectly reconstructed. However, this theorem provides only a sufficient upper boundary for the sampling rate, rather than an absolute limit on information recovery. Consequently, research has emerged addressing the possibility of obtaining frequency domain information beyond these standard constraints [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Additionally, in the case of frequency bands with a high density of natural modes, the component response strongly depends on the specific exci­ tation frequency, and even slight frequency variation can determine significant differences in response amplitudes and even shapes.",
+       "Indeed, many single-frequency measurements are needed to fully describe a wide frequency range, even if the measurements are performed only in correspondence of response peaks."
+      ],
+      "title": "frequency-band down-sampled stereo-dic: beyond the limitation of single frequency excitation",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The Nyquist-Shannon sampling theorem states that the sampling frequency should not be less than twice the maximum frequency that is to be recorded<sup>10)</sup>."
+      ],
+      "title": "design of digital filters for frequency weightings (a and c) required for risk assessments of workers exposed to noise",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Exploiting Aliasing and Undersampling",
+    "text": "One approach to surpassing traditional limits involves the advantageous use of aliasing for measurements above the Nyquist frequency [4]. This is achieved by repeating measurements in various frequency bands and merging the resulting data [4]. The frequency translation aspect of aliasing can be specifically exploited through techniques known as undersampling, band-pass sampling, harmonic sampling, or Super-Nyquist sampling [3]. While effective, this technique is constrained by the requirement that the frequency limit of the aliased data must remain below a specific threshold.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "The frequency translation aspect of aliasing can be exploited by using a technique called undersampling, band-pass sampling, harmonic sampling or Super-Nyquist sampling."
+      ],
+      "title": "a field programmable gate array spectrometer  for radio astronomy",
+      "metadata": {
+       "year": 2005,
+       "doi": null,
+       "arxiv": "astro-ph/0503067",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "After repeating the measurements in various frequency bands and merging these frequency bands, they demonstrated the advantageous use of aliasing for measurements above the Nyquist frequency [42].",
+       "To recover higher frequency content than the Nyquist frequency without the RIP, J. Javh et al. excited the structure in a predetermined frequency band.",
+       "Similarly, in time domain, if the signal is repeatable and its phase is manipulable, repetitions with different phases are also a feasible approach [43]."
+      ],
+      "title": "camera-based experimental modal analysis with impact excitation: reaching high frequencies thanks to one accelerometer and random sampling in time",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Control Theory and Signal Reconstruction",
+    "text": "Sampled-data control theory offers a method to reconstruct lost high-frequency components that lie beyond the so-called Nyquist frequency [6]. This approach allows for the recovery of higher frequency content without relying on the Restricted Isometry Property (RIP) [4]. Specifically, J. Javh et al. demonstrated that exciting a structure in a predetermined frequency band enables the recovery of these higher frequency components [4]. Additionally, a trust-region algorithm has been developed to minimize a smoothed non-convex least-squares objective function, allowing for the iterative recovery of the underlying signal of interest for either time- or band-limited support [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "We provide a trust-region algorithm that minimizes a smoothed non-convex least-squares objective function to iteratively recover the underlying signal-of-interest for either time- or band-limited support."
+      ],
+      "title": "Phase Retrieval for Radar Waveform Design",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.11384",
+       "authors": [
+        "Samuel Pinilla",
+        "Kumar Vijay Mishra",
+        "Brian M. Sadler and Henry Arguello"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "After repeating the measurements in various frequency bands and merging these frequency bands, they demonstrated the advantageous use of aliasing for measurements above the Nyquist frequency [42].",
+       "To recover higher frequency content than the Nyquist frequency without the RIP, J. Javh et al. excited the structure in a predetermined frequency band.",
+       "Similarly, in time domain, if the signal is repeatable and its phase is manipulable, repetitions with different phases are also a feasible approach [43]."
+      ],
+      "title": "camera-based experimental modal analysis with impact excitation: reaching high frequencies thanks to one accelerometer and random sampling in time",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "The present talk describes how sampled-‐data control theory can be applied to reconstruct the lost highfrequency components beyond the so-‐called Nyquist frequency, and how this new method can surpass the existing signal processing paradigm."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Practical Constraints and Excitation Challenges",
+    "text": "Despite these advancements, pure sinusoidal excitation remains a severe limitation because many single-frequency measurements are required to fully describe a wide frequency range [1]. This challenge is exacerbated in frequency bands with a high density of natural modes, where the component response strongly depends on the specific excitation frequency [1]. In such dense modal environments, even slight variations in frequency can determine significant changes in the response [1]. To address temporal dynamics, efficient sampling schemes are discussed to obtain both the frequency spectrum and signal energy [7]. Furthermore, in the time domain, if the signal is repeatable and its phase is manipulable, performing repetitions with different phases represents a feasible approach for data acquisition [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "After repeating the measurements in various frequency bands and merging these frequency bands, they demonstrated the advantageous use of aliasing for measurements above the Nyquist frequency [42].",
+       "To recover higher frequency content than the Nyquist frequency without the RIP, J. Javh et al. excited the structure in a predetermined frequency band.",
+       "Similarly, in time domain, if the signal is repeatable and its phase is manipulable, repetitions with different phases are also a feasible approach [43]."
+      ],
+      "title": "camera-based experimental modal analysis with impact excitation: reaching high frequencies thanks to one accelerometer and random sampling in time",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "In the following, we discuss efficient sampling schemes to obtain both frequency spectrum and signal energy."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Additionally, in the case of frequency bands with a high density of natural modes, the component response strongly depends on the specific exci­ tation frequency, and even slight frequency variation can determine significant differences in response amplitudes and even shapes.",
+       "Indeed, many single-frequency measurements are needed to fully describe a wide frequency range, even if the measurements are performed only in correspondence of response peaks."
+      ],
+      "title": "frequency-band down-sampled stereo-dic: beyond the limitation of single frequency excitation",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 14,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "title_only_citations": 1,
+   "orphan_downgraded": [
+    {
+     "cid": "C12",
+     "sentence": "However, this theorem provides only a sufficient upper boundary for the sampling rate, rather than an absolute limit on information recovery ."
+    },
+    {
+     "cid": "C14",
+     "sentence": "This principle establishes that a function containing no frequencies above half the sampling rate can be perfectly reconstructed ."
+    },
+    {
+     "cid": "C13",
+     "sentence": "While effective, this technique is constrained by the requirement that the frequency limit of the aliased data must remain below a specific threshold ."
+    }
+   ],
+   "word_count": 373,
+   "n_sections": 4,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

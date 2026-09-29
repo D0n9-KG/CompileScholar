@@ -1,0 +1,1204 @@
+[
+ {
+  "qid": "0650cf7bfe45d90ba3e1bb72",
+  "question": "The Nyquist-Shannon theorem provides an upper bound for the sampling period when designing a Kalman filter. Leaving apart the computational cost, are there any other reasons, e.g., noise-related issues, to set a lower bound for the sampling period? And, if so, is there an optimal value between these bounds?",
+  "sections": [
+   {
+    "title": "Upper Bound Constraints",
+    "text": "The Nyquist-Shannon sampling theorem establishes the primary upper limit for the sampling period in Kalman filter design. Specifically, the sampling frequency must not be less than twice the maximum frequency intended for recording [2]. In a specific application context, this principle dictates that the minimum required sampling frequency is 2.0 Hz, which corresponds to a maximum allowed sampling period of 0.5 s [1]. Consequently, the sampling rate of the recorded data strictly limits the range of frequencies that can be processed.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "hence the minimum required sampling frequency is $2.0~\\mathrm{Hz}$ (i.e., a maximum allowed sampling period of 0.5 s) according to the Nyquist-Shannon sampling theorem."
+      ],
+      "title": "stability analysis of networked control in smart grids",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The Nyquist-Shannon sampling theorem states that the sampling frequency should not be less than twice the maximum frequency that is to be recorded<sup>10)</sup>."
+      ],
+      "title": "design of digital filters for frequency weightings (a and c) required for risk assessments of workers exposed to noise",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Lower Bound Determinants",
+    "text": "Beyond computational costs, several noise-related and system-dynamic factors necessitate a lower bound for the sampling period. The sampling period is a key index that directly affects the final estimation error [4]. To maintain stability and accuracy, the sampling time should be at least two times less than the minimum system time constant [3]. Furthermore, the lower sampling period bound can be estimated using schedulability criteria. In systems involving force sensing via Kalman filters and disturbance observers, the cut-off frequency is inversely proportional to the sampling period; therefore, increasing the bandwidth is constrained by noise limits.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "As such, the sampling time should be at least two times less than the minimum system time constant."
+      ],
+      "title": "sampling rate selection for multi‐loop cascade control systems in an optimal manner",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "The sampling period is a key index affecting the final estimation error."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Noise Handling and Filter Adaptation",
+    "text": "Kalman filters are frequently employed to model frequency drift, such as in adaptive oscillator models for TCXO characteristics when GPS time reference signals are lost [5]. In these scenarios, components like IIRF1 are used to attenuate GPS receiver noise [5]. The effectiveness of the filter depends on its ability to handle unknown noise statistics, a problem addressed by self-tuning Kalman filters for high-maneuvering targets through system identification. A survey of Bayesian filters, including the standard Kalman filter, Extended Kalman Filter (EKF), Unscented Kalman Filter (UKF), and adaptive Sage-Husa filter, provides the context for these adaptive mechanisms. Time-domain Kalman filters offer fast convergence and good tracking properties, particularly in tracking time-varying noise conditions where LMS and RLS algorithms often struggle.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "the adaptive oscillator model (AOM) models the frequency drift characteristics of the TCXO. This model is used when the GPS time reference signal is lost. This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging. In addition, the AOM uses three infinite impulse response filters (IIRFs). IIRF1 attenuates the GPS rec"
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "chunk_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod#12150",
+         "char_start": 12150
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Optimal Sampling Period",
+    "text": "While the claims establish that the sampling period is a key index affecting final estimation error [4] and that bounds are defined by Nyquist limits [1] [2] and system time constants [3], the provided text does not explicitly define a single optimal value between these bounds. Instead, it highlights that the choice involves balancing bandwidth constraints and noise attenuation [5] against the requirement to remain within the schedulability and time-constant limits [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "As such, the sampling time should be at least two times less than the minimum system time constant."
+      ],
+      "title": "sampling rate selection for multi‐loop cascade control systems in an optimal manner",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "the adaptive oscillator model (AOM) models the frequency drift characteristics of the TCXO. This model is used when the GPS time reference signal is lost. This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging. In addition, the AOM uses three infinite impulse response filters (IIRFs). IIRF1 attenuates the GPS rec"
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "chunk_id": "sciverse_fpga_based_autonomous_gps_disciplined_oscillatorsfor_wireless_sensor_network_nod#12150",
+         "char_start": 12150
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "hence the minimum required sampling frequency is $2.0~\\mathrm{Hz}$ (i.e., a maximum allowed sampling period of 0.5 s) according to the Nyquist-Shannon sampling theorem."
+      ],
+      "title": "stability analysis of networked control in smart grids",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The Nyquist-Shannon sampling theorem states that the sampling frequency should not be less than twice the maximum frequency that is to be recorded<sup>10)</sup>."
+      ],
+      "title": "design of digital filters for frequency weightings (a and c) required for risk assessments of workers exposed to noise",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "The sampling period is a key index affecting the final estimation error."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 11,
+   "n_claims_usable": 11,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C3",
+     "sentence": "Consequently, the sampling rate of the recorded data strictly limits the range of frequencies that can be processed ."
+    },
+    {
+     "cid": "C9",
+     "sentence": "In systems involving force sensing via Kalman filters and disturbance observers, the cut-off frequency is inversely proportional to the sampling period; therefore, increasing the bandwidth is constrai"
+    },
+    {
+     "cid": "C2",
+     "sentence": "Furthermore, the lower sampling period bound can be estimated using schedulability criteria ."
+    },
+    {
+     "cid": "C10",
+     "sentence": "Time-domain Kalman filters offer fast convergence and good tracking properties, particularly in tracking time-varying noise conditions where LMS and RLS algorithms often struggle ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "A survey of Bayesian filters, including the standard Kalman filter, Extended Kalman Filter (EKF), Unscented Kalman Filter (UKF), and adaptive Sage-Husa filter, provides the context for these adaptive "
+    },
+    {
+     "cid": "C11",
+     "sentence": "The effectiveness of the filter depends on its ability to handle unknown noise statistics, a problem addressed by self-tuning Kalman filters for high-maneuvering targets through system identification "
+    },
+    {
+     "cid": "C9",
+     "sentence": "Instead, it highlights that the choice involves balancing bandwidth constraints  and noise attenuation [5] against the requirement to remain within the schedulability and time-constant limits [3]."
+    }
+   ],
+   "word_count": 367,
+   "n_sections": 4,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "f0e4b81f93c36652a08a8160",
+  "question": "Suggest some ways in which precise positioning and context-aware networking can be achieved in 6G mobile communication?",
+  "sections": [
+   {
+    "title": "Foundational Role of Localization and Sensing",
+    "text": "Precise positioning and context-aware services are fundamental to 6G architecture, where localization and sensing play a crucial role [2]. Intelligent context-aware networks in 6G leverage these capabilities to enhance service delivery [1]. The generation is characterized by the coexistence of fast imaging, high-resolution sensing, and high-accuracy localization alongside basic wireless communication functions [1]. This integration allows 6G to boost specific trends in context-awareness and supports extremely high data rate radio links necessary for data-intensive applications.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "As previously mentioned, the fast imaging, high-resolution sensing, and high accuracy localization will coexist with basic wireless communication functions in 6G, which can constantly share the abundant data and information in the time, frequency, and space domain.",
+       "Moreover, intelligent context-aware networks in 6G can also utilize localization and sens"
+      ],
+      "title": "interplay between ris and ai in wireless communications: fundamentals, architectures, applications, and open research problems",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2101.00250",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Localization and sensing play a crucial role in 6G, enabling precise positioning and context-aware services."
+      ],
+      "title": "from efficiency to sustainability: exploring the potential of 6g for a greener future",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Integrated Sensing and Communication (ISAC)",
+    "text": "A key enabler for context-aware reliability is the joint and robust design of task-oriented communications, semantic communications, and integrated sensing and communications (ISAC) within a multi-task learning framework [4]. ISAC integrates sensing capabilities directly into communication access points, eliminating the need for dedicated sensor hardware. This approach supports applications such as elderly monitoring, building analytics, and V2V driver assistance. However, current research combining communication and sensing remains limited to vision and range simulations, indicating a gap in broader implementation [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Research combining communication and sensing is limited to vision [ 80 ] and range simulations [ 140 ] ."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "V-D Application Integration",
+         "chunk_id": "arxiv_2012.13664#c47",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Overall, the joint and robust design of task-oriented communications, semantic communications, and integrated sensing and communications in a multi-task learning framework emerges as the key enabler for context-aware, resource-efficient, and secure communications ultimately needed in NextG network systems.",
+       "This approach employs deep neural networks representing a dedicated encoder at the transmitter and multiple task-specific decoders at the receiver, collectively trained to handle diverse tasks including semantic information preservation, source input reconstruction, and integrated sensing and communications."
+      ],
+      "title": "Will 6G be Semantic Communications? Opportunities and Challenges from Task Oriented and Secure Communications to Integrated Sensing",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.01531",
+       "authors": [
+        "Yalin E. Sagduyu",
+        "Tugba Erpek",
+        "Aylin Yener",
+        "Sennur Ulukus"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Advanced Antenna and Network Infrastructure",
+    "text": "6G mobile wireless networks introduce new technologies based on the massive deployment of antennas into small areas, which boosts both communication and single-user performance [7]. Network virtualization and slicing are crucial enablers that make certain 6G capabilities possible. Specifically, network slicing supports the composition and deployment of virtual network infrastructures required by the dynamic behavior of 5G/6G mobile networks, IoT-aware networks, and e-health systems [6]. To support these complex virtual environments, the CAVIAR modular co-simulation methodology provides a solution by upgrading to support a message passing library and enabling the virtual counterpart of a 6G digital twin [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Aiming at providing a solution to this demand, this work describes a modular co-simulation methodology called CAVIAR. Here, CAVIAR is upgraded to support a message passing library and enable the virtual counterpart of a digital twin system using different 6G-related simulators."
+      ],
+      "title": "CAVIAR: Co-simulation of 6G Communications, 3D Scenarios and AI for Digital Twins",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.03310",
+       "authors": [
+        "Jo\\~ao Borges",
+        "Felipe Bastos",
+        "Ilan Correa",
+        "Pedro Batista"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Network slicing is a crucial enabler to support the composition and deployment of virtual network infrastructures required by the dynamic behavior of networks like 5G/6G mobile networks, IoT-aware networks, e-health systems, and industry verticals like the internet of vehicles (IoV) and industry 4.0."
+      ],
+      "title": "On Modeling Network Slicing Communication Resources with SARSA Optimization",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2301.04696",
+       "authors": [
+        "Eduardo S. Xavier and Nazim Agoulmine and Joberto S. B. Martins"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "In this context, next sixth generation (6G) mobile wireless networks will introduce new technologies based on the massive deployment of antennas into small areas, allowing to boost not only communication but also single-anchor localization capabilities at an unprecedented scale of accuracy [11]–[17]."
+      ],
+      "title": "radio positioning with em processing of the spherical wavefront",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "1912.13331",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "AI-Driven Access and Semantic Processing",
+    "text": "For AI-driven beyond-5G and 6G millimeter (mmWave) networks, the DeepIA deep neural network (DNN) framework enables fast and reliable initial access [8]. Semantic communications further enhance context-awareness by employing deep neural networks representing a dedicated encoder at the transmitter and multiple task-specific decoders at the receiver [4]. These components are collectively trained to handle diverse tasks, including semantic information extraction [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Overall, the joint and robust design of task-oriented communications, semantic communications, and integrated sensing and communications in a multi-task learning framework emerges as the key enabler for context-aware, resource-efficient, and secure communications ultimately needed in NextG network systems.",
+       "This approach employs deep neural networks representing a dedicated encoder at the transmitter and multiple task-specific decoders at the receiver, collectively trained to handle diverse tasks including semantic information preservation, source input reconstruction, and integrated sensing and communications."
+      ],
+      "title": "Will 6G be Semantic Communications? Opportunities and Challenges from Task Oriented and Secure Communications to Integrated Sensing",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.01531",
+       "authors": [
+        "Yalin E. Sagduyu",
+        "Tugba Erpek",
+        "Aylin Yener",
+        "Sennur Ulukus"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "We present DeepIA, a deep neural network (DNN) framework for enabling fast and reliable initial access for AI-driven beyond 5G and 6G millimeter (mmWave) networks."
+      ],
+      "title": "Deep Learning for Fast and Reliable Initial Access in AI-Driven 6G mmWave Networks",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2101.01847",
+       "authors": [
+        "Tarun S. Cousik",
+        "Vijay K. Shah",
+        "Tugba Erpek",
+        "Yalin E. Sagduyu"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "RF Localization Methodologies",
+    "text": "RF-based localization methods can be roughly categorized into distinct taxonomies. Traditional Global Positioning System (GPS) utilizes Time of Arrival (ToA) techniques [10]. GNSS localization is based on trilateration using radio frequency (RF) signals, which requires a free line of sight (LOS) to at least 3 satellites [9].",
+    "citations": [
+     {
+      "id": "[9]",
+      "snippets": [
+       "localization with a GNSS is based on trilateration, using radio frequency (RF) signals, which requires free line of sight (LOS) to at least 3 satellites"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I Introduction",
+         "chunk_id": "arxiv_2012.11171#c2",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "Global Positioning System (GPS) uses ToA [4]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 22,
+   "n_claims_usable": 17,
+   "claims_dropped_noref": 5,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C8",
+     "sentence": "This integration allows 6G to boost specific trends in context-awareness [C7] and supports extremely high data rate radio links necessary for data-intensive applications ."
+    },
+    {
+     "cid": "C7",
+     "sentence": "This integration allows 6G to boost specific trends in context-awareness  and supports extremely high data rate radio links necessary for data-intensive applications ."
+    },
+    {
+     "cid": "C10",
+     "sentence": "This approach supports applications such as elderly monitoring, building analytics, and V2V driver assistance ."
+    },
+    {
+     "cid": "C10",
+     "sentence": "ISAC integrates sensing capabilities directly into communication access points, eliminating the need for dedicated sensor hardware ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "Network virtualization and slicing are crucial enablers that make certain 6G capabilities possible ."
+    },
+    {
+     "cid": "C13",
+     "sentence": "RF-based localization methods can be roughly categorized into distinct taxonomies ."
+    }
+   ],
+   "word_count": 361,
+   "n_sections": 5,
+   "n_citations": 10,
+   "record_level": 10,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "f7d0d99e1d158e6f89eee62b",
+  "question": "The following paper focuses on a problem of counting the number of subgraphs in a graph that have certain properties.  What are the most significant downstream applications that either are or could be using these algorithms?  Concrete examples of the graph algorithms in use in real-world applications would be especially helpful.  https://arxiv.org/pdf/2407.06801",
+  "sections": [
+   {
+    "title": "Biological and Bioinformatics Applications",
+    "text": "Subgraph counting algorithms are extensively applied in biological sciences, particularly within bioinformatics [2] [1]. A primary application involves the study of gene transcription networks, where counting specific subgraphs helps identify network motifs [3]. Additionally, these methods are used to detect and count subgraphs in protein interaction networks, facilitating the analysis of molecular pathways and cellular processes across different species [2]. The search for fast algorithms in this domain is driven by practical needs in bioinformatics rather than purely theoretical interest [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Thus, the search for fast algorithms for subgraph counting is not just a theoretical problem, but one that has many applications in bioinformatics, social science"
+      ],
+      "title": "linear time subgraph counting, graph degeneracy, and the chasm at size six",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1911.05896",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "For example, detecting and counting subgraphs in protein interaction networks is used to study molecular pathways and cellular processes across species [SIKS06].",
+       "The subgraph counting problem has applications in many different fields, including the study of biological, internet and database systems.",
+       "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation"
+      ],
+      "title": "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1601.04233",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Through network motifs, the problem of counting subgraphs has found applications in the study of gene transcription networks, neural networks, and social networks [42], and there is a large body of work dedicated to the algorithmic discovery of network motifs ["
+      ],
+      "title": "homomorphisms are a good basis for counting small subgraphs",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": "1705.01595",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Social and Internet Systems",
+    "text": "Beyond biology, subgraph counting has significant applications in social science and the analysis of social networks [3] [1]. The problem is also relevant to the study of internet systems, where understanding structural patterns is crucial [2]. These applications highlight the broad utility of subgraph counting across various networked systems, including both biological and digital infrastructures [2] [1].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "For example, detecting and counting subgraphs in protein interaction networks is used to study molecular pathways and cellular processes across species [SIKS06].",
+       "The subgraph counting problem has applications in many different fields, including the study of biological, internet and database systems.",
+       "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation"
+      ],
+      "title": "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1601.04233",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Thus, the search for fast algorithms for subgraph counting is not just a theoretical problem, but one that has many applications in bioinformatics, social science"
+      ],
+      "title": "linear time subgraph counting, graph degeneracy, and the chasm at size six",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1911.05896",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Through network motifs, the problem of counting subgraphs has found applications in the study of gene transcription networks, neural networks, and social networks [42], and there is a large body of work dedicated to the algorithmic discovery of network motifs ["
+      ],
+      "title": "homomorphisms are a good basis for counting small subgraphs",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": "1705.01595",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Database Systems and Query Optimization",
+    "text": "In the realm of database systems, subgraph counting is critical for join selectivity estimation [2]. Specifically, sublinear-time algorithms for counting star subgraphs have been developed to improve the efficiency of database joins [2]. This application demonstrates how theoretical advances in subgraph counting can directly enhance the performance of data management systems [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "For example, detecting and counting subgraphs in protein interaction networks is used to study molecular pathways and cellular processes across species [SIKS06].",
+       "The subgraph counting problem has applications in many different fields, including the study of biological, internet and database systems.",
+       "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation"
+      ],
+      "title": "sublinear-time algorithms for counting star subgraphs with applications to join selectivity estimation",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": "1601.04233",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Algorithmic Approaches and Complexity",
+    "text": "The fundamental problem of subgraph counting in large input graphs has a rich history, with recent work focusing on subquadratic time algorithms for bounded-degeneracy graphs [8]. While exact counting of constant-size subgraphs is polynomial-time solvable, traditional off-line methods that require storing the whole graph are often impractical for large datasets [7]. To address these limitations, various algorithmic strategies have been proposed, including a GraphBLAS approach for subgraph counting [6] and a randomized algorithm known as extensor [5]. However, without further assumptions, the best possible algorithm for this problem is likely to have a running time of $f(k) \\cdot n^{\\Theta(k)}$, indicating inherent computational challenges [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "If no further assumptions are made, the best possible algorithm for this problem is likely to have running time $f(k) \\cdot n^{\\Theta(k)}$ ."
+      ],
+      "title": "faster algorithms for counting subgraphs in sparse graphs",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1805.02089",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The main algorithmic result in this paper is a randomized algorithm t"
+      ],
+      "title": "extensor-coding",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1804.09448",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "a graphblas approach for subgraph counting"
+      ],
+      "title": "a graphblas approach for subgraph counting",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1903.04395",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "While the exact counting of subgraphs of constant size is polynomial-time solvable, traditional algorithms need to store the whole graph and compute the solution in an off-line fashion, which is not practical even for graphs of medium size."
+      ],
+      "title": "counting hypergraphs in data streams",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": "1304.7456",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "The fundamental algorithmic problem of subgraph counting in a large input graph has a long and rich history [37, 24, 28, 22, 38, 2, 20, 42, 49]."
+      ],
+      "title": "subgraph counting in subquadratic time for bounded degeneracy graphs",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 10,
+   "n_claims_usable": 10,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 294,
+   "n_sections": 4,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[6]"
+   ]
+  }
+ },
+ {
+  "qid": "ce433b751f38f7d0173095c2",
+  "question": "What are advantages and disadvantages of top methods for picking the right number of topics in topic modeling?",
+  "sections": [
+   {
+    "title": "The Challenge of Topic Selection",
+    "text": "Determining the appropriate number of topics is a challenging step in the topic modeling process [1]. There is likely no single correct number of topics for any corpus, but rather several good options, each of which may be useful [1]. Consequently, topic modeling requires subjective decisionmaking informed by the data and research questions [1]. Researchers can utilize specific tools to identify both the number and labels of topics [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "In this tutorial, we describe tools researchers can use to identify the number and labels of topics in topic modeling.",
+       "Thus, topic modeling requires subjective decisionmaking informed by the data and research questions.",
+       "There is likely no single correct number of topics for any corpus but, rather, several good options, each of which may be useful.",
+       "A challenging step of topic modeling is determining the number of topics to extract."
+      ],
+      "title": "selecting the number and labels of topics in topic modeling: a tutorial",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Variety of Methods and Evaluation",
+    "text": "A library-an paper provides a summarized comparison of the core ideas and advantages and disadvantages of several typical methods for determining the optimal number of topics in LDA [2]. This comparison, presented in Table 2, reveals a rich variety of methods for determining the number of topics in LDA methods [2]. However, the evaluation perspectives of these methods vary significantly, resulting in different outcomes [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "The evaluation perspectives vary significantly, resulting in different m",
+       "Table 2 reveals a rich variety of methods for determining the number of topics in LDA methods.",
+       "This paper provides a summarized comparison of the core ideas and advantages and disadvantages of several typical methods for determining the optimal number of topics, as shown in Table 2."
+      ],
+      "title": "advancements of artificial intelligence techniques in the realm about library and information subject—a case survey of latent dirichlet allocation method",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Advantages and Disadvantages",
+    "text": "One proposed optimal topic number selection method can better select the appropriate number of topics for the LDA model compared with several other topic number selection methods [3]. A key disadvantage of this approach is that if we want to obtain a more reliable optimal number of topic selection, we also need to perform multiple sampling, which will increase the computational time consumption of the optimal topic selection [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "should be noted that if we want to obtain a more reliable optimal number of topic selection, we also need to perform multiple sampling, which will increase the computational time consumption of the optimal topic selection method.",
+       "First, in terms of the number of topics selected, the optimal topic number selection method can better select the appropriate number of topics for the LDA model. Compared with several other topic number selection methods, the optimal number of topi"
+      ],
+      "title": "selection of the optimal number of topics for lda topic model—taking patent policy analysis as an example",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 9,
+   "n_claims_usable": 9,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 203,
+   "n_sections": 3,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]",
+    "[2]"
+   ]
+  }
+ },
+ {
+  "qid": "ca229869d669f7985df9e6b2",
+  "question": "What are different techniques in Non-linear, Non-stationary signal processing? Which one is much effective in view of Geophysical signals?",
+  "sections": [
+   {
+    "title": "Limitations of Classical Methods",
+    "text": "Traditional Fourier transform is considered powerless for non-stationary signals that change with time [2]. Consequently, specialized techniques are required to handle the complexity of such data. Most geophysical signals of interest are nonstationary, consisting of transients, edges, and/or local features [1]. This characteristic necessitates methods that can adapt to time-varying properties rather than relying on global frequency analysis.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a recognition algorithm of seismic signals based on wavelet analysis",
+       "It can be seen that most of the energy is concentrated between 0.2 and $1.2\\mathrm{Hz}$ , and the energy of other frequency bands is relatively uniform and maintained at a low level."
+      ],
+      "title": "a recognition algorithm of seismic signals based on wavelet analysis",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "But for the non-stationary signal which changes with time, Fourier transform is powerless."
+      ],
+      "title": "data processing of pulsation signals based on local wave decomposition and teager energy",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Core Nonlinear Analysis Techniques",
+    "text": "Three common analysis methods for nonlinear signals are identified: Wavelet spectrum, Hilbert spectral analysis (HSA), and Poincare mapping [3][3][3]. Selecting the most suitable method quickly for a nonlinear signal is particularly important to improve signal processing efficiency [3]. Wavelet spectrum analysis has a good effect on concentrating on a particular band of system characteristics [3]. Poincare mapping is suited to achieve the chaotic characteristics of a system for identifying its operating status [3]. Hilbert spectral analysis (HSA) is part of the Hilbert-Huang Transform (HHT), which consists of two parts: empirical mode decomposition (EMD) and HSA [3]. In this process, the Hilbert transform is applied to each Intrinsic Mode Function (IMF) to compute instantaneous frequency and amplitude, resulting in the Hilbert-Huang spectrum [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Hilbert spectral analysis (HSA) is part of HHT[4]. HHT consists of two parts: empirical mode decomposition (EMD) and Hilbert spectral analysis (HSA).",
+       "Poincaré mapping is suited to achieve the chaotic characteristics of system for identifying the system operating status.",
+       "Wave spectrum analysis has a good effect to Concentrated on a particular band of system characteristics analysis.",
+       "How to select a most suitable analysis method quickly for the nonlinear signal is particularly important, which can improve the signal processing efficiently.",
+       "In this paper, three common analysis methods for nonlinear signals, Wavelet spectrum, Hilbert spectral analysis (HSA) and Poinca",
+       "So HHT spectrum is more suitable for mutation of nonlinear signal",
+       "The Hilbert spectrum analysis has an excellent performance in the analysis mutation nonlinear signals.",
+       "Moreover, HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis."
+      ],
+      "title": "comparison of non-linear signals analysis methods",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "3.2 Hilbert spectral analysis (HSA)[8-10]",
+         "chunk_id": "sciverse_comparison_of_non_linear_signals_analysis_methods#c4",
+         "char_start": 7717
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Advanced Time-Frequency Decomposition",
+    "text": "Local wave decomposition (LWD) is an adaptive time-frequency method that decomposes a signal into band-limited IMFs [1]. LWD is described as one of the most effective time-frequency analysis methods, particularly when used with Teage for pulsation signal processing [2]. In specific energy analyses, it has been observed that most energy is concentrated between 0.2 and 1.2 Hz, while the energy of other frequency bands is relatively uniform and maintained at a low level [1]. This method provides a structured approach to isolating specific frequency components within complex signals.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "a recognition algorithm of seismic signals based on wavelet analysis",
+       "It can be seen that most of the energy is concentrated between 0.2 and $1.2\\mathrm{Hz}$ , and the energy of other frequency bands is relatively uniform and maintained at a low level."
+      ],
+      "title": "a recognition algorithm of seismic signals based on wavelet analysis",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "But for the non-stationary signal which changes with time, Fourier transform is powerless."
+      ],
+      "title": "data processing of pulsation signals based on local wave decomposition and teager energy",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Effectiveness for Geophysical Signals",
+    "text": "A recognition algorithm of seismic signals based on wavelet analysis has been proposed, applying wavelet analysis directly to seismic signals [1][1]. However, the HHT spectrum has better resolution both in the time and frequency domain than wavelet analysis [3]. The Hilbert spectrum analysis has excellent performance in the analysis of mutation nonlinear signals [3], and the HHT spectrum is more suitable for the mutation of nonlinear signals [3]. While multi-component seismic vector field processing is discussed, no explicit claim of HHT or wavelet superiority was found in those specific findings [4]. Furthermore, the comparison matrix for wavelet, Hilbert, and Poincare methods on geophysical signals returned empty due to vocabulary mismatch, and the comparison paper did not explicitly name geophysical signals in its finding records [3][3]. Despite the lack of a direct comparative matrix in the provided records, the superior time-frequency resolution of HHT suggests its potential effectiveness for the nonstationary nature of geophysical data.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Hilbert spectral analysis (HSA) is part of HHT[4]. HHT consists of two parts: empirical mode decomposition (EMD) and Hilbert spectral analysis (HSA).",
+       "Poincaré mapping is suited to achieve the chaotic characteristics of system for identifying the system operating status.",
+       "Wave spectrum analysis has a good effect to Concentrated on a particular band of system characteristics analysis.",
+       "How to select a most suitable analysis method quickly for the nonlinear signal is particularly important, which can improve the signal processing efficiently.",
+       "In this paper, three common analysis methods for nonlinear signals, Wavelet spectrum, Hilbert spectral analysis (HSA) and Poinca",
+       "So HHT spectrum is more suitable for mutation of nonlinear signal",
+       "The Hilbert spectrum analysis has an excellent performance in the analysis mutation nonlinear signals.",
+       "Moreover, HHT spectrum has better resolution both in time and frequency domain than the wavelet analysis."
+      ],
+      "title": "comparison of non-linear signals analysis methods",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "3.2 Hilbert spectral analysis (HSA)[8-10]",
+         "chunk_id": "sciverse_comparison_of_non_linear_signals_analysis_methods#c4",
+         "char_start": 7717
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [],
+      "title": "discussions on the processing of the multi-component seismic vector field",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": []
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "a recognition algorithm of seismic signals based on wavelet analysis",
+       "It can be seen that most of the energy is concentrated between 0.2 and $1.2\\mathrm{Hz}$ , and the energy of other frequency bands is relatively uniform and maintained at a low level."
+      ],
+      "title": "a recognition algorithm of seismic signals based on wavelet analysis",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 19,
+   "claims_dropped_noref": 1,
+   "claims_invalidated": 0,
+   "title_only_citations": 1,
+   "word_count": 422,
+   "n_sections": 4,
+   "n_citations": 4,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]"
+   ]
+  }
+ }
+]

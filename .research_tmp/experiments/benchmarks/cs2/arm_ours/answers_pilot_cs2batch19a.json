@@ -1,0 +1,2489 @@
+[
+ {
+  "id": "2a84ae2f6196e574f7b9a912",
+  "type": "aggregation",
+  "question": "How have open-source publishing platforms impacted the global distribution of academic publishing?",
+  "gold_hint": "",
+  "answer": "The global distribution of academic publishing has historically been characterized by a significant geographical imbalance, with the majority of international journals possessing wide reach located in Western countries, resulting in limited distribution to the Global South . This structural disparity means that the broader ecosystem of academic publishing remains fairly unbalanced, as most international journals are concentrated in Western nations . In response to the challenges posed by this centralized model and the difficulty in accessing information regarding e-publishing tools and services, which is often hard to obtain or tends not to be passed on, the CARPET platform was developed to provide information on e-publishing technology and support the sustainability of e-publishing projects .\n\nThe emergence of open-source publishing platforms has fundamentally altered the dynamics of content distribution by enabling a shift away from exclusive publisher control. The Open Journal Systems (OJS) platform, for instance, was enabled by the combined ethos of the Open Source software movement, which also facilitated the development of the Open Access approach as an exemplar for moving academic publishing forward and opening up routes to publication . With the rise of open access, academic social networks, and piracy websites, publishers are no longer in total control over how academics access published content . This loss of control has been further exacerbated by the fact that open access articles now appear in a wide range of locations, including faculty websites, institutional and subject repositories, and academic social networks, thereby legally circumventing publisher control .\n\nTo address the struggle within the academic community to regain the capacity to act on the extent of public circulation of their work, the creation of open source scholarly publishing platforms has become a central strategy . These platforms facilitate the proliferation of open access publications across the web through the use of Creative Commons licenses, which allow for permission-free sharing without publisher mediation . Furthermore, the integration of peer review boards within these open frameworks has assisted in raising the quality of submissions from developing countries, helping them approach international standards . While the consulted records did not surface specific quantitative metrics regarding the extent of this geographical redistribution, the qualitative evidence indicates a move toward a more decentralized and accessible global publishing infrastructure driven by open-source technologies and open access principles.",
+  "arm": "main",
+  "steps": 11,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "open source scholarly publishing platforms"
+    },
+    "intent": "dossier on the main entity",
+    "obs_chars": 394,
+    "notes_chars": 846
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ecosystem of academic publishing"
+    },
+    "intent": "dossier on the ecosystem entity",
+    "obs_chars": 427,
+    "notes_chars": 846
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_a_philosophy_of_academic_publishing",
+     "contains": "open source|open access|distribution|global|platform"
+    },
+    "intent": "findings from philosophy of academic publishing paper",
+    "obs_chars": 1051,
+    "notes_chars": 846
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_",
+     "contains": "open source|open access|distribution|global|platform|e-publishing"
+    },
+    "intent": "findings from e-publishing technology paper",
+    "obs_chars": 1045,
+    "notes_chars": 846
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges",
+     "contains": "open access|open source|distribution|global|platform|publishing"
+    },
+    "intent": "Find findings from the 2024 open research agenda paper about open publishing impact",
+    "obs_chars": 244,
+    "notes_chars": 1161
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries",
+     "contains": "open access|open source|distribution|global|platform|publishing|developing"
+    },
+    "intent": "Find findings about publishing challenges in developing countries",
+    "obs_chars": 1494,
+    "notes_chars": 1161
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_individuation_through_infrastructure_i_get_full_text_research_i_data_extraction_(individuation through infrastructure: <i>get full text research</i>, data extrac",
+     "contains": "open access|open source|distribution|global|platform|publishing|infrastructure"
+    },
+    "intent": "Find findings about infrastructure and full-text access",
+    "obs_chars": 1706,
+    "notes_chars": 1161
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "geographical distribution of academic journals"
+    },
+    "intent": "Get dossier on geographical distribution of academic journals",
+    "obs_chars": 462,
+    "notes_chars": 1161
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_a_philosophy_of_academic_publishing",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the philosophy of academic publishing paper",
+    "obs_chars": 1415,
+    "notes_chars": 2833
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the e-publishing technology paper",
+    "obs_chars": 1045,
+    "notes_chars": 2833
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the open research agenda paper",
+    "obs_chars": 999,
+    "notes_chars": 2833
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "open source scholarly publishing platforms",
+     "contains": "impact|distribution|access|global|open"
+    },
+    "intent": "Find findings about open-source publishing platforms and their impact",
+    "obs_chars": 565,
+    "notes_chars": 2833
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "ecosystem of academic publishing",
+     "contains": "impact|distribution|access|global|open|platform"
+    },
+    "intent": "Find findings about the ecosystem of academic publishing and its distribution",
+    "obs_chars": 553,
+    "notes_chars": 2833
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "geographical distribution of academic journals",
+     "contains": "distribution|geography|global|western|south"
+    },
+    "intent": "Find findings about geographical distribution of academic journals",
+    "obs_chars": 244,
+    "notes_chars": 2833
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_a_philosophy_of_academic_publishing",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the paper's own critical/limitation statements about the publishing ecosystem",
+    "obs_chars": 553,
+    "notes_chars": 3111
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements about open research agenda and its gaps",
+    "obs_chars": 999,
+    "notes_chars": 3111
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements about publishing challenges in developing countries",
+    "obs_chars": 487,
+    "notes_chars": 3111
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements about e-publishing technology information gaps",
+    "obs_chars": 1045,
+    "notes_chars": 3111
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "contains": "open source|open access|platform|distribution|global|developing",
+     "paper_id": "sciverse_towards_a_philosophy_of_academic_publishing"
+    },
+    "intent": "Get all findings from the philosophy of academic publishing paper about open source platforms and distribution",
+    "obs_chars": 1051,
+    "notes_chars": 3111
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "contains": "open source|open access|platform|distribution|global|developing|OJS",
+     "paper_id": "sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries"
+    },
+    "intent": "Get all findings from the developing countries publishing paper about open source platforms and distribution",
+    "obs_chars": 1494,
+    "notes_chars": 3111
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_individuation_through_infrastructure_i_get_full_text_research_i_data_extraction_(in",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the individuation/infrastructure paper on publishing platforms",
+    "obs_chars": 1153,
+    "notes_chars": 2926
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_a_philosophy_of_academic_publishing",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the philosophy of academic publishing paper",
+    "obs_chars": 553,
+    "notes_chars": 2926
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 11,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:85d8203718b4] Most international journals with wide reach are located in Western countries, less distribution to Global South | anchor:\"Most of the international journals with a wide reach are located in Western countries, wit\" | epistemic:stated\nN2. [coarse:b7001450f1b9] Ecosystem of academic publishing is fairly unbalanced, most journals in Western countries | anchor:\"The ecosystem of academic publishing is fairly unbalanced. Most of the international journ\" | epistemic:stated\nN3. [coarse:3fb798558c64] CARPET platform provides info on e-publishing technology, supports sustainability of e-publishing projects | anchor:\"In order to fill this gap, the CARPET platform provides information on e-publishing techno\" | epistemic:stated\nN4. [coarse:33fb391e057d] Information on e-publishing tools/services is often hard to get or not passed on | anchor:\"But information on e-publishing tools and services is often hard to get or tends not to ge\" | epistemic:stated\nN5. [coarse:3342a34274d9] OJS platform was enabled by the Open Source software movement | anchor:\"The combined ethos of the Open Source software movement that enabled the development of th\" | epistemic:stated\nN6. [coarse:20546c02d7f8] Open Access approach has enabled an exemplar of how to move academic publishing forward to open up routes to publication | anchor:\"The combined ethos of the Open Source software movement that enabled the development of th\" | epistemic:stated\nN7. [coarse:4b739e910870] Peer review board assists in raising quality of submissions from developing countries to approach international standards | anchor:\"Nevertheless, our experience to date is that the desire of researchers and practitioners i\" | epistemic:stated\nN8. [coarse:4a91a82f3275] With rise of open access, academic social networks and piracy websites, publishers are no longer in total control over how academics access published content | anchor:\"With the rise of open access, academic social networks and piracy websites, publishers are\" | epistemic:stated\nN9. [coarse:e7786a7c803e] Open access publications may proliferate across the web through Creative Commons license, allowing permission-free sharing without publisher mediation | anchor:\"Open access publications may proliferate across the web through the use of Creative Common\" | epistemic:stated\nN10. [coarse:61ba0e799425] Open access articles appear in a range of locations (faculty websites, institutional/subject repositories, academic social networks), legally circumventing publisher control | anchor:\"Open access articles appear in a range of locations, including faculty websites, instituti\" | epistemic:stated\nN11. [coarse:e11b82f6a28a] Struggle to regain capacity to act on public circulation of work has involved creating open source scholarly publishing platforms | anchor:\"This struggle within the academic community to regain the capacity to act on the extent to\" | epistemic:stated",
+  "gaps_final": "G1. What do the corpus papers say about open-source publishing platforms and their impact?\nG2. What is the recorded state of geographical distribution of academic journals?\nG3. What are the specific impacts (access, cost, geography, decentralization) documented?",
+  "queried": [
+   "card|{\"entity\": \"open source scholarly publishing platforms\"}",
+   "card|{\"entity\": \"ecosystem of academic publishing\"}",
+   "findings|{\"contains\": \"open source|open access|distribution|global|platform\", \"paper_id\": \"sciverse_towards_a_philosophy_of_academic_publishing\"}",
+   "findings|{\"contains\": \"open source|open access|distribution|global|platform|e-publishing\", \"paper_id\": \"sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_\"}",
+   "findings|{\"contains\": \"open access|open source|distribution|global|platform|publishing\", \"paper_id\": \"sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges\"}",
+   "findings|{\"contains\": \"open access|open source|distribution|global|platform|publishing|developing\", \"paper_id\": \"sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries\"}",
+   "findings|{\"contains\": \"open access|open source|distribution|global|platform|publishing|infrastructure\", \"paper_id\": \"sciverse_individuation_through_infrastructure_i_get_full_text_research_i_data_extraction_(in",
+   "card|{\"entity\": \"geographical distribution of academic journals\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_towards_a_philosophy_of_academic_publishing\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges\"}",
+   "findings|{\"contains\": \"impact|distribution|access|global|open\", \"entity\": \"open source scholarly publishing platforms\"}",
+   "findings|{\"contains\": \"impact|distribution|access|global|open|platform\", \"entity\": \"ecosystem of academic publishing\"}",
+   "findings|{\"contains\": \"distribution|geography|global|western|south\", \"entity\": \"geographical distribution of academic journals\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_towards_a_philosophy_of_academic_publishing\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_accelerating_the_open_research_agenda_to_solve_global_challenges\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_provide_obtain_and_exchange_information_the_e_publishing_technology_information_\"}",
+   "findings|{\"contains\": \"open source|open access|platform|distribution|global|developing\", \"paper_id\": \"sciverse_towards_a_philosophy_of_academic_publishing\"}",
+   "findings|{\"contains\": \"open source|open access|platform|distribution|global|developing|OJS\", \"paper_id\": \"sciverse_the_challenges_of_publishing_on_health_informatics_in_developing_countries\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_individuation_through_infrastructure_i_get_full_text_research_i_data_extraction_(in\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_towards_a_philosophy_of_academic_publishing\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 9,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:sleep apnea index->sleep apnea index"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "2dc0ff181a621680dde0a48e",
+  "type": "aggregation",
+  "question": "How has the citation graph been used to improve neural language models for scientific papers?",
+  "gold_hint": "",
+  "answer": "The integration of citation graph structures into neural language models for scientific papers has evolved from enhancing information extraction and summarization to supporting advanced retrieval-augmented generation for large language models. A foundational approach, CitationIE, explores the use of citation graph information in neural scientific information extraction by leveraging either the graph structure or the content of citing and cited documents . The paper states that combining this citation graph information with document text leads to strong improvements in salient entity classification and relation extraction . This integration increases the end-to-end performance of the information extraction system over strong baselines . The underlying rationale for this approach is that in a citation graph, adjacent paper nodes share related scientific terms and topics .\n\nIn the domain of summarization, the citation graph is utilized to convey unique structural information regarding document-level relatedness, which is applicable to summarization tasks . The paper states that the citation graph can assist in generating high-quality summaries . This is supported by the observation that reference papers within a research community are very similar in content, logic, and writing style to the source paper . To leverage this, MUS (Multi-granularity Unsupervised Summarization) was proposed as a simple, low-cost solution for extractive summarization .\n\nMore recently, the application of citation graphs has extended to Large Language Models (LLMs) through retrieval-augmented generation. SciRAG is described as an adaptive, citation-aware, and outline-guided system for retrieval and synthesis of scientific literature . This system addresses the challenge of whether papers use different Question and Answer (Q&A) formats to clarify intent and compose more complicated prompts to LLMs . The use of Q&A formats to clarify user intent and enhance prompt composition is noted as gaining prominence . These developments occur in the context of LLMs, which are AI systems whose primary knowledge consists of statistical patterns, semantic relationships, and syntactical structures , and which are adept at complex tasks despite having limited forms of knowledge .\n\nRegarding specific architectural mechanisms, quantitative performance metrics, and the genealogical evolution of these approaches, the consulted records did not surface detailed information. Specifically, there are no recorded configurations, main results, or lineage outputs for the \"citation graph\" entity , and no lineage edges or genealogy are recorded for this concept . Consequently, the exact architectural details of how CitationIE, MUS, or SciRAG implement citation graph integration, as well as specific numerical improvements, are not present in the available data.",
+  "arm": "main",
+  "steps": 10,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "citation graph"
+    },
+    "intent": "Get cross-paper evidence dossier for citation graph entity",
+    "obs_chars": 851,
+    "notes_chars": 758
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "citation graph",
+     "contains": "language model|neural|scientific paper|summarization|improve"
+    },
+    "intent": "Find finding records about citation graph + language models",
+    "obs_chars": 1623,
+    "notes_chars": 758
+   },
+   {
+    "step": 1,
+    "tool": "lineage",
+    "args": {
+     "entity": "citation graph"
+    },
+    "intent": "Get lineage edges for citation graph to see evolution",
+    "obs_chars": 74,
+    "notes_chars": 758
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac"
+    },
+    "intent": "Get findings from the CitationIE paper",
+    "obs_chars": 1623,
+    "notes_chars": 758
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_enhancing_scientific_papers_summarization_with_citation_graph"
+    },
+    "intent": "Get findings from the 2021 summarization-with-citation-graph paper",
+    "obs_chars": 946,
+    "notes_chars": 1358
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs"
+    },
+    "intent": "Get findings from the 2022 extractive summarization enhanced by citation graphs paper",
+    "obs_chars": 1475,
+    "notes_chars": 1358
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc"
+    },
+    "intent": "Get findings from SCIRAG 2025 paper on citation-aware retrieval",
+    "obs_chars": 1623,
+    "notes_chars": 1358
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation"
+    },
+    "intent": "Get findings from the 2023 LLMs for scientific synthesis paper",
+    "obs_chars": 1126,
+    "notes_chars": 1358
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "neural language models"
+    },
+    "intent": "Get cross-paper evidence dossier for neural language models to find connections to citation graph usage",
+    "obs_chars": 856,
+    "notes_chars": 2325
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "citation graph neural language model scientific paper summarization improvement",
+     "k": 12
+    },
+    "intent": "Find full-text passages about how citation graphs improve neural LMs for scientific papers",
+    "obs_chars": 1749,
+    "notes_chars": 2325
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from CitationIE paper",
+    "obs_chars": 599,
+    "notes_chars": 2325
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from MUS paper",
+    "obs_chars": 1033,
+    "notes_chars": 2325
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from CitationIE for concrete method details",
+    "obs_chars": 1623,
+    "notes_chars": 2325
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_enhancing_scientific_papers_summarization_with_citation_graph",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2021 summarization paper",
+    "obs_chars": 946,
+    "notes_chars": 2325
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from SciRAG for concrete method details",
+    "obs_chars": 1623,
+    "notes_chars": 2325
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from MUS paper",
+    "obs_chars": 983,
+    "notes_chars": 2325
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details for SciRAG — how citation-aware retrieval works",
+    "obs_chars": 542,
+    "notes_chars": 2325
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "citation graph",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about how citation graph is used to improve LMs",
+    "obs_chars": 2490,
+    "notes_chars": 2325
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "citation graph",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation records about citation graph effects on LM performance",
+    "obs_chars": 3956,
+    "notes_chars": 2325
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "citation graph",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation records about citation graph usage for LMs",
+    "obs_chars": 2490,
+    "notes_chars": 2325
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 10,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:eaec81e588ce] CitationIE leverages citation graph structure OR content of citing/cited documents for neural scientific IE | anchor:\"We explore the use of citation graph information in neural scientific information extracti\" | epistemic:stated\nN2. [coarse:84f9b1848504] Combining citation graph info with document text → strong improvements for salient entity classification and relation extraction | epistemic:stated\nN3. [coarse:116d0acd4b88] Citation graph info increases end-to-end IE system performance over strong baseline | epistemic:stated\nN4. [coarse:d81865d59859] In citation graph, adjacent paper nodes share related scientific terms/topics | epistemic:stated\nN5. [coarse:c6189652bcce] Citation graph conveys unique structure info of document-level relatedness usable in summarization | epistemic:stated\nN6. [coarse:28490d678ed3] MUS (Multi-granularity Unsupervised Summarization) proposed as simple low-cost solution | epistemic:stated\nN7. [coarse:e7da1442cf65] Citation graph can assist in generating high-quality summaries | epistemic:stated\nN8. [coarse:1c1b31d8d369] Reference papers in a research community are very similar in content, logic, writing style to source paper | epistemic:stated\nN9. [coarse:f556f3ff0d86] SciRAG is adaptive, citation-aware, outline-guided retrieval+synthesis for scientific literature | epistemic:stated\nN10. [coarse:5668ab9d13f6] SciRAG addresses whether papers use different Q&A formats to clarify intent and compose more complicated prompts to LLMs | epistemic:stated\nN11. [coarse:1ab374a44b26] Q&A formats to clarify user intent and enhance prompt composition gaining prominence | epistemic:stated\nN12. [coarse:ead369bf0286] LLMs are AI systems whose primary knowledge = statistical patterns, semantic relationships, syntactical structures | epistemic:stated\nN13. [coarse:7edfa89d16e5] LLMs adept at complex tasks despite limited forms of knowledge | epistemic:stated\nN14. [card:citation graph] No configs, no main_results, no lineage_out for \"citation graph\" entity\nN15. [lineage:citation graph] 0 lineage edges — no genealogy recorded\nPapers:\n- CitationIE (2021): citation graph → neural IE\n- Enhancing summarization w/ citation graph (2021)\n- MUS extractive summarization (2022)\n- SciRAG (2025): citation-aware RAG for LLMs\n- LLMs for scientific synthesis (2023)",
+  "gaps_final": "G1. Need concrete methods: how exactly does each paper use citation graph to improve the LM? (CitationIE architecture, MUS mechanism, SciRAG citation-aware retrieval)\nG2. Concrete results/improvements reported (numbers)\nG3. Lineage/evolution of approaches",
+  "queried": [
+   "card|{\"entity\": \"citation graph\"}",
+   "findings|{\"contains\": \"language model|neural|scientific paper|summarization|improve\", \"entity\": \"citation graph\"}",
+   "lineage|{\"entity\": \"citation graph\"}",
+   "findings|{\"paper_id\": \"sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac\"}",
+   "findings|{\"paper_id\": \"sciverse_enhancing_scientific_papers_summarization_with_citation_graph\"}",
+   "findings|{\"paper_id\": \"sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs\"}",
+   "findings|{\"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "findings|{\"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "card|{\"entity\": \"neural language models\"}",
+   "search_text|{\"k\": 12, \"query\": \"citation graph neural language model scientific paper summarization improvement\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_title_citationie_leveraging_the_citation_graph_for_scientific_information_extrac\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_enhancing_scientific_papers_summarization_with_citation_graph\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scientific_paper_extractive_summarization_enhanced_by_citation_graphs\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"citation graph\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"citation graph\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"citation graph\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 74,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 15,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:sleep apnea index->sleep apnea index"
+  ],
+  "auto_rows": [
+   "A1. [coarse:95dad3f4714f] including=836 | src:findings@step6 | epi:stated"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "c6740fc5bd8daa6a8628ae27",
+  "type": "aggregation",
+  "question": "How have theories of distributed cognition informed the design of features in social computing systems?",
+  "gold_hint": "",
+  "answer": "The knowledge base contains a meaningful but limited set of papers that trace the arc from distributed cognition theory to social computing design. Below is a synthesis of what the corpus surfaces, with honest disclosure of where the evidence is thin.\n\n**Theoretical foundation: distributed cognition as a design framework**\n\nThe foundational 2000 paper by Hutchins (and colleagues) explicitly proposes distributed cognition \"as a new foundation for human-computer interaction,\" arguing it \"provides a radical reorientation of how to think about designing and supporting human-computer interaction\" [sciverse_distributed_cognition]. The theory is \"specifically tailored to understanding interactions among people and technologies\" [sciverse_distributed_cognition], identifying \"cognitive agents, processes, events within an environment and beyond the 'skin or skull of an individual'\" [sciverse_a_tale_of_two_perspectives]. A later paper restates that distributed cognition theory \"provides an effective theoretical foundation for understanding human-computer interaction and a fertile framework for designing and evaluating digital\" systems, citing Hollan et al. [sciverse_a_tale_of_two_perspectives]. The aircraft cockpit case study in that same paper illustrates the design implication: what matters is not individual pilot skill but the environmental and systemic factors that support the crew's collective cognitive performance [sciverse_a_tale_of_two_perspectives].\n\n**Application to group and social dynamics**\n\nThe 2009 paper \"Group Intelligence: A Distributed Cognition Perspective\" explicitly frames group intelligence through the distributed cognition lens, noting that \"theories of social psychology and cognitive science provide diverse and enlightening perspectives of group dynamics, adaptive behavior, networks of social relationships\" [sciverse_group_intelligence_a_distributed_cognition_perspective]. The paper builds a model that \"visualizes different theoretical aspects of the theory of distributed cognition\" as applied to group-level cognition [sciverse_group_intelligence_a_distributed_cognition_perspective]. This is the most direct bridge in the corpus between distributed cognition theory and social/group computing contexts.\n\n**Design patterns and artifact ecologies**\n\nA paper on \"artifact ecologies as shared spaces\" reports having \"examined different design patterns for distributed cognition in a controlled experiment among software practitioners\" [sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo]. This suggests that distributed cognition has been operationalized into concrete design patterns for collaborative software environments, though the specific patterns are not detailed in the records my search surfaced.\n\n**Compatibility with user-facing feature design**\n\nA paper on \"challenging the phenomena of technology\" draws a direct design implication: \"Distributed Cognition is compatible with different users encountering different features of the same experience\" [sciverse_challenging_the_phenomena_of_technology]. This is a key design principle for social computing: the same system can present different feature subsets to different users while maintaining a coherent shared cognitive space.\n\n**Social media feed customization (2025)**\n\nThe most recent and most directly social-computing-relevant paper in the corpus is \"Designing Usable Controls for Customizable Social Media Feeds\" (2025) [sciverse_designing_usable_controls_for_customizable_social_media_feeds]. It identifies \"a natural tradeoff between the expressiveness of a system and its understandability\" [sciverse_designing_usable_controls_for_customizable_social_media_feeds] and applies the Interactive Machine Teaching (IMT) framework to feed customization [sciverse_designing_usable_controls_for_customizable_social_media_feeds]. While this paper addresses the design of user-facing controls in a social computing system, my search did not surface an explicit citation of distributed cognition theory within it; the connection to distributed cognition is inferential (the tradeoff between expressiveness and understandability, and the design of shared yet customizable interfaces, are themes consistent with distributed cognition's emphasis on the system-environment as the unit of analysis).\n\n**What my search did not surface**\n\n- I did not find a paper in the corpus that explicitly names \"social computing\" as its domain AND explicitly cites distributed cognition as its theoretical framework in the same record. The bridge is built across multiple papers: the foundational theory [sciverse_distributed_cognition], the group-intelligence application [sciverse_group_intelligence_a_distributed_cognition_perspective], the design-patterns experiment [sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo], and the social media feed design [sciverse_designing_usable_controls_for_customizable_social_media_feeds].\n- I did not find specific feature-level design decisions (e.g., \"we added a shared annotation panel because distributed cognition suggests X\") attributed to distributed cognition in a social computing system. The corpus records are at the level of theoretical framing and design principles rather than granular feature specifications.\n- Lineage queries for \"distributed cognition\" with relation \"informs\" did not return explicit edges to social computing design papers, suggesting the corpus does not encode a direct citation lineage between the foundational distributed cognition papers and the social computing design papers.\n\n**Summary of the design principles that have been drawn from distributed cognition for social computing systems, as evidenced in this corpus:**\n\n1. **The system-environment is the unit of analysis**, not the individual user — design should focus on how artifacts, representations, and coordination mechanisms in the shared environment support collective cognition [sciverse_distributed_cognition, sciverse_a_tale_of_two_perspectives].\n2. **Different users can encounter different features of the same experience** while the system maintains a coherent shared cognitive space [sciverse_challenging_the_phenomena_of_technology].\n3. **Group-level intelligence emerges from the interaction of individuals with shared artifacts and representations**, not from summing individual capabilities [sciverse_group_intelligence_a_distributed_cognition_perspective].\n4. **Design patterns for distributed cognition** can be experimentally evaluated in collaborative software settings [sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo].\n5. **There is a tradeoff between expressiveness and understandability** in user-facing controls, which must be managed when designing customizable social media features [sciverse_designing_usable_controls_for_customizable_social_media_feeds].",
+  "arm": "main",
+  "steps": 31,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity: distributed cognition*] Question asks how distributed cognition theories informed desig",
+     "N5. [paper: sciverse_design_computing_and_cognition_14] 2015 design computing and cognition."
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "distributed cognition"
+    },
+    "intent": "Get cross-paper evidence dossier for distributed cognition - findings, configs, results, lineage",
+    "obs_chars": 1346,
+    "notes_chars": 940
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "participatory design"
+    },
+    "intent": "Get cross-paper evidence dossier for participatory design - may connect to social computing design",
+    "obs_chars": 2108,
+    "notes_chars": 940
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "contains": "social computing|social media|collaboration|design feature|interface"
+    },
+    "intent": "Find findings linking distributed cognition to social computing design features",
+    "obs_chars": 3107,
+    "notes_chars": 940
+   },
+   {
+    "step": 1,
+    "tool": "lineage",
+    "args": {
+     "entity": "distributed cognition",
+     "direction": "both"
+    },
+    "intent": "Trace lineage of distributed cognition to see what it influenced and what influenced it",
+    "obs_chars": 74,
+    "notes_chars": 940
+   },
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity: distributed cognition*] Question: how distributed cognition theories informed design of"
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_group_intelligence_a_distributed_cognition_perspective",
+     "contains": "social|group|collaboration|design|feature|system"
+    },
+    "intent": "Get findings from the 2009 group intelligence distributed cognition paper to understand how DC applies to social/group s",
+    "obs_chars": 590,
+    "notes_chars": 2946
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds",
+     "contains": "distributed cognition|cognition|design|feature|social"
+    },
+    "intent": "Get findings from the 2025 social media feed design paper to see if DC theory is referenced",
+    "obs_chars": 716,
+    "notes_chars": 2946
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo",
+     "contains": "distributed cognition|design pattern|social|collaboration|feature"
+    },
+    "intent": "Get findings from the artifact ecologies paper that examined DC design patterns",
+    "obs_chars": 1612,
+    "notes_chars": 2946
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "distributed cognition social computing system design features",
+     "k": 12
+    },
+    "intent": "Broad text search for papers connecting distributed cognition to social computing design",
+    "obs_chars": 1756,
+    "notes_chars": 2946
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_group_intelligence_a_distributed_cognition_perspective"
+    },
+    "intent": "Get full dossier for the group intelligence / distributed cognition paper to see all findings, configs, and results",
+    "obs_chars": 609,
+    "notes_chars": 3324
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_designing_usable_controls_for_customizable_social_media_feeds"
+    },
+    "intent": "Get full dossier for the social media feed design paper to see all findings and how DC is applied",
+    "obs_chars": 617,
+    "notes_chars": 3324
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo"
+    },
+    "intent": "Get full dossier for the artifact ecologies / DC design patterns paper",
+    "obs_chars": 418,
+    "notes_chars": 3324
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_challenging_the_phenomena_of_technology"
+    },
+    "intent": "Get full dossier for the challenging phenomena paper that discusses DC in social contexts",
+    "obs_chars": 3748,
+    "notes_chars": 3324
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "mechanism|definition|recommendation"
+    },
+    "intent": "Get mechanism/definition/recommendation records about distributed cognition to understand its core concepts and design i",
+    "obs_chars": 266,
+    "notes_chars": 3352
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "mechanism|definition|recommendation"
+    },
+    "intent": "Get participatory design records to see how it connects to distributed cognition and social computing",
+    "obs_chars": 266,
+    "notes_chars": 3352
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-type findings about distributed cognition theory",
+    "obs_chars": 3166,
+    "notes_chars": 3324
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings about distributed cognition",
+    "obs_chars": 3768,
+    "notes_chars": 3324
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation-type findings about distributed cognition",
+    "obs_chars": 2695,
+    "notes_chars": 3324
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings about participatory design",
+    "obs_chars": 3912,
+    "notes_chars": 3324
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition findings about participatory design",
+    "obs_chars": 2427,
+    "notes_chars": 3324
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation findings about participatory design",
+    "obs_chars": 3374,
+    "notes_chars": 3324
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "recommendation|observation",
+     "contains": "social|collaboration|group|team|community|online"
+    },
+    "intent": "Find findings about DC applied to social/collaborative computing contexts",
+    "obs_chars": 257,
+    "notes_chars": 4321
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "mechanism|definition|recommendation",
+     "contains": "social|collaboration|online|community|crowdsourcing"
+    },
+    "intent": "Find participatory design findings related to social computing",
+    "obs_chars": 266,
+    "notes_chars": 4321
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "distributed cognition",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings about distributed cognition in social computing contexts",
+    "obs_chars": 2808,
+    "notes_chars": 4321
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "participatory design",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings about participatory design in social computing",
+    "obs_chars": 3423,
+    "notes_chars": 4321
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "online social networks",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings linking online social networks to cognitive/distributed cognition theory",
+    "obs_chars": 488,
+    "notes_chars": 4321
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "entity": "co-design",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism findings about co-design that may connect to distributed cognition",
+    "obs_chars": 2484,
+    "notes_chars": 4321
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "online social networks"
+    },
+    "intent": "Get full evidence dossier for online social networks entity",
+    "obs_chars": 1068,
+    "notes_chars": 4321
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "co-design"
+    },
+    "intent": "Get full evidence dossier for co-design entity",
+    "obs_chars": 1369,
+    "notes_chars": 4321
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism|definition|recommendation",
+     "contains": "social computing|social media|collaborative|groupware|shared|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Find specific design implications of DC for social computing features",
+    "obs_chars": 266,
+    "notes_chars": 4321
+   },
+   {
+    "f28_auto_retrieval": "sciverse_distributed_cognition",
+    "at_step": 11,
+    "obs_chars": 1333
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_group_intelligence_a_distributed_cognition_perspective",
+     "claim_type": "mechanism|definition|recommendation|observation"
+    },
+    "intent": "Get detailed findings from the group intelligence / distributed cognition paper to understand how DC theory applies to g",
+    "obs_chars": 271,
+    "notes_chars": 4335
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo",
+     "claim_type": "mechanism|definition|recommendation|observation"
+    },
+    "intent": "Get detailed findings from the artifact ecologies / DC design patterns paper to understand specific design features info",
+    "obs_chars": 271,
+    "notes_chars": 4335
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds",
+     "claim_type": "mechanism|definition|recommendation|observation"
+    },
+    "intent": "Get detailed findings from the social media feeds paper to understand how DC-informed design applies to social computing",
+    "obs_chars": 271,
+    "notes_chars": 4335
+   },
+   {
+    "step": 13,
+    "tool": "lineage",
+    "args": {
+     "entity": "distributed cognition",
+     "direction": "forward"
+    },
+    "intent": "Find papers that extend or build on distributed cognition theory, especially in social computing contexts",
+    "obs_chars": 74,
+    "notes_chars": 4335
+   },
+   {
+    "f28_auto_retrieval": "sciverse_a_tale_of_two_perspectives",
+    "at_step": 15,
+    "obs_chars": 1461
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism|definition|recommendation|observation",
+     "contains": "social computing|social media|collaborative|groupware|shared|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Find DC findings specifically about social computing system design features",
+    "obs_chars": 271,
+    "notes_chars": 4864
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation|mechanism",
+     "contains": "design|feature|interface|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Find design-relevant findings about distributed cognition that connect to system features",
+    "obs_chars": 255,
+    "notes_chars": 4847
+   },
+   {
+    "f28_auto_retrieval": "sciverse_challenging_the_phenomena_of_technology",
+    "at_step": 21,
+    "obs_chars": 1348
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 38
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_group_intelligence_a_distributed_cognition_perspective",
+     "claim_type": "recommendation|observation|mechanism",
+     "contains": "design|feature|system|interface|social|collaborative|group"
+    },
+    "intent": "Get specific design implications from the group intelligence DC paper",
+    "obs_chars": 267,
+    "notes_chars": 5321
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds",
+     "claim_type": "recommendation|mechanism|observation",
+     "contains": "distributed cognition|cognitive|design|feature|control|customiz"
+    },
+    "intent": "Get specific design features informed by cognitive theory in social media feeds paper",
+    "obs_chars": 267,
+    "notes_chars": 5321
+   },
+   {
+    "step": 23,
+    "tool": "lineage",
+    "args": {
+     "entity": "distributed cognition",
+     "direction": "forward",
+     "relation": "informs"
+    },
+    "intent": "Find papers that distributed cognition informed in the lineage",
+    "obs_chars": 74,
+    "notes_chars": 5321
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "distributed cognition|cognitive system|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Get definition records for distributed cognition to understand its core concepts",
+    "obs_chars": 3768,
+    "notes_chars": 5321
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "design|feature|interface|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Get design recommendation records from distributed cognition papers",
+    "obs_chars": 1455,
+    "notes_chars": 5321
+   },
+   {
+    "step": 25,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_group_intelligence_a_distributed_cognition_perspective",
+     "claim_type": "definition|observation|mechanism"
+    },
+    "intent": "Get specific findings from the group intelligence paper that directly applies DC to social/group computing",
+    "obs_chars": 263,
+    "notes_chars": 5321
+   },
+   {
+    "step": 25,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds",
+     "claim_type": "definition|observation|mechanism|recommendation"
+    },
+    "intent": "Get specific findings from the social media feeds paper to see how DC informs feature design",
+    "obs_chars": 271,
+    "notes_chars": 5321
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "social computing|social media|collaborative|groupware|shared|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Find observation records linking distributed cognition to social computing design",
+    "obs_chars": 1011,
+    "notes_chars": 5321
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "distributed cognition|cognitive|design|feature|control|customiz",
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds"
+    },
+    "intent": "Get mechanism findings from the social media feeds paper",
+    "obs_chars": 992,
+    "notes_chars": 5321
+   },
+   {
+    "step": 28,
+    "tool": "search_text",
+    "args": {
+     "query": "distributed cognition social computing design features",
+     "k": 12
+    },
+    "intent": "Find papers that explicitly connect distributed cognition to social computing system design",
+    "obs_chars": 1752,
+    "notes_chars": 2988
+   },
+   {
+    "step": 28,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation|mechanism|observation",
+     "contains": "social computing|social media|collaborative|groupware|shared|artifact|representation|coordination",
+     "entity": "distributed cognition"
+    },
+    "intent": "Find findings linking distributed cognition to social computing features",
+    "obs_chars": 267,
+    "notes_chars": 2988
+   },
+   {
+    "step": 29,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_group_intelligence_a_distributed_cognition_perspective",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from the group intelligence paper to see how distributed cognition is applied to group/social sy",
+    "obs_chars": 1020,
+    "notes_chars": 3589
+   },
+   {
+    "step": 29,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_usable_controls_for_customizable_social_media_feeds",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from the social media feeds paper to see specific design features informed by distributed cognit",
+    "obs_chars": 939,
+    "notes_chars": 3589
+   }
+  ],
+  "notes_final": "N1. [sciverse_distributed_cognition] 2000: \"Distributed cognition is proposed as a new foundation for human-computer interaction\" | anchor:\"In this article we propose distributed cognition as a new foundation for human-computer in\" | epistemic:stated\nN2. [sciverse_distributed_cognition] \"Distributed cognition provides a radical reorientation of how to think about designing and supporting human-computer interaction\" | anchor:\"Distributed cognition provides a radical reorientation of how to think about designing and\" | epistemic:stated\nN3. [sciverse_distributed_cognition] \"As a theory, distributed cognition is specifically tailored to understanding interactions among people and technologies\" | anchor:\"As a theory it is specifically tailored to understanding interactions among people and tec\" | epistemic:stated\nN4. [sciverse_a_tale_of_two_perspectives] \"Distributed cognition theory provides an effective theoretical foundation for understanding human-computer interaction and a fertile framework for designing and evaluating digital\" | anchor:\"Hollan et al. [28, p. 175] state that distributed cognition theory 'provides an effective\" | epistemic:stated\nN5. [sciverse_a_tale_of_two_perspectives] \"The theory identifies cognitive agents, processes, events within an environment and beyond the 'skin or skull of an individual'\" | anchor:\"The theory identifies cognitive agents, processes, events within an environment and beyond\" | epistemic:stated\nN6. [sciverse_a_tale_of_two_perspectives] Aircraft cockpit case study: focus on environmental factors rather than just individual skills | anchor:\"in a case study of an aircraft cockpit [32], what concerns a passenger is not\" | epistemic:stated\nN7. [sciverse_challenging_the_phenomena_of_technology] \"Distributed Cognition is compatible with different users encountering different features of the same experience\" | anchor:\"We can also take from this that Distributed Cognition is compatible with different users e\" | epistemic:stated\nN8. [sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo] \"examined different design patterns for distributed cognition in a controlled experiment among software practitioners\" | anchor:\"examined different design patterns for distributed cognition in a controlled experi\" | epistemic:stated\nN9. [sciverse_group_intelligence_a_distributed_cognition_perspective] 2009: \"Theories of social psychology and cognitive science provide diverse and enlightening perspectives of group dynamics, adaptive behavior, networks of social relationships\" | anchor:\"Such theories provide diverse and enlightening perspectives of group dynamics, adaptive be\" | epistemic:stated\nN10. [sciverse_designing_usable_controls_for_customizable_social_media_feeds] 2025: \"There is a natural tradeoff between the expressiveness of a system and its understandability\" | anchor:\"There is a natural tradeoff between the expressiveness of a system and its understandabili\" | epistemic:stated\nN11. [sciverse_group_intelligence_a_distributed_cognition_perspective] 2009: paper explicitly frames group intelligence through distributed cognition lens | anchor:\"group intelligence: a distributed cognition perspective\" | epistemic:stated\nN12. [sciverse_designing_usable_controls_for_customizable_social_media_feeds] 2025: paper on designing usable controls for customizable social media feeds — directly addresses social computing feature design | anchor:\"designing usable controls for customizable social media feeds\" | epistemic:stated\nN13. [sciverse_group_intelligence_a_distributed_cognition_perspective] \"The model visualizes different theoretical aspects of the theory of distributed cognition\" | anchor:\"The model visualizes different theoretical aspects of the theory of distributed cognition.\" | epistemic:stated\nN14. [sciverse_designing_usable_controls_for_customizable_social_media_feeds] \"The work applies the Interactive Machine Teaching (IMT) framework to feed customization\" | anchor:\"In this work, we apply the Interactive Machine Teaching (IMT) framework to feed cust\" | epistemic:stated",
+  "gaps_final": "G2. How has distributed cognition been applied to social computing system design specifically?\nG3. What specific features in social computing systems were informed by distributed cognition?\nG4. Are there lineage connections between distributed cognition papers and social computing design papers?",
+  "queried": [
+   "card|{\"entity\": \"distributed cognition\"}",
+   "card|{\"entity\": \"participatory design\"}",
+   "findings|{\"contains\": \"social computing|social media|collaboration|design feature|interface\", \"entity\": \"distributed cognition\"}",
+   "lineage|{\"direction\": \"both\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"contains\": \"social|group|collaboration|design|feature|system\", \"paper_id\": \"sciverse_group_intelligence_a_distributed_cognition_perspective\"}",
+   "findings|{\"contains\": \"distributed cognition|cognition|design|feature|social\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}",
+   "findings|{\"contains\": \"distributed cognition|design pattern|social|collaboration|feature\", \"paper_id\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "search_text|{\"k\": 12, \"query\": \"distributed cognition social computing system design features\"}",
+   "card|{\"entity\": \"sciverse_group_intelligence_a_distributed_cognition_perspective\"}",
+   "card|{\"entity\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}",
+   "card|{\"entity\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "card|{\"entity\": \"sciverse_challenging_the_phenomena_of_technology\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"recommendation|observation\", \"contains\": \"social|collaboration|group|team|community|online\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation\", \"contains\": \"social|collaboration|online|community|crowdsourcing\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"participatory design\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"online social networks\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"co-design\"}",
+   "card|{\"entity\": \"online social networks\"}",
+   "card|{\"entity\": \"co-design\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation\", \"contains\": \"social computing|social media|collaborative|groupware|shared|artifact|representation|coordination\", \"entity\": \"distributed cognition\"",
+   "findings|{\"paper_id\": \"sciverse_distributed_cognition\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation|observation\", \"paper_id\": \"sciverse_group_intelligence_a_distributed_cognition_perspective\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation|observation\", \"paper_id\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation|observation\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}",
+   "lineage|{\"direction\": \"forward\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"paper_id\": \"sciverse_a_tale_of_two_perspectives\"}",
+   "findings|{\"claim_type\": \"mechanism|definition|recommendation|observation\", \"contains\": \"social computing|social media|collaborative|groupware|shared|artifact|representation|coordination\", \"entity\": \"distribute",
+   "findings|{\"claim_type\": \"recommendation|mechanism\", \"contains\": \"design|feature|interface|artifact|representation|coordination\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"paper_id\": \"sciverse_challenging_the_phenomena_of_technology\"}",
+   "findings|{\"claim_type\": \"recommendation|observation|mechanism\", \"contains\": \"design|feature|system|interface|social|collaborative|group\", \"paper_id\": \"sciverse_group_intelligence_a_distributed_cognition_perspe",
+   "findings|{\"claim_type\": \"recommendation|mechanism|observation\", \"contains\": \"distributed cognition|cognitive|design|feature|control|customiz\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_s",
+   "lineage|{\"direction\": \"forward\", \"entity\": \"distributed cognition\", \"relation\": \"informs\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"distributed cognition|cognitive system|artifact|representation|coordination\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"design|feature|interface|artifact|representation|coordination\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism\", \"paper_id\": \"sciverse_group_intelligence_a_distributed_cognition_perspective\"}",
+   "findings|{\"claim_type\": \"definition|observation|mechanism|recommendation\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"social computing|social media|collaborative|groupware|shared|artifact|representation|coordination\", \"entity\": \"distributed cognition\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"distributed cognition|cognitive|design|feature|control|customiz\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}",
+   "search_text|{\"k\": 12, \"query\": \"distributed cognition social computing design features\"}",
+   "findings|{\"claim_type\": \"recommendation|mechanism|observation\", \"contains\": \"social computing|social media|collaborative|groupware|shared|artifact|representation|coordination\", \"entity\": \"distributed cognition",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_group_intelligence_a_distributed_cognition_perspective\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_designing_usable_controls_for_customizable_social_media_feeds\"}"
+  ],
+  "gate": {
+   "note_rejects": 3,
+   "numeric_fail": {
+    "missing_nums": [],
+    "unsourced": [],
+    "altered_titles": [
+     [
+      "From Behaviour to Design: Implications for Artifact Ecologie",
+      "from behaviour to design: implications for artifact ecologie"
+     ]
+    ]
+   },
+   "repair": 1,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 3
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 3,
+   "merge_total_lines": 20,
+   "relaxed_writes": 2,
+   "notes_truncated": 2964,
+   "absence_repair": 1,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [
+   "backfill:sleep apnea index->sleep apnea index"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "34b00939c1190990c1c9be59",
+  "type": "aggregation",
+  "question": "How has literature discussed AI as a design material?",
+  "gold_hint": "",
+  "answer": "The literature characterizes Artificial Intelligence (AI) as a design material primarily within the Human-Computer Interaction (HCI) community, where it has recently been highlighted as a distinct resource for design . This conceptualization is described as a call for interaction designers to consider intelligence itself as a resource, rather than merely a tool or component . Consequently, the view of intelligence as a design material necessitates a deeper understanding of how intelligence functions in this capacity . HCI researchers and designers have investigated this idea to explore AI's potential in improving interactions with applications and software systems .\n\nA significant portion of the literature focuses on the challenges and complexities inherent in working with AI as a material. Researchers have investigated the specific challenges for UX practitioners, noting the complexity of the material itself . These challenges include a lack of clear understanding of AI's capabilities, difficulties in envisioning uses that do not yet exist, and other obstacles . Furthermore, designers, who are often novices in machine learning, experience difficulties and bottlenecks while working with AI . The materiality of AI is further complicated by the fragility, incompleteness, and opacity of models such as topic models, where even minor changes can induce large and potentially undesirable changes in the resulting model . In the context of user interactions, these interactions often negatively affect the quality of the resulting modelling in ways that can be difficult for the user to evaluate .\n\nThe literature also discusses the integration of AI into existing design workflows and tools. New AI generation tools, such as Midjourney and Stable Diffusion, have been incorporated into participants' daily routines . These AI tools are used alongside creative design platforms such as Figma, Adobe XD, and Adobe Illustrator . Additionally, general purpose conversational AI platforms, including ChatGPT, Claude, Copilot, Perplexity, and Gemini, are characterized by their chat-based interfaces where users type prompts or upload documents to receive text responses .\n\nWhile the notes provide specific insights into the challenges and tools associated with AI as a design material, the consulted records did not surface detailed discussions regarding the specific arguments of the \"User Ex Machina\" paper beyond the noted impacts on modelling quality, nor did they provide detailed accounts of the \"from behaviour to design\" paper's specific contributions to the materiality of AI, aside from its examination of distributed cognition design patterns in software teams   . Similarly, the records did not surface detailed information on the \"from pen to prompt\" paper's specific discussion of AI as material in writing practice, nor did they provide detailed elaborations on the \"towards human-ai synergy in ui design\" paper's broader theoretical stance on AI as material beyond the mention of tool integration, nor did they offer detailed insights into the \"wikipedia ores explorer\" paper beyond the mention of designer difficulties    .",
+  "arm": "main",
+  "steps": 24,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N2. [paper: sciverse_giving_form_to_smart_objects...] \"giving form to smart objects: exploring intel",
+     "N3. [paper: sciverse_towards_human_ai_synergy_in_ui_design...] \"towards human-ai synergy in ui desig",
+     "N4. [paper: sciverse_from_pen_to_prompt...] \"from pen to prompt: how creative writers integrate ai i"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ai as a design material"
+    },
+    "intent": "Get cross-paper evidence dossier for the main entity",
+    "obs_chars": 385,
+    "notes_chars": 1293
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "ai as a design material",
+     "contains": "design material|AI material|intelligence as material|materiality of AI"
+    },
+    "intent": "Find finding records about AI as design material across papers",
+    "obs_chars": 2681,
+    "notes_chars": 1293
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat",
+     "contains": "design material|intelligence|material|interaction design"
+    },
+    "intent": "Get findings from the most directly on-topic paper (2018)",
+    "obs_chars": 1546,
+    "notes_chars": 1293
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms",
+     "contains": "design|AI|synergy|material|LLM"
+    },
+    "intent": "Get findings from the 2025 human-AI synergy in UI design paper",
+    "obs_chars": 1501,
+    "notes_chars": 1293
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat",
+     "contains": "design material|intelligence|material|smart objects|interaction"
+    },
+    "intent": "Get all findings from the most directly on-topic paper about intelligence as interaction design material",
+    "obs_chars": 1546,
+    "notes_chars": 3185
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_question_driven_design_process_for_explainable_ai_user_experiences",
+     "contains": "design material|AI|challenge|explainable|material"
+    },
+    "intent": "Get findings from the question-driven design process paper discussing AI as design material challenges",
+    "obs_chars": 1074,
+    "notes_chars": 3185
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "contains": "design material|AI|transparency|model|material|UX"
+    },
+    "intent": "Get findings from the designerly understanding paper about AI as design material",
+    "obs_chars": 1128,
+    "notes_chars": 3185
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice",
+     "contains": "AI|material|writing|prompt|creative|tool"
+    },
+    "intent": "Get findings from the creative writers paper about AI as material in writing practice",
+    "obs_chars": 2697,
+    "notes_chars": 3185
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|simulation|probe|material|interaction",
+     "paper_id": "arxiv_2101.02244"
+    },
+    "intent": "User Ex Machina paper findings on AI as design material",
+    "obs_chars": 966,
+    "notes_chars": 3848
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|behaviour|artifact|material|ecology",
+     "paper_id": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo"
+    },
+    "intent": "From behaviour to design paper findings",
+    "obs_chars": 1119,
+    "notes_chars": 3848
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|writing|material|practice|tool",
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "From pen to prompt paper findings on AI as material",
+    "obs_chars": 2697,
+    "notes_chars": 3848
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|synergy|material|LLM|generation",
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms"
+    },
+    "intent": "Towards human-AI synergy paper findings on AI as material",
+    "obs_chars": 1551,
+    "notes_chars": 3848
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "AI as a design material intelligence materiality",
+     "k": 12
+    },
+    "intent": "Find all passages across corpus papers that discuss AI as a design material, to fill remaining gaps",
+    "obs_chars": 1752,
+    "notes_chars": 5423
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m",
+     "contains": "AI|design material|trade-off|explorer|model"
+    },
+    "intent": "Get detailed findings from the Wikipedia ORES Explorer paper about AI as design material",
+    "obs_chars": 1543,
+    "notes_chars": 5423
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice",
+     "contains": "AI|material|writing|practice|integration|tool|prompt"
+    },
+    "intent": "Get findings from the creative writers paper about AI as material in writing practice",
+    "obs_chars": 2697,
+    "notes_chars": 5423
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|material|interaction|probe|simulation",
+     "paper_id": "arxiv_2101.02244"
+    },
+    "intent": "Get findings from User Ex Machina paper about AI as design material",
+    "obs_chars": 966,
+    "notes_chars": 5423
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|material|writing|practice|integration",
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "Get findings from from pen to prompt paper about AI as material in writing",
+    "obs_chars": 2697,
+    "notes_chars": 5423
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "contains": "design material|AI|material|synergy|LLM|generation",
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms"
+    },
+    "intent": "Get findings from towards human-ai synergy paper about AI as material",
+    "obs_chars": 1551,
+    "notes_chars": 5423
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "participatory design"
+    },
+    "intent": "Get cross-paper evidence for participatory design as related concept",
+    "obs_chars": 2108,
+    "notes_chars": 5423
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "Research through Design (RtD)"
+    },
+    "intent": "Get cross-paper evidence for RtD as related concept",
+    "obs_chars": 375,
+    "notes_chars": 5423
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "creative design platforms"
+    },
+    "intent": "Get cross-paper evidence for creative design platforms",
+    "obs_chars": 445,
+    "notes_chars": 5423
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.02244",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get all definitional/observational/recommendation findings from User Ex Machina paper",
+    "obs_chars": 268,
+    "notes_chars": 2856
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get all definitional/observational/recommendation findings from from pen to prompt paper",
+    "obs_chars": 268,
+    "notes_chars": 2856
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get all definitional/observational/recommendation findings from towards human-ai synergy paper",
+    "obs_chars": 268,
+    "notes_chars": 2856
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get all definitional/observational/recommendation findings from wikipedia ores explorer paper",
+    "obs_chars": 268,
+    "notes_chars": 2856
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "arxiv_2101.02244"
+    },
+    "intent": "Get observation records from User Ex Machina paper",
+    "obs_chars": 1417,
+    "notes_chars": 2856
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "Get observation records from from pen to prompt paper",
+    "obs_chars": 2697,
+    "notes_chars": 2856
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms"
+    },
+    "intent": "Get observation records from human-ai synergy paper",
+    "obs_chars": 1501,
+    "notes_chars": 2856
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m"
+    },
+    "intent": "Get observation records from wikipedia ores explorer paper",
+    "obs_chars": 1543,
+    "notes_chars": 2856
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get findings from the 'from behaviour to design' paper",
+    "obs_chars": 268,
+    "notes_chars": 4156
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get findings from the 'giving form to smart objects' paper",
+    "obs_chars": 268,
+    "notes_chars": 4156
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get findings from the 'designerly understanding' paper",
+    "obs_chars": 268,
+    "notes_chars": 4156
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_question_driven_design_process_for_explainable_ai_user_experiences",
+     "claim_type": "definition|observation|recommendation"
+    },
+    "intent": "Get findings from the 'question-driven design process' paper",
+    "obs_chars": 268,
+    "notes_chars": 4156
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.02244",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from User Ex Machina paper",
+    "obs_chars": 978,
+    "notes_chars": 4156
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from from pen to prompt paper",
+    "obs_chars": 2697,
+    "notes_chars": 4156
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from towards human-ai synergy paper",
+    "obs_chars": 187,
+    "notes_chars": 4156
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition-type findings from wikipedia ores explorer paper",
+    "obs_chars": 1001,
+    "notes_chars": 4156
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "arxiv_2101.02244",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get mechanism/criticism/recommendation records from User Ex Machina paper",
+    "obs_chars": 265,
+    "notes_chars": 4156
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get mechanism/criticism/recommendation records from from pen to prompt paper",
+    "obs_chars": 265,
+    "notes_chars": 4156
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get mechanism/criticism/recommendation records from towards human-ai synergy paper",
+    "obs_chars": 265,
+    "notes_chars": 4156
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get mechanism/criticism/recommendation records from wikipedia ores explorer paper",
+    "obs_chars": 265,
+    "notes_chars": 4156
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo"
+    },
+    "intent": "Get observation findings from from behaviour to design paper",
+    "obs_chars": 1587,
+    "notes_chars": 4156
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation|recommendation",
+     "paper_id": "arxiv_2101.02244"
+    },
+    "intent": "Get more findings from User Ex Machina paper",
+    "obs_chars": 257,
+    "notes_chars": 5130
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation|recommendation",
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "Get more findings from from pen to prompt paper",
+    "obs_chars": 257,
+    "notes_chars": 5130
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation|recommendation",
+     "paper_id": "sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms"
+    },
+    "intent": "Get more findings from towards human-ai synergy paper",
+    "obs_chars": 257,
+    "notes_chars": 5130
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation|recommendation",
+     "paper_id": "sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m"
+    },
+    "intent": "Get more findings from wikipedia ores explorer paper",
+    "obs_chars": 257,
+    "notes_chars": 5130
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "arxiv_2101.02244"
+    },
+    "intent": "Get recommendation findings from User Ex Machina paper",
+    "obs_chars": 1429,
+    "notes_chars": 5130
+   },
+   {
+    "step": 15,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice"
+    },
+    "intent": "Get recommendation findings from from pen to prompt paper",
+    "obs_chars": 2697,
+    "notes_chars": 5130
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get detailed findings from the 'giving form to smart objects' paper",
+    "obs_chars": 265,
+    "notes_chars": 5130
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_question_driven_design_process_for_explainable_ai_user_experiences",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get detailed findings from the 'question-driven design process' paper",
+    "obs_chars": 265,
+    "notes_chars": 5130
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "claim_type": "mechanism|criticism|recommendation"
+    },
+    "intent": "Get detailed findings from the 'designerly understanding' paper",
+    "obs_chars": 265,
+    "notes_chars": 5130
+   },
+   {
+    "step": 18,
+    "tool": "card",
+    "args": {
+     "entity": "co-design"
+    },
+    "intent": "Get cross-paper evidence for co-design as related concept",
+    "obs_chars": 1369,
+    "notes_chars": 5130
+   },
+   {
+    "step": 21,
+    "tool": "search_text",
+    "args": {
+     "query": "AI as a design material",
+     "k": 12
+    },
+    "intent": "Find all passages across corpus papers that discuss AI as a design material",
+    "obs_chars": 1753,
+    "notes_chars": 5130
+   },
+   {
+    "step": 21,
+    "tool": "card",
+    "args": {
+     "entity": "Interaction and Interface Design"
+    },
+    "intent": "Get dossier on interaction/interface design as context for AI as material",
+    "obs_chars": 380,
+    "notes_chars": 5130
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 54
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 24,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [entity: ai as a design material] Question: how literature discusses AI as a design material — broad/survey. Related: participatory design*, co-design*, Research through Design (RtD), Interaction and Interface Design, creative design platforms*.\nN2. [coarse:c7aa1a25c486] \"Researchers have investigated the challenges for UX practitioners to work with 'AI as a design material,' including the complexity of the material itself.\" | anchor:\"challenges for UX practitioners to work with 'AI as a design material'\" | epistemic:stated | paper: sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\nN3. [coarse:e5da5f93db80] \"The acknowledgement of AI as a design material is a call for interaction designers to consider intelligence as a resource for design.\" | anchor:\"call for interaction designers to consider intelligence as a resource\" | epistemic:stated | paper: sciverse_giving_form_to_smart_objects...\nN4. [coarse:18c31ad2eb43] \"Challenges in working with AI as a design material include a lack of clear understanding of AI's capabilities, difficulties in envisioning uses that do not yet exist, and obstacles\" | anchor:\"lack of clear understanding of AI's capabilities, difficulties in envisioning uses\" | epistemic:stated | paper: sciverse_question_driven_design_process_for_explainable_ai_user_experiences\nN5. [coarse:9ffd60e1ded6] \"HCI researchers and designers have investigated the idea of AI as a design material to explore AI's potential in improving interactions with apps and software systems.\" | anchor:\"investigated the idea of AI as a design material to explore AI's potential\" | epistemic:stated | paper: sciverse_wikipedia_ores_explorer...\nN6. [coarse:16c6f3628a64] \"The view of intelligence as a design material brings with it a need to better understand how intelligence functions as a design material.\" | anchor:\"need to better understand how intelligence functions as a design material\" | epistemic:stated | paper: sciverse_giving_form_to_smart_objects...\nN7. [coarse:df97c1029855] \"Artificial intelligence (AI) has recently been highlighted as a design material in the HCI community.\" | anchor:\"highlighted as a design material in the HCI community\" | epistemic:stated | paper: sciverse_giving_form_to_smart_objects...\nN8. [coarse:275e13ccddb4] \"New AI generation tools such as Midjourney and Stable Diffusion have been incorporated into participants' daily routines.\" | anchor:\"Midjourney and Stable Diffusion have been incorporated into participants' daily routines\" | epistemic:stated | paper: sciverse_towards_human_ai_synergy_in_ui_design...\nN9. [coarse:95da56ef05b9] \"Participants use creative design platforms such as Figma, Adobe XD, and Adobe Illustrator.\" | anchor:\"Figma, Adobe XD, and Adobe Illustrator\" | epistemic:stated | paper: sciverse_towards_human_ai_synergy_in_ui_design...\nN10. [coarse:4b32f4757ee9] \"User interactions often negatively affect the quality of the resulting modelling in a way that can be difficult for the user to evaluate.\" | anchor:\"user interactions have impacts that differ in magnitude but often negatively\" | epistemic:stated | paper: arxiv_2101.02244 (User Ex Machina)\nN11. [coarse:34088af2d86c] \"The fragility, incompleteness, and opacity of topic models means even minor changes could induce large and potentially undesirable changes in resulting model.\" | anchor:\"fragility, incompleteness, and opacity of these models means even minor chang\" | epistemic:stated | paper: arxiv_2101.02244\nN12. [coarse:fb436a207780] \"Designers, who are often ML novices, experience difficulties and bottlenecks while working with AI.\" | anchor:\"difficulties and bottlenecks designers, often ML novice, exp\" | epistemic:stated | paper: sciverse_wikipedia_ores_explorer...\nN13. [coarse:bf7cb68f15a3] \"ChatGPT, Claude, Copilot, Perplexity and Gemini are all general purpose conversational AI platforms that use a chat-based interface where users type prompts or upload documents and receive text responses.\" | anchor:\"ChatGPT (Figure 4), Claude, Copilot, Perplexity and Gemini are all general purpose convers\" | epistemic:stated | paper: sciverse_from_pen_to_prompt...\nN14. [coarse:2eee185df632] \"The study examined different design patterns for distributed cognition in a controlled experiment among software practitioners.\" | anchor:\"examined different design patterns for distributed cognition in a controlled experi\" | epistemic:stated | paper: sciverse_from_behaviour_to_design...\nN15. [coarse:7cca5e60556e] \"The aim was to investigate the effects of distributed cognition with regard to pairing in software design teams.\" | anchor:\"investigate the effects of distributed cognition with regard to pairing in\" | epistemic:stated | paper: sciverse_from_behaviour_to_design...\nN16. [coarse:dbebe159c6e8] \"Through the findings of a DCog analysis, researchers can identify what is prominent in the current design of a system or environment to create effective human-computer interactions\" | anchor:\"through the findings of a DCog analysis, researchers can identify what is pro\" | epistemic:stated | paper: sciverse_from_behaviour_to_design...",
+  "gaps_final": "G1. What does the \"User Ex Machina\" paper say about AI as design material?\nG2. What does the \"from behaviour to design\" paper say?\nG3. What does the \"from pen to prompt\" paper say about AI as material in writing practice?\nG4. What does the \"towards human-ai synergy in ui design\" paper say about AI as material?\nG5. What does the \"wikipedia ores explorer\" paper say in detail?",
+  "queried": [
+   "card|{\"entity\": \"ai as a design material\"}",
+   "findings|{\"contains\": \"design material|AI material|intelligence as material|materiality of AI\", \"entity\": \"ai as a design material\"}",
+   "findings|{\"contains\": \"design material|intelligence|material|interaction design\", \"paper_id\": \"sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat\"}",
+   "findings|{\"contains\": \"design|AI|synergy|material|LLM\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"contains\": \"design material|intelligence|material|smart objects|interaction\", \"paper_id\": \"sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat\"}",
+   "findings|{\"contains\": \"design material|AI|challenge|explainable|material\", \"paper_id\": \"sciverse_question_driven_design_process_for_explainable_ai_user_experiences\"}",
+   "findings|{\"contains\": \"design material|AI|transparency|model|material|UX\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"contains\": \"AI|material|writing|prompt|creative|tool\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"contains\": \"design material|AI|simulation|probe|material|interaction\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"contains\": \"design material|AI|behaviour|artifact|material|ecology\", \"paper_id\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "findings|{\"contains\": \"design material|AI|writing|material|practice|tool\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"contains\": \"design material|AI|synergy|material|LLM|generation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "search_text|{\"k\": 12, \"query\": \"AI as a design material intelligence materiality\"}",
+   "findings|{\"contains\": \"AI|design material|trade-off|explorer|model\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"contains\": \"AI|material|writing|practice|integration|tool|prompt\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"contains\": \"design material|AI|material|interaction|probe|simulation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"contains\": \"design material|AI|material|writing|practice|integration\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"contains\": \"design material|AI|material|synergy|LLM|generation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "card|{\"entity\": \"participatory design\"}",
+   "card|{\"entity\": \"Research through Design (RtD)\"}",
+   "card|{\"entity\": \"creative design platforms\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"claim_type\": \"definition|observation|recommendation\", \"paper_id\": \"sciverse_question_driven_design_process_for_explainable_ai_user_experiences\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_from_behaviour_to_design_implications_for_artifact_ecologies_as_shared_spaces_fo\"}",
+   "findings|{\"claim_type\": \"observation|recommendation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"observation|recommendation\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"observation|recommendation\", \"paper_id\": \"sciverse_towards_human_ai_synergy_in_ui_design_supporting_iterative_generation_with_llms\"}",
+   "findings|{\"claim_type\": \"observation|recommendation\", \"paper_id\": \"sciverse_wikipedia_ores_explorer_visualizing_trade_offs_for_designing_applications_with_m\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"arxiv_2101.02244\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_from_pen_to_prompt_how_creative_writers_integrate_ai_into_their_writing_practice\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_giving_form_to_smart_objects_exploring_intelligence_as_an_interaction_design_mat\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_question_driven_design_process_for_explainable_ai_user_experiences\"}",
+   "findings|{\"claim_type\": \"mechanism|criticism|recommendation\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "card|{\"entity\": \"co-design\"}",
+   "search_text|{\"k\": 12, \"query\": \"AI as a design material\"}",
+   "card|{\"entity\": \"Interaction and Interface Design\"}"
+  ],
+  "gate": {
+   "note_rejects": 5,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 5
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 5,
+   "merge_total_lines": 7,
+   "relaxed_writes": 1,
+   "notes_truncated": 3635,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 19,
+   "fallback_compiled": true
+  },
+  "backfills": [
+   "backfill:sleep apnea index->sleep apnea index"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "e09a30179e0b587d57edb173",
+  "type": "aggregation",
+  "question": "How is artificial intelligence being utilized to enhance the diagnosis and treatment of sleep apnea?",
+  "gold_hint": "",
+  "answer": "Artificial intelligence is increasingly utilized to address the significant public health burden of sleep apnea, a condition described as a chronic and highly prevalent disease that remains underdiagnosed and untreated in a substantial number of adult patients [coarse:2e20f53dadc1] [coarse:25a826ec71fc]. While the gold standard for diagnosis remains in-laboratory nocturnal polysomnography (PSG) [coarse:445fc17b8e28], the widespread implementation of machine learning technologies for big data analysis and prediction tools offers a relevant step forward in the intricate scenario of sleep apnea diagnosis and phenotypization [coarse:4953ee5bf04a] [coarse:1411614e7f94]. The most important applications of artificial intelligence in obstructive sleep apnea (OSA) have been identified as predicting treatment outcomes, improving treatment options, and personalizing treatment [coarse:e3d2367b08b6].\n\nIn the domain of diagnosis, AI methods are being applied to overcome the limitations of traditional visual scoring, which suffers from subjectivity and inter-rater variability when identifying sleep stages in overnight PSG data that utilizes EEG as a sensing modality [arxiv_2012.06104#63450]. Specific machine learning approaches cited in the literature include the use of Recurrent Deep Neural Networks for real-time sleep stage classification from single-channel EEG, as restated from the work of Bresch et al. (2018) [arxiv_2012.06104#129600]. Additionally, a state space and density estimation framework for sleep staging in obstructive sleep apnea has been proposed, as restated from the work of Kang et al. (2018) [arxiv_2012.06104#130950]. Further diagnostic automation involves the automated identification of sleep disorder types using triplet half-band filters and ensemble machine learning techniques with EEG signals, as restated from the work of Sharma et al. (2021) [arxiv_2403.17561#326700]. Beyond EEG-based PSG, 24-hour ECG analysis has been utilized to determine the sleep apnea index (AI) in patients with heart rhythm disorders; in this pilot study, patients with an AI greater than 5 were referred for further diagnostic evaluation of sleep apnea [coarse:d4cf84106741] [coarse:d856d632530a].\n\nRegarding treatment, if sleep apnea is confirmed in a specialized laboratory, Continuous Positive Airway Pressure (CPAP) is considered the best form of treatment, with patients also advised to correct living habits and reduce or eliminate the use of medications predisposing to respiratory distress, such as sedatives [coarse:917a4cfc8217] [coarse:475c5c735bab]. The consulted records did not surface specific details regarding AI methods used for CPAP adherence or the specific performance metrics and results reported for the diagnostic and treatment algorithms mentioned.",
+  "arm": "main",
+  "steps": 18,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "obstructive sleep apnea"
+    },
+    "intent": "Get cross-paper evidence dossier for obstructive sleep apnea entity",
+    "obs_chars": 484,
+    "notes_chars": 834
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "sleep apnea index"
+    },
+    "intent": "Get cross-paper evidence dossier for sleep apnea index entity",
+    "obs_chars": 515,
+    "notes_chars": 834
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep"
+    },
+    "intent": "Get all finding records from the central 2017 ANN sleep apnea paper",
+    "obs_chars": 1034,
+    "notes_chars": 834
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning"
+    },
+    "intent": "Get all finding records from the 2020 ML faces of sleep apnea paper",
+    "obs_chars": 1485,
+    "notes_chars": 834
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea"
+    },
+    "intent": "Get findings from the 2023 sleep texture paper for diagnosis methods",
+    "obs_chars": 1106,
+    "notes_chars": 1610
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_importance_of_sleep_apnea_index_determination_using_24h_ecg_analysis_in_pati"
+    },
+    "intent": "Get findings from the 2014 ECG-based sleep apnea index paper",
+    "obs_chars": 2051,
+    "notes_chars": 1610
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us"
+    },
+    "intent": "Get findings from the 2023 endoscopy scoring paper for treatment-related AI",
+    "obs_chars": 63,
+    "notes_chars": 1610
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "obstructive sleep apnea",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism-type findings about AI in OSA across all papers",
+    "obs_chars": 187,
+    "notes_chars": 1610
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep",
+     "contains": "neural network|diagnosis|treatment|CPAP|polysomnography|ECG|accuracy|sensitivity"
+    },
+    "intent": "Get specific AI methods and diagnostic/treatment applications from the 2017 ANN paper",
+    "obs_chars": 1059,
+    "notes_chars": 2949
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning",
+     "contains": "machine learning|deep learning|classification|detection|diagnosis|treatment|phenotype|prediction"
+    },
+    "intent": "Get specific ML methods and applications from the 2020 faces of sleep apnea paper",
+    "obs_chars": 1485,
+    "notes_chars": 2949
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us",
+     "contains": "endoscopy|scoring|deep learning|CNN|classification|accuracy|treatment"
+    },
+    "intent": "Get specific AI methods for endoscopy scoring from the 2023 DIS-E paper",
+    "obs_chars": 244,
+    "notes_chars": 2949
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea",
+     "contains": "sleep texture|characterization|phenotype|machine learning|classification|diagnosis"
+    },
+    "intent": "Get specific methods for sleep texture characterization from the 2023 paper",
+    "obs_chars": 559,
+    "notes_chars": 2949
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the 2017 ANN paper on specific AI methods for diagnosis/treatment",
+    "obs_chars": 526,
+    "notes_chars": 2949
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the 2020 ML faces of sleep apnea paper",
+    "obs_chars": 187,
+    "notes_chars": 2949
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the 2023 endoscopy scoring paper",
+    "obs_chars": 187,
+    "notes_chars": 2949
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the 2023 sleep texture paper",
+    "obs_chars": 187,
+    "notes_chars": 2949
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "artificial neural network sleep apnea diagnosis treatment CPAP accuracy sensitivity",
+     "k": 12
+    },
+    "intent": "Full-text retrieval to find specific AI methods, data modalities, and performance metrics for sleep apnea diagnosis and ",
+    "obs_chars": 1750,
+    "notes_chars": 2901
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "deep learning machine learning obstructive sleep apnea endoscopy scoring classification",
+     "k": 12
+    },
+    "intent": "Find specific deep learning methods for OSA endoscopy scoring and classification",
+    "obs_chars": 1751,
+    "notes_chars": 2901
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "sleep apnea phenotype prediction machine learning ECG polysomnography features",
+     "k": 12
+    },
+    "intent": "Find data modalities and feature engineering approaches for sleep apnea AI",
+    "obs_chars": 1752,
+    "notes_chars": 2901
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "entity": "obstructive sleep apnea"
+    },
+    "intent": "Find observation-type findings about OSA to get specific AI methods and results",
+    "obs_chars": 1056,
+    "notes_chars": 4191
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "entity": "obstructive sleep apnea"
+    },
+    "intent": "Find limitations/criticisms noted about AI in OSA diagnosis/treatment",
+    "obs_chars": 187,
+    "notes_chars": 4191
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 2017 ANN sleep apnea paper",
+    "obs_chars": 526,
+    "notes_chars": 4191
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 2020 faces of sleep apnea ML paper",
+    "obs_chars": 1485,
+    "notes_chars": 4191
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 2023 endoscopy scoring paper",
+    "obs_chars": 187,
+    "notes_chars": 4191
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 2023 sleep texture paper",
+    "obs_chars": 608,
+    "notes_chars": 4191
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us",
+     "contains": "endoscopy|scoring|deep learning|CNN|classification|accuracy"
+    },
+    "intent": "Get specific findings about AI-based endoscopy scoring for OSA treatment planning",
+    "obs_chars": 244,
+    "notes_chars": 4191
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning",
+     "contains": "diagnosis|detection|classification|prediction|phenotype|machine learning|deep learning|neural network"
+    },
+    "intent": "Get specific AI methods and applications for sleep apnea diagnosis from the 2020 review",
+    "obs_chars": 1485,
+    "notes_chars": 4191
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep",
+     "contains": "neural network|ANN|diagnosis|treatment|CPAP|accuracy|sensitivity|specificity"
+    },
+    "intent": "Get specific ANN methods and results for sleep apnea diagnosis and treatment from the 2017 paper",
+    "obs_chars": 1265,
+    "notes_chars": 4191
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "sleep apnea-hypopnea syndrome",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about how AI is applied to SAHS diagnosis/treatment",
+    "obs_chars": 187,
+    "notes_chars": 4191
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "sleep apnea-hypopnea syndrome",
+     "claim_type": "recommendation"
+    },
+    "intent": "Find recommendation records about AI for SAHS",
+    "obs_chars": 187,
+    "notes_chars": 4191
+   },
+   {
+    "step": 12,
+    "tool": "card",
+    "args": {
+     "entity": "sleep apnea-hypopnea syndrome"
+    },
+    "intent": "Get cross-paper evidence dossier for SAHS",
+    "obs_chars": 309,
+    "notes_chars": 4191
+   },
+   {
+    "step": 12,
+    "tool": "find_gap",
+    "args": {
+     "entity": "obstructive sleep apnea"
+    },
+    "intent": "Find what the corpus states it did NOT do / what is missing for OSA",
+    "obs_chars": 120,
+    "notes_chars": 4191
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "entity": "obstructive sleep apnea"
+    },
+    "intent": "Find recommendation records about AI for OSA treatment/diagnosis",
+    "obs_chars": 187,
+    "notes_chars": 4191
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning",
+     "contains": "phenotype|phenotypization|classification|random forest|gradient boosting|support vector|logistic regression|accuracy|sensitivity|specificity|AUC"
+    },
+    "intent": "Get specific AI methods and performance metrics from the faces of sleep apnea paper",
+    "obs_chars": 244,
+    "notes_chars": 4191
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us",
+     "contains": "endoscopy|scoring|deep learning|CNN|classification|accuracy|sensitivity|specificity|AUC|model"
+    },
+    "intent": "Get specific AI methods and performance metrics from the endoscopy scoring paper",
+    "obs_chars": 244,
+    "notes_chars": 4191
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep",
+     "contains": "neural network|ANN|diagnosis|treatment|CPAP|accuracy|sensitivity|specificity|prediction"
+    },
+    "intent": "Get specific AI methods and performance metrics from the ANN paper",
+    "obs_chars": 1265,
+    "notes_chars": 4191
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea",
+     "contains": "texture|characterization|classification|machine learning|deep learning|accuracy|sensitivity|specificity|AUC|model"
+    },
+    "intent": "Get specific AI methods and performance metrics from the sleep texture paper",
+    "obs_chars": 559,
+    "notes_chars": 4191
+   },
+   {
+    "step": 15,
+    "tool": "search_text",
+    "args": {
+     "query": "sleep apnea diagnosis artificial intelligence machine learning deep learning",
+     "k": 12
+    },
+    "intent": "Broad text search to find specific AI methods, modalities, and results across all sleep apnea papers",
+    "obs_chars": 1748,
+    "notes_chars": 4191
+   },
+   {
+    "step": 15,
+    "tool": "search_text",
+    "args": {
+     "query": "sleep apnea treatment CPAP adherence prediction endoscopy scoring",
+     "k": 12
+    },
+    "intent": "Find treatment-related AI applications and specific methods",
+    "obs_chars": 1750,
+    "notes_chars": 4191
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 18,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How is AI used to enhance diagnosis & treatment of sleep apnea?\nRelevant corpus papers:\n- sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep (2017)\n- sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning (2020)\n- sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea (2023)\n- sciverse_the_importance_of_sleep_apnea_index_determination_using_24h_ecg_analysis_in_pati (2014)\n- sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us (2023)\nN1. [coarse:2e20f53dadc1] SAHS is chronic, highly prevalent, major health problem | anchor:\"chronic and highly prevalent disease\" | epistemic:stated\nN2. [coarse:445fc17b8e28] Gold standard diagnostic methodology for SAHS is in-laboratory nocturnal polysomnography (PSG) | anchor:\"gold standard diagnostic methodology is in-laboratory nocturnal polysomnography (PSG)\" | epistemic:stated\nN3. [coarse:25a826ec71fc] OSA is underdiagnosed and untreated in a significant number of adult patients | anchor:\"underdiagnosed and untreated in a significant number of adult patients\" | epistemic:stated\nN4. [coarse:4953ee5bf04a] ML technologies widely implemented for big data analysis and prediction tools | anchor:\"widespread implementation of machine-learning technologies\" | epistemic:stated\nN5. [coarse:e3d2367b08b6] Most important AI applications in OSA: predicting treatment outcomes, improving treatment options, personalizing treatment | anchor:\"most important applications of artificial intelligence in obstructive sleep apnea have been predicting treatment outcomes, improving treatment options, and personalizing treatm\" | epistemic:stated\nN6. [coarse:1411614e7f94] ML could represent a relevant step forward in sleep apnea diagnosis and phenotypization | anchor:\"machine learning could represent a relevant step forward in the intricate scenario of sleep apnea diagnosis and phenotypization\" | epistemic:stated\nN7. [coarse:d4cf84106741] 24h ECG analysis used to determine sleep apnea index (AI) in patients with heart rhythm disorders | anchor:\"This pilot study showed the significance of determining AI in patients with rhythm disorde\" | epistemic:stated\nN8. [coarse:d856d632530a] Patients with AI > 5 are referred for further diagnostic of sleep apnea | anchor:\"people with AI > 5 are referred for further diagnostic of sleep apnea\" | epistemic:stated\nN9. [coarse:917a4cfc8217] If sleep apnea confirmed in specialized lab, CPAP is considered best form of treatment | anchor:\"If sleep apnea is confirmed in the specialized laboratory, than the application of CPAP wi\" | epistemic:stated\nN10. [coarse:475c5c735bab] Patients advised to correct living habits, reduce/eliminate medications predisposing respiratory distress (sedatives) | anchor:\"we advise them to correct habits of living, reduce and/or eliminate use of medicatio\" | epistemic:stated\nN11. [arxiv_2012.06104#63450] Diagnosis of sleep disorders done through identifying sleep stages in overnight PSG which utilizes EEG as one sensing modality; visual scoring suffers from subjectivity and inter-rater variability | anchor:\"Diagnosis of sleep disorders can be done through identifying sleep stages in an overnight polysomnogram (PSG) which utilizes EEG as one of its sensing modalities\" | epistemic:stated\nN12. [arxiv_2012.06104#129600] Recurrent Deep Neural Networks used for real-time sleep stage classification from single channel EEG (Bresch et al. 2018) | anchor:\"Recurrent Deep Neural Networks for Real-Time Sleep Stage Classification From Single Channel EEG\" | epistemic:cited\nN13. [arxiv_2012.06104#130950] State space and density estimation framework for sleep staging in obstructive sleep apnea (Kang et al. 2018) | anchor:\"A state space and density estimation framework for sleep staging in obstructive sleep apnea\" | epistemic:cited\nN14. [arxiv_2403.17561#326700] Automated identification of sleep disorder types using triplet half-band filter and ensemble ML with EEG signals (Sharma et al. 2021) | anchor:\"Automated identification of sleep disorder types using triplet half-band filter and ensemble machine learning techniques with eeg signals\" | epistemic:cited",
+  "gaps_final": "G1. What specific AI methods are used for sleep apnea diagnosis (detection, classification, scoring)?\nG2. What AI methods are used for sleep apnea treatment (e.g., CPAP adherence, endoscopy scoring)?\nG3. What data modalities are used (ECG, polysomnography, images, audio)?\nG4. What performance metrics/results are reported?\nG5. What are the limitations/absences noted in the corpus?",
+  "queried": [
+   "card|{\"entity\": \"obstructive sleep apnea\"}",
+   "card|{\"entity\": \"sleep apnea index\"}",
+   "findings|{\"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep\"}",
+   "findings|{\"paper_id\": \"sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning\"}",
+   "findings|{\"paper_id\": \"sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea\"}",
+   "findings|{\"paper_id\": \"sciverse_the_importance_of_sleep_apnea_index_determination_using_24h_ecg_analysis_in_pati\"}",
+   "findings|{\"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"obstructive sleep apnea\"}",
+   "findings|{\"contains\": \"neural network|diagnosis|treatment|CPAP|polysomnography|ECG|accuracy|sensitivity\", \"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep\"",
+   "findings|{\"contains\": \"machine learning|deep learning|classification|detection|diagnosis|treatment|phenotype|prediction\", \"paper_id\": \"sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning\"}",
+   "findings|{\"contains\": \"endoscopy|scoring|deep learning|CNN|classification|accuracy|treatment\", \"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us\"}",
+   "findings|{\"contains\": \"sleep texture|characterization|phenotype|machine learning|classification|diagnosis\", \"paper_id\": \"sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea\"}",
+   "search_text|{\"k\": 12, \"query\": \"artificial neural network sleep apnea diagnosis treatment CPAP accuracy sensitivity\"}",
+   "search_text|{\"k\": 12, \"query\": \"deep learning machine learning obstructive sleep apnea endoscopy scoring classification\"}",
+   "search_text|{\"k\": 12, \"query\": \"sleep apnea phenotype prediction machine learning ECG polysomnography features\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"obstructive sleep apnea\"}",
+   "findings|{\"claim_type\": \"criticism\", \"entity\": \"obstructive sleep apnea\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_the_contribution_of_sleep_texture_in_the_characterization_of_sleep_apnea\"}",
+   "findings|{\"contains\": \"endoscopy|scoring|deep learning|CNN|classification|accuracy\", \"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sleep_apnea_us\"}",
+   "findings|{\"contains\": \"diagnosis|detection|classification|prediction|phenotype|machine learning|deep learning|neural network\", \"paper_id\": \"sciverse_the_faces_of_sleep_apnea_in_the_age_of_machine_learning\"}",
+   "findings|{\"contains\": \"neural network|ANN|diagnosis|treatment|CPAP|accuracy|sensitivity|specificity\", \"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of_sleep\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"sleep apnea-hypopnea syndrome\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"sleep apnea-hypopnea syndrome\"}",
+   "card|{\"entity\": \"sleep apnea-hypopnea syndrome\"}",
+   "find_gap|{\"entity\": \"obstructive sleep apnea\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"entity\": \"obstructive sleep apnea\"}",
+   "findings|{\"contains\": \"phenotype|phenotypization|classification|random forest|gradient boosting|support vector|logistic regression|accuracy|sensitivity|specificity|AUC\", \"paper_id\": \"sciverse_the_faces_of_slee",
+   "findings|{\"contains\": \"endoscopy|scoring|deep learning|CNN|classification|accuracy|sensitivity|specificity|AUC|model\", \"paper_id\": \"sciverse_automatic_scoring_of_drug-induced_sleep_endoscopy_for_obstructive_sl",
+   "findings|{\"contains\": \"neural network|ANN|diagnosis|treatment|CPAP|accuracy|sensitivity|specificity|prediction\", \"paper_id\": \"sciverse_usefulness_of_artificial_neural_networks_in_the_diagnosis_and_treatment_of",
+   "findings|{\"contains\": \"texture|characterization|classification|machine learning|deep learning|accuracy|sensitivity|specificity|AUC|model\", \"paper_id\": \"sciverse_the_contribution_of_sleep_texture_in_the_charact",
+   "search_text|{\"k\": 12, \"query\": \"sleep apnea diagnosis artificial intelligence machine learning deep learning\"}",
+   "search_text|{\"k\": 12, \"query\": \"sleep apnea treatment CPAP adherence prediction endoscopy scoring\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 14,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [
+   "backfill:sleep apnea index->sleep apnea index"
+  ],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

@@ -1,0 +1,271 @@
+# Redundancy Management for P2P Storage
+
+Chris Williams, Philippe Huibonhoa, JoAnne Holliday, Andy Hospodor, Thomas Schwarz
+
+Department of Computer Engineering,
+
+Santa Clara University, Santa Clara, CA 95053, USA
+
+phuibonhoa@gmail.com; chris-williams@comcast.net;
+
+[jholliday,ahospodor,tjschwarz]@scu.edu
+
+# Abstract
+
+P2P storage systems must protect data against temporary unavailability and the effects of churn in order to become platforms for safe storage. This paper evaluates and compares redundancy techniques for P2P storage according to availability, accessibility, and maintainability using traces and theoretical results.
+
+# 1 Introduction and Related Work
+
+The initial wave of peer-to-peer (P2P) networks provided file-sharing and prompted the emergence of applications such as distributed internet storage [19, 13, 22] and internet backup [6, 16, 15]. P2P storage applications still need to handle the typical P2P problem of unreliable peers and of churn - the process of peers leaving and entering the system continuously. In contrast to other P2P systems, P2P storage systems place even more emphasis on reliable data availability, but can be more selective in the peers that are used.
+
+Furthermore, the selected peers are usually connected by a high bandwidth network. In this paper, we elide important P2P storage problems such as search, allocation, load distribution, and peer selection in favor of investigating the choice of a redundancy scheme that combines fast access, availability, and low costs of maintenance.
+
+To achieve the required level of data availability, we store data redundantly. We typically generate redundancy with an $m / n$ code. These linear codes break an object into $m$ equal-sized chunks and generate additional parity chunks to bring the total number of chunks to $n$ . Any $m$ out of the $n$ chunks suffice to reconstruct the object. Replication is formally a $1 / n$ code.
+
+We can use a $m / n$ code $(m\neq 1)$ in two different ways. First, erasure coding breaks a single object, such as a backup of part of a file system, into $m$ chunks. In the second approach, bucketing, we take $m$ objects of similar size and calculate additional $n - m$ parity objects. Erasure coding must retrieve data from at least $m$ different peers to construct our object. Bucketing needs to access only a single peer, the one with the complete copy. However, if that one
+
+is unavailable, it needs to access at least $m$ other peers and transfer $m$ times more data than the size of our object. In the following, we investigate replication, bucketing, erasure coding, and hybrid schemes, which combine replication with erasure coding and bucketing.
+
+Several recent studies [2, 5, 20, 22] compare replication and erasure coding. Erasure coding wins over replication in terms of object availability with limited resources such as storage space [2, 22]. However, Rodrigues and Liskov [20] argue that access costs make erasure coding less attractive – a concern addressed by our hybrid schemes. Blake and Rodrigues [5] show that replacing copies on peers that have left the system poses a big burden for P2P systems. Our focus is P2P storage with the underlying assumption that the selected peers are both reliable and connected by high-speed internet connections, which lessens the strength of the Blake-Rodrigues argument in this case.
+
+Due to space considerations, we only measure the impact of churn on the maintenance of data in P2P storage in our traces. We refer the reader instead to the work of Datta and Aberer [9] as well as that of Godfrey et al. [12] for a more complete discussion of maintenance.
+
+![](dt=2026-06-02/ht=12/bcd0f4d750d7d5d86350203c384f4e64fb071e2b23ef87bccd8dc41e2e43369c.jpg)
+
+# 2 Redundancy Schemes
+
+Data stored on unreliable servers is protected by redundancy. The simplest scheme is Replication (Rep) where we store the same object in $n$ different locations. Simple Erasure Coding (EC) uses an $m/n$ code. It breaks an object into $m$ chunks and generates additional $n - m$ parity chunks. To access an item, we need only to gather any $m$ chunks and decode. Churn, the constant joining and leaving of node in a P2P system, forces us to constantly replace data stored on lost peers somewhere else. Using EC, we have to
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07)
+
+0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+access and read $m$ surviving chunks, reconstruct the data, and generate replacement chunks. To streamline this cumbersome process, we can store the original data elsewhere and generate replacement chunks preferably from it. Following Rodrigues and Liskov [20], we call this Erasure Coding with Primary Copy (EC/1P), (see Figure 1). Data accesses in EC/1P are also simpler since we can directly access the stored object. We also consider a scheme EC/2P where we mirror the primary copy.
+
+Bucketing (BUCK) attempts to combine the advantages of replication and EC without the disadvantages of an increased storage footprint. BUCK emulates a RAID Level 6 reliability stripe, where each data item is stored in its entirety in a bucket and a peer holds one bucket. A typical bucket contains several data items. All buckets are roughly the same size. Note that data buckets might not be completely filled. We group $m$ data buckets into a reliability stripe and add to them $k$ parity buckets (Figure 2). If possible, the data is accessed directly from the data bucket containing the item.
+
+As any $m$ data buckets in a reliability stripe are sufficient to reconstruct any data item, we can still satisfy requests to data stored on dead or unavailable peers and reconstruct lost buckets in the background.
+
+We also consider schemes where each data bucket is mirrored (BUCK/1R) or even triplicated (BUCK/2R). These hybrid schemes satisfy more reads in a single access.
+
+![](dt=2026-06-02/ht=12/c808d7817b8211f354808981b518bc0bbfc2dd8513ef1009f3bb42d147dbe48c.jpg)
+
+![](dt=2026-06-02/ht=12/c6bab6fb20b73f2d2d78acbb5cb2d520426abdedee31408c48190cd08a9eb42a.jpg)
+
+# 3 Theoretical Results
+
+In order to compare our schemes, we derive formulae for the stretch (the ratio of storage actually used over the size of the data stored) and the access costs in the case where peers are available with constant probability $p$ . We first calculate formulae for the availability of our data. Throughout, we use $n$ for the group size, $m$ for the number of peers necessary to recover data, and we abbreviate $q = 1 - p$ . We also denote the cumulative binomial probability by
+
+$$
+B (m, n, p) = \sum_ {\nu = m} ^ {n} \binom {n} {\nu} p ^ {\nu} q ^ {n - \nu}
+$$
+
+For comparison purposes, we select a high level of data availability and calculate the storage overhead as the stretch, defined to be the ratio of the size of storage used in order to provide this availability over the size of the user data items. We use our formulae to numerically determine the stretches for a data availability level of $99.99\%$ (four nines) using $m = 7$ for all schemes but replication (Figure 4). Certainly, other levels of availability such as two nines or five nines, could be presented in a longer paper.
+
+For ease of reading, the schemes appear in the same order within the legend as they do in the graph at high levels of availability. We observe the much larger stretch required by replication for low to medium peer availability. The hybrid schemes (EC/1P, EC/2P, BUCK/1R, BUCK/2R) converge to the space efficiency of EC and BUCK for low peer availability. However, the hybrid schemes follow the trend to the higher stretch of replication for higher peer availability.
+
+Always, BUCK has lower stretch than EC, mainly because we define our availability as the probability that a given object is available. If, for instance, only one bucket survives then the data in that bucket is considered available. In EC, a single chunk is not sufficient to reconstruct data. For much lower object availability levels and very low peer availability, replication can provide better object availability than bucketing and chunking [17] for the same stretch.
+
+Table 1: Availability of a stored data item.
+
+![](dt=2026-06-02/ht=12/e806466042db47c61f6f3f7791b6403b26f78654c2918fa6aaaf59e5445d95b1.jpg)
+
+<table><tr><td>REP</td><td>1-qn</td></tr><tr><td>EC</td><td>B(m,n,p)</td></tr><tr><td>EC/1P,2P</td><td>1-ql·(1-B(m,n,p)</td></tr><tr><td>BUCK</td><td>1-q(1-B(m,n-1,p))</td></tr><tr><td>BUCK/1P,2P</td><td>1-ql(1-D(m,m-1,n-lm,l,p))</td></tr></table>
+
+![](dt=2026-06-02/ht=12/93305ef6d93c0c57f0c2de7063f6054c172bd0b4117ef99b1d3af6b50db9838c.jpg)
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07)
+
+0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+We now turn to modeling data accesses. As it would be impossible for us to give a complete taxonomy of data access organizations, we use two simple measurements. First, we measure the difficulty to locate peers from which to transfer data. In a typical, P2P system based on Distributed Hash Tables (DHT) with $N$ peers, clients can access a peer with a given ID in $O(\log N)$ hops. Rather than counting the hops, we just consider this one access, and then count the number of accesses (pings) it takes to locate enough peers to get the desired data.
+
+We assume that the client will ping peers until it finds either a single peer that contains the data or enough peers to reconstruct it. Our model presupposes that client peers cache the Internet Protocol (IP) addresses of their storage sites. The distributed hash table locates the storage peers only if the peer or peers at cached addresses do not respond or refuse to honor the request. While not valid in general (e.g. if a random walk strategy is used), we believe that our assumption is valid in P2P storage schemes.
+
+Even if the assumption is wrong, our numbers still give a rough idea of the difficulties of accessing data for each scheme.
+
+Our second measure is the minimum amount of data that needs to be transferred to retrieve the data. (Some P2P systems are more profligate in their retrieval than others.) While replication and EC only download the requested data, this is not always true for Bucketing. If a data bucket with the requested data is not available, then $m$ complete buckets must be accessed and transferred in order to reconstruct the desired data.
+
+We now present the access costs associated with our various schemes. As before, $p$ stands for the probability of a peer being available, $q$ is $1 - p$ , and $m$ and $n$ are the parameters of the erasure correcting code. $S$ is the expected number of pings.
+
+Replication searches for one replica after the other:
+
+$$
+S _ {\text {R e p l}} = p + 2 q p + 3 q ^ {2} p + \dots (n - 1) q ^ {n - 2} p + n q ^ {n - 1} = \frac {1 - q ^ {n}}{p}
+$$
+
+Erasure Coding (EC) uses exactly $s$ pings if the first $s - 1$ pings provide $m - 1$ available peers and the next access is successful. The sole exception is $s = n$ pings, which happens if we have not found $m$ available peers in $n - 1$ trials. In this case, our data retrieval is either unsuccessful or uses all $n$ peers in the reliability stripe. It appears that our formula cannot be simplified:
+
+$$
+S _ {\mathrm {E C}} (n, m, p) = \sum_ {\mu = m} ^ {n - 1} \mu \binom {\mu - 1} {m - 1} p ^ {m} q ^ {\mu - m} + n (1 - B (m, n - 1, p)))
+$$
+
+In Erasure Coding with one primary copy (EC/1P) $n$ peers store data chunks and an additional peer stores the primary copy. We use one ping if the primary copy is available (with probability $p$ ). Otherwise, (with probability $q$ ) we proceed, as with Erasure Coding, by looking for $m$ available peers among $n$ possible peers in the reliability
+
+stripe:
+
+$$
+S _ {\mathrm {E C} / 1 \mathrm {P}} = p \cdot 1 + q \cdot (1 + S _ {\mathrm {E C}} (n, m, p))
+$$
+
+Similarly, if we duplicate the primary copy to be more likely to satisfy reads from that copy, then we use 1 ping, if the first primary copy is available (probability $p$ ), 2 pings, if the first one is down and the second is available (probability $pq$ ), and otherwise two more than with Erasure Coding (probability $q^2$ ).
+
+$$
+S _ {\mathrm {E C} / 2 \mathrm {P}} = 1 \cdot p + 2 \cdot p \cdot q + (2 + S _ {\mathrm {E C}} (n, m, p)) \cdot q ^ {2}
+$$
+
+In Bucketing (BUCK), we access the data directly with probability $p$ when the peer with the desired data is available. Otherwise, we must collect data from $m$ of the $n - 1$ remaining peers.
+
+$$
+S _ {\text {B U C K}} = 1 \cdot p + (1 + S _ {\text {E C}} (n - 1, m, p)) \cdot q
+$$
+
+An exact expression for $S$ for Bucketing with Replication is difficult to derive because of the accounting for replicas of data buckets. Merely being able to find $m$ available peers is not sufficient, because sometimes a peer carries redundant user data items that do not contribute to the ability to reconstruct data. We achieve our numerical results in this case using an upper and a lower bound, separated by at most $2\%$ .
+
+![](dt=2026-06-02/ht=12/3cee88df8b9d551f8d724b85816dcfca82055bc8b51ad70e36132d3e34c5319b.jpg)
+
+We show the numerical results in Figure 5 for $99.99\%$ data availability. With perfect peer availability, all schemes require a single ping to access data, except EC, that requires $m$ pings. Not surprisingly, replication requires the least number of pings and erasure coding the most. The addition of primary copies to erasure coding (EC/1P, EC/2P) dramatically improves ping performance. In fact, for very high levels of peer availability $(90\%)$ , their performance almost equals that of replication. BUCK and EC/1P and BUCK/1P and EC/2P have almost identical ping performance.
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07)
+
+0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+![](dt=2026-06-02/ht=12/fd47795155bd3a1a643e10e0002c8435f39d3b67078c7f18df3ed855a6e4bf0d.jpg)
+
+Figure 6 highlights the disadvantage of bucketing schemes, which must fetch additional and unrelated data to reconstruct the requested data. The x-axis gives peer availability, while the y-axis gives the amount of data transferred. We see that with BUCK/2R these additional transfers are small $(< 10\%)$ for peer availability levels greater than $75\%$ . However, if peers are only available $20\%$ of the time, then BUCK transfers almost six times more data than REP or any of the EP schemes.
+
+# 4 Experimental Evaluation and Simulation
+
+Of course, our analytic models cannot accurately reflect the variety and diversity of peer availability in an actual P2P system. We therefore used traces extracted from live P2P systems to evaluate the efficacy of the various schemes. We again chose a data availability level of 4 nines, then determined the necessary stretch and access costs associated with each scheme.
+
+A P2P storage scheme must recognize and replace under-performing peers as well as peers that have permanently left the system. timeouts are a simple and proven approach. A peer currently storing data that has been unavailable for a period $T$ – the time-out value – is replaced by a random available peer. Incidentally, we have experimented with more sophisticated replacement and selection algorithms, and our results confirm others [10,12] that random replacement is a good strategy. We consider here only this simple time-out scheme with three levels of $T$ .
+
+We model a static scheme by using an infinite timeout level, $T = \infty$ . Timeout level $T = 1$ hour is clearly aggressive and replaces any peer not responding within a single time period. Timeout level $T = 24$ hours was intended to represent a real world case where a peer would be unavailable for many time periods before replacement.
+
+Our evaluation used different traces from Godfrey's collection. The first one is Farsite, which gives the
+
+availability of 51,663 desktop PCs within Microsoft for 35 days beginning July 6, 1999 [1, 10]. The overall average availability for the Farsite network was approximately $81\%$ with $9\%$ of all peers being available for the entire trace. The second trace, Overnet, collected the availability of 2400 peers in the Overnet P2P system gathered during a membership crawl over a 7 day period [3]. The overall average uptime for the Overnet network is approximately $15\%$ with none of the hosts being available for the entire trace.
+
+We report our results for an availability level of $99.99\%$ (four nines). We note that our experiments for $99\%$ (two nines) did not lead us to different conclusions. We first compare simulated and theoretical expected values for stretch using the Farsite traces in Table 2. Here, we chose $m = 7$ and 4 nines of availability for different timeouts. The experimental values are consistently less than those predicted by the formulae, even though a model with timeout value $\mathrm{T} = \infty$ should be accurate.
+
+The discrepancy has a simple explanation: Peers are not independent with respect to availability. In the Farsite trace, for example, peer availability is highest during the day and lowest during nights and weekends. Secondly, as is well-known [3, 18, 21], random replacement of failed peers by currently available peers tends to select peers with higher availability over time. As a result, the availability of peers actually used in our scheme is on average higher than the general population.
+
+Table 2: Simulated vs. Theoretical Stretch (Farsite)
+
+![](dt=2026-06-02/ht=12/5d361c6050477dcf8fe720ffc5ac50bbd05dd87467f67a10ea3ceef2d8d3932b.jpg)
+
+<table><tr><td>Scheme</td><td>T=1</td><td>T=24</td><td>T=∞</td><td>Theoretical</td></tr><tr><td>REP</td><td>2.00</td><td>3.00</td><td>4.00</td><td>6.00</td></tr><tr><td>EC</td><td>1.43</td><td>1.72</td><td>2.15</td><td>2.42</td></tr><tr><td>EC/1P</td><td>2.15</td><td>2.43</td><td>2.91</td><td>3.14</td></tr><tr><td>EC/2P</td><td>3.00</td><td>3.29</td><td>3.72</td><td>4.00</td></tr><tr><td>Buck</td><td>1.29</td><td>1.58</td><td>2.00</td><td>2.28</td></tr><tr><td>Buck/1P</td><td>2.15</td><td>2.29</td><td>2.58</td><td>3.14</td></tr><tr><td>Buck/2P</td><td>3.00</td><td>3.15</td><td>3.29</td><td>3.85</td></tr></table>
+
+# 4.1 Churn Costs
+
+Churn, the data movement caused by replacing peers that have timed out and are thus considered unavailable, is difficult to model analytically. Even if we were to assume a completely homogenous set of peers, churn costs depend on the frequency of peers changing state from unavailable to available and the timeout value. While it is possible to model the steady state for a homogeneous set of peers, we doubt its applicability to practical systems. Therefore, we
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07)
+
+0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+used the traces of P2P systems to evaluate churn. We measure churn as the total amount of data transferred per hour normalized against the total amount of user data. A churn of 0.1 thus signifies that on average, we move $10\%$ of the user-stored data around the network in order to maintain the current state.
+
+![](dt=2026-06-02/ht=12/31e370d8ade2c6f4611a673e9780730a3294da74efd5b39f1ebca24dfe33a0be.jpg)
+
+![](image)age/dt=2026-06-02/ht=12//a868ed4437649aaae63533d50db35452df3fe146c2fd5073ccb689748ed1a1ce.jpg)
+
+Figure 7 shows stretch and churn cost in Farsite and Overnet for the various schemes. Farsite only needs two replicas in the replication scheme at the aggressive timeout value 1. The two primary copies in EC/2P and the triplication of data buckets in BUCK/2R are overkill and these schemes far exceed our availability threshold of $99.99\%$ . EC/1P has a slightly worse stretch than REP, but this is because the minimum configuration, one primary copy and 7 chunks, just misses the availability mark of $99.99\%$ . All bucketing schemes cause considerably more
+
+churn. Since Farsite peers are highly available, we typically only have to replace data on a single peer. EC/1P and EC/2P deal best with this situation. If the primary copies have survived, we generate a new chunk from the primary and send it to the replacement peer for a cost of $1 / m$ . Replacing a peer in BUCK is done at one of the surviving buckets, we read $m - 1$ other buckets and write to the replacement peer, for a total transfer cost of $m$ times the contents of the bucket. Consequently, BUCK and its variants have considerably more churn costs in both traces.
+
+As expected, the Overnet trace, Figure 7, with relatively low peer availability, had considerably higher stretch and churn than Farsite. An aggressive timeout and replacement policies force early replacements of typically a single peer. As before, EC/1P and EC/2P have the least amount of churn cost. REP and EC, as before, have slightly higher churn costs and BUCK and its variants fares more poorly. The cost of churn should diminish as replacement picks more highly available peers.
+
+Table 3: Churn Costs in Overnet and Farsite, First and Last Quintile, Timedouts 1hr and 24 hrs
+
+![](dt=2026-06-02/ht=12/5e561e13e0d8e1ce9ff0ca6c6a94725542b865d0935f380a47f1e4549e25f433.jpg)
+
+<table><tr><td></td><td colspan="2">Farsite</td><td colspan="2">Overnet</td></tr><tr><td>Scheme</td><td>T=1</td><td>T=24</td><td>T=1</td><td>T=24</td></tr><tr><td>BUCK 1stquint.</td><td>0.0336</td><td>0.0058</td><td>0.1474</td><td>0.0069</td></tr><tr><td>BUCK 5thquint.</td><td>0.0198</td><td>0.0027</td><td>0.1302</td><td>0.0095</td></tr><tr><td>BUCK/1R 1stq.</td><td>0.0329</td><td>0.0058</td><td>0.1424</td><td>0.0069</td></tr><tr><td>BUCK/1R 5thq.</td><td>0.0196</td><td>0.0027</td><td>0.1273</td><td>0.0096</td></tr><tr><td>BUCK/2R 1stq.</td><td>0.0324</td><td>0.0059</td><td>0.1358</td><td>0.0068</td></tr><tr><td>BUCK/2R 5thq.</td><td>0.0192</td><td>0.0028</td><td>0.1219</td><td>0.0096</td></tr><tr><td>EC 1stquintile</td><td>0.0048</td><td>0.0008</td><td>0.0202</td><td>0.0009</td></tr><tr><td>EC 5thquintile</td><td>0.0028</td><td>0.0004</td><td>0.0180</td><td>0.0014</td></tr><tr><td>EC/1P 1stquint.</td><td>0.0005</td><td>0.0001</td><td>0.0049</td><td>0.0005</td></tr><tr><td>EC/1P 5thquint.</td><td>0.0003</td><td>0.0000</td><td>0.0039</td><td>0.0008</td></tr><tr><td>EC/2P 1stquint.</td><td>0.0011</td><td>0.0002</td><td>0.0039</td><td>0.0003</td></tr><tr><td>EC/2P 5thquint.</td><td>0.0006</td><td>0.0001</td><td>0.0033</td><td>0.0004</td></tr><tr><td>REP 1stquintile</td><td>0.0049</td><td>0.0008</td><td>0.0245</td><td>0.0011</td></tr><tr><td>REP 5thquintile</td><td>0.0029</td><td>0.0004</td><td>0.0211</td><td>0.0014</td></tr></table>
+
+Table 3 contrasts the churn costs in the first and the last quintile of the trace. We obtained these values with 10,000 runs. We notice the beneficial effects of increasing the timeout. We also notice that Overnet churn costs increase from the first quintile to the last when using $T = 24$ , mainly
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07) 0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+because the timeout value (1 day) is so close to one fifth the length of the trace (of 7 days). This problem is endemic to using timeout schemes on finite traces. Just as a cold cache has mandatory misses, so our timeout scheme can only replace underperforming peers after a warm-up period.
+
+![](dt=2026-06-02/ht=12/aa510745a06b5e4163d64b246c7ba97d992294c304a4884bd0a8a857fb1762af.jpg)
+
+# 4.2 Access Costs
+
+Recall that we distinguish two access costs, the number of pings to find the data and the amount of data that needs to be transferred. Recall also that measuring access costs in pings should be valid in a P2P storage system, but is meaningless for some P2P systems. Only Bucketing transfers a larger amount than the requested piece of data, and this only if the peer(s) storing the entire data item are unavailable. We use the number of pings as a measure of the latency users will experience before they start receiving data.
+
+Figure 8 shows the stretch and access cost (number of pings) for Overnet. The EC scheme is not shown because its access cost is so much greater than the others (about 8 under these conditions). The access cost of EC is so high because no single peer can supply the entire data item.
+
+# 4.3 Sensitivity
+
+Tables 4 and Figure 9 show the influence of the choice of the time-out parameter. In related, unpublished work, the authors found that more sophisticated selection mechanisms than randomly picking an available peer as a replacement can improve the availability of the selected peers over time, but that the improvement is rarely over $20\%$ in availability. Similarly, the choice of the erasure coding parameter $m$ also influences stretch and churn costs but the effect is also less
+
+pronounced.
+
+Table 4: Complete Overnet and Farsite stretch results
+
+![](dt=2026-06-02/ht=12/1fba08e2943952f44b90117f14c3302eaee84d9ad023a7ee7ec31ad5715e2c78.jpg)
+
+<table><tr><td></td><td></td><td colspan="3">Overnet</td><td colspan="3">Farsite</td></tr><tr><td>Scheme</td><td>T-out</td><td>m=4</td><td>m=7</td><td>m=12</td><td>m=4</td><td>m=7</td><td>m=12</td></tr><tr><td rowspan="3">REP</td><td>1</td><td>5</td><td>5</td><td>5</td><td>2</td><td>2</td><td>2</td></tr><tr><td>24</td><td>12</td><td>12</td><td>12</td><td>3</td><td>3</td><td>3</td></tr><tr><td>∞</td><td>21</td><td>21</td><td>21</td><td>4</td><td>4</td><td>4</td></tr><tr><td rowspan="3">BUCK</td><td>1</td><td>2.75</td><td>2.15</td><td>1.92</td><td>1.5</td><td>1.29</td><td>1.25</td></tr><tr><td>24</td><td>5.71</td><td>4.43</td><td>3.67</td><td>2</td><td>1.58</td><td>1.42</td></tr><tr><td>∞</td><td>9.25</td><td>7.29</td><td>6</td><td>2.5</td><td>2</td><td>1.81</td></tr><tr><td rowspan="3">BUCK /1P</td><td>1</td><td>3</td><td>2.58</td><td>2.42</td><td>2.25</td><td>2.15</td><td>2.09</td></tr><tr><td>24</td><td>5.75</td><td>4.58</td><td>3.92</td><td>2.5</td><td>2.29</td><td>2.17</td></tr><tr><td>∞</td><td>9.5</td><td>7.29</td><td>6.09</td><td>2.75</td><td>2.58</td><td>2.34</td></tr><tr><td rowspan="3">BUCK /2P</td><td>1</td><td>3.5</td><td>3.29</td><td>3.25</td><td>3</td><td>3</td><td>3</td></tr><tr><td>24</td><td>6</td><td>5</td><td>4.42</td><td>3.25</td><td>3.15</td><td>3.09</td></tr><tr><td>∞</td><td>9.5</td><td>7.58</td><td>6.34</td><td>3.5</td><td>3.29</td><td>3.17</td></tr><tr><td rowspan="3">EC</td><td>1</td><td>2.75</td><td>2.29</td><td>1.92</td><td>1.5</td><td>1.43</td><td>1.25</td></tr><tr><td>24</td><td>5.75</td><td>4.43</td><td>3.75</td><td>2</td><td>1.72</td><td>1.5</td></tr><tr><td>∞</td><td>9.25</td><td>7.29</td><td>6</td><td>2.5</td><td>2.15</td><td>1.84</td></tr><tr><td rowspan="3">EC/1P</td><td>1</td><td>3.5</td><td>3.15</td><td>2.84</td><td>2.25</td><td>2.15</td><td>2.11</td></tr><tr><td>24</td><td>6.5</td><td>5.41</td><td>4.67</td><td>2.71</td><td>2.43</td><td>2.34</td></tr><tr><td>∞</td><td>10</td><td>8.15</td><td>6.84</td><td>3.25</td><td>2.91</td><td>2.67</td></tr><tr><td rowspan="3">EC/2P</td><td>1</td><td>4</td><td>3.86</td><td>3.67</td><td>3</td><td>3</td><td>3</td></tr><tr><td>24</td><td>7.25</td><td>6.15</td><td>5.5</td><td>3.5</td><td>3.29</td><td>3.25</td></tr><tr><td>∞</td><td>10.75</td><td>8.91</td><td>7.75</td><td>4</td><td>3.72</td><td>3.51</td></tr></table>
+
+![](dt=2026-06-02/ht=12/6d9629e99ad642de74e3797302f6440465d40c0d07a47104e41cede36a938302.jpg)
+
+# 4.4 Improving Bucketing
+
+Lazy peer replacement lowers the costs of churn. As bucketing has higher churn costs, we experimented with an "improved" version of bucketing (BUIM), where we add $m$ additional parity peers to a reliability stripe. We only replace data on lost parity peers if $m$ or more peers need to be replaced. This bulk replacement lowers the data transfer overhead that the original bucketing scheme incurs. Recall
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07) 0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+that if we reconstruct a single peer, we access $m$ peers, but also have to transfer $m$ times the amount of data stored on a peer. Table 5 shows that the increased stretch of BUIM with mirrored or triplicated data peers pays off in significantly lowered churn costs, about a factor of 10 in both Overnet and Farsite.
+
+# 4.5 Summary
+
+When assessing our various schemes, we observed that Replication has the lowest maintenance costs and is conceptually the simplest scheme. However, only with high peer availability was its stretch comparable to other schemes. Bucketing and Erasure Coding have much lower stretch, with the advantage going to Bucketing when using highly available peers. In general, Bucketing has the highest churn cost and Erasure Coding the highest access cost.
+
+Table 5: Churn Costs in Overnet and Farsite, First and Last Quintile, Timedouts 1hr and 24 hrs
+
+![](image)73429e227bbd7dc0fdc7c49cf97d4b0e463201572eb7bb3b06fe9b985278.jpg)
+
+<table><tr><td></td><td colspan="2">Farsite</td><td colspan="2">Overnet</td></tr><tr><td>Scheme</td><td>T=1</td><td>T=24</td><td>T=1</td><td>T=24</td></tr><tr><td>BUCK/1R 1st</td><td>0.0329</td><td>0.0058</td><td>0.1424</td><td>0.0069</td></tr><tr><td>BUCK/1R 5th</td><td>0.0196</td><td>0.0027</td><td>0.1273</td><td>0.0096</td></tr><tr><td>BUIM/1R 1st</td><td>0.0033</td><td>0.0005</td><td>0.0141</td><td>0.0002</td></tr><tr><td>BUIM/1R 5th</td><td>0.0019</td><td>0.0002</td><td>0.0133</td><td>0.0003</td></tr><tr><td>BUCK/2R 1st</td><td>0.0324</td><td>0.0059</td><td>0.1358</td><td>0.0068</td></tr><tr><td>BUCK/2R 5th</td><td>0.0192</td><td>0.0028</td><td>0.1219</td><td>0.0096</td></tr><tr><td>BUIM/2R 1st</td><td>0.0037</td><td>0.0006</td><td>0.0183</td><td>0.0005</td></tr><tr><td>BUIM/2R 5th</td><td>0.0022</td><td>0.0003</td><td>0.0165</td><td>0.0007</td></tr></table>
+
+Not surprisingly, we observe that combining replication with either Bucketing or Erasure Coding lowers the access cost considerably because a complete copy of the data is usually available from a single peer. Our "improved" hybrid bucketing schemes (Table 5) present a further performance compromise. It trades higher stretch than hybrid Erasure Coding for easier access and almost the low churn costs of hybrid Erasure Coding.
+
+# 5 Conclusions
+
+Replication is simple and offers good performance, but its stretch is reasonable only for very highly available peers. More complex schemes are worth considering when peers
+
+exhibit lower availability as in the traces of Farsite and Overnet. Fault-free software for distributed systems is difficult to produce and we caution against adding too much complexity. The most complicated part of a P2P storage scheme implementation lies in the addressing scheme, the monitoring of the peers and the selection of replacement peers, i.e., the handling of churn. An improved redundancy scheme does not require a significant amount of added complexity. Linear Erasure Coding schemes are well known and can be implemented in a separate module.
+
+The complexity of updating data (and parity) in any scheme depends on the guarantees given about when the change of data becomes visible to all users. This is a well-known, difficult, but solved problem in distributed systems and well-studied in the literature. The added complexity of Erasure Coding or Bucketing is small in comparison.
+
+In short, we believe that implementing pure erasure coding and bucketing impose rather high maintenance costs (churn) and access costs, even for relatively highly available peers. As a consequence, we advise the use of hybrid schemes that combine data Replication with either Erasure Coding or Bucketing. A hybrid scheme achieves reasonably good performance because it typically accesses data items directly (i.e.
+
+it uses Replication for both maintenance and data access) and achieves very high data availability at a reasonable stretch level because it uses the more space efficient methods of Erasure Coding or Bucketing to increase the data availability level. Our experiments with traces of P2P systems confirm these conclusions. Additionally, we can reduce the costs of churn in Bucketing by being smart about maintenance, creating proactively "spare" parity buckets so that we can perform bulk maintenance operations less often.
+
+In the larger picture, our work addresses to some extent the concerns of the work of Blake and Rodrigues [5]. As we have seen, churn costs are manageable in our environment, mainly because our replacement mechanism selects peers with higher availability with good network bandwidth. We achieve scalability, because reliability groups are autonomous. This leaves the problem of locating the data, something that this paper could not address.
+
+In conclusion, our results lead us to recommend the use of replication to obtain simple data access most of the time, but to use additional erasure-code-generated parity to achieve the last nines in the desired availability level. While we can tolerate the observed churn in a P2P storage environment, lazy and proactive techniques to reduce churn are advisable. However, in this paper, we did not study the efficacy of these schemes again. Our results suggest a P2P storage system with reasonable maintenance costs, fast access time, desired high availability, and reasonable storage overhead from peers with a much smaller availability level.
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07)
+
+0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY
+
+# REFERENCES
+
+Seventh IEEE International Symposium on Cluster Computing and the Grid(CCGrid'07) 0-7695-2833-3/07 $20.00 © 2007 IEEE
+
+COMPUTER SOCIETY

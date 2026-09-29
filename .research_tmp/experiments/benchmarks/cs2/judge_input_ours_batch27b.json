@@ -1,0 +1,1257 @@
+[
+ {
+  "qid": "dda770e4b5c6b0933de17c4b",
+  "question": "What data link layer problems can cause to termination of a connection?",
+  "sections": [
+   {
+    "title": "Role and Scope of the Data Link Layer",
+    "text": "The data link layer, positioned as the second layer from the bottom in the OSI model, serves as the protocol layer that conveys data between neighbor network entities, including single-hop or multi-hop connections [6][2]. It is responsible for establishing, maintaining, and deciding how to transfer data over the physical layer [5]. Specifically, this layer transmits data between network devices adjacent to each other in a wide area network (WAN) or between nodes on a segment of a local area network (LAN) of the same [2]. The primary unit of data, or PDU, used at this layer is the frame [5]. The data link layer converts network frames that contain data into bits to be processed by the physical layer [2][2]. It provides the actual communication protocols across the wire [4]. Additionally, the layer is responsible for multiplexing of data streams, data frame detection, medium access control, and error control [3]. It also handles making frames, flow control, error control, error correction, and re-transmission of the frame, where re-transmission is considered a failure [2]. The data link layer adds special bit patterns to the start and to the end of blocks to ensure they are recognized [1]. The MAC address is implemented in this layer [2]. Layer 2 contains the access protocol for the medium and the functions for call set-up and termination with regard to the operated link [1]. In contrast, the network layer (Layer 3) is responsible for the setting up, operation, and termination of network connections between open systems [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Network layer: Layer 3 The network layer is responsible for the setting up, operation and termination of network connections between open systems.",
+       "Layer 2 contains the access protocol for the medium and the functions for call set-up and termination with regard to the operated link.",
+       "The data link layer adds special bit patterns to the start and to the end of blocks to ensure they are recognized."
+      ],
+      "title": "mobile radio networks ||",
+      "metadata": {
+       "year": 1999,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The MAC address is also implemented in this l",
+       "This layer is responsible for making frames, flow control, error control error correction and re-transmission of the frame is considered a failure.",
+       "Data-link layer (data link layer) is a layer second from bottom in the OSI model, which can convert network frames that contain data that is sent into bits of crude to be processed by the physical layer.",
+       "This layer will transmit data between network devices adjacent to each other in a wide area network (WAN), or between nodes on a segment of a local area network (LAN) of the same."
+      ],
+      "title": "detection of tapping via wifi",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The link layer is responsible for multiplexing of data streams, data frame detection, medium access control, and error control [1].",
+       "Attacks at this layer include purposefully created collisions, resource exhaustion, and unfairness in allocation."
+      ],
+      "title": "wireless sensor networks (current status and future trends) || security in wireless sensor networks",
+      "metadata": {
+       "year": 2012,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Layer 2, the data link layer, provides the actual communication protocols across the wire."
+      ],
+      "title": "pro linux system administration ||",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "PDU used here in this layer is frame.",
+       "The data link layer is responsible for establishing/ maintaining and deciding how to transfer data over the physical layer.",
+       "The most critical attacks at the data link layer involve Content Address Table (CAM) exhaustion, ARP spoofing, DHCP starvation attacks, MAC address spoofing, VLAN attacks and many more.",
+       "Attacks at this layer can vary from Address Resolution Protocol (ARP) cache poisoning for wired clients to de-authentication of wireless clients."
+      ],
+      "title": "denial of service attacks – an updated perspective",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Data link layer is the protocol layer that convey data between the neighbor network entities (i.e., single-hop or multi-hop connections) and may provide functions to detect and correct possible physical layer errors.",
+       "Regardless of users ultimate destination, data link layer undertakes the task of arbitrating among the users, who compete for the same network resources such as time, frequency, space, wavelength, etc., in order to prevent frame collisions and specify protocols to detect and recover from such collisions."
+      ],
+      "title": "underwater optical wireless communications, networking, and localization: a survey",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1803.02442",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Resource Arbitration and Access Control",
+    "text": "The data link layer undertakes the task of arbitrating among users who compete for the same network resources, such as time, frequency, space, and wavelength, to prevent conflicts [6]. This arbitration is critical for managing access to the shared medium. The layer's functions for call set-up and termination are directly tied to the management of the operated link [1]. When resources are contested, the layer must ensure fair allocation and prevent unauthorized access, which is a primary target for various security attacks.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Network layer: Layer 3 The network layer is responsible for the setting up, operation and termination of network connections between open systems.",
+       "Layer 2 contains the access protocol for the medium and the functions for call set-up and termination with regard to the operated link.",
+       "The data link layer adds special bit patterns to the start and to the end of blocks to ensure they are recognized."
+      ],
+      "title": "mobile radio networks ||",
+      "metadata": {
+       "year": 1999,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Data link layer is the protocol layer that convey data between the neighbor network entities (i.e., single-hop or multi-hop connections) and may provide functions to detect and correct possible physical layer errors.",
+       "Regardless of users ultimate destination, data link layer undertakes the task of arbitrating among the users, who compete for the same network resources such as time, frequency, space, wavelength, etc., in order to prevent frame collisions and specify protocols to detect and recover from such collisions."
+      ],
+      "title": "underwater optical wireless communications, networking, and localization: a survey",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1803.02442",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Security Attacks and Adversarial Interference",
+    "text": "Attacks at the data link layer can lead to connection termination or disruption through several mechanisms. These include purposefully created collisions, resource exhaustion, and unfairness in allocation [3]. An adversary may strategically cause collisions in specific packets to disrupt communication. Other significant attacks include Address Resolution Protocol (ARP) cache poisoning for wired clients and de-authentication of wireless clients [5]. The most critical attacks at the data link layer involve Content Address Table (CAM) exhaustion, ARP spoofing, DHCP starvation attacks, MAC address spoofing, and VLAN attacks [5]. These attacks exploit the layer's responsibilities for medium access and frame handling to exhaust resources or spoof identities, potentially leading to the termination of legitimate connections.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "PDU used here in this layer is frame.",
+       "The data link layer is responsible for establishing/ maintaining and deciding how to transfer data over the physical layer.",
+       "The most critical attacks at the data link layer involve Content Address Table (CAM) exhaustion, ARP spoofing, DHCP starvation attacks, MAC address spoofing, VLAN attacks and many more.",
+       "Attacks at this layer can vary from Address Resolution Protocol (ARP) cache poisoning for wired clients to de-authentication of wireless clients."
+      ],
+      "title": "denial of service attacks – an updated perspective",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The link layer is responsible for multiplexing of data streams, data frame detection, medium access control, and error control [1].",
+       "Attacks at this layer include purposefully created collisions, resource exhaustion, and unfairness in allocation."
+      ],
+      "title": "wireless sensor networks (current status and future trends) || security in wireless sensor networks",
+      "metadata": {
+       "year": 2012,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Error Handling and Link Failure Detection",
+    "text": "Errors and losses can occur at the data link layer and higher layers [8]. The data link layer may provide functions to detect and correct possible physical layer errors [6]. The physical layer or data link layer delivers transmission contextual information, indicating whether a discontinuation is permanent or temporary, to the upper layer protocol or to the service users [7]. A proposed agent technique for judging the presence of data link discontinuation depends not just on answer back latency time but assumes various link failures based on the error and flow control of the physical layer or data link layer [7]. This approach allows for more accurate detection of link issues that could otherwise lead to connection termination if not properly managed.",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "The proposed agent technique depends not on just the answer back latency time for judging the presence of data link discontinuation but assumes various link failures based on error and flow control of physical layer or data link layer (or the 2nd layer).",
+       "The physical layer or data link layer delivers transmission contextual information, whether the permanent discontinuation or a temporary discontinuation, to the upper layer protocol or to the service users differently from the existing message of discontinuation preparation warning."
+      ],
+      "title": "optical wireless access point agent networks",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Data link layer is the protocol layer that convey data between the neighbor network entities (i.e., single-hop or multi-hop connections) and may provide functions to detect and correct possible physical layer errors.",
+       "Regardless of users ultimate destination, data link layer undertakes the task of arbitrating among the users, who compete for the same network resources such as time, frequency, space, wavelength, etc., in order to prevent frame collisions and specify protocols to detect and recover from such collisions."
+      ],
+      "title": "underwater optical wireless communications, networking, and localization: a survey",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1803.02442",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Specifically, errors and losses can occur at different levels: data link layer and higher layers [3]."
+      ],
+      "title": "a protection scheme for multimedia packet streams in bursty packet loss networks based on small block low-density parity-check codes",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 22,
+   "n_claims_usable": 22,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C21",
+     "sentence": "An adversary may strategically cause collisions in specific packets to disrupt communication ."
+    },
+    {
+     "cid": "C22",
+     "sentence": "A proposed agent technique for judging the presence of data link discontinuation depends not just on answer back latency time but assumes various link failures based on the error and flow control of t"
+    }
+   ],
+   "word_count": 568,
+   "n_sections": 4,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]"
+   ]
+  }
+ },
+ {
+  "qid": "11e71107ddfdc824b8b87d4f",
+  "question": "What data preprocessing steps are most important for point cloud datasets before performing surface reconstruction?",
+  "sections": [
+   {
+    "title": "Nature of Input Data",
+    "text": "Point clouds are fundamentally raw, unstructured representations generated through 3D scanning or depth projection methods. These initial datasets are frequently characterized by significant imperfections, including outliers, noise, and non-uniformities in both thickness and spacing [1]. Such irregularities often stem from acquisition errors or the misalignment of multiple scans [1]. Because these raw formats are not immediately suitable for detailed analysis, they typically undergo further processing to achieve more organized structures. The presence of these artifacts makes the initial state of the data highly susceptible to errors if not properly addressed before any geometric modeling begins [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We take as input an unorganized point cloud which may contain outliers, noise, and non-uniformities in thickness and spacing, due to acquisition errors or misalignment of multiple scans. Based on point positions alone, we consolidate [Alexa et al. 2003] the point cloud.",
+       "This preprocessing phase for surface reconstruction includes denoising, outlier removal, thinning, orientation, and redistribution of the input points.",
+       "During the process, we defer and avoid any surface generation, a phase that is highly susceptible to various data artifacts."
+      ],
+      "title": "consolidation of unorganized point clouds for surface reconstruction",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Core Preprocessing Operations",
+    "text": "The standard preprocessing phase for surface reconstruction encompasses a specific set of operations, namely denoising, outlier removal, thinning, orientation, and redistribution of the input points [1]. Filtering is a central component of this workflow, used to remove noise and distortion points from the dataset [4]. In addition to general filtering, specific techniques such as smoothing are applied to refine the point cloud structure [4]. Outlier filtering is explicitly required to clean the data before it can be effectively utilized [3]. Furthermore, the process may involve blending existing points to ensure continuity and consistency within the dataset [3]. Segmentation is also identified as a key preprocessing step, particularly when dealing with acquired point cloud data that requires distinct handling of different regions [2]. These operations collectively aim to transform the noisy, unorganized input into a cleaner, more manageable format [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We take as input an unorganized point cloud which may contain outliers, noise, and non-uniformities in thickness and spacing, due to acquisition errors or misalignment of multiple scans. Based on point positions alone, we consolidate [Alexa et al. 2003] the point cloud.",
+       "This preprocessing phase for surface reconstruction includes denoising, outlier removal, thinning, orientation, and redistribution of the input points.",
+       "During the process, we defer and avoid any surface generation, a phase that is highly susceptible to various data artifacts."
+      ],
+      "title": "consolidation of unorganized point clouds for surface reconstruction",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Firstly, preprocessing the acquired point cloud data, including segmentation and filtering."
+      ],
+      "title": "study of huizhou architecture component point cloud in surface reconstruction",
+      "metadata": {
+       "year": 2017,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Point cloud data, acquired from these techniques, require preprocessing operations, such as filtering outliers, smoothing and blending of existing points before being registered into one coordinate system (Schoene and Hoffmann 1997)."
+      ],
+      "title": "selective data acquisition for direct integration of reverse engineering and rapid prototyping",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Secondly, the point cloud data is pre-processed, such as removing noise and distortion points through corresponding filtering, and the point cloud is smoothed.",
+       "Thirdly, the processed 3D point clouds are sampled to reduce the computat"
+      ],
+      "title": "microscopic 3d reconstruction based on point cloud data generated using defocused images",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Data Alignment and Registration",
+    "text": "When point cloud data is acquired from multiple sources or techniques, it requires specific preprocessing operations to unify the geometry [3]. This includes filtering outliers, applying smoothing, and blending existing points [3]. These steps are essential before the data can be registered into a single, coherent coordinate system [3]. Without this alignment, the disparate scans cannot be treated as a unified surface for reconstruction purposes [3]. The orientation of points is also a critical aspect of this phase, ensuring that the data is correctly positioned for subsequent analysis [1]. Proper registration and orientation prevent the introduction of geometric inconsistencies that could compromise the final reconstruction [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We take as input an unorganized point cloud which may contain outliers, noise, and non-uniformities in thickness and spacing, due to acquisition errors or misalignment of multiple scans. Based on point positions alone, we consolidate [Alexa et al. 2003] the point cloud.",
+       "This preprocessing phase for surface reconstruction includes denoising, outlier removal, thinning, orientation, and redistribution of the input points.",
+       "During the process, we defer and avoid any surface generation, a phase that is highly susceptible to various data artifacts."
+      ],
+      "title": "consolidation of unorganized point clouds for surface reconstruction",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Point cloud data, acquired from these techniques, require preprocessing operations, such as filtering outliers, smoothing and blending of existing points before being registered into one coordinate system (Schoene and Hoffmann 1997)."
+      ],
+      "title": "selective data acquisition for direct integration of reverse engineering and rapid prototyping",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Computational Efficiency and Sampling",
+    "text": "Beyond cleaning and alignment, preprocessing also addresses computational constraints. Processed 3D point clouds are often sampled to reduce the computational load required for subsequent steps [4]. Thinning is another related operation that serves to reduce the density of points, thereby optimizing the dataset for efficient processing [1]. This reduction in data volume is crucial for managing the high computational costs associated with detailed surface reconstruction algorithms [4]. By sampling and thinning the data, researchers can balance the need for high-fidelity input with the practical limitations of computational resources [1] [4]. This step ensures that the reconstruction process remains feasible even for large-scale datasets [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Secondly, the point cloud data is pre-processed, such as removing noise and distortion points through corresponding filtering, and the point cloud is smoothed.",
+       "Thirdly, the processed 3D point clouds are sampled to reduce the computat"
+      ],
+      "title": "microscopic 3d reconstruction based on point cloud data generated using defocused images",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "We take as input an unorganized point cloud which may contain outliers, noise, and non-uniformities in thickness and spacing, due to acquisition errors or misalignment of multiple scans. Based on point positions alone, we consolidate [Alexa et al. 2003] the point cloud.",
+       "This preprocessing phase for surface reconstruction includes denoising, outlier removal, thinning, orientation, and redistribution of the input points.",
+       "During the process, we defer and avoid any surface generation, a phase that is highly susceptible to various data artifacts."
+      ],
+      "title": "consolidation of unorganized point clouds for surface reconstruction",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Strategic Avoidance of Early Surface Generation",
+    "text": "A critical strategic consideration in the preprocessing workflow is the deliberate deferral of surface generation. During the preprocessing phase, any surface generation is avoided because this phase is highly susceptible to various data artifacts [1]. Generating a surface too early can lock in errors from noise or outliers, making them difficult to correct in later stages [1]. Therefore, the focus remains on manipulating the point cloud data itself—through denoising, filtering, and redistribution—before any attempt is made to create a continuous surface [1]. This approach ensures that the underlying point data is as clean and accurate as possible, providing a robust foundation for the final reconstruction [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "We take as input an unorganized point cloud which may contain outliers, noise, and non-uniformities in thickness and spacing, due to acquisition errors or misalignment of multiple scans. Based on point positions alone, we consolidate [Alexa et al. 2003] the point cloud.",
+       "This preprocessing phase for surface reconstruction includes denoising, outlier removal, thinning, orientation, and redistribution of the input points.",
+       "During the process, we defer and avoid any surface generation, a phase that is highly susceptible to various data artifacts."
+      ],
+      "title": "consolidation of unorganized point clouds for surface reconstruction",
+      "metadata": {
+       "year": 2009,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 8,
+   "n_claims_usable": 8,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C8",
+     "sentence": "Because these raw formats are not immediately suitable for detailed analysis, they typically undergo further processing to achieve more organized structures ."
+    },
+    {
+     "cid": "C8",
+     "sentence": "Point clouds are fundamentally raw, unstructured representations generated through 3D scanning or depth projection methods ."
+    }
+   ],
+   "word_count": 551,
+   "n_sections": 5,
+   "n_citations": 4,
+   "record_level": 4,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "572a95b728f52a2529b641de",
+  "question": "What data structures are commonly used to solve the Range Minimum Query (RMQ) problem?",
+  "sections": [
+   {
+    "title": "Problem Definition and Objectives",
+    "text": "The Range Minimum Query (RMQ) problem involves preprocessing an array A of integers, specifically defined as A[1..n], into a specialized data structure [2]. This structure must support queries that return the index of the minimum value within a specified range, formally expressed as arg min_{i in [a,b]} A[i] [2]. The primary goals in designing these structures are to minimize both the query time and the space requirement. While the problem has been studied since Chazelle's original work on range searching, the field has seen many simplifications and improvements over time [1]. A linear-space data structure, which can return the position of the minimum, is a standard solution for this problem.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Although solving RMQ can be dated back from Chazelle's original paper on range searching [7], many simplifications [5] and improvements have been made, culminating in Fischer et al.'s 2n + o(n) bit data structure [9, 10]."
+      ],
+      "title": "inverted indexes for phrases and strings",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Given an array $A[1..n]$ of integers, the Range Minimum Query (RMQ) problem asks to preprocess $A$ into a data structure, supporting RMQ(a, b): return arg $\\min_{i\\in [a,b]}A[i]$ (if multiple entries have the smallest $A[i]$ , return the one with smallest $i$ ).",
+       "RMQ data structures have numerous applications in computer science, for instance, in text processing [ALV92, Mut02, FHK06, Sad07a, Sad07b, VM07, CPS08, FMN09, HSV09, $\\mathrm{CIK}^{+}12$ ], graph problems [RV88, BV93, GT04, $\\mathrm{BFP}^{+}05$ , LC08] and other areas of"
+      ],
+      "title": "title:lower bound for succinct range minimum query",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Space-Efficient and Succinct Representations",
+    "text": "A significant advancement in RMQ solutions is the existence of a linear space data structure, requiring O(n) words, that supports constant time queries [4]. However, these linear space structures are often complicated, and efficient implementations did not exist for a period. The culmination of simplifications and improvements led to Fischer et al.'s data structure, which uses 2n + o(n) bits [1]. Information theoretically, the answer to an RMQ is determined if one knows the Cartesian tree of the input, as a tree takes just 2n bits to describe [3]. Consequently, a succinct data structure for the range minimum problem is a key ingredient in modern solutions [3]. This approach allows for highly compressed representations that maintain query efficiency.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Our first ingredient is a succinct data structure for the range minimum problem (RMQ).",
+       "Information theoretically, the answer is determined if we know the Cartesian tree [31] of the input; a tree takes just $2n$ bits to describe."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Although solving RMQ can be dated back from Chazelle's original paper on range searching [7], many simplifications [5] and improvements have been made, culminating in Fischer et al.'s 2n + o(n) bit data structure [9, 10]."
+      ],
+      "title": "inverted indexes for phrases and strings",
+      "metadata": {
+       "year": 2011,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "There exists a linear space ($\\mathrm{O}(n)$ words) data structure for the RMQ problem supporting constant time queries [3, 4]."
+      ],
+      "title": "combinatorial algorithms",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Tree-Based Techniques and Compression",
+    "text": "The tree-covering (TC) technique is a fundamental method for succinct tree data structures, originally introduced by Geary, Raman and Raman for ordinal trees [5]. This technique was later simplified by Farzan and Munro, and further operations for ordinal trees were added by He, Munro and Rao [5]. Additionally, Davoodi et al. have contributed to this area [5]. To improve compression for skewed tree shapes, the entropy trees approach adapts to the empirical distributions found in any given tree [5]. This adaptation yields better compression ratios compared to static methods, making it suitable for diverse data distributions encountered in practical applications.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "to the empirical distributions found in any given tree. This yields better compression for skewed tree shapes.",
+       "The idea of tree covering was introduced by Geary, Raman and Raman [11] (for ordinal trees) and later simplified by Farzan and Munro [6]; He, Munro and Rao [15] added further operations for ordinal trees and Davoodi et al. [4] designed inorder support."
+      ],
+      "title": "entropy trees and range-minimum queries in optimal average-case space",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1903.02533",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Applications and Practical Adoption",
+    "text": "RMQ data structures have numerous applications in computer science, including text processing and graph problems [2]. In 2000, a simple solution was provided, which facilitated the use of constant query time RMQ data structures in many algorithms thereafter. This simplicity and efficiency have made RMQ structures a staple in algorithmic design, enabling complex tasks in text and graph analysis to be performed with optimal query performance [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Given an array $A[1..n]$ of integers, the Range Minimum Query (RMQ) problem asks to preprocess $A$ into a data structure, supporting RMQ(a, b): return arg $\\min_{i\\in [a,b]}A[i]$ (if multiple entries have the smallest $A[i]$ , return the one with smallest $i$ ).",
+       "RMQ data structures have numerous applications in computer science, for instance, in text processing [ALV92, Mut02, FHK06, Sad07a, Sad07b, VM07, CPS08, FMN09, HSV09, $\\mathrm{CIK}^{+}12$ ], graph problems [RV88, BV93, GT04, $\\mathrm{BFP}^{+}05$ , LC08] and other areas of"
+      ],
+      "title": "title:lower bound for succinct range minimum query",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 13,
+   "n_claims_usable": 13,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C13",
+     "sentence": "A linear-space data structure, which can return the position of the minimum, is a standard solution for this problem ."
+    },
+    {
+     "cid": "C8",
+     "sentence": "The primary goals in designing these structures are to minimize both the query time and the space requirement ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "However, these linear space structures are often complicated, and efficient implementations did not exist for a period ."
+    },
+    {
+     "cid": "C7",
+     "sentence": "In 2000, a simple solution was provided, which facilitated the use of constant query time RMQ data structures in many algorithms thereafter ."
+    }
+   ],
+   "word_count": 395,
+   "n_sections": 4,
+   "n_citations": 5,
+   "record_level": 5,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "db4211ada9ca179cddb052bf",
+  "question": "What data analysis tool are the most accurate for an appraisal of a mixed methodology research study?",
+  "sections": [
+   {
+    "title": "Identification of the Primary Tool",
+    "text": "The Mixed Methods Appraisal Tool (MMAT) is the primary instrument identified for the quality assessment of research studies that incorporate mixed methodologies [3]. This specific tool was developed to facilitate quality assessment in reviews that include quantitative, qualitative, and mixed methods studies [3]. It is specifically designed for use in systematic mixed studies reviews, allowing for the appraisal of quantitative, qualitative, and mixed method papers using a single unified tool [1]. The MMAT is noted as one of the other tools that allow for the appraisal of multiple study types, offering good reliability and efficiency [2]. When compared with other available instruments, the MMAT demonstrates the most consistent performance [2]. Furthermore, this tool has been used widely in other systematic mixed studies reviews, establishing its prevalence in the field [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "It has also been used widely in other systematic mixed studies reviews [41-45].",
+       "specifically designed for use in systematic mixed studies reviews and allows the appraisal of quantitative, qualitative and mixed method papers using one tool [38]."
+      ],
+      "title": "the impact of assistive technology use for students with disabilities in higher education: a systematic review",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "We will use the most up-to-date versions of CASP tools for RCTS, cohort and qualitative studies (CASP, 2020) and the 2018 version of the Mixed Methods Assessment Tool (MMAT) to appraise all mixed-methods studies (Hong et al., 2018)."
+      ],
+      "title": "protocol: domestic abuse interventions for mothers in or exiting prison: an evidence and gap map",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "This appraisal tool was developed for the quality assessment in reviews that include quantitative, qualitative and mixed methods studies."
+      ],
+      "title": "patient expectations for management of chronic non-cancer pain: a systematic review",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Versions and Implementation Protocols",
+    "text": "Researchers have employed different versions of the MMAT to conduct critical appraisals, with the 2011 and 2018 versions being specifically cited in the literature [4] [5]. In one instance, critical appraisal of the data was conducted by two independent investigators, identified as J.C. and L.B., using the Mixed Methods Appraisal Tool version 2011 [4]. In another study, quality appraisals for each study were assessed by two investigators using the Mixed Methods Appraisal Tool version 2018, with reference to Appendix C and the work of Hong et al., 2018 [5]. The 2018 version of the Mixed Methods Assessment Tool is also designated for the appraisal of all mixed-methods studies in broader review protocols [2]. The implementation of the MMAT typically involves a dual-reviewer process to ensure rigor; for example, the tool was used by two reviewers, JS and AK, to appraise the quality of the included studies [6]. This approach of using two independent investigators or reviewers is a consistent feature across the cited applications of the tool [4] [5] [6].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Critical appraisal of the data was conducted by two independent investigators (J.C. and L.B.) using the Mixed Methods Appraisal tool (MMAT), version $2011^{(34)}$ ."
+      ],
+      "title": "nutrition care by primary-care physicians: advancing our understanding using the com-b framework",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Quality appraisals for each study were assessed by two investigators using the Mixed Methods Appraisal Tool (MMAT), version 2018 (Appendix C; Hong et al., 2018)."
+      ],
+      "title": "match officials and abuse: a systematic review",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "To guide future research on this topic and to meet the aims of the review, the Mixed Methods Appraisal Tool (MMAT) [34] was used by two reviewers (JS, AK) to appraise the quality of the included studies."
+      ],
+      "title": "virtual reality and artificial intelligence as psychological countermeasures in space and other isolated and confined environments: a scoping review",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "We will use the most up-to-date versions of CASP tools for RCTS, cohort and qualitative studies (CASP, 2020) and the 2018 version of the Mixed Methods Assessment Tool (MMAT) to appraise all mixed-methods studies (Hong et al., 2018)."
+      ],
+      "title": "protocol: domestic abuse interventions for mothers in or exiting prison: an evidence and gap map",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Application in Quality Assessment",
+    "text": "The MMAT is utilized to assess the quality of included studies in various research contexts [9] [8]. In specific studies, the quality of the methodology of all included studies was appraised by means of the Mixed Methods Appraisal Tool [7]. The tool serves as the standard for evaluating study quality, as evidenced by its use in assessing the quality of included studies in multiple review processes [8]. The application of the MMAT is central to the appraisal process, ensuring that the quality methodology of the research is rigorously examined [7]. By using the MMAT, researchers can guide future research on a topic and meet the specific aims of the review [6]. The tool's design allows it to handle the complexity of mixed methods research, providing a structured approach to quality appraisal that is distinct from tools designed solely for single-method studies [3] [1].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "This appraisal tool was developed for the quality assessment in reviews that include quantitative, qualitative and mixed methods studies."
+      ],
+      "title": "patient expectations for management of chronic non-cancer pain: a systematic review",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "It has also been used widely in other systematic mixed studies reviews [41-45].",
+       "specifically designed for use in systematic mixed studies reviews and allows the appraisal of quantitative, qualitative and mixed method papers using one tool [38]."
+      ],
+      "title": "the impact of assistive technology use for students with disabilities in higher education: a systematic review",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "To guide future research on this topic and to meet the aims of the review, the Mixed Methods Appraisal Tool (MMAT) [34] was used by two reviewers (JS, AK) to appraise the quality of the included studies."
+      ],
+      "title": "virtual reality and artificial intelligence as psychological countermeasures in space and other isolated and confined environments: a scoping review",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Quality methodology of all the included studies was appraised by means of Mixed Methods Appraisal Tool [17]."
+      ],
+      "title": "assessing preparedness of non-hospital health centers to provide primary emergency care; a systematic review",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "In order to assess the quality of the studies included, we used the mixed methods appraisal tool (MMAT)."
+      ],
+      "title": "analysis of gender perspective in the use of nanda‐i nursing diagnoses: a systematic review",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "Study quality was assessed using the Mixed Methods Appraisal Tool (MMAT) $^{18}$ ."
+      ],
+      "title": "“giving something back”: a systematic review and ethical enquiry into public views on the use of patient data for research in the united kingdom and the republic of ireland",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Comparison with Other Appraisal Tools",
+    "text": "While the MMAT is the primary tool for mixed-methods studies, it is often used in conjunction with other appraisal instruments. For instance, the most up-to-date versions of CASP tools for randomized controlled trials (RCTs), cohort studies, and qualitative studies (CASP, 2020) are used alongside the 2018 version of the Mixed Methods Assessment Tool [2]. This combination allows for the appraisal of all mixed-methods studies using the MMAT while addressing specific study types with the CASP tools [2]. The MMAT is highlighted for its ability to appraise multiple study types, which contributes to its good reliability and efficiency [2]. In comparisons with other tools, the MMAT is noted to be the most consistent [2]. This consistency, along with its wide use in systematic mixed studies reviews, supports its selection as a robust instrument for quality assessment [1]. The integration of the MMAT with other tools like CASP ensures a comprehensive appraisal framework that covers the full spectrum of study designs included in mixed-methods reviews [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "We will use the most up-to-date versions of CASP tools for RCTS, cohort and qualitative studies (CASP, 2020) and the 2018 version of the Mixed Methods Assessment Tool (MMAT) to appraise all mixed-methods studies (Hong et al., 2018)."
+      ],
+      "title": "protocol: domestic abuse interventions for mothers in or exiting prison: an evidence and gap map",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "It has also been used widely in other systematic mixed studies reviews [41-45].",
+       "specifically designed for use in systematic mixed studies reviews and allows the appraisal of quantitative, qualitative and mixed method papers using one tool [38]."
+      ],
+      "title": "the impact of assistive technology use for students with disabilities in higher education: a systematic review",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 14,
+   "n_claims_usable": 11,
+   "claims_dropped_noref": 3,
+   "claims_invalidated": 0,
+   "word_count": 607,
+   "n_sections": 4,
+   "n_citations": 9,
+   "record_level": 9,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "750fda63f5c3ae6fe29e3c29",
+  "question": "What datasets and methods are used to pre-train models on table specific tasks?",
+  "sections": [
+   {
+    "title": "Pre-training Task Construction",
+    "text": "The methodology for pre-training state-of-the-art tabular in-context learning (ICL) models is characterized by a consistent procedural framework across the field. All state-of-the-art tabular ICL models identified in the literature, specifically those referenced as [6, 7, 9, 12, 4, 13], employ a similar task construction procedure during the pre-training phase [1]. This shared approach involves selecting or creating a specific dataset to serve as the foundation for training [1]. Within this dataset, the model is trained to predict the values of one specific column, which serves as the target variable [1]. To facilitate this prediction, a subset of the remaining columns from the same dataset is utilized as the input features [1]. This structural choice ensures that the model learns to leverage relational information within the tabular data to infer missing or target values, establishing a robust baseline for subsequent inference tasks [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "All state-of-the-art tabular ICL models of which we are aware [6, 7, 9, 12, 4, 13] share a similar task construction procedure during pre-training: a dataset is either selected or created, a column of this dataset is used as the target, and a subset of the remaining columns is used as features.",
+       "Inference is then performed on new datasets while keeping the pre-trained weights frozen (much like LLMs); labeled examples from the evaluation dataset are given as context and the models must predict the values of unlabeled examples."
+      ],
+      "title": "generalization can emerge in tabular foundation models from a single table",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Inference Protocol and Weight Handling",
+    "text": "Following the pre-training phase, the inference process is designed to mimic the operational patterns of large language models (LLMs) [1]. When applying the model to new datasets, the pre-trained weights are kept frozen, meaning no further fine-tuning or weight updates occur during the evaluation stage [1]. This frozen-weight approach allows the model to generalize to unseen data without adaptation [1]. To perform predictions, labeled examples from the evaluation dataset are provided to the model as context [1]. The model then uses this contextual information to predict the values of unlabeled entries in the new dataset [1]. This in-context learning mechanism relies on the model's ability to extract patterns from the provided labeled examples to make accurate predictions on the remaining data points [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "All state-of-the-art tabular ICL models of which we are aware [6, 7, 9, 12, 4, 13] share a similar task construction procedure during pre-training: a dataset is either selected or created, a column of this dataset is used as the target, and a subset of the remaining columns is used as features.",
+       "Inference is then performed on new datasets while keeping the pre-trained weights frozen (much like LLMs); labeled examples from the evaluation dataset are given as context and the models must predict the values of unlabeled examples."
+      ],
+      "title": "generalization can emerge in tabular foundation models from a single table",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluation Tasks and Datasets",
+    "text": "While the core pre-training and inference methods are well-defined, the evaluation landscape includes a broader set of related tasks and datasets that have not yet been fully assessed by existing table pre-training methods [2]. These additional tasks are considered helpful for evaluating the overall effectiveness and generalizability of pre-training models [2]. Among the specific tasks identified as relevant for evaluation is table title generation, which serves as a useful metric for assessing model performance [2]. Another related task that contributes to the evaluation framework is pairwise table relation classification [2]. Furthermore, tabular data synthesis is recognized as a related task that can be used to test the capabilities of pre-trained models [2]. Table error detection is also included in the set of related tasks that are beneficial for evaluating the effectiveness of these models [2]. Although these tasks and their associated datasets are not yet standard in the evaluation of current pre-training methods, they represent important areas for future assessment to fully understand the utility of the pre-trained representations [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "There are still many related tasks and datasets that have not been evaluated by table existing pre-training methods, but they are also helpful to evaluate the effectiveness of pre-training models, such as table title generation [Hancock et al., 2019], pairwise table relation classification [Fetahu et al., 2019], tabular data synthesis [Park et al., 2018], table error detection [Huang and He, 2018]"
+      ],
+      "title": "table pre-training: a survey on model architectures, pre-training objectives, and downstream tasks",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.09745",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 7,
+   "n_claims_usable": 7,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 435,
+   "n_sections": 3,
+   "n_citations": 2,
+   "record_level": 2,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

@@ -1,0 +1,38 @@
+# Introduction
+# Background
+## Open-Vocabulary Object Detection
+## Limitations of User-Defined Vocabularies
+## Test-Time Adaptation in Vision-Language Models
+# Methodology
+## Overview of the Vocabulary Adapter (VocAda)
+## Inference-Time Adaptation Pipeline
+### Image Captioning
+### Noun Parsing
+### Vocabulary Selection and Filtering
+## Mechanism of Action
+### Training-Free Plug-and-Play Design
+### Distinction from Gradient-Based Adaptation
+# Experimental Evaluation
+## Datasets
+### COCO
+### Objects365
+## Experimental Setup
+### State-of-the-Art Detectors
+### Evaluation Metrics
+## Quantitative Results
+### Performance Improvements
+### Versatility Across Detectors
+# Analysis
+## Comparison with Related Test-Time Adaptation Methods
+### Bayesian Class Adaptation plus (BCA+)
+### Meta Test-Time Prompt Tuning (MetaTPT)
+### Test-time Textual Learning (TTL)
+## Computational Considerations
+### Inference Latency and Overhead
+## Failure Modes and Robustness
+### Dependence on Captioner Accuracy
+### Handling of Synonyms and Hallucinations
+# Limitations
+## Lack of Fallback Mechanisms
+## Sensitivity to Captioning Errors
+# Future Work

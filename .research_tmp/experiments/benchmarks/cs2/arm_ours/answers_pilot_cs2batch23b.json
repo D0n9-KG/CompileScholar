@@ -1,0 +1,2723 @@
+[
+ {
+  "id": "38dea1ab1b53857ef1e9ffad",
+  "type": "aggregation",
+  "question": "What are some biologically-inspired robot path planning algorithms?",
+  "gold_hint": "",
+  "answer": "Biologically-inspired (bio-inspired / bionic) robot path planning algorithms are a well-established family of meta-heuristic methods that imitate the behavior, evolution, or collective dynamics of natural organisms to solve the problem of finding a feasible, often optimal, path for a robot through an environment. The 2016 survey of robot 3D path planning algorithms frames the field by dividing path-planning algorithms into three broad groups — search-based, sampling-based, and intelligent bionic algorithms — and defines the bionic category as those that \"mimic evolutionary processes of organisms or collective behavior of swarming animals\" [coarse:e0230ff5d350, coarse:ea430fdfea25]. More generally, bioinspired algorithms \"originate from imitating the way humans or other natural creatures behave or think\" [coarse:60bdddd75be8].\n\nThe corpus documents the following specific bio-inspired algorithms applied to robot path planning:\n\n1. **Ant Colony Optimization (ACO)** — Perhaps the most widely cited bio-inspired method in this domain. Dorigo and Colorni proposed the original biologically inspired heuristic in 1991, simulating ant foraging behavior to solve combinatorial optimization problems [coarse:acda501a6dd2]. In the robot path planning literature, ACO is described as \"a widely known algorithm inspired by biological behaviors successfully applied in robot path planning\" [coarse:13e6a6c19aca]. Specific applications in the corpus include: exploratory path planning for mobile robots in dynamic environments [coarse:77a4d72debe6], intelligent path planning for mobile robots in manufacturing logistics [coarse:4acaadfe3626], and general obstacle avoidance and path optimization [coarse:5fa0ec08e5e3].\n\n2. **Genetic Algorithm (GA)** — Inspired by biological evolution (selection, crossover, mutation), GA is listed among the core intelligent bionic algorithms for robot path planning [coarse:b6f8a97f0b58, coarse:0ae4c0222bee]. It appears alongside other methods in the 2025 particle-swarm paper's taxonomy of intelligent path programming algorithms [coarse:155aa6488fb5].\n\n3. **Particle Swarm Optimization (PSO)** — Modeled on the social foraging behavior of bird flocks or fish schools, PSO is explicitly named as a bio-inspired algorithm for mobile robot path planning [coarse:ab29b75f1de9, coarse:155aa6488fb5]. A 2025 paper designs a path planning algorithm using particle swarm optimization combined with artificial neural networks [coarse:155aa6488fb5].\n\n4. **Artificial Bee Colony (ABC) Algorithm** — Inspired by the foraging behavior of honey bees. An improved multi-objective variant was proposed specifically for mobile robot path planning [coarse:517483cacfcb]. The bee colony algorithm is also listed among bio-inspired methods for robot path planning [coarse:215787a2e78f].\n\n5. **Butterfly Optimization Algorithm (BOA)** — Inspired by the nectar-foraging behavior of butterflies. An improved version was applied to mobile robot path planning and shown to achieve an optimal motion path between initial and target points [coarse:e5517cfcb33e].\n\n6. **Whale Optimization Algorithm (WOA)** — Inspired by the bubble-net hunting strategy of humpback whales, applied to robot path planning [coarse:1bc498549f30].\n\n7. **Dragonfly Algorithm (DA)** — Inspired by the social behavior and hunting patterns of dragonflies, applied to robot path planning [coarse:7b6cbbb7fad7].\n\n8. **Ant Lion Optimizer (ALO)** — Inspired by the trapping behavior of ant lions in sand, applied to robot path planning [coarse:f558a2527eeb].\n\n9. **Cuckoo Search and Bat Algorithm (hybrid)** — Gunji et al. (2019) combined cuckoo search (inspired by brood parasitism in cuckoo birds) with the bat algorithm (inspired by echolocation in bats) to obtain a mobile robot roadmap, validated in a real workspace [coarse:19c2c08d1f91].\n\n10. **Artificial Immune Algorithm (AIA)** — Inspired by the biological immune system, listed among intelligent path programming algorithms for robots [coarse:155aa6488fb5].\n\n11. **Neural Networks** — While not always classified strictly as \"bio-inspired\" in the same sense as swarm meta-heuristics, neural networks (which imitate biological neural tissue) are included in the bio-inspired / intelligent bionic category for robot path planning [coarse:ab29b75f1de9, coarse:155aa6488fb5].\n\nThe survey notes that previously studied methods \"have many shortcomings,\" which motivates the continued development of new bio-inspired approaches [coarse:fb0d861a7e75]. The field is active, with papers from 2013 through 2025 in the corpus applying and improving these algorithms for various robot platforms (mobile robots, UAVs, microrobots, underwater vehicles) and environments (static, dynamic, narrow, 3D).",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "bio-inspired path planning methods"
+    },
+    "intent": "Get dossier on the bio-inspired category to see which members are grounded",
+    "obs_chars": 749,
+    "notes_chars": 499
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ant colony algorithm"
+    },
+    "intent": "Get ant colony algorithm dossier",
+    "obs_chars": 386,
+    "notes_chars": 499
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "genetic algorithm"
+    },
+    "intent": "Get genetic algorithm dossier",
+    "obs_chars": 1313,
+    "notes_chars": 499
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "bio-inspired path planning methods",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition/observation records about bio-inspired methods",
+    "obs_chars": 2096,
+    "notes_chars": 499
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "bio-inspired path planning methods",
+     "contains": "ant colony|particle swarm|bee colony|butterfly|whale|firefly|grey wolf|artificial bee"
+    },
+    "intent": "Find specific bio-inspired algorithm mentions in findings records",
+    "obs_chars": 1655,
+    "notes_chars": 1859
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms",
+     "contains": "bio|bionic|inspired|swarm|colony|genetic|evolutionary"
+    },
+    "intent": "Get survey paper's enumeration of bio-inspired methods",
+    "obs_chars": 960,
+    "notes_chars": 1859
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col",
+     "contains": "ant colony|algorithm|path planning"
+    },
+    "intent": "Get ant colony path planning paper findings",
+    "obs_chars": 1544,
+    "notes_chars": 1859
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for",
+     "contains": "bee colony|algorithm|path planning"
+    },
+    "intent": "Get artificial bee colony path planning paper findings",
+    "obs_chars": 2057,
+    "notes_chars": 1859
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "butterfly|algorithm|path planning",
+     "paper_id": "sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl"
+    },
+    "intent": "Get findings from the butterfly optimization algorithm path planning paper",
+    "obs_chars": 3628,
+    "notes_chars": 3487
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "particle swarm|algorithm|path planning",
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial"
+    },
+    "intent": "Get findings from the particle swarms optimization path planning paper",
+    "obs_chars": 244,
+    "notes_chars": 3487
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "ant colony|algorithm|path planning",
+     "paper_id": "sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo"
+    },
+    "intent": "Get findings from the 2014 ant colony algorithm path planning paper",
+    "obs_chars": 2151,
+    "notes_chars": 3487
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "contains": "bio|bionic|inspired|swarm|colony|genetic|evolutionary|butterfly|whale|firefly|grey wolf|artificial bee|cuckoo|bat",
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms"
+    },
+    "intent": "Get comprehensive enumeration of bio-inspired methods from the survey paper",
+    "obs_chars": 960,
+    "notes_chars": 3487
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "contains": "particle swarm|PSO|swarm optimization",
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial"
+    },
+    "intent": "Get findings from the particle swarms optimization paper (2025)",
+    "obs_chars": 244,
+    "notes_chars": 2785
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "contains": "artificial bee colony|ABC|bee colony|multi-objective",
+     "paper_id": "sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for"
+    },
+    "intent": "Get findings from the artificial bee colony paper (2023)",
+    "obs_chars": 1107,
+    "notes_chars": 2785
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "contains": "ant colony|ACO|exploratory|dynamic",
+     "paper_id": "sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col"
+    },
+    "intent": "Get findings from the ant colony dynamic environments paper (2020)",
+    "obs_chars": 1544,
+    "notes_chars": 2785
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "contains": "butterfly|optimization|path",
+     "paper_id": "sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl"
+    },
+    "intent": "Get findings from the butterfly optimization paper (2023)",
+    "obs_chars": 3628,
+    "notes_chars": 2785
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "contains": "particle swarm|PSO|swarm|optimization|path planning"
+    },
+    "intent": "Get findings from the particle swarm optimization path planning paper (2025)",
+    "obs_chars": 244,
+    "notes_chars": 4918
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo",
+     "contains": "ant colony|ACO|path planning|mobile robot"
+    },
+    "intent": "Get findings from the ant colony algorithm path planning paper (2014)",
+    "obs_chars": 2225,
+    "notes_chars": 4918
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms",
+     "contains": "bio-inspired|bionic|swarm|colony|genetic|evolutionary|artificial bee|butterfly|whale|firefly|grey wolf|cuckoo|bat|dragonfly|ant lion"
+    },
+    "intent": "Check if the 2016 survey enumerates bio-inspired methods comprehensively",
+    "obs_chars": 1191,
+    "notes_chars": 4918
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the PSO paper",
+    "obs_chars": 187,
+    "notes_chars": 2736
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the ant colony 2014 paper",
+    "obs_chars": 1111,
+    "notes_chars": 2736
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition findings from the survey paper to enumerate bio-inspired methods",
+    "obs_chars": 496,
+    "notes_chars": 2736
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the artificial bee colony paper",
+    "obs_chars": 957,
+    "notes_chars": 2736
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "contains": "particle swarm|PSO|swarm|optimization|path planning|artificial"
+    },
+    "intent": "Get findings from the PSO+artificial paper (2025)",
+    "obs_chars": 244,
+    "notes_chars": 3732
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl",
+     "contains": "butterfly|optimization|path|mobile robot"
+    },
+    "intent": "Get findings from the butterfly optimization paper (2023)",
+    "obs_chars": 3628,
+    "notes_chars": 3732
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the PSO+artificial paper",
+    "obs_chars": 187,
+    "notes_chars": 5399
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 3D path planning survey",
+    "obs_chars": 496,
+    "notes_chars": 5399
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "contains": "particle swarm|PSO|artificial|path planning|design"
+    },
+    "intent": "Get findings from the PSO+artificial paper",
+    "obs_chars": 244,
+    "notes_chars": 5399
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition/overview records from the PSO+artificial paper",
+    "obs_chars": 187,
+    "notes_chars": 5399
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from the 2016 survey that may enumerate bio-inspired methods",
+    "obs_chars": 496,
+    "notes_chars": 5399
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition records from the butterfly optimization paper",
+    "obs_chars": 3628,
+    "notes_chars": 5399
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition records from the artificial bee colony paper",
+    "obs_chars": 957,
+    "notes_chars": 5399
+   },
+   {
+    "step": 12,
+    "tool": "card",
+    "args": {
+     "entity": "particle swarm optimization"
+    },
+    "intent": "Get dossier on particle swarm optimization for robot path planning",
+    "obs_chars": 561,
+    "notes_chars": 3252
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "bio-inspired|bionic|swarm|ant colony|genetic|bee|whale|dragonfly|butterfly|cuckoo|bat|artificial immune|bioinspired",
+     "paper_id": "sciverse_survey_of_robot_3d_path_planning_algorithms"
+    },
+    "intent": "Check if the 2016 survey enumerates specific bio-inspired methods",
+    "obs_chars": 496,
+    "notes_chars": 3425
+   }
+  ],
+  "notes_final": "N1. [coarse:1f02c77409df] Bio-inspired path planning methods mimic behavior/decision-making of biological organisms | epistemic:stated\nN2. [coarse:e0230ff5d350] Path-planning algorithms categorized into three groups: search-based, sampling-based, and intelligent bionic algorithms | epistemic:stated\nN3. [coarse:ea430fdfea25] Intelligent bionic algorithms mimic evolutionary processes of organisms or collective behavior of swarming animals | epistemic:stated\nN4. [coarse:0ae4c0222bee] Ant colony algorithms and genetic algorithms are widely recognized among intelligent bionic algorithms\nN5. [coarse:ab29b75f1de9] Bioinspired algorithms for mobile robot path planning include particle swarm, ant colony, genetic algorithms, and neural networks | epistemic:stated\nN6. [coarse:155aa6488fb5] Intelligent path programming algorithms include genetic algorithm, particle swarm algorithm, fuzzy logic, neural network, artificial immune algorithm, and hybrid algorithm | epistemic:stated\nN7. [coarse:19c2c08d1f91] Gunji et al. (2019) obtained a mobile robot roadmap using a hybrid algorithm like cuckoo search and bats, simulated and tested in a real workspace | epistemic:stated\nN8. [coarse:517483cacfcb] Improved multi-objective artificial bee colony algorithm proposed for mobile robot path planning | epistemic:stated\nN9. [coarse:77a4d72debe6] Ant Colony Optimization is the meta-heuristic used by the proposed algorithm (exploratory path planning in dynamic environments) | epistemic:stated\nN10. [coarse:13e6a6c19aca] Ant Colony Optimization is a widely known algorithm inspired by biological behaviors successfully applied in robot path planning | epistemic:stated\nN11. [coarse:4acaadfe3626] Ant colony algorithm applied to mobile robots intelligent path planning in manufacturing logistics | epistemic:stated\nN12. [coarse:acda501a6dd2] Dorigo and Colorni proposed a biologically inspired heuristic optimization algorithm in 1991 that simulates ant behavior to solve combinatorial optimization | epistemic:stated\nN13. [coarse:60bdddd75be8] Bioinspired algorithms originate from imitating the way humans or other natural creatures behave or think | epistemic:stated\nN14. [coarse:fb0d861a7e75] Methods previously studied have many shortcomings, motivating new bio-inspired approaches | epistemic:stated\nN15. [coarse:e5517cfcb33e] Improved butterfly optimization algorithm achieves optimal robot motion path between initial and target points | epistemic:stated\nN16. [coarse:5fa0ec08e5e3] Ant colony algorithm inspired by biological technology for robot path planning, obstacle avoidance, path optimization | epistemic:stated\nN17. [coarse:215787a2e78f] Bee colony algorithm inspired by biological technology for robot path planning | epistemic:stated\nN18. [coarse:b6f8a97f0b58] Genetic algorithm (GA) inspired by biological technology for robot path planning | epistemic:stated\nN19. [coarse:1bc498549f30] Whale optimization algorithm inspired by biological technology for robot path planning | epistemic:stated\nN20. [coarse:7b6cbbb7fad7] Dragonfly algorithm inspired by biological technology for robot path planning | epistemic:stated\nN21. [coarse:f558a2527eeb] Ant lion optimizer inspired by biological technology for robot path planning | epistemic:stated\nN22. [coarse:155aa6488fb5] PSO paper (2025) defines intelligent path programming algorithms including GA, PSO, fuzzy logic, NN, artificial immune, hybrid | epistemic:stated",
+  "gaps_final": "",
+  "queried": [
+   "card|{\"entity\": \"bio-inspired path planning methods\"}",
+   "card|{\"entity\": \"ant colony algorithm\"}",
+   "card|{\"entity\": \"genetic algorithm\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"bio-inspired path planning methods\"}",
+   "findings|{\"contains\": \"ant colony|particle swarm|bee colony|butterfly|whale|firefly|grey wolf|artificial bee\", \"entity\": \"bio-inspired path planning methods\"}",
+   "findings|{\"contains\": \"bio|bionic|inspired|swarm|colony|genetic|evolutionary\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_planning_algorithms\"}",
+   "findings|{\"contains\": \"ant colony|algorithm|path planning\", \"paper_id\": \"sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col\"}",
+   "findings|{\"contains\": \"bee colony|algorithm|path planning\", \"paper_id\": \"sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for\"}",
+   "findings|{\"contains\": \"butterfly|algorithm|path planning\", \"paper_id\": \"sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl\"}",
+   "findings|{\"contains\": \"particle swarm|algorithm|path planning\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"contains\": \"ant colony|algorithm|path planning\", \"paper_id\": \"sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo\"}",
+   "findings|{\"contains\": \"bio|bionic|inspired|swarm|colony|genetic|evolutionary|butterfly|whale|firefly|grey wolf|artificial bee|cuckoo|bat\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_planning_algorithms\"}",
+   "findings|{\"contains\": \"particle swarm|PSO|swarm optimization\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"contains\": \"artificial bee colony|ABC|bee colony|multi-objective\", \"paper_id\": \"sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for\"}",
+   "findings|{\"contains\": \"ant colony|ACO|exploratory|dynamic\", \"paper_id\": \"sciverse_exploratory_path_planning_for_mobile_robots_in_dynamic_environments_with_ant_col\"}",
+   "findings|{\"contains\": \"butterfly|optimization|path\", \"paper_id\": \"sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl\"}",
+   "findings|{\"contains\": \"particle swarm|PSO|swarm|optimization|path planning\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"contains\": \"ant colony|ACO|path planning|mobile robot\", \"paper_id\": \"sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo\"}",
+   "findings|{\"contains\": \"bio-inspired|bionic|swarm|colony|genetic|evolutionary|artificial bee|butterfly|whale|firefly|grey wolf|cuckoo|bat|dragonfly|ant lion\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_plann",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_research_on_the_mobile_robots_intelligent_path_planning_based_on_ant_colony_algo\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_planning_algorithms\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for\"}",
+   "findings|{\"contains\": \"particle swarm|PSO|swarm|optimization|path planning|artificial\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"contains\": \"butterfly|optimization|path|mobile robot\", \"paper_id\": \"sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_planning_algorithms\"}",
+   "findings|{\"contains\": \"particle swarm|PSO|artificial|path planning|design\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_path_planning_algorithm_design_using_particle_swarms_optimization_and_artificial\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_survey_of_robot_3d_path_planning_algorithms\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_application_of_improved_butterfly_optimization_algorithm_in_mobile_robot_path_pl\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_improved_multi_objective_artificial_bee_colony_algorithm_based_path_planning_for\"}",
+   "card|{\"entity\": \"particle swarm optimization\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"bio-inspired|bionic|swarm|ant colony|genetic|bee|whale|dragonfly|butterfly|cuckoo|bat|artificial immune|bioinspired\", \"paper_id\": \"sciverse_survey_of_robot_3d"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 1,
+   "a_chars": 97,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "notes_truncated": 6284,
+   "f28_autos": 0,
+   "max_evidence_streak": 0,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:acda501a6dd2] istic optimization algorithm in=1991 | src:findings@step2 | epi:stated"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "89477b47d76d0cc8eb59b1b7",
+  "type": "aggregation",
+  "question": "What are metrics to mesures the quality of human robot communication?",
+  "gold_hint": "",
+  "answer": "Based on the scientific literature in the knowledge base, several metrics and approaches have been proposed to measure the quality of human-robot communication and interaction. These span multiple dimensions—from task-level effectiveness to perceptual and social qualities:\n\n**1. Quality of the Interaction (QoI) Model**\nA model has been proposed to provide robots with the means to measure in real-time the Quality of the Interaction (QoI) with human partners [sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_]. The system computes the value of each metric every second and outputs two aggregate values: QoI_task and QoI_action [sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_#24300]. This framework enables continuous, online assessment of interaction quality rather than post-hoc evaluation.\n\n**2. Proficiency-Based Communication Metrics**\nA framework for robot proficiency self-assessment and communication of proficiency identifies a four-stage interaction flow. A key principle is that communicating proficiency is only effective if the intended receiver correctly understands the message [coarse:2183d3bbf855]. The framework distinguishes between metrics at the Robot Communication Proficiency (RCP) stage, which measure communication in isolation, and metrics related to human understanding, which necessarily involve the human partner [coarse:5d0014076a79]. This distinction is important because communication quality cannot be fully assessed without considering the human's comprehension.\n\n**3. Subjective/Holistic Metrics**\nQualitative, holistic metrics are identified as very important for assessing the quality of human-robot interaction [coarse:d64695078d1e]. These include Likert-scale agreement measures, such as assessing the degree to which humans agree or disagree with statements like \"I trust the robot\" [coarse:46d9ba4970d0]. Such subjective measures capture dimensions of communication quality—trust, perceived helpfulness, comfort—that are difficult to quantify through purely objective or task-based metrics.\n\n**4. Behavioral and Attention-Based Metrics**\nSeveral metrics for measuring Human-Robot Interaction (HRI) have been proposed, including those measuring the ability of a robot to engage in temporally structured behavioral interactions with humans [coarse:6ac5d52caa28]. One specific line of work focuses on measuring the quality of an attentive mechanism that adopts two fundamental skills for joint attention [coarse:9eef7efac890]. The evaluation aims to identify characteristics that need to be emphasized when implementing attentive mechanisms in robots and to identify correlations between them [coarse:de358aebf657].\n\n**5. Communication Facilitation Metrics**\nWork on facilitating human-mobile robot communication via haptic feedback and gesture teleoperation addresses communication quality from the channel and modality perspective [coarse:2896d9036630]. While this paper primarily proposes a communication method, it implicitly addresses quality through the effectiveness of the chosen communication channels (haptic, gestural) in conveying information between human and robot.\n\n**Summary of Metric Categories:**\n- **Task-level**: QoI_task, task completion, on-time execution\n- **Action-level**: QoI_action, behavioral interaction quality\n- **Comprehension-level**: human understanding of robot messages, RSA (Representational State Alignment) uncertainty\n- **Subjective/social**: trust (Likert scale), perceived helpfulness, holistic quality ratings\n- **Perceptual/attentional**: joint attention quality, saliency detection effectiveness, attention manipulation metrics\n\nThe literature suggests that no single metric captures all dimensions of human-robot communication quality. Effective assessment requires a combination of objective task metrics, real-time interaction quality models, subjective human ratings, and attention/behavioral measures. The QoI model represents a notable advance in providing continuous, robot-computable quality estimates, while the proficiency framework emphasizes the critical role of the human's understanding in determining communication effectiveness.\n\n*Note: The specific concrete metric names within the QoI model's component metrics (beyond QoI_task and QoI_action) and the detailed four-stage proficiency metrics were not fully extracted from the available records. The facilitating communication paper's specific quality metrics were also not fully detailed in the available evidence.*",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "model for online estimation of Quality of the Interaction"
+    },
+    "intent": "Get dossier on the online quality-of-interaction estimation model",
+    "obs_chars": 587,
+    "notes_chars": 1001
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+     "claim_type": "definition"
+    },
+    "intent": "Find metric definitions in the robot proficiency communication paper",
+    "obs_chars": 1047,
+    "notes_chars": 1001
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+     "claim_type": "definition"
+    },
+    "intent": "Find metric definitions in the helpfulness-as-metric paper",
+    "obs_chars": 565,
+    "notes_chars": 1001
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_",
+     "claim_type": "definition"
+    },
+    "intent": "Find metric definitions in the online quality estimation paper",
+    "obs_chars": 565,
+    "notes_chars": 1001
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+     "contains": "metric|measure|quality|communication|proficiency"
+    },
+    "intent": "Get all finding records from the robot proficiency communication paper to identify specific metrics",
+    "obs_chars": 1047,
+    "notes_chars": 1948
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+     "contains": "helpfulness|metric|measure|quality|collaboration"
+    },
+    "intent": "Get all finding records from the helpfulness paper to identify the proposed metric",
+    "obs_chars": 1046,
+    "notes_chars": 1948
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_",
+     "contains": "quality|interaction|metric|measure|estimate"
+    },
+    "intent": "Get all finding records from the online quality estimation paper",
+    "obs_chars": 565,
+    "notes_chars": 1948
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te",
+     "contains": "communication|quality|metric|feedback|gesture|haptic"
+    },
+    "intent": "Get findings from the haptic feedback/gesture communication paper",
+    "obs_chars": 538,
+    "notes_chars": 1948
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "human-in-the-loop metric"
+    },
+    "intent": "Get cross-paper evidence dossier for human-in-the-loop metric entity",
+    "obs_chars": 325,
+    "notes_chars": 2448
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "metrics for human understanding"
+    },
+    "intent": "Get cross-paper evidence dossier for metrics for human understanding entity",
+    "obs_chars": 407,
+    "notes_chars": 2448
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_",
+     "contains": "metric|measure|quality|communication|saliency|attention"
+    },
+    "intent": "Find specific metrics from the saliency/attention manipulation paper",
+    "obs_chars": 1644,
+    "notes_chars": 2448
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "metrics measure quality human robot communication helpfulness trust",
+     "k": 12
+    },
+    "intent": "Broad text search for specific metric names across all papers",
+    "obs_chars": 1749,
+    "notes_chars": 2448
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the proficiency communication paper for specific metrics",
+    "obs_chars": 570,
+    "notes_chars": 3006
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the helpfulness paper for specific metrics",
+    "obs_chars": 1021,
+    "notes_chars": 3006
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the QoI paper for specific metrics",
+    "obs_chars": 1056,
+    "notes_chars": 3006
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the haptic/gesture communication paper",
+    "obs_chars": 957,
+    "notes_chars": 3006
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level details on what specific metrics are proposed for robot proficiency communication",
+    "obs_chars": 570,
+    "notes_chars": 3006
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level details on the helpfulness metric proposed",
+    "obs_chars": 565,
+    "notes_chars": 3006
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level details on the online quality-of-interaction estimation model",
+    "obs_chars": 984,
+    "notes_chars": 3006
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level details on the saliency/attention metrics for HRI",
+    "obs_chars": 1075,
+    "notes_chars": 3006
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "tamp for human-robot collaboration"
+    },
+    "intent": "Get full dossier for the helpfulness/TAMP paper to find specific metrics",
+    "obs_chars": 454,
+    "notes_chars": 3006
+   },
+   {
+    "step": 6,
+    "tool": "card",
+    "args": {
+     "entity": "human-robot interaction studies"
+    },
+    "intent": "Get full dossier for HRI studies to find specific metrics",
+    "obs_chars": 413,
+    "notes_chars": 3006
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition records from the saliency/attention paper for HRI metrics",
+    "obs_chars": 1075,
+    "notes_chars": 3006
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of communication quality metrics from the haptic feedback paper",
+    "obs_chars": 1067,
+    "notes_chars": 3006
+   },
+   {
+    "step": 10,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i"
+    },
+    "intent": "Get full dossier for the proficiency communication paper to find specific metrics",
+    "obs_chars": 655,
+    "notes_chars": 3006
+   },
+   {
+    "step": 10,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration"
+    },
+    "intent": "Get full dossier for the helpfulness metric paper",
+    "obs_chars": 607,
+    "notes_chars": 3006
+   },
+   {
+    "step": 10,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_"
+    },
+    "intent": "Get full dossier for the online quality estimation paper",
+    "obs_chars": 3320,
+    "notes_chars": 3006
+   },
+   {
+    "step": 10,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_"
+    },
+    "intent": "Get full dossier for the saliency/attention HRI paper",
+    "obs_chars": 3668,
+    "notes_chars": 3006
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "query": "metrics measure quality human robot communication interaction",
+     "k": 12
+    },
+    "intent": "Find specific metric names and definitions across all relevant papers",
+    "obs_chars": 1750,
+    "notes_chars": 3006
+   },
+   {
+    "f28_auto_retrieval": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+    "at_step": 15,
+    "obs_chars": 1047
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_",
+     "claim_type": "observation"
+    },
+    "intent": "Get specific HRI metrics used in the saliency/attention paper",
+    "obs_chars": 1075,
+    "notes_chars": 3006
+   },
+   {
+    "f28_auto_retrieval": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+    "at_step": 19,
+    "obs_chars": 1021
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 32
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "metrics for measuring quality of human-robot communication interaction",
+     "k": 10
+    },
+    "intent": "Search external literature for specific metrics used to measure quality of human-robot communication",
+    "obs_chars": 2460,
+    "notes_chars": 3006
+   },
+   {
+    "step": 23,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_"
+    },
+    "intent": "Get recommendation records from the QoI paper for specific metrics proposed",
+    "obs_chars": 565,
+    "notes_chars": 3006
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [3e81f08d8d58ed9e154c7ab1f501acfadb0fb6e1436af5262920385821c10e0e] QoI model targets evaluation",
+     "N11. [13075820b0744cab26766526e8d6ac3b6edcf9c481db7a5ee8922dbc4762144c] Automated metrics for human-"
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i",
+     "sections": [
+      "metrics",
+      "evaluation",
+      "communication"
+     ]
+    },
+    "intent": "Get specific metrics proposed for measuring quality of robot communication of proficiency",
+    "obs_chars": 1315,
+    "notes_chars": 3953
+   },
+   {
+    "step": 24,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration",
+     "sections": [
+      "metrics",
+      "evaluation",
+      "helpfulness"
+     ]
+    },
+    "intent": "Get specific helpfulness metric definition and how it measures HRC quality",
+    "obs_chars": 1722,
+    "notes_chars": 3953
+   },
+   {
+    "step": 24,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_",
+     "sections": [
+      "metrics",
+      "QoI model",
+      "evaluation"
+     ]
+    },
+    "intent": "Get specific QoI metrics (human engagement, task effectiveness) and how they are computed",
+    "obs_chars": 1840,
+    "notes_chars": 3953
+   },
+   {
+    "step": 24,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_",
+     "sections": [
+      "metrics",
+      "evaluation",
+      "joint attention"
+     ]
+    },
+    "intent": "Get specific metrics for measuring quality of attentive/joint attention mechanisms in HRI",
+    "obs_chars": 2028,
+    "notes_chars": 3953
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [3e81f08d8d58ed9e154c7ab1f501acfadb0fb6e1436af5262920385821c10e0e] QoI model targets evaluation",
+     "N11. [13075820b0744cab26766526e8d6ac3b6edcf9c481db7a5ee8922dbc4762144c] Automated metrics for human-"
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [3e81f08d8d58ed9e154c7ab1f501acfadb0fb6e1436af5262920385821c10e0e] QoI model targets evaluation",
+     "N11. [13075820b0744cab26766526e8d6ac3b6edcf9c481db7a5ee8922dbc4762144c] Automated metrics for human-"
+    ]
+   },
+   {
+    "step": 26,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "QoI metric engagement task effectiveness compliance confusion non-cooperative"
+    },
+    "intent": "Find specific metric names from the QoI paper's section IV",
+    "obs_chars": 2190,
+    "notes_chars": 6374
+   },
+   {
+    "step": 26,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "proficiency metric four-stage RCP communication understanding task completion"
+    },
+    "intent": "Find specific metric names from the proficiency-based HRI paper",
+    "obs_chars": 2186,
+    "notes_chars": 6374
+   },
+   {
+    "step": 26,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te"
+    },
+    "intent": "Check the haptic feedback/gesture paper for quality metrics",
+    "obs_chars": 729,
+    "notes_chars": 6374
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [3e81f08d8d58ed9e154c7ab1f501acfadb0fb6e1436af5262920385821c10e0e] QoI model targets evaluation",
+     "N11. [13075820b0744cab26766526e8d6ac3b6edcf9c481db7a5ee8922dbc4762144c] Automated metrics for human-"
+    ]
+   },
+   {
+    "step": 27,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_#24300",
+     "window": 800
+    },
+    "intent": "Get the full list of QoI metrics from section IV of the QoI paper",
+    "obs_chars": 2001,
+    "notes_chars": 7926
+   },
+   {
+    "step": 27,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i#21600",
+     "window": 800
+    },
+    "intent": "Get Table 1 with specific metric names from the proficiency paper",
+    "obs_chars": 2009,
+    "notes_chars": 7926
+   }
+  ],
+  "notes_final": "N1. [coarse:2183d3bbf855] Communicating proficiency is only effective if the intended receiver correctly understands the message. | anchor:\"Communicating proficiency is only effective if the intended receiver correctly understands\" | epistemic:stated\nN2. [coarse:5d0014076a79] Metrics related to human understanding necessarily involve the human, unlike metrics at the RCP stage which measure communication in isolation. | anchor:\"Unlike metrics at the RCP stage of the proficiency-based interaction flow\" | epistemic:stated\nN3. [coarse:46d9ba4970d0] Likert-scale agreement with statements like \"I trust the robot\" used in prior work to assess human-robot collaboration. | anchor:\"Assessing the degree to which humans agree or disagree with statements such as 'I trust the robot' on a Likert scale\" | epistemic:stated\nN4. [coarse:da0f80f2049f] Model proposed to provide robots with means to measure in real-time the Quality of the Interaction with human partners. | anchor:\"provide robots with means to measure in real-time the Quality of the Interaction\" | epistemic:stated\nN5. [coarse:d64695078d1e] Qualitative, holistic metrics can be very important for assessing the quality of human-robot interaction. | anchor:\"qualitative, holistic metrics can be very important metrics for assessing the qua\" | epistemic:stated\nN6. [coarse:2896d9036630] Paper proposes facilitating human-mobile robot communication via haptic feedback and gesture teleoperation. | anchor:\"facilitating human-mobile robot communication via haptic feedback and gesture teleoperation\" | epistemic:stated\nN7. [coarse:6ac5d52caa28] Several metrics for measuring HRI have been proposed, including those measuring the ability of a robot to engage in temporally structured behavioural interactions with humans. | anchor:\"Several metrics for measuring HRI have been proposed, from measuring the ability of a robo\" | epistemic:stated\nN8. [coarse:9eef7efac890] Paper focuses on measuring the quality of an attentive mechanism which adopts two fundamental skills for joint attention. | anchor:\"In this paper, we focus on measuring the quality of this implementation.\" | epistemic:stated\nN9. [coarse:de358aebf657] Evaluation aims to identify characteristics that need to be emphasised when implementing attentive mechanisms in robots and to identify correlations between them. | anchor:\"By evaluating robot skills, in fact, we want to identify those characteristics that need t\" | epistemic:stated\nN10. [sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_#24300] QoI paper: system computes value of each metric every second, outputs QoI_task and QoI_action. | anchor:\"every second, the system computes the value of each metric and then outputs a value for $QoI_{task}$ and $QoI_{action}$\" | epistemic:stated",
+  "gaps_final": "G1. Need more specific metric names from the QoI paper (section IV) — what are the concrete metrics beyond On-Time-Execution?\nG2. Need more specific metric names from the proficiency paper — what are the concrete metrics in the four-stage flow beyond RSA uncertainty/performance?\nG3. Need to check the facilitating human-mobile robot communication paper for any quality metrics.",
+  "queried": [
+   "card|{\"entity\": \"model for online estimation of Quality of the Interaction\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "findings|{\"contains\": \"metric|measure|quality|communication|proficiency\", \"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "findings|{\"contains\": \"helpfulness|metric|measure|quality|collaboration\", \"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "findings|{\"contains\": \"quality|interaction|metric|measure|estimate\", \"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "findings|{\"contains\": \"communication|quality|metric|feedback|gesture|haptic\", \"paper_id\": \"sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te\"}",
+   "card|{\"entity\": \"human-in-the-loop metric\"}",
+   "card|{\"entity\": \"metrics for human understanding\"}",
+   "findings|{\"contains\": \"metric|measure|quality|communication|saliency|attention\", \"paper_id\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\"}",
+   "search_text|{\"k\": 12, \"query\": \"metrics measure quality human robot communication helpfulness trust\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\"}",
+   "card|{\"entity\": \"tamp for human-robot collaboration\"}",
+   "card|{\"entity\": \"human-robot interaction studies\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te\"}",
+   "card|{\"entity\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "card|{\"entity\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "card|{\"entity\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "card|{\"entity\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\"}",
+   "search_text|{\"k\": 12, \"query\": \"metrics measure quality human robot communication interaction\"}",
+   "findings|{\"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\"}",
+   "findings|{\"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\"}",
+   "search_papers|{\"k\": 10, \"query\": \"metrics for measuring quality of human-robot communication interaction\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\"}",
+   "deep_read|{\"paper_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i\", \"sections\": [\"metrics\", \"evaluation\", \"communication\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_helpfulness_as_a_key_metric_of_human_robot_collaboration\", \"sections\": [\"metrics\", \"evaluation\", \"helpfulness\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_\", \"sections\": [\"metrics\", \"QoI model\", \"evaluation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_evaluating_the_effect_of_saliency_detection_and_attention_manipulation_in_human_\", \"sections\": [\"metrics\", \"evaluation\", \"joint attention\"]}",
+   "search_text|{\"k\": 12, \"query\": \"QoI metric engagement task effectiveness compliance confusion non-cooperative\"}",
+   "search_text|{\"k\": 12, \"query\": \"proficiency metric four-stage RCP communication understanding task completion\"}",
+   "card|{\"entity\": \"sciverse_facilitating_human_mobile_robot_communication_via_haptic_feedback_and_gesture_te\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_toward_a_robot_computing_an_online_estimation_of_the_quality_of_its_interaction_#24300\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"sciverse_metrics_for_robot_proficiency_self_assessment_and_communication_of_proficiency_i#21600\", \"window\": 800}"
+  ],
+  "gate": {
+   "note_rejects": 8,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 4,
+   "a_chars": 350,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 8
+   },
+   "merge_downgraded_lines": 15,
+   "merge_total_lines": 89,
+   "relaxed_writes": 4,
+   "notes_truncated": 4476,
+   "f28_autos": 2,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [c0be8ac8bfd8bb] act forgetting frequency=500 steps | src:card@step9",
+   "A2. [28fcf7e881e197] act embedding matrix scheduling=independently across the 500 s | src:card@step9",
+   "A3. [290d6a89d34d57] act scheduler for the body=cosine scheduler | src:card@step9",
+   "A4. [045110fd5b94de] act checkpoint selection=checkpoint with the lowest val | src:card@step9"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "0ed1770483ec64633a580366",
+  "type": "aggregation",
+  "question": "What are some of the challenges associated with creating a training dataset for question answering in scientific domains? Describe some recent methods that try to overcome these challenges.",
+  "gold_hint": "",
+  "answer": "Creating a training dataset for question answering (QA) in scientific domains presents a complex set of challenges, primarily stemming from the inherent difficulty of the task, the unique characteristics of scientific language, and the resource-intensive nature of data generation. Recent methodologies have emerged to address these hurdles, focusing on synthetic data generation, retrieval-augmented synthesis, and rigorous quality control mechanisms.\n\n**Challenges in Scientific QA Dataset Creation**\n\nThe fundamental challenge in QA is that it is a demanding task in Natural Language Processing (NLP) that requires a gigantic sequence of Q&A pairs produced by humans [coarse:fd42f775dac1]. In the specific context of scientific domains, the application of large language models (LLMs) remains challenging due to the unique characteristics of scientific language and knowledge [coarse:b452520db615]. Scientific texts are often dense with technical terminology, implicit assumptions, multimodal data representations, and tightly interlinked concepts, all of which require deeper contextual understanding [coarse:b9b9e37dedc6]. This density creates a significant barrier, as there is still a lack of scientific context understanding datasets that cover the full range of scientific disciplines [35eb74007d0f8f].\n\nFurthermore, the process of generating high-quality data is fraught with reliability issues. When leveraging LLMs to generate QA pairs, challenges such as output variability and hallucinations pose significant threats to reliability [coarse:714bebc1eefa]. Specifically, hallucinations may lead to generated questions that introduce information not present in the source context or violate prompt constraints [coarse:63866fc823f0]. Additionally, context understanding remains sensitive to prompt design and the quality of the provided context, making the creation of robust datasets difficult [56bc3389697784]. For languages that are highly inflectional and have limited resources, a major challenge is the hand-crafted rule building required for processing [coarse:95b360a288eb]. Finally, ensuring the usability of the created data is a critical concern; the consulted records indicate that 71 of 94 articles tested data usability by benchmarking downstream performance on models trained on the data, highlighting the necessity of rigorous evaluation [coarse:03dc0059e002].\n\n**Recent Methods to Overcome Challenges**\n\nTo address the scale, faithfulness, and realism trade-offs inherent in scientific data creation, several recent frameworks have been developed. SciMDR (2026) proposes a synthesize-and-reground framework that generates 300K QA pairs with reasoning chains across 20K scientific papers, explicitly addressing the trade-off among scale, faithfulness, and realism [external:SciMDR]. Similarly, CQ^2A (2025) leverages the strong text generation capabilities of LLMs to generate questions given a specific context and answer [coarse:14c2ef8e5d03]. The mechanism of CQ^2A involves extracting entities and relationships from the context to serve as answers, and then generating the corresponding questions, thereby grounding the data in specific textual evidence [52d2bbd09e7823].\n\nIn the realm of retrieval and synthesis, SciRAG (2025) introduces an adaptive, citation-aware, and outline-guided retrieval and synthesis method for scientific literature [coarse:f556f3ff0d86]. This approach aims to mitigate the issues of context sensitivity and hallucination by structuring the retrieval process. For broader dataset generation, DataGen (2024) offers an LLM-powered framework designed for diverse, accurate, and controllable datasets [external:DataGen]. It employs an attribute-guided generation module and a group checking feature to ensure diversity, while using code-based math assessment and retrieval-augmented generation to enhance accuracy [external:DataGen].\n\nQuality assurance is another critical area of recent innovation. SciCUEval utilizes GPT-4o as an automated evaluator to verify that answers are extractable and logically deducible from the context, with 90.83% of instances in the dataset meeting high-quality criteria [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin]. In the domain of scientific claim verification, the SciVer shared task (2021) focused on systems identifying SUPPORT or REFUTE labels along with evidentiary sentences, involving 11 teams and 14 submissions [external:SciVer]. Additionally, to tackle the resource constraints of low-resource languages, cross-lingual learning techniques are gaining popularity [coarse:92c44d8f468e]. While proprietary models such as GPT-4o and Claude-3.5-Sonnet maintain competitive performance on scientific context understanding [c20dfe72746d6e], the development of specialized datasets and generation frameworks remains essential to address the specific nuances of scientific inquiry.",
+  "arm": "main",
+  "steps": 27,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [question] Need: (a) challenges of creating training datasets for QA in scientific domains; (b) "
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "question answering"
+    },
+    "intent": "Get cross-paper dossier on QA to identify key papers and findings about dataset challenges",
+    "obs_chars": 2582,
+    "notes_chars": 773
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+     "claim_type": "criticism"
+    },
+    "intent": "Get the survey's own critical statements about dataset challenges in QA",
+    "obs_chars": 1049,
+    "notes_chars": 773
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation",
+     "claim_type": "criticism"
+    },
+    "intent": "Get LLM-for-science paper's statements about limitations/challenges of scientific QA datasets",
+    "obs_chars": 187,
+    "notes_chars": 773
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get SciRAG's mechanism for addressing scientific QA challenges",
+    "obs_chars": 542,
+    "notes_chars": 773
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+     "contains": "dataset|annotation|challenge|scientific|domain"
+    },
+    "intent": "Get all findings from the QA survey about dataset challenges in scientific domains",
+    "obs_chars": 561,
+    "notes_chars": 1471
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe",
+     "contains": "synthetic|quality|challenge|dataset|scientific"
+    },
+    "intent": "Get findings on synthetic data quality challenges for QA datasets",
+    "obs_chars": 755,
+    "notes_chars": 1471
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "contains": "question generation|context|dataset|challenge|scientific"
+    },
+    "intent": "Get findings on context-driven question generation for QA testing",
+    "obs_chars": 2054,
+    "notes_chars": 1471
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation",
+     "contains": "dataset|training|challenge|scientific|domain|annotation"
+    },
+    "intent": "Get findings on LLMs for scientific synthesis and dataset challenges",
+    "obs_chars": 244,
+    "notes_chars": 1471
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "challenges creating training dataset question answering scientific domain annotation",
+     "k": 12
+    },
+    "intent": "Find raw-text passages about dataset creation challenges in scientific QA",
+    "obs_chars": 2043,
+    "notes_chars": 2544
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "dataset|annotation|scientific|domain|resource|cost",
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric"
+    },
+    "intent": "Get criticism/limitation findings from the QA survey about dataset challenges",
+    "obs_chars": 1049,
+    "notes_chars": 2544
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "synthetic|generation|quality|assessment|scientific",
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe"
+    },
+    "intent": "Get mechanism findings from the synthetic data quality assessment paper",
+    "obs_chars": 244,
+    "notes_chars": 2544
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "question generation|context|scientific|domain|dataset",
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation"
+    },
+    "intent": "Get mechanism findings from the context-driven question generation paper",
+    "obs_chars": 1567,
+    "notes_chars": 2544
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+     "claim_type": "observation"
+    },
+    "intent": "Get observational findings from the QA survey about dataset challenges",
+    "obs_chars": 1556,
+    "notes_chars": 2544
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe",
+     "claim_type": "observation"
+    },
+    "intent": "Get observational findings from the synthetic data quality assessment paper",
+    "obs_chars": 3295,
+    "notes_chars": 2544
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation",
+     "claim_type": "observation"
+    },
+    "intent": "Get observational findings from the LLMs for scientific synthesis paper",
+    "obs_chars": 580,
+    "notes_chars": 2544
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "scientific question answering dataset annotation domain expertise cost quality control"
+    },
+    "intent": "Find text passages about scientific QA dataset creation challenges",
+    "obs_chars": 2043,
+    "notes_chars": 2544
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "criticism"
+    },
+    "intent": "Get limitations/challenges stated by SciCUEval paper about creating scientific QA datasets",
+    "obs_chars": 2250,
+    "notes_chars": 3262
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism of how SciCUEval constructs its dataset (generation pipeline, quality control)",
+    "obs_chars": 3052,
+    "notes_chars": 3262
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations about ambiguity challenges in scientific NL queries",
+    "obs_chars": 1070,
+    "notes_chars": 3262
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations about SciRAG's approach to scientific retrieval/synthesis challenges",
+    "obs_chars": 1623,
+    "notes_chars": 3262
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "qa systems"
+    },
+    "intent": "Get cross-paper evidence dossier on QA systems for dataset challenges",
+    "obs_chars": 852,
+    "notes_chars": 4904
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "scientific question answering dataset creation challenges annotation domain expertise cost quality"
+    },
+    "intent": "Find specific text about challenges in creating scientific QA datasets",
+    "obs_chars": 1892,
+    "notes_chars": 4904
+   },
+   {
+    "f28_auto_retrieval": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+    "at_step": 10,
+    "obs_chars": 1556
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe",
+     "claim_type": "mechanism",
+     "contains": "synthetic|quality|assessment|scientific|domain"
+    },
+    "intent": "Get mechanism details of the synthetic data quality assessment framework",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation",
+     "claim_type": "observation",
+     "contains": "dataset|annotation|scientific|domain|challenge"
+    },
+    "intent": "Get observations on scientific domain dataset challenges from LLM paper",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "challenges creating training dataset question answering scientific domain annotation expertise cost quality"
+    },
+    "intent": "Find specific passages about challenges in creating scientific QA datasets",
+    "obs_chars": 286,
+    "notes_chars": 4904
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "dataset|annotation|quality|scientific|domain|challenge",
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe"
+    },
+    "intent": "Get criticism/limitation findings from the synthetic data quality assessment paper",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "retrieval|synthesis|citation|outline|scientific",
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc"
+    },
+    "intent": "Get mechanism details of SciRAG method for scientific QA",
+    "obs_chars": 542,
+    "notes_chars": 4904
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism of context-driven question generation for QA testing",
+    "obs_chars": 2054,
+    "notes_chars": 4904
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "annotation|expert|domain|knowledge|cost|expensive|scientific",
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric"
+    },
+    "intent": "Get the survey's own critical statements about dataset challenges in scientific QA",
+    "obs_chars": 765,
+    "notes_chars": 4904
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "synthetic|generation|LLM|context|question|answer|scientific",
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe"
+    },
+    "intent": "Get the mechanism of the synthetic data quality assessment framework",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "step": 16,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "scientific|domain|dataset|challenge|annotation|expert",
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation"
+    },
+    "intent": "Get observations about scientific domain dataset challenges from the LLMs for science paper",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "dataset|annotation|expert|domain|knowledge|cost|expensive|scientific",
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric"
+    },
+    "intent": "Find the survey's own critical statements about dataset challenges",
+    "obs_chars": 244,
+    "notes_chars": 4904
+   },
+   {
+    "f28_auto_retrieval": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin",
+    "at_step": 19,
+    "obs_chars": 2657
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+     "claim_type": "criticism",
+     "contains": "dataset|annotation|expert|domain|knowledge|cost|expensive|scientific|quality"
+    },
+    "intent": "Get the QA survey's specific criticisms/challenges about dataset creation in scientific domains",
+    "obs_chars": 244,
+    "notes_chars": 2688
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe",
+     "claim_type": "mechanism",
+     "contains": "synthetic|generation|LLM|context|question|answer|scientific|quality|assessment"
+    },
+    "intent": "Get the mechanism of the synthetic data quality assessment framework for scientific QA",
+    "obs_chars": 244,
+    "notes_chars": 2688
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation",
+     "claim_type": "observation",
+     "contains": "scientific|domain|dataset|challenge|annotation|expert|knowledge|training"
+    },
+    "intent": "Get observations about scientific domain dataset challenges from the LLMs for science paper",
+    "obs_chars": 580,
+    "notes_chars": 2688
+   },
+   {
+    "step": 21,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "claim_type": "mechanism",
+     "contains": "retrieval|synthesis|citation|outline|scientific|dataset|training"
+    },
+    "intent": "Get SciRAG's mechanism for addressing scientific QA challenges",
+    "obs_chars": 542,
+    "notes_chars": 2688
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "paper_id": "sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe"
+    },
+    "intent": "Get mechanism findings from the synthetic data quality assessment paper",
+    "obs_chars": 499,
+    "notes_chars": 2688
+   },
+   {
+    "step": 22,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "paper_id": "sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin"
+    },
+    "intent": "Get observation findings from SciCUEval paper on scientific dataset creation",
+    "obs_chars": 2664,
+    "notes_chars": 2688
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 40
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "challenges creating training datasets question answering scientific domain annotation expert knowledge",
+     "k": 8
+    },
+    "intent": "Find external papers on challenges of creating QA training datasets in scientific domains",
+    "obs_chars": 2178,
+    "notes_chars": 3910
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "synthetic data generation LLM scientific question answering dataset quality assessment 2024 2025",
+     "k": 8
+    },
+    "intent": "Find recent methods for synthetic QA dataset generation in scientific domains",
+    "obs_chars": 2533,
+    "notes_chars": 3910
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "SciQA scientific question answering dataset construction challenges domain expertise annotation",
+     "k": 8
+    },
+    "intent": "Find papers specifically on scientific QA dataset construction challenges",
+    "obs_chars": 2550,
+    "notes_chars": 3910
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [external:SciMDR] SciMDR (2026): synthesize-and-reground framework; 300K QA pairs with reasonin",
+     "N19. [external:SciQA] SciQA (2023): scientific QA benchmark leveraging ORKG (170K resources, 15K art",
+     "N20. [external:DataGen] DataGen (2024): LLM-powered framework for diverse, accurate, controllable da"
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric",
+     "claim_type": "criticism",
+     "contains": "dataset|annotation|expert|domain|knowledge|cost|expensive|scientific|quality|label"
+    },
+    "intent": "Get the survey's specific criticisms/challenges about dataset creation in scientific domains",
+    "obs_chars": 244,
+    "notes_chars": 5079
+   },
+   {
+    "step": 25,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [external:SciMDR] SciMDR (2026): synthesize-and-reground framework; 300K QA pairs with reasonin",
+     "N19. [external:SciQA] SciQA (2023): scientific QA benchmark leveraging ORKG (170K resources, 15K art",
+     "N20. [external:DataGen] DataGen (2024): LLM-powered framework for diverse, accurate, controllable da"
+    ]
+   },
+   {
+    "step": 26,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [external:SciMDR] SciMDR (2026): synthesize-and-reground framework; 300K QA pairs with reasonin",
+     "N19. [external:SciQA] SciQA (2023): scientific QA benchmark leveraging ORKG (170K resources, 15K art",
+     "N20. [external:DataGen] DataGen (2024): LLM-powered framework for diverse, accurate, controllable da"
+    ]
+   },
+   {
+    "step": 27,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [external:SciMDR] SciMDR (2026): synthesize-and-reground framework; 300K QA pairs with reasonin",
+     "N19. [external:SciQA] SciQA (2023): scientific QA benchmark leveraging ORKG (170K resources, 15K art",
+     "N20. [external:DataGen] DataGen (2024): LLM-powered framework for diverse, accurate, controllable da"
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 27,
+    "f28_autos": 2
+   }
+  ],
+  "notes_final": "N1. [sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric] Survey (2021) on QA: directions, challenges, datasets, evaluation metrics.\nN2. [coarse:95b360a288eb] Major challenge: hand-crafted rule building for highly inflectional languages with limited resources | anchor:\"Major challenge of this work is hand crafted rule building for a language that is highly i\" | epistemic:stated\nN3. [coarse:92c44d8f468e] Cross-lingual learning techniques gaining popularity to tackle resource constraints of low-resource languages | anchor:\"Cross-lingual learning techniques are gaining popularity to tackle the resource constrain\" | epistemic:stated\nN4. [coarse:f556f3ff0d86] SciRAG (2025): adaptive, citation-aware, outline-guided retrieval and synthesis for scientific literature | anchor:\"scirag: adaptive, citation-aware, and outline-guided retrieval and synthesis for scientifi\" | epistemic:stated\nN5. [coarse:62151048a71b] Knowledge-based QA is a challenging task in NLP | epistemic:stated\nN6. [coarse:fd42f775dac1] In QA, a gigantic sequence of Q&A produced by humans is needed | epistemic:stated\nN7. [coarse:14c2ef8e5d03] CQ^2A (2025): leverages LLM text generation to generate questions given a specific context and answer | anchor:\"we leverage the strong text generation capabilities of LLMs to generate que\" | epistemic:stated\nN8. [coarse:714bebc1eefa] Challenges of LLM-generated QA: output variability and hallucinations threaten reliability | anchor:\"challenges such as output variability [16], [17] and hallucinations [18] pose sig\" | epistemic:stated\nN9. [coarse:63866fc823f0] Hallucinations may lead to generated questions that introduce information not present in source context or violate prompt constraints | anchor:\"hallucinations may lead to generated questions that introduce information not\" | epistemic:stated\nN10. [52d2bbd09e7823] CQ^2A mechanism: extracts entities/relationships from context to serve as answers, then generates corresponding questions | anchor:\"$CQ^2A$ extracts entities/relationship\" | epistemic:stated\nN11. [coarse:03dc0059e002] 71 of 94 articles tested data usability by benchmarking downstream performance on models trained on the data | anchor:\"71 of the 94 articles tested data usability by benchmarking downstream performance on mode\" | epistemic:stated\nN12. [sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin] SciCUEval: 90.83% of instances met high-quality criteria; uses GPT-4o as automated evaluator to verify answers are extractable and logically deducible from context | anchor:\"$90.83\\%$ of instances in our dataset met the high-quality criteria\" | epistemic:stated\nN13. [coarse:b452520db615] LLM application to scientific domains remains challenging due to unique characteristics of scientific language and knowledge | anchor:\"their application to scientific domains remains challenging due to the unique cha\" | epistemic:stated\nN14. [coarse:b9b9e37dedc6] Scientific texts are dense with technical terminology, implicit assumptions, multimodal data representations, and tightly interlinked concepts requiring deeper contextual understanding | anchor:\"Scientific texts are often dense with technical terminology, implicit assumptions, multimo\" | epistemic:stated\nN15. [35eb74007d0f8f] There is a lack of scientific context understanding datasets that cover the full range of scientific disciplines | anchor:\"there is still a lack of scientific context underst\" | epistemic:stated\nN16. [56bc3389697784] Context understanding remains sensitive to prompt design and the quality of the provided context | anchor:\"context understanding remain\" | epistemic:stated\nN17. [c20dfe72746d6e] Proprietary models such as GPT-4o and Claude-3.5-Sonnet maintain competitive performance on scientific context understanding | anchor:\"proprietary models such as GPT-4o and Claude-3.5-Son\" | epistemic:stated\n[unsourced] N18. [external:SciMDR] SciMDR (2026): synthesize-and-reground framework; 300K QA pairs with reasoning chains across 20K scientific papers; addresses scale/faithfulness/realism trade-off | anchor:\"inherent trade-off among scale, faithfulness, and realism\" | epistemic:stated\n[unsourced] N19. [external:SciQA] SciQA (2023): scientific QA benchmark leveraging ORKG (170K resources, 15K articles, 709 fields); bottom-up: 100 manual complex questions + 2465 auto-generated via 8 templates | anchor:\"100 complex questions... 2465 question\" | epistemic:stated\n[unsourced] N20. [external:DataGen] DataGen (2024): LLM-powered framework for diverse, accurate, controllable datasets; attribute-guided generation + group checking for diversity; code-based math assessment + retrieval-augmented generation for accuracy | anchor:\"attribute-guided generation module and a group checking feature\" | epistemic:stated\n[unsourced] N21. [external:SciVer] SciVer shared task (2021): scientific claim verification; systems identify SUPPORT/REFUTE + evidentiary sentences; 11 teams, 14 submissions, +23 F1 improvement | anchor:\"improvement of more than +23 F1\" | epistemic:stated",
+  "gaps_final": "G1. What specific challenges does the QA survey list for dataset creation in scientific domains?\nG2. What recent methods (2023-2025) address these challenges (synthetic data, retrieval-augmented, context-driven generation, quality assessment)?\nG3. Are there specific findings on scientific-domain dataset challenges (domain knowledge, annotation cost, evaluation)?",
+  "queried": [
+   "card|{\"entity\": \"question answering\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "findings|{\"contains\": \"dataset|annotation|challenge|scientific|domain\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric\"}",
+   "findings|{\"contains\": \"synthetic|quality|challenge|dataset|scientific\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe\"}",
+   "findings|{\"contains\": \"question generation|context|dataset|challenge|scientific\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "findings|{\"contains\": \"dataset|training|challenge|scientific|domain|annotation\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "search_text|{\"k\": 12, \"query\": \"challenges creating training dataset question answering scientific domain annotation\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"dataset|annotation|scientific|domain|resource|cost\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"synthetic|generation|quality|assessment|scientific\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"question generation|context|scientific|domain|dataset\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "search_text|{\"k\": 12, \"query\": \"scientific question answering dataset annotation domain expertise cost quality control\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "card|{\"entity\": \"qa systems\"}",
+   "search_text|{\"k\": 12, \"query\": \"scientific question answering dataset creation challenges annotation domain expertise cost quality\"}",
+   "findings|{\"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_matric\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"synthetic|quality|assessment|scientific|domain\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"dataset|annotation|scientific|domain|challenge\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "search_text|{\"k\": 12, \"query\": \"challenges creating training dataset question answering scientific domain annotation expertise cost quality\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"dataset|annotation|quality|scientific|domain|challenge\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"retrieval|synthesis|citation|outline|scientific\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"annotation|expert|domain|knowledge|cost|expensive|scientific\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_evaluation_",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"synthetic|generation|LLM|context|question|answer|scientific\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_s",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"scientific|domain|dataset|challenge|annotation|expert\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"dataset|annotation|expert|domain|knowledge|cost|expensive|scientific\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_datasets_eva",
+   "findings|{\"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"dataset|annotation|expert|domain|knowledge|cost|expensive|scientific|quality\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenges_data",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"synthetic|generation|LLM|context|question|answer|scientific|quality|assessment\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessm",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"scientific|domain|dataset|challenge|annotation|expert|knowledge|training\", \"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"retrieval|synthesis|citation|outline|scientific|dataset|training\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthe",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_can_i_trust_my_fake_data_a_comprehensive_quality_assessment_framework_for_synthe\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_scicueval_a_comprehensive_dataset_for_evaluating_scientific_context_understandin\"}",
+   "search_papers|{\"k\": 8, \"query\": \"challenges creating training datasets question answering scientific domain annotation expert knowledge\"}",
+   "search_papers|{\"k\": 8, \"query\": \"synthetic data generation LLM scientific question answering dataset quality assessment 2024 2025\"}",
+   "search_papers|{\"k\": 8, \"query\": \"SciQA scientific question answering dataset construction challenges domain expertise annotation\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"dataset|annotation|expert|domain|knowledge|cost|expensive|scientific|quality|label\", \"paper_id\": \"sciverse_title_question_answering_survey_directions_challenge"
+  ],
+  "gate": {
+   "note_rejects": 17,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 1,
+   "a_chars": 70,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 1,
+   "reject_reasons": {
+    "bad_backref": 17
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 18,
+   "merge_total_lines": 86,
+   "relaxed_writes": 5,
+   "notes_truncated": 3232,
+   "f28_autos": 2,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 17,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "23"
+    ],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [coarse:03dc0059e002] of the=94 | src:findings@step1 | epi:stated"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "0dd4500b3ca1daf372dffb43",
+  "type": "aggregation",
+  "question": "What are some practically-relevant properties of k-node subgraphs that can be counted in faster than cubic time in the size of the input graph?",
+  "gold_hint": "",
+  "answer": "The search for fast algorithms for subgraph counting is not just a theoretical problem, as it has significant applications in bioinformatics and social science . Subgraph counts are widely used to analyze real-world graphs, including telecommunication networks, biological structures, and social interactions . Additionally, subgraph counting problems have applications in areas like statistical physics, probabilistic inference, and network analysis . Through network motifs, the problem of counting subgraphs has found applications in the study of gene transcription networks, neural networks, and social networks .\n\nIn terms of computational complexity, the naive brute-force algorithm for counting induced copies of a pattern $H$ in a graph $G$ has a running time of $O(k^2 n^k)$ . Under the Exponential Time Hypothesis (ETH), counting $k$-cliques requires $n^{\\Omega(k)}$ time . Consequently, the best possible algorithm for this problem is likely $f(k)n^{\\Theta(k)}$ .\n\nRegarding specific subcubic counting results, for $k=4$, all non-induced frequencies, except for $K_4$, are computable in $O(a(G)m)$ time, a result shown by Lin et al. (2012) . The $k$-node subgraph census is usually computed via a system of linear equations relating orbit counts . This implies that the total running time to calculate the quad census at the level of the entire graph is $O(a(a(G)m + i(G)))$ .\n\nThe consulted records did not surface specific details regarding other $k$-node subgraph properties countable in subcubic time beyond the $k=4$ non-induced cases, nor did they provide further concrete time-complexity results for other patterns or graph properties such as degeneracy or sparsity in the context of subcubic algorithms.",
+  "arm": "main",
+  "steps": 10,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "subgraph counting"
+    },
+    "intent": "Get cross-paper evidence dossier on subgraph counting to identify key findings and properties",
+    "obs_chars": 2197,
+    "notes_chars": 855
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the linear-time subgraph counting paper",
+    "obs_chars": 187,
+    "notes_chars": 855
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the faster subgraph counting in sparse graphs paper",
+    "obs_chars": 187,
+    "notes_chars": 855
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_counting_subgraphs_in_degenerate_graphs",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the degenerate graphs subgraph counting paper",
+    "obs_chars": 187,
+    "notes_chars": 855
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "subcubic time counting subgraphs k-node patterns",
+     "k": 12
+    },
+    "intent": "Find raw-text passages about subcubic-time subgraph counting and which patterns/properties are covered",
+    "obs_chars": 1760,
+    "notes_chars": 855
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six",
+     "contains": "linear time|degeneracy|chasm|size six|subcubic"
+    },
+    "intent": "Get findings from the linear-time subgraph counting paper on degeneracy and the size-6 chasm",
+    "obs_chars": 746,
+    "notes_chars": 855
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs",
+     "contains": "faster|sparse|subcubic|time complexity|k-node"
+    },
+    "intent": "Get findings from the faster-algorithms-in-sparse-graphs paper",
+    "obs_chars": 1686,
+    "notes_chars": 855
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join",
+     "contains": "sublinear|star|join|time|counting"
+    },
+    "intent": "Get findings from the sublinear-time star subgraph counting paper",
+    "obs_chars": 244,
+    "notes_chars": 855
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the linear-time subgraph counting paper to identify which subgraphs are countable in l",
+    "obs_chars": 1024,
+    "notes_chars": 1471
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the faster algorithms paper to identify subcubic results",
+    "obs_chars": 1430,
+    "notes_chars": 1471
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_counting_subgraphs_in_degenerate_graphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the degenerate graphs paper",
+    "obs_chars": 1033,
+    "notes_chars": 1471
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the graph pattern detection hardness paper",
+    "obs_chars": 187,
+    "notes_chars": 1471
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six",
+     "contains": "linear time|degeneracy|chasm|size six|subcubic|faster than cubic"
+    },
+    "intent": "Get specific subcubic/linear-time results and the 'chasm at size six' from the linear-time paper",
+    "obs_chars": 1280,
+    "notes_chars": 1696
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs",
+     "contains": "faster|sparse|subcubic|time complexity|k-node|treewidth"
+    },
+    "intent": "Get specific faster-than-cubic results for sparse graphs",
+    "obs_chars": 1685,
+    "notes_chars": 1696
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced",
+     "contains": "hardness|induced|noninduced|faster|subcubic|time"
+    },
+    "intent": "Get hardness results and which patterns are faster to count",
+    "obs_chars": 244,
+    "notes_chars": 1696
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_homomorphisms_are_a_good_basis_for_counting_small_subgraphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from the homomorphisms paper about which subgraphs are countable fast",
+    "obs_chars": 1034,
+    "notes_chars": 1696
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_efficient_orbit_aware_triad_and_quad_census_in_directed_and_undirected_graphs",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from the orbit-aware triad/quad census paper about which subgraphs are countable fast",
+    "obs_chars": 1482,
+    "notes_chars": 1696
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the graph pattern detection hardness paper",
+    "obs_chars": 187,
+    "notes_chars": 2857
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 10,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: practically-relevant properties of k-node subgraphs countable in subcubic time.\nCorpus papers:\n- sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six (2019)\n- sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join (2016)\n- sciverse_homomorphisms_are_a_good_basis_for_counting_small_subgraphs (2017)\n- sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs (2018)\n- sciverse_counting_subgraphs_in_degenerate_graphs (2020)\n- sciverse_efficient_orbit_aware_triad_and_quad_census_in_directed_and_undirected_graphs (2017)\n- sciverse_efficiently_counting_vertex_orbits_of_all_5_vertex_subgraphs_by_evoke (2020)\n- sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced (2021)\nN1. [coarse:858ad82466d8] Fast subgraph counting has applications in bioinformatics and social science | anchor:\"search for fast algorithms for subgraph counting is not just a theoretical probl\" | epistemic:stated\nN2. [coarse:72549fb877d3] Best possible algorithm for subgraph counting likely f(k)*n^Theta(k) | anchor:\"best possible algorithm for this problem is likely\" | epistemic:stated\nN3. [coarse:cbbe9280e506] Under ETH, counting k-cliques requires n^Omega(k) | anchor:\"naive brute-force algorithm has running time $O(k^2 n^k)$\" | epistemic:stated\nN4. [coarse:89a061993c8c] Naive brute-force for counting induced copies of H in G: O(k^2 n^k) | anchor:\"$O(k^2 n^k)$\" | epistemic:stated\nN5. [coarse:1fc410fcb53e] Subgraph counts used in practice for telecommunication networks, biological structures, social interactions | anchor:\"subgraph counts are widely used to analyze real-world graphs\" | epistemic:stated\nN6. [coarse:22f1466a2e3d] Subgraph counting applications: statistical physics, probabilistic inference, network analysis | anchor:\"Subgraph counting problems have applications in areas like statistical physics, probabilis\" | epistemic:stated\nN7. [coarse:75dd8b702228] Subgraph counting via network motifs: gene transcription networks, neural networks, social networks | anchor:\"Through network motifs, the problem of counting subgraphs has found applications in the st\" | epistemic:stated\nN8. [coarse:78881b568e31] k-node subgraph census computed via system of linear equations relating orbit counts | anchor:\"The $k$ -node subgraph census is usually computed via a system of linear equations relatin\" | epistemic:stated\nN9. [coarse:699161ebb8ad] For k=4, all non-induced frequencies except K4 computable in O(a(G)m) time | anchor:\"Lin et al. (2012) show that for $k = 4$ all non-induced frequencies, except for $K_{4}$\" | epistemic:stated\nN10. [coarse:875a7bbc9ba7] Total running time for quad census at entire graph level: O(a(a(G)m + i(G)) | anchor:\"This implies that the total running time to calculate the quad census at the level of the\" | epistemic:stated",
+  "gaps_final": "G1. What specific k-node subgraph properties/patterns are countable in subcubic time?\nG2. What are the practical relevance claims (applications, graph properties like degeneracy/sparse)?\nG3. What are the concrete time-complexity results?",
+  "queried": [
+   "card|{\"entity\": \"subgraph counting\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_counting_subgraphs_in_degenerate_graphs\"}",
+   "search_text|{\"k\": 12, \"query\": \"subcubic time counting subgraphs k-node patterns\"}",
+   "findings|{\"contains\": \"linear time|degeneracy|chasm|size six|subcubic\", \"paper_id\": \"sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six\"}",
+   "findings|{\"contains\": \"faster|sparse|subcubic|time complexity|k-node\", \"paper_id\": \"sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs\"}",
+   "findings|{\"contains\": \"sublinear|star|join|time|counting\", \"paper_id\": \"sciverse_sublinear_time_algorithms_for_counting_star_subgraphs_with_applications_to_join\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_counting_subgraphs_in_degenerate_graphs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced\"}",
+   "findings|{\"contains\": \"linear time|degeneracy|chasm|size six|subcubic|faster than cubic\", \"paper_id\": \"sciverse_linear_time_subgraph_counting_graph_degeneracy_and_the_chasm_at_size_six\"}",
+   "findings|{\"contains\": \"faster|sparse|subcubic|time complexity|k-node|treewidth\", \"paper_id\": \"sciverse_faster_algorithms_for_counting_subgraphs_in_sparse_graphs\"}",
+   "findings|{\"contains\": \"hardness|induced|noninduced|faster|subcubic|time\", \"paper_id\": \"sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_homomorphisms_are_a_good_basis_for_counting_small_subgraphs\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_efficient_orbit_aware_triad_and_quad_census_in_directed_and_undirected_graphs\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_graph_pattern_detection_hardness_for_all_induced_patterns_and_faster_noninduced\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 10,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "a8ba07610b6d77890e50144b",
+  "type": "aggregation",
+  "question": "What are some common UI designs for sense-making, information organization, and AI writing tools?",
+  "gold_hint": "",
+  "answer": "Based on the knowledge base, here is a synthesis of common UI designs across the three categories:\n\n## Sense-Making Tools\n\nThe corpus identifies several recurring UI design patterns for sense-making:\n\n**Visual Analytics Dashboards**: The design space paper (2025) identifies visual analytics dashboards as a key computational support for sensemaking, enabling iterative exploration of information [sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a]. The foundational interaction pattern is Shneiderman's mantra: \"overview first, zoom and filter, then details on demand\" — an overview display depicts major data trends and clusters to orient the user, with subsequent interrogations occurring through zooming and filtering actions [ext_concept_driven_visual_analytics].\n\n**Concept-Driven Interfaces**: A newer pattern involves concept-driven visualization where users iteratively pose data queries and optionally provide their data expectations in natural language. The system then presents visualizations that incorporate a representation of the user's expectation alongside the actual results, supporting a hypothesis-testing loop [ext_concept_driven_visual_analytics].\n\n**Mind-Mapping / Spatial Organization**: Creative sensemaking interfaces are designed like mind-mapping interfaces, integrated into a collaboration layer, supporting the spatial organization of ideas and their relationships [sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a].\n\n**Note-Taking Systems**: Note-taking systems facilitate organization in computational supports for sensemaking, providing a structured space for capturing and organizing insights [sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a].\n\n**AI-Integrated Sensemaking**: AI introduces automation possibilities like theme clustering and summarization, raising design questions about how to effectively integrate these capabilities while supporting the user's cognitive process [sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a].\n\n## Information Organization Tools\n\n**Scaffolded Interfaces**: The 2025 paper on scaffolded interfaces for professional learning describes interfaces that progressively reveal complexity, supporting users as they build expertise in organizing and navigating information [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n\n**Collaborative Traceability**: Professional collaborative information seeking systems emphasize traceability — the ability to track how information was found, organized, and shared across a team — supporting creative sensemaking in group contexts [sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens].\n\n**Model Transparency for Design**: The \"Designerly understanding\" paper (2023) addresses information needs for model transparency to support design decisions, identifying what information designers need to understand about AI models to make informed organizational choices [sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des].\n\n**AI as Design Material**: Researchers have investigated challenges for UX practitioners working with \"AI as a design material,\" including the complexity of the material itself and uncertainty surrounding its capabilities, with expansive and evolving algorithms [sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des].\n\n## AI Writing Tools\n\n**In-Place Editing vs. Chat-Based Interfaces**: A key design distinction is between in-place editing interfaces (where AI suggestions appear directly in the text) and chat-based interfaces (where the user interacts with the AI through a separate conversation panel). In-place editing offers increased flexibility over the edited content compared to chat-based interfaces [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n\n**Parallel Variation Management**: HCI and traditional design practices encourage parallel exploration of multiple variations to help avoid fixation. When writers do not have a way to organize and work with multiple text variations, they may end up committing to a single path prematurely [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n\n**ABScribe's Interface Ensemble**: The ABScribe system contributed an ensemble of five interface elements that significantly enhance user perceptions of AI-assisted writing, supporting the recursive, non-linear revision process that experienced writers engage in [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n\n**Adaptive Control Levels**: Systems should assign different levels of control to users based on task importance, automating less important tasks while preserving user agency over critical decisions [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess].\n\n## Cross-Cutting Design Principles\n\nAcross all three categories, the corpus highlights:\n- **Iterative, non-linear workflows**: Both sensemaking and writing are recursive processes requiring interfaces that support backtracking and reorganization\n- **Progressive disclosure**: Scaffolded interfaces that reveal complexity gradually\n- **Human-AI collaboration balance**: Designing for appropriate levels of automation vs. user control\n- **Spatial/visual organization**: Mind maps, dashboards, and spatial layouts for organizing complex information\n- **Transparency and traceability**: Making the system's reasoning and information provenance visible to users\n\n**Note**: The knowledge base contains limited specific detail on faceted search interfaces, knowledge graph visualization patterns, and detailed text-generation UI patterns. The corpus is strongest on sensemaking tool design (with the 2025 design space paper as a central reference) and AI writing tool design (with the scaffolded interfaces and ABScribe papers). For information organization tools, the evidence is more scattered across the designerly understanding and collaborative information seeking papers.",
+  "arm": "main",
+  "steps": 29,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 2,
+    "type": "note_reject",
+    "n_bad": 74,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N6. [sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_el] \"ChatG",
+     "N13. [sciverse_e-publishing_tools_and_services] \"E-publishing tools and services\" — info organizatio",
+     "N27. [sciverse_innovative_tools_for_detecting_engagement_during_vagal_nerve_stimulation_therapy] \"In"
+    ]
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "Sensemaking"
+    },
+    "intent": "Find evidence dossier for sensemaking tools and their UI designs",
+    "obs_chars": 380,
+    "notes_chars": 16037
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "information organization"
+    },
+    "intent": "Find evidence dossier for information organization tools and their UI designs",
+    "obs_chars": 880,
+    "notes_chars": 16037
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "AI writing"
+    },
+    "intent": "Find evidence dossier for AI writing tools and their UI designs",
+    "obs_chars": 783,
+    "notes_chars": 16037
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "Sensemaking",
+     "claim_type": "definition"
+    },
+    "intent": "Find definition records for sensemaking to understand what UI designs are used",
+    "obs_chars": 1933,
+    "notes_chars": 16037
+   },
+   {
+    "step": 3,
+    "type": "note_reject",
+    "n_bad": 60,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N10. [sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_el] \"Chat",
+     "N22. [sciverse_e-publishing_tools_and_services] \"E-publishing tools and services\" — info organizatio",
+     "N32. [sciverse_innovative_tools_for_detecting_engagement_during_vagal_nerve_stimulation_therapy] \"In"
+    ]
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "contains": "interface|design|visualization|interaction|UI|layout|dashboard|note-taking|mind map|canvas|timeline|graph"
+    },
+    "intent": "Get all UI/design-related findings from the central sensemaking design space paper",
+    "obs_chars": 1924,
+    "notes_chars": 14820
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+     "contains": "interface|design|visualization|interaction|UI|layout|dashboard|transparency|explanation"
+    },
+    "intent": "Get UI/design findings from the model transparency design paper",
+    "obs_chars": 1128,
+    "notes_chars": 14820
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "contains": "interface|design|scaffold|interaction|UI|layout|pattern|structure"
+    },
+    "intent": "Get UI/design findings from the scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 14820
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "contains": "interface|design|outline|citation|synthesis|writing|generation|structure|layout"
+    },
+    "intent": "Get UI/design findings from the SciRAG AI writing tool paper",
+    "obs_chars": 1096,
+    "notes_chars": 14820
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 60,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N19. [sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_el] \"Chat",
+     "N31. [sciverse_e-publishing_tools_and_services] \"E-publishing tools and services\" — info organizatio",
+     "N40. [sciverse_innovative_tools_for_detecting_engagement_during_vagal_nerve_stimulation_therapy] \"In"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "UI design patterns sensemaking visualization interface interaction",
+     "k": 12
+    },
+    "intent": "Find specific UI design patterns for sensemaking tools across the corpus",
+    "obs_chars": 1857,
+    "notes_chars": 17145
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "information organization interface taxonomy faceted search knowledge graph UI",
+     "k": 12
+    },
+    "intent": "Find specific UI design patterns for information organization tools",
+    "obs_chars": 1900,
+    "notes_chars": 17145
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "AI writing tool interface text generation editing pattern UI design",
+     "k": 12
+    },
+    "intent": "Find specific UI design patterns for AI writing tools",
+    "obs_chars": 1893,
+    "notes_chars": 17145
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "contains": "design space|pattern|category|dimension|interface type|visualization|canvas|timeline|graph|card|list|table|outline|mind map|spatial|temporal"
+    },
+    "intent": "Get the specific design space dimensions and UI patterns from the central sensemaking paper",
+    "obs_chars": 1196,
+    "notes_chars": 2693
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens",
+     "contains": "interface|design|visualization|interaction|UI|layout|pattern|structure|traceability|sensemaking|tool|system"
+    },
+    "intent": "Get UI design details from the professional collaborative information seeking paper",
+    "obs_chars": 552,
+    "notes_chars": 2693
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating_the_effectiveness_o",
+     "contains": "interface|design|UI|interaction|pattern|editing|writing|generation|feedback|correction|revision|draft"
+    },
+    "intent": "Get UI/interaction patterns for AI writing assistants from the LLM assistant paper",
+    "obs_chars": 578,
+    "notes_chars": 2693
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "design space dimensions sensemaking tools visualization canvas timeline graph card list outline mind map spatial temporal interaction pattern"
+    },
+    "intent": "Find specific design space dimensions and UI patterns for sensemaking tools",
+    "obs_chars": 1750,
+    "notes_chars": 2693
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "contains": "design space|dimension|category|pattern|type|approach|technique|method|strategy"
+    },
+    "intent": "Get the specific design space dimensions/categories from the central sensemaking paper",
+    "obs_chars": 3029,
+    "notes_chars": 3308
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc",
+     "contains": "outline|structure|format|layout|presentation|interface|user|interaction|writing|generation|synthesis"
+    },
+    "intent": "Get specific UI/structure details from the AI writing tool paper",
+    "obs_chars": 1623,
+    "notes_chars": 3308
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "contains": "scaffold|interface|design|pattern|structure|layout|interaction|UI|support|progressive|fading"
+    },
+    "intent": "Get specific scaffolded interface design patterns",
+    "obs_chars": 1149,
+    "notes_chars": 3308
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a"
+    },
+    "intent": "Get full dossier for the central design-space paper to extract all UI design patterns and dimensions it identifies",
+    "obs_chars": 418,
+    "notes_chars": 5120
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc"
+    },
+    "intent": "Get full dossier for SCIRAG to extract specific UI/interaction patterns for AI writing tools",
+    "obs_chars": 655,
+    "notes_chars": 5120
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess"
+    },
+    "intent": "Get full dossier for scaffolded interfaces paper to extract UI design patterns for information organization",
+    "obs_chars": 319,
+    "notes_chars": 5120
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens"
+    },
+    "intent": "Get full dossier for collaborative sensemaking paper to extract UI design patterns for sense-making tools",
+    "obs_chars": 319,
+    "notes_chars": 5120
+   },
+   {
+    "f28_auto_retrieval": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+    "at_step": 9,
+    "obs_chars": 2905
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "claim_type": "definition"
+    },
+    "intent": "Get definition records from the design space paper to understand the taxonomy of UI design patterns for sensemaking tool",
+    "obs_chars": 2905,
+    "notes_chars": 5120
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from the design space paper for specific UI design patterns and categories",
+    "obs_chars": 2428,
+    "notes_chars": 5120
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendation records from the design space paper for design guidelines and patterns",
+    "obs_chars": 2428,
+    "notes_chars": 5120
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the design space paper for how specific UI patterns work",
+    "obs_chars": 2428,
+    "notes_chars": 5120
+   },
+   {
+    "step": 12,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "UI design patterns sensemaking visualization canvas timeline graph card list outline mind map spatial temporal interaction pattern"
+    },
+    "intent": "Find specific UI design patterns and interaction metaphors discussed across corpus papers for sensemaking, information o",
+    "obs_chars": 1752,
+    "notes_chars": 5120
+   },
+   {
+    "step": 14,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "interface design patterns visualization layout interaction sensemaking information organization writing tool"
+    },
+    "intent": "Find specific UI design patterns across the three categories",
+    "obs_chars": 286,
+    "notes_chars": 5120
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "contains": "interface|design|pattern|layout|visualization|interaction|UI|user experience",
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a"
+    },
+    "intent": "Get specific UI design findings from the central sensemaking paper",
+    "obs_chars": 1497,
+    "notes_chars": 5120
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "contains": "interface|design|pattern|layout|visualization|interaction|UI|user experience|writing|generation",
+     "paper_id": "sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc"
+    },
+    "intent": "Get specific UI design findings from the AI writing paper",
+    "obs_chars": 1094,
+    "notes_chars": 5120
+   },
+   {
+    "step": 14,
+    "tool": "findings",
+    "args": {
+     "contains": "interface|design|pattern|layout|visualization|interaction|UI|user experience|organization|structure",
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess"
+    },
+    "intent": "Get specific UI design findings from the scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 5120
+   },
+   {
+    "f28_auto_retrieval": "sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des",
+    "at_step": 16,
+    "obs_chars": 1128
+   },
+   {
+    "f28_auto_retrieval": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+    "at_step": 19,
+    "obs_chars": 1149
+   },
+   {
+    "coverage_audit": true,
+    "at_step": 22,
+    "unique_queries": 34
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "UI design patterns sensemaking tools visualization interaction design",
+     "k": 8
+    },
+    "intent": "Find external papers on UI design patterns for sensemaking tools",
+    "obs_chars": 2072,
+    "notes_chars": 4997
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "interface design information organization tools taxonomy faceted search knowledge graph UI",
+     "k": 8
+    },
+    "intent": "Find external papers on UI design for information organization tools",
+    "obs_chars": 3061,
+    "notes_chars": 4997
+   },
+   {
+    "step": 23,
+    "tool": "search_papers",
+    "args": {
+     "query": "AI writing assistant interface design text generation editing UX patterns",
+     "k": 8
+    },
+    "intent": "Find external papers on UI design for AI writing tools",
+    "obs_chars": 2586,
+    "notes_chars": 4997
+   },
+   {
+    "step": 24,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N20. [concept-driven visual analytics 2019] Concept-driven visual analytics: users share hypotheses/",
+     "N21. [abscribe 2024] ABScribe: interface for rapid exploration & organization of multiple writing va",
+     "N23. [modeling reusable and interoperable faceted browsing systems with category theory 2015] Facete"
+    ]
+   },
+   {
+    "step": 24,
+    "tool": "admit_paper",
+    "args": {
+     "title": "abscribe: rapid exploration & organization of multiple writing variations in human-ai co-writing tasks using large language models"
+    },
+    "intent": "Admit ABScribe paper for deep reading of specific UI design patterns for AI writing tools",
+    "obs_chars": 532,
+    "notes_chars": 7094
+   },
+   {
+    "step": 24,
+    "tool": "admit_paper",
+    "args": {
+     "title": "mapping the design space of human-ai interaction in text summarization"
+    },
+    "intent": "Admit text summarization design space paper for deep reading of AI writing interaction patterns",
+    "obs_chars": 452,
+    "notes_chars": 7094
+   },
+   {
+    "step": 24,
+    "tool": "admit_paper",
+    "args": {
+     "title": "concept-driven visual analytics"
+    },
+    "intent": "Admit concept-driven visual analytics paper for deep reading of sensemaking UI patterns",
+    "obs_chars": 335,
+    "notes_chars": 7094
+   },
+   {
+    "step": 25,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_",
+     "sections": [
+      "interface design",
+      "evaluation",
+      "discussion"
+     ]
+    },
+    "intent": "Get specific UI design patterns for AI writing tools from ABScribe",
+    "obs_chars": 2032,
+    "notes_chars": 2693
+   },
+   {
+    "step": 25,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization",
+     "sections": [
+      "taxonomy",
+      "design dimensions",
+      "discussion"
+     ]
+    },
+    "intent": "Get specific UI design patterns for AI writing tools from the summarization design space paper",
+    "obs_chars": 2044,
+    "notes_chars": 2693
+   },
+   {
+    "step": 25,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "ext_concept_driven_visual_analytics",
+     "sections": [
+      "interface",
+      "design",
+      "evaluation"
+     ]
+    },
+    "intent": "Get specific UI design patterns for sensemaking from concept-driven visual analytics",
+    "obs_chars": 1822,
+    "notes_chars": 2693
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get specific UI design mechanisms from ABScribe paper",
+    "obs_chars": 2902,
+    "notes_chars": 4404
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization",
+     "claim_type": "definition"
+    },
+    "intent": "Get taxonomy/definitions of interaction patterns from text summarization design space paper",
+    "obs_chars": 187,
+    "notes_chars": 4404
+   },
+   {
+    "step": 26,
+    "tool": "findings",
+    "args": {
+     "paper_id": "ext_concept_driven_visual_analytics",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get specific UI design mechanisms from concept-driven visual analytics paper",
+    "obs_chars": 187,
+    "notes_chars": 4404
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a",
+     "contains": "interface|design|visualization|layout|interaction"
+    },
+    "intent": "Get specific UI design patterns from the central sensemaking design space paper",
+    "obs_chars": 1974,
+    "notes_chars": 5200
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens",
+     "contains": "interface|design|organization|structure|tool"
+    },
+    "intent": "Get UI/organization patterns from the collaborative sensemaking paper",
+    "obs_chars": 552,
+    "notes_chars": 5200
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_lessons_from_deep_learning_applied_to_scholarly_information_extraction_what_work",
+     "contains": "interface|design|organization|tool|system"
+    },
+    "intent": "Get information organization tool design patterns from scholarly information extraction paper",
+    "obs_chars": 244,
+    "notes_chars": 5200
+   },
+   {
+    "step": 27,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_el",
+     "contains": "interface|design|pattern|tool|system"
+    },
+    "intent": "Get AI tool interface design patterns from the ChatGPT prompt patterns paper",
+    "obs_chars": 244,
+    "notes_chars": 5200
+   },
+   {
+    "step": 28,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of scaffolded interface patterns",
+    "obs_chars": 1149,
+    "notes_chars": 5200
+   },
+   {
+    "step": 28,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations about specific UI patterns from scaffolded interfaces paper",
+    "obs_chars": 1149,
+    "notes_chars": 5200
+   },
+   {
+    "step": 29,
+    "tool": "card",
+    "args": {
+     "entity": "skeleton"
+    },
+    "intent": "Check if skeleton entity has UI design patterns relevant to sense-making or information organization",
+    "obs_chars": 865,
+    "notes_chars": 2848
+   },
+   {
+    "step": 29,
+    "tool": "card",
+    "args": {
+     "entity": "multiplexing"
+    },
+    "intent": "Check if multiplexing entity has UI design patterns relevant to information organization",
+    "obs_chars": 1618,
+    "notes_chars": 2848
+   },
+   {
+    "step": 29,
+    "tool": "search_text",
+    "args": {
+     "query": "UI design patterns sensemaking visualization interface layout",
+     "k": 8
+    },
+    "intent": "Search for specific UI design patterns across all papers",
+    "obs_chars": 2530,
+    "notes_chars": 2848
+   },
+   {
+    "step": 29,
+    "tool": "search_text",
+    "args": {
+     "query": "information organization taxonomy faceted search knowledge graph interface",
+     "k": 8
+    },
+    "intent": "Search for information organization UI patterns",
+    "obs_chars": 2309,
+    "notes_chars": 2848
+   }
+  ],
+  "notes_final": "N1. [sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a] Central paper: \"The design space of recent AI-assisted research tools for ideation, sensemaking\" (2025).\nN2. [coarse:1d4407480cc8] Sensemaking involves iterative processes of information foraging, structuring, and developing insights | epistemic:stated\nN3. [coarse:41e9ccd510ef] Visual analytics dashboards aid exploration in computational supports for sensemaking | epistemic:stated\nN4. [coarse:b2c5ed016170] Note-taking systems facilitate organization in computational supports for sensemaking | epistemic:stated\nN5. [coarse:d2593e4ed93d] Creative sensemaking interface designed like a mind mapping interface integrated into collaboration layer | epistemic:stated\nN6. [coarse:d0748fc4b51b] AI introduces automation possibilities like theme clustering and summarization | epistemic:stated\nN7. [coarse:aadc6bf50a6c] AI raises questions about how to design interfaces that effectively integrate automation capabilities while supporting the user's cognitive process | epistemic:stated\nN8. [sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des] \"Designerly understanding: information needs for model transparency to support design\" (2023) — UI/design angle.\nN9. [coarse:c7aa1a25c486] Researchers have investigated challenges for UX practitioners to work with \"AI as a design material,\" including complexity of the material itself | epistemic:stated\nN10. [coarse:d49608d6a4bd] Yang et al. summarize two sources of AI's distinctive design challenges: 1) uncertainty surrounding its capabilities, with expansive and evolving algorithms | epistemic:stated\nN11. [sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess] \"Designing scaffolded interfaces for enhanced learning and performance\" (2025) — interface design.\nN12. [b46ee6691597bf] HCI and traditional design practices encourage parallel exploration of multiple variations to help avoid fixation | epistemic:stated\nN13. [4f4682eb5d2274] Experienced writers treat revision as a recursive, non-linear process and engage with the text in repeated cycles | epistemic:stated\nN14. [86a8e5757d9357] ABScribe contributed an ensemble of five interface elements that significantly enhance user perceptions on AI-assisted writing | epistemic:stated\nN15. [961e8a221e05a0] When writers do not have a way to organize and work with multiple text variations, they may end up committing to a single path prematurely | epistemic:stated\nN16. [d2e075423e32de] In-place editing interfaces offer increased flexibility over the edited content compared to chat-based interfaces | epistemic:stated\nN17. [255e23b276dd51] Systems should assign different levels of control to users based on task importance, automating less important tasks | epistemic:stated\nN18. [ext_concept_driven_visual_analytics#12150] Shneiderman's mantra: \"overview first, zoom and filter, then details on demand\" — overview display depicts major data trends/clusters to orient user, with subsequent interrogations through zooming and filtering | epistemic:stated\nN19. [ext_concept_driven_visual_analytics#6750] Concept-driven visualization interface: users iteratively pose data queries and optionally provide data expectations in natural language; visualizations incorporate representation of expectation alongside results | epistemic:stated\nN20. [sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens] \"Professional collaborative information seeking: on traceability and creative sensemaking\" (2015) — collaborative sensemaking UI.",
+  "gaps_final": "G1. Need more specific UI design patterns for sense-making tools (visualizations, interaction patterns)\nG2. Need specific UI design patterns for information organization tools (taxonomies, faceted search, knowledge graphs)\nG3. Need more specific UI design patterns for AI writing tools (text generation interfaces, editing patterns)\nG4. Need to identify the most relevant papers from the corpus that discuss UI designs for these three categories",
+  "queried": [
+   "card|{\"entity\": \"sensemaking\"}",
+   "card|{\"entity\": \"information organization\"}",
+   "card|{\"entity\": \"AI writing\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"sensemaking\"}",
+   "findings|{\"contains\": \"interface|design|visualization|interaction|UI|layout|dashboard|note-taking|mind map|canvas|timeline|graph\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_fo",
+   "findings|{\"contains\": \"interface|design|visualization|interaction|UI|layout|dashboard|transparency|explanation\", \"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_suppo",
+   "findings|{\"contains\": \"interface|design|scaffold|interaction|UI|layout|pattern|structure\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"contains\": \"interface|design|outline|citation|synthesis|writing|generation|structure|layout\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "search_text|{\"k\": 12, \"query\": \"UI design patterns sensemaking visualization interface interaction\"}",
+   "search_text|{\"k\": 12, \"query\": \"information organization interface taxonomy faceted search knowledge graph UI\"}",
+   "search_text|{\"k\": 12, \"query\": \"AI writing tool interface text generation editing pattern UI design\"}",
+   "findings|{\"contains\": \"design space|pattern|category|dimension|interface type|visualization|canvas|timeline|graph|card|list|table|outline|mind map|spatial|temporal\", \"paper_id\": \"sciverse_the_design_space_of_r",
+   "findings|{\"contains\": \"interface|design|visualization|interaction|UI|layout|pattern|structure|traceability|sensemaking|tool|system\", \"paper_id\": \"sciverse_professional_collaborative_information_seeking_on_trac",
+   "findings|{\"contains\": \"interface|design|UI|interaction|pattern|editing|writing|generation|feedback|correction|revision|draft\", \"paper_id\": \"sciverse_why_and_when_llm_based_assistants_can_go_wrong_investigating",
+   "search_text|{\"k\": 12, \"query\": \"design space dimensions sensemaking tools visualization canvas timeline graph card list outline mind map spatial temporal interaction pattern\"}",
+   "findings|{\"contains\": \"design space|dimension|category|pattern|type|approach|technique|method|strategy\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"contains\": \"outline|structure|format|layout|presentation|interface|user|interaction|writing|generation|synthesis\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_a",
+   "findings|{\"contains\": \"scaffold|interface|design|pattern|structure|layout|interaction|UI|support|progressive|fading\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance",
+   "card|{\"entity\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "card|{\"entity\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_synthesis_for_sc\"}",
+   "card|{\"entity\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "card|{\"entity\": \"sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens\"}",
+   "findings|{\"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "search_text|{\"k\": 12, \"query\": \"UI design patterns sensemaking visualization canvas timeline graph card list outline mind map spatial temporal interaction pattern\"}",
+   "search_text|{\"k\": 12, \"query\": \"interface design patterns visualization layout interaction sensemaking information organization writing tool\"}",
+   "findings|{\"contains\": \"interface|design|pattern|layout|visualization|interaction|UI|user experience\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"contains\": \"interface|design|pattern|layout|visualization|interaction|UI|user experience|writing|generation\", \"paper_id\": \"sciverse_scirag_adaptive_citation_aware_and_outline_guided_retrieval_and_sy",
+   "findings|{\"contains\": \"interface|design|pattern|layout|visualization|interaction|UI|user experience|organization|structure\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_perf",
+   "findings|{\"paper_id\": \"sciverse_designerly_understanding_information_needs_for_model_transparency_to_support_des\"}",
+   "findings|{\"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "search_papers|{\"k\": 8, \"query\": \"UI design patterns sensemaking tools visualization interaction design\"}",
+   "search_papers|{\"k\": 8, \"query\": \"interface design information organization tools taxonomy faceted search knowledge graph UI\"}",
+   "search_papers|{\"k\": 8, \"query\": \"AI writing assistant interface design text generation editing UX patterns\"}",
+   "admit_paper|{\"title\": \"abscribe: rapid exploration & organization of multiple writing variations in human-ai co-writing tasks using large language models\"}",
+   "admit_paper|{\"title\": \"mapping the design space of human-ai interaction in text summarization\"}",
+   "admit_paper|{\"title\": \"concept-driven visual analytics\"}",
+   "deep_read|{\"paper_id\": \"ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_\", \"sections\": [\"interface design\", \"evaluation\", \"discussion\"]}",
+   "deep_read|{\"paper_id\": \"ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization\", \"sections\": [\"taxonomy\", \"design dimensions\", \"discussion\"]}",
+   "deep_read|{\"paper_id\": \"ext_concept_driven_visual_analytics\", \"sections\": [\"interface\", \"design\", \"evaluation\"]}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"ext_abscribe_rapid_exploration_organization_of_multiple_writing_variations_in_human_\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"ext_mapping_the_design_space_of_human_ai_interaction_in_text_summarization\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"ext_concept_driven_visual_analytics\"}",
+   "findings|{\"contains\": \"interface|design|visualization|layout|interaction\", \"paper_id\": \"sciverse_the_design_space_of_recent_ai_assisted_research_tools_for_ideation_sensemaking_a\"}",
+   "findings|{\"contains\": \"interface|design|organization|structure|tool\", \"paper_id\": \"sciverse_professional_collaborative_information_seeking_on_traceability_and_creative_sens\"}",
+   "findings|{\"contains\": \"interface|design|organization|tool|system\", \"paper_id\": \"sciverse_lessons_from_deep_learning_applied_to_scholarly_information_extraction_what_work\"}",
+   "findings|{\"contains\": \"interface|design|pattern|tool|system\", \"paper_id\": \"sciverse_chatgpt_prompt_patterns_for_improving_code_quality_refactoring_requirements_el\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_designing_scaffolded_interfaces_for_enhanced_learning_and_performance_in_profess\"}",
+   "card|{\"entity\": \"skeleton\"}",
+   "card|{\"entity\": \"multiplexing\"}",
+   "search_text|{\"k\": 8, \"query\": \"UI design patterns sensemaking visualization interface layout\"}",
+   "search_text|{\"k\": 8, \"query\": \"information organization taxonomy faceted search knowledge graph interface\"}"
+  ],
+  "gate": {
+   "note_rejects": 198,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": true,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 198
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 198,
+   "merge_total_lines": 313,
+   "relaxed_writes": 4,
+   "notes_truncated": 10036,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

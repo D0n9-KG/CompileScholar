@@ -1,0 +1,40 @@
+# Introduction
+# Background
+## Challenges in Edge LLM Inference
+### Memory and Storage Constraints
+### Computational and Latency Bottlenecks
+### Hardware Heterogeneity and Resource Fluctuations
+# Technical Methodologies
+## Model Compression and Customization
+### Quantization Strategies
+#### Low-Precision Quantization (4-bit/8-bit)
+#### Heterogeneous and Hardware-Aware Quantization
+### Structured Pruning and Sparsity Exploitation
+#### Hardware-Aware Reductive Pruning
+#### Adaptive Thresholding for Sparse Serving
+### Knowledge Distillation and Co-Tuning
+## Latency-Aware Optimization Techniques
+### Speculative Decoding and Configuration Optimization
+### Dynamic Scheduling and Adaptive Inference
+#### Iteration-Level Scheduling and Continuous Batching
+#### Width-Adaptive Nested Subnetworks
+### Edge-Cloud Collaborative Strategies
+#### Task Assignment and Division
+#### Co-Execution of Fine-Tuning and Inference
+# System Architecture and Hardware Integration
+## Hardware-Software Co-Design
+### NPU and Accelerator Interface
+### CPU-GPU Hybrid Execution
+## Runtime Adaptation Mechanisms
+### Thermal Management and Performance Stability
+### Dynamic Node Dropout for SLO Compliance
+# Evaluation and Performance Analysis
+## Key Performance Metrics
+### Time-To-First-Token (TTFT)
+### Time-Per-Output-Token (TPOT)
+### Energy Efficiency and Goodput
+## Comparative Analysis
+### Accuracy vs. Latency Trade-offs
+### Impact of Compression on Inference Speed
+# Limitations and Future Directions
+# Conclusion

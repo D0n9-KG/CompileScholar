@@ -1,0 +1,54 @@
+# Overview
+## Background
+### Vision Transformer Architecture
+### Microscaling Integer (MXInt) Format
+## Motivation
+### Inefficiency of CPU-Accelerator Communication
+### Precision Sensitivity of Non-Linear Operations
+### Quadratic Computational and Memory Costs
+## Key Contributions
+### First All-On-Chip ViT Accelerator
+### Elimination of CPU Offloading for Softmax and LayerNorm
+# Methodology
+## Microscaling Integer (MXInt) Arithmetic
+### Handling Dynamic Range and Non-Linearity
+### Integerization via Operation Reordering
+## Datapath Refinements
+### Delayed Dequantization Strategy
+### Integerized Matrix Multiplication
+### On-Chip Execution of Complex Operations
+## Hardware Implementation
+### FPGA Accelerator Design
+### Pipelined Dataflow and Compute-Transfer Overlap
+### Memory Bandwidth Optimization
+# Challenges and Numerical Stability
+## Limitations of Standard Low-Precision Formats
+### Accumulation of Quantization Errors
+### Ineffective Handling of Exponential and Square Root Operations
+## Activation Distribution Characteristics
+### Irregular Outliers in Post-LayerNorm and Post-GELU Layers
+### Long-Tailed Distribution Challenges
+### Time-Varying Outlier Channels
+## Comparison with Standard Quantization Methods
+### Post-Training Quantization (PTQ) Limitations
+### Quantization-Aware Training (QAT) Costs
+# Performance and Efficiency Analysis
+## Addressing Communication Overhead
+### Reduction of CPU-Accelerator Data Transfers
+## Computational Overhead Reduction
+### Mitigation of Dequantization Costs
+### Optimization of MAC Unit Accumulation
+## Resource Utilization
+### Memory Bandwidth Management
+### Pipeline Latency and Scheduling
+# Discussion
+## Trade-offs
+### Accuracy vs. Hardware Efficiency
+### Integer-Only Inference vs. Floating-Point Scaling Factors
+## Generalizability
+### Applicability to Deep Encoder-Decoder Pipelines
+## Limitations
+### Specifics of Non-Linear Hardware Implementation
+### Lack of Structural Modifications to ViT Blocks
+# Conclusion
+## Future Directions

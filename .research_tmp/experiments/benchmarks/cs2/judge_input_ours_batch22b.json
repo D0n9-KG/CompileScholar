@@ -1,0 +1,1572 @@
+[
+ {
+  "qid": "eef3ee38231d9fa5ffabbec7",
+  "question": "What are good benchmarks and evaluation strategies for comparing obstacle avoidance strategies in mobile robots?",
+  "sections": [
+   {
+    "title": "Benchmark Utility and Task Definition",
+    "text": "Obstacle avoidance is a fundamental task in robotics, defined by the goal of reaching a destination without collision [3]. It serves as a valuable benchmark for testing learning algorithms [2] and was utilized in some of the earliest works involving evaluative adaptation with Genetic Algorithms on real robots, as well as for testing Particle Swarm optimization [2]. The task is particularly suitable for benchmarking because it can be implemented with different numbers of robots and relies on basic sensors and actuators available in most mobile platforms [2]. Furthermore, multiple mobile robot systems offer significant incentives to researchers due to their distributed nature in time and space and their high efficiency [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Multiple mobile robots system provides an unchallenged incentive to all researchers in the past two decades, with its distribution characters in time and space, as well as its high efficiency.",
+       "In order to improve the real time performance, accuracy and stability, an obstacle avoidance strategy of mobile robot based on wireless sensor networks is proposed in this paper."
+      ],
+      "title": "obstacle avoidance strategy of mobile robot based on wireless sensor networks",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "We chose obstacle avoidance as a benchmark task because it can be implemented with different number of robots, requires basic sensors and actuators available in most mobile robots, and the performance metric can be defined to be fully evaluated with on-board resources.",
+       "Obstacle avoidance was used in one of the earliest works of evaluative adaptation with Genetic Algorithms applied to real robots [1], and it has also been employed to test other learning algorithms such as Particle Swarm Optimization (PSO) [2] and Reinforcement Learning [3].",
+       "Thus, it can serve as a benchmark for testing learning"
+      ],
+      "title": "the role of environmental and controller complexity in the distributed optimization of multi-robot obstacle avoidance",
+      "metadata": {
+       "year": 2014,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Obstacle avoidance is an important task in the field of robotics, since the goal of autonomous robot is to reach the destination without collision.",
+       "Several algorithms have been proposed for obstacle avoidance, having drawbacks and benefits."
+      ],
+      "title": "control strategies for mobile robot with obstacle avoidance",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": "1306.1144",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluation Metrics and Simulation",
+    "text": "To assess the effectiveness and safety of navigation strategies, several evaluation metrics have been developed to measure the performance of different obstacle avoidance approaches [7]. These metrics allow for the definition of performance standards across various implementations [2]. Computer simulations are frequently conducted to validate the performance of proposed methods [6]. For instance, performance evaluation results have indicated that specific proposed approaches are accurate, efficient, and robust [5]. Additionally, sufficient experiments have proven that certain implementations can significantly improve the robustness and safety of Unmanned Aerial Vehicles (UAVs) with limited Field of View (FOV) in obstacle avoidance missions [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Sufficient experiments prove that this implementation could significantly improve the robustness and safety of UAVs with limited FOV in obstacle avoidance missions."
+      ],
+      "title": "title:autonomous flights in dynamic environments with onboard vision",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The obtained results from performance evaluation indicate that the proposed approach is accurate, efficient, and robust."
+      ],
+      "title": "Deep Capsule Encoder-Decoder Network for Surrogate Modeling and Uncertainty Quantification",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2201.07753",
+       "authors": [
+        "Akshay Thakur and Souvik Chakraborty"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Computer simulations are conducted to validate the performance of th",
+       "The proposed method combines global path planning with reactive methods to guarantee safe navigation.",
+       "In this section, a novel hybrid navigation for collision-free movement in a dynamic environment was proposed."
+      ],
+      "title": "real-time obstacle avoidance algorithms for unmanned aerial and ground vehicles",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "We chose obstacle avoidance as a benchmark task because it can be implemented with different number of robots, requires basic sensors and actuators available in most mobile robots, and the performance metric can be defined to be fully evaluated with on-board resources.",
+       "Obstacle avoidance was used in one of the earliest works of evaluative adaptation with Genetic Algorithms applied to real robots [1], and it has also been employed to test other learning algorithms such as Particle Swarm Optimization (PSO) [2] and Reinforcement Learning [3].",
+       "Thus, it can serve as a benchmark for testing learning"
+      ],
+      "title": "the role of environmental and controller complexity in the distributed optimization of multi-robot obstacle avoidance",
+      "metadata": {
+       "year": 2014,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "In order to evaluate the effectiveness and safety of navigation and obstacle avoidance for mobile robots, several evaluation metrics were developed to measure the performance of different obstacle avoidance strategies, which are defined as follows."
+      ],
+      "title": "motion planning method for car-like autonomous mobile robots in dynamic obstacle environments",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Algorithmic Approaches and Planning Types",
+    "text": "Several algorithms have been proposed for obstacle avoidance, each possessing distinct drawbacks and benefits [3]. Path planning algorithms for mobile robots generally focus on maneuvering from a starting point to a destination while minimizing distance traveled or energy consumed [11]. There are generally two types of motion planning approaches for robots, such as cleaning robots: off-line (static) and on-line (dynamic) planning, categorized by the behavior of obstacles [10]. Global obstacle avoidance requires full knowledge of the static environment to search for the target from an initial location [9]. In contrast, Rapidly-exploring Random Tree (RRT) algorithms have been successfully applied to challenging robot motion planning and under-actuated nonlinear control problems [8]. A novel hybrid navigation approach has also been proposed for collision-free movement in dynamic environments [6], and another proposed method combines global path planning with reactive methods to guarantee safe navigation [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Computer simulations are conducted to validate the performance of th",
+       "The proposed method combines global path planning with reactive methods to guarantee safe navigation.",
+       "In this section, a novel hybrid navigation for collision-free movement in a dynamic environment was proposed."
+      ],
+      "title": "real-time obstacle avoidance algorithms for unmanned aerial and ground vehicles",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "Rapidly-exploring Random Tree (RRT) algorithms have been applied successfully to challenging robot motion planning and under-actuated nonlinear control problems."
+      ],
+      "title": "an improved rapidly exploring random tree algorithm for path planning in configuration spaces with narrow channels",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "A global type requires full knowledge of the static environment to search the target from an initial place."
+      ],
+      "title": "reactive obstacle–avoidance systems for wheeled mobile robots based on artificial intelligence",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[10]",
+      "snippets": [
+       "There are generally two types of motion planning approaches for a cleaning robot. These are (according to the behavior of obstacles) off-line (or static) and on-line (or dynamic) motion planning [1,4]."
+      ],
+      "title": "hybrid spiral stc-hedge algebras model in knowledge reasonings for robot coverage path planning and its applications",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[11]",
+      "snippets": [
+       "Path planning algorithms implemented for most mobile robots focus on maneuvering the robot from a starting point to the destination with minimal distance traveled or energy consumed"
+      ],
+      "title": "realization energy optimization of complete path planning in differential drive based self-reconfigurable floor cleaning robot",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Obstacle avoidance is an important task in the field of robotics, since the goal of autonomous robot is to reach the destination without collision.",
+       "Several algorithms have been proposed for obstacle avoidance, having drawbacks and benefits."
+      ],
+      "title": "control strategies for mobile robot with obstacle avoidance",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": "1306.1144",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Sensing and System Enhancements",
+    "text": "Sensing capabilities play a critical role in evaluation and performance. LiDAR, with a range of up to 200 meters, is often used for collision avoidance [12]. To improve real-time performance, accuracy, and stability, an obstacle avoidance strategy for mobile robots based on wireless sensor networks has been proposed [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Multiple mobile robots system provides an unchallenged incentive to all researchers in the past two decades, with its distribution characters in time and space, as well as its high efficiency.",
+       "In order to improve the real time performance, accuracy and stability, an obstacle avoidance strategy of mobile robot based on wireless sensor networks is proposed in this paper."
+      ],
+      "title": "obstacle avoidance strategy of mobile robot based on wireless sensor networks",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[12]",
+      "snippets": [
+       "LiDAR, with a range of up to 200 meters often used for collision avoidance."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "III-B Autonomous Driving Components and Reinforcement Learning",
+         "chunk_id": "arxiv_2212.06123#c19",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 18,
+   "n_claims_usable": 18,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 401,
+   "n_sections": 4,
+   "n_citations": 12,
+   "record_level": 12,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "de3b24bf31962c6107002d48",
+  "question": "What are existing methods to elicit user intents when an automation encounters ambiguity, especially in failure cases?",
+  "sections": [
+   {
+    "title": "Mixed-Initiative and Interactive Clarification",
+    "text": "When automation encounters irresolvable ambiguities, systems should employ mixed-initiative specification to cooperatively engage users rather than failing or guessing [1]. A central challenge is determining when to automate grounding decisions versus requiring explicit user consultation [1]. In database interfaces, systems like MISP and DialSQL use mixed-initiative approaches to ask follow-up questions that clarify intent, such as distinguishing between 'sales amount' and 'number of sales' [2]. These interactive methods help establish 'common ground' between the user and the AI [2]. However, users can become frustrated if the conversation becomes repetitive or fails to address the core error [2]. Multi-stage clarification is essential; without it, systems may provide direct but non-relevant answers or generic fallback messages, both of which degrade user experience. In the context of natural language queries, a 2025 study emphasizes that irresolvable ambiguities in single-shot execution must be handled through this cooperative engagement [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "While we have focused on single-shot query execution, irresolvable ambiguities should be handled through mixed-initiative specification [11, 1], cooperatively engaging the user to resolve ambiguities rather than fail or guess.",
+       "A key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation."
+      ],
+      "title": "are we asking the right questions? on ambiguity in natural language queries for tabular data analysis",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "While effective for simple disambiguation, users can become frustrated if the conversation becomes repetitive or fails to address the core error [5].",
+       "These interactive methods help establish \"common ground\" between the user and the AI",
+       "Systems like MISP [16] and DialSQL [17] use a mixed-initiative approach, asking follow-up questions to clarify user intent (e.g., \"When you say 'sales,' do you mean 'sales amount' or 'number of sales'?\")."
+      ],
+      "title": "natural language interfaces for databases: what do users think?",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Automated Disambiguation and Intent Reasoning",
+    "text": "Alternative approaches aim to resolve ambiguity without explicit user queries. One 2025 method proposes that LLMs, which implicitly commit to one interpretation, should instead generate structured responses enumerating all valid interpretations with corresponding answers. This approach is trained with reinforcement learning using a dual reward system that balances recall on ambiguous inputs and precision on unambiguous ones, eliminating the need for clarification questions. Another 2020 rule-based system generates discriminative questions to disambiguate between two intents without requiring annotated clarification data, a method extensible to multiple intents. Conversely, a 2025 study challenges the necessity of explicit intent modelling by benchmarking Intent-First versus Direct Response Generation paradigms for service assistants. In dialogue, a 2020 reinforcement learning model clarifies ambiguous questions by suggesting refinements, formulating collection partitioning to select labels that distinguish unambiguous intents, and listing these as intent phrases for user confirmation.",
+    "citations": []
+   },
+   {
+    "title": "Programming-by-Demonstration and Continuous Refinement",
+    "text": "Specifying intents to cover every case can be tedious, and users may not know all potential cases initially [3]. DiLogics, a programming-by-demonstration system utilizing NLP, addresses this by parsing input data and allowing users to refine their intent continuously during automation [3]. By recording user demonstrations for each step, DiLogics generalizes web macros to novel but semantically similar task requirements [3]. The system employs program synthesis techniques to record user actions and their symbolic relationships within the web DOM structure [3]. Users of DiLogics can successfully create automation programs that satisfy diverse input requests for every task [3]. In error handling, 9 out of 10 users edited the input data table to rephrase segmented steps to the appropriate detail, utilizing error repair techniques at every stage [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "We showed that users of DiLogics can successfully create automation programs that satisfy the input requests for every task.",
+       "In addition, DiLogics employs program synthesis techniques to record the user’s actions and their symbolic relationships in the web DOM structure.",
+       "By recording user demonstrations for each step, DiLogics generalizes the web macros to novel but semantically similar task requirements.",
+       "DiLogics addresses this challenge by parsing input data and allowing users to refine their intent continuously during automation by coordinating with our system.",
+       "We present DiLogics, a programming-by-demonstration system that utilizes NLP to assist users in creating web automation programs that handle diverse specifications.",
+       "Despite promises, specifying intents to cover every case can be tedious.",
+       "Furthermore, users may not know all the cases in the first place."
+      ],
+      "title": "dilogics: creating web automation programs with diverse logics",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2308.05828",
+       "authors": []
+      }
+     }
+    ]
+   },
+   {
+    "title": "Failure Recovery and Robustness in Automation",
+    "text": "Deep neural networks do not provide an option for maintaining control when unexpected failures are inevitable [6]. In Robotic Process Automation (RPA), a 2023 systematic literature review analyzed implementation studies regarding process selection criteria, utilizing six electronic repositories (IEEE, ACM, SCHOLAR, SpringerLink, Web of Science, Scopus) with search strings combining RPA terms with selection or criteria, considering only English publications [5]. A 2018 study on implementing robust RPA solutions in large organizations focuses on exception handling, work queue, and data management strategies to increase robot robustness against external application interactions and environment instabilities. In human-robot interaction, a 2018 review of 52 studies highlights that robots in unstructured environments are challenged by frequent failures, with little prior research on communicating these failures and their causes. For task automation, the Pumice system implements multi-modal interaction for end-user programmable agents, noting that existing natural language programming systems are inadequate for domain-general tasks [4]. Pumice addresses the issue of end users using unclear or vague concepts, especially in conditionals, by supporting error recovery and backtracking, and allowing users to teach agents new concepts, a capability where existing systems have limited support [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "our formative study found that end users would often use unclear, ambiguous or vague concepts when naturally instructing tasks in natural language, especially when specifying conditionals.",
+       "Existing systems have limited support for letting the user teach agents new concepts or explaining unclear concepts.",
+       "We demonstrate this approach in Pumice , an end-user programmable agent that implements this approach.",
+       "However, existing natural language programming systems are not adequate for supporting end user task automation in domain-general tasks."
+      ],
+      "title": "interactive task and concept learning from natural language instructions and gui demonstrations",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1909.00031",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "Interactive Task and Concept Learning from Natural Language Instructions and GUI Demonstrations Thanks:  To be presented at the AAAI-20 Workshop on Intelligent Process Automation (IPA-20). An earlier version of this paper was published and presented at ACM UIST 2019.",
+         "chunk_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Since this research focuses on identifying the criteria to select the most suitable business processes to automate, this SLR aims to analyze RPA implementation studies with information regarding the process selection and the criteria used.",
+       "Then, six electronic repositories were used: IEEE, ACM, SCHOLAR, SpringerLink, Web of Science, and Scopus. The following search string was used in each repository: (\"Robotic Process Automation\" OR \"RPA\") \"AND\" (\"selection\" or \"criteria\").",
+       "Only English publications were considered."
+      ],
+      "title": "a framework to support robotic process automation",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Deep neural networks do not provide such an option."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I-B The Importance of Interpretability",
+         "chunk_id": "arxiv_2012.14261#c4",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Challenges in LLM-Assisted Automation",
+    "text": "AutoCopilot, a system for 'do it for me/with me' automation, generates concise textual responses and facilitates follow-up debugging questions [8]. However, it occasionally encounters incorrect full automation when it fails to identify a single automation function from multiple intents in a user's query for complex tasks [8]. Similarly, AutoCopilot may fail to accurately map multiple entities from a user's query to the appropriate automation function [8]. A 2024 study notes that it is unclear how integrating the context of feature-rich applications can help novice end-users seek accurate assistance from LLMs [7]. Furthermore, more insights are needed on where and how users struggle with LLMs to harness their full potential for software tasks [7].",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "Furthermore, to harness the full potential of these LLM assistants for seeking help for their software tasks, we need more insights on where and how users struggle with these LLMs [31].",
+       "As many of these interfaces are still at a nascent stage, it is unclear how this current practice (i.e., integrating the context of these feature-rich applications) can help novice end-users in seeking accurate and relevant assistance from LLMs."
+      ],
+      "title": "why and when llm-based assistants can go wrong: investigating the effectiveness of prompt-based interactions for software help-seeking",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.08030",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[8]",
+      "snippets": [
+       "To mirror real-world automation performance, AutoCopilot occasionally encounters incorrect full automation when it fails to identify a single automation function from the multiple intents in the user's query for performing complex tasks outlined in the study, or when it cannot accurately map multiple entities from the user's query to the appropriate automation function.",
+       "to generate a concise textual response and facilitate users' follow-up debugging questions."
+      ],
+      "title": "do it for me vs. do it with me: investigating user perceptions of different paradigms of automation in copilots for feature-rich software",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 38,
+   "n_claims_usable": 38,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C7",
+     "sentence": "Multi-stage clarification is essential; without it, systems may provide direct but non-relevant answers or generic fallback messages, both of which degrade user experience ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "In dialogue, a 2020 reinforcement learning model clarifies ambiguous questions by suggesting refinements, formulating collection partitioning to select labels that distinguish unambiguous intents, and"
+    },
+    {
+     "cid": "C5",
+     "sentence": "Conversely, a 2025 study challenges the necessity of explicit intent modelling by benchmarking Intent-First versus Direct Response Generation paradigms for service assistants ."
+    },
+    {
+     "cid": "C26",
+     "sentence": "Another 2020 rule-based system generates discriminative questions to disambiguate between two intents without requiring annotated clarification data, a method extensible to multiple intents ."
+    },
+    {
+     "cid": "C4",
+     "sentence": "This approach is trained with reinforcement learning using a dual reward system that balances recall on ambiguous inputs and precision on unambiguous ones, eliminating the need for clarification quest"
+    },
+    {
+     "cid": "C4",
+     "sentence": "One 2025 method proposes that LLMs, which implicitly commit to one interpretation, should instead generate structured responses enumerating all valid interpretations with corresponding answers ."
+    },
+    {
+     "cid": "C38",
+     "sentence": "In human-robot interaction, a 2018 review of 52 studies highlights that robots in unstructured environments are challenged by frequent failures, with little prior research on communicating these failu"
+    },
+    {
+     "cid": "C37",
+     "sentence": "A 2018 study on implementing robust RPA solutions in large organizations focuses on exception handling, work queue, and data management strategies to increase robot robustness against external applica"
+    }
+   ],
+   "title_only_citations": 1,
+   "word_count": 713,
+   "n_sections": 5,
+   "n_citations": 8,
+   "record_level": 8,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[2]"
+   ]
+  }
+ },
+ {
+  "qid": "948b6cb986a5d7732722975d",
+  "question": "What are leading approaches for evaluating complex scientific question answering systems in NLP?",
+  "sections": [
+   {
+    "title": "Foundational Benchmarks and Metrics",
+    "text": "The evolution of question answering (QA) evaluation has shifted from rudimentary rule-based systems to modern deep learning architectures and large pre-trained models [1] [2] [3] [4]. A key milestone in this progression was the introduction of contextual word embeddings, where ELMo advanced the state of the art for several major NLP benchmarks, including question answering tasks [1] [2] [3] [4]. For commonsense reasoning, the CommonsenseQA dataset was developed to focus on knowledge encoded in ConceptNet [1] [2] [3] [4]. In the domain of complex reasoning, the DROP benchmark provides 9,536 examples and utilizes a few-shot setting with 4 passages, employing an F1 metric for assessment. For chart-based factoid QA, the ChartQA benchmark introduces a relaxed accuracy metric, while multiple other benchmarks such as ChartCheck, Chocolate, ChartLlama, and ChartX have also been established.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "In this work, we present CommonsenseQA , a new dataset focusing on commonsense question answering, based on knowledge encoded in ConceptNet Speer et al. (2017) ."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "hub_W2898695519#c2",
+         "char_start": 1952
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Through a historical overview, we chart the evolution from rudimentary rule-based systems to modern deep learning architectures and large pre-trained models."
+      ],
+      "title": "deep learning approaches for improving question answering systems in hepatocellular carcinoma research",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.16038",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "When integrating contextual word embeddings with existing task-specific architectures, ELMo advances the state of the art for several major NLP benchmarks Peters et al. (2018a) including question answering Rajpurkar et al. (2016) , sentiment analysis Socher et al. (2013) , and named entity recognition Tjong Kim Sang and De Meulder (2003) ."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2 Related Work",
+         "chunk_id": "hub_W2896457183#c3",
+         "char_start": 5754
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5 Summary",
+         "chunk_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#c17",
+         "char_start": 43029
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Scientific-Specific Evaluation Frameworks",
+    "text": "Evaluating systems on scientific content requires specialized datasets that address the unique complexities of the domain. SciCUEval is a comprehensive dataset designed specifically for evaluating scientific context understanding in large language models (LLMs) [7]. To address the challenges of open-domain QA, the SF-QA framework offers a simple and fair evaluation approach that modularizes the pipeline, thereby making the task more accessible and reproducible [6]. Additionally, a novel \"question-to-question\" retrieval approach has been introduced for knowledge-based QA, which avoids the generation step to mitigate associated limitations [5]. These resources, along with others like sciverse_ccsbench and sciverse_scirag, form the core corpus for assessing scientific QA capabilities.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "This paper introduces a novel approach to knowledge-based question answering that addresses these limitations by performing \"question-to-question\" retrieval and avoids the generation step."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa#c2",
+         "char_start": 1295
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "In this paper, we introduce SF-QA: simple and fair evaluation framework for open-domain QA. SF-QA framework modularizes the pipeline open-domain QA system, which makes the task itself easily accessible and reproducible to research groups without enough computing resources."
+      ],
+      "title": "SF-QA: Simple and Fair Evaluation Library for Open-domain Question Answering",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2101.01910",
+       "authors": [
+        "Xiaopeng Lu",
+        "Kyusong Lee",
+        "Tiancheng Zhao"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "scicueval: a comprehensive dataset for evaluating scientific context understanding in large language models"
+      ],
+      "title": "scicueval: a comprehensive dataset for evaluating scientific context understanding in large language models",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Controllable Generation and Automated Testing",
+    "text": "Recent work has focused on controllable text generation, though existing evaluations primarily test LLMs under single-constraint settings, such as adjusting formality [9]. To expand evaluation coverage, researchers have leveraged the strong text generation capabilities of LLMs to automatically generate questions given a specific context and answer [8]. This automated testing approach allows for the creation of diverse QA pairs without manual annotation. However, the reliance on LLMs for generating evaluation data introduces significant risks. Output variability and hallucinations pose serious threats to the reliability of these LLM-generated results [8]. Specifically, hallucinations can lead to generated questions that introduce information not present in the source context or violate the constraints specified in the prompt [8].",
+    "citations": [
+     {
+      "id": "[8]",
+      "snippets": [
+       "In our work, hallucinations may lead to generated questions that introduce information not present in the source context or violate the constraints specified in the prompt.",
+       "However, challenges such as output variability [16], [17] and hallucinations [18] pose significant threats to the reliability of LLM-generated results.",
+       "In this study, we leverage the strong text generation capabilities of LLMs to generate questions given a specific context and answer."
+      ],
+      "title": "testing question answering software with context-driven question generation",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[9]",
+      "snippets": [
+       "These models also show promise in controllable text generation [33, 35, 37], though existing work primarily evaluates them under single-constraint settings (e.g., adjusting formality)."
+      ],
+      "title": "ccsbench: evaluating compositional controllability in llms for scientific document summarization",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Human Evaluation and System Reliability",
+    "text": "Despite the rise of automated metrics, human evaluation remains critical for assessing complex scientific work. Due to the high complexity of the task, evaluators must be experts in the specific domain and topic [10]. To ensure rigor, the evaluation protocol requires that the evaluator has at least 5 years of experience and has published at least 5 papers in the relevant field [10]. This strict qualification standard acknowledges that general NLP proficiency is insufficient for judging the validity of scientific answers. Furthermore, there is a noted disconnect between QA performance and summary quality, suggesting that optimizing for one metric does not guarantee success in the other [1] [2] [3] [4]. Therefore, a robust evaluation strategy must combine automated benchmarks like DROP and ChartQA with rigorous, expert-led human assessment to fully capture system performance [10].",
+    "citations": [
+     {
+      "id": "[10]",
+      "snippets": [
+       "d the work being evaluated. Specifically, the evaluator must be an expert in the domain and topic. Given the complexity of human evaluation, we approached authors (as the authors have the knowledge of their paper and they also have knowledge of the literature) who have published papers in reputable venues, possess over 5 years of experience in scientific publishing, and have authored more than 5 s"
+      ],
+      "title": "can large language models unlock novel scientific research ideas?",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "chunk_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_#24300",
+         "char_start": 24300
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "In this work, we present CommonsenseQA , a new dataset focusing on commonsense question answering, based on knowledge encoded in ConceptNet Speer et al. (2017) ."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "hub_W2898695519#c2",
+         "char_start": 1952
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Through a historical overview, we chart the evolution from rudimentary rule-based systems to modern deep learning architectures and large pre-trained models."
+      ],
+      "title": "deep learning approaches for improving question answering systems in hepatocellular carcinoma research",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2402.16038",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "When integrating contextual word embeddings with existing task-specific architectures, ELMo advances the state of the art for several major NLP benchmarks Peters et al. (2018a) including question answering Rajpurkar et al. (2016) , sentiment analysis Socher et al. (2013) , and named entity recognition Tjong Kim Sang and De Meulder (2003) ."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2 Related Work",
+         "chunk_id": "hub_W2896457183#c3",
+         "char_start": 5754
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "There can also be a disconnect between the performance on question answering and the quality of the overall summary, where the best sentences to include may not always be captured by the answers a standardized set of questions."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5 Summary",
+         "chunk_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#c17",
+         "char_start": 43029
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 13,
+   "n_claims_usable": 13,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C6",
+     "sentence": "For chart-based factoid QA, the ChartQA benchmark introduces a relaxed accuracy metric, while multiple other benchmarks such as ChartCheck, Chocolate, ChartLlama, and ChartX have also been established"
+    },
+    {
+     "cid": "C5",
+     "sentence": "In the domain of complex reasoning, the DROP benchmark provides 9,536 examples and utilizes a few-shot setting with 4 passages, employing an F1 metric for assessment ."
+    },
+    {
+     "cid": "C2",
+     "sentence": "These resources, along with others like sciverse_ccsbench and sciverse_scirag, form the core corpus for assessing scientific QA capabilities ."
+    },
+    {
+     "cid": "C6",
+     "sentence": "Therefore, a robust evaluation strategy must combine automated benchmarks like DROP and ChartQA with rigorous, expert-led human assessment to fully capture system performance [C5][10]."
+    },
+    {
+     "cid": "C5",
+     "sentence": "Therefore, a robust evaluation strategy must combine automated benchmarks like DROP and ChartQA with rigorous, expert-led human assessment to fully capture system performance [10]."
+    }
+   ],
+   "word_count": 484,
+   "n_sections": 4,
+   "n_citations": 10,
+   "record_level": 10,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "144eea4816fa6949029e53eb",
+  "question": "What are leading methods for generating hard examples of the boolean satisfiability problem, and what are their strengths and weaknesses?",
+  "sections": [
+   {
+    "title": "Context and Problem Definition",
+    "text": "The Boolean satisfiability problem (SAT) is a well-known NP-hard problem with significant practical applications [3]. It involves determining whether truth values can be assigned to Boolean variables in a propositional expression such that the overall expression evaluates to true [2]. Models for generating random instances of search problems have received substantial attention from the artificial intelligence community over the last twenty years [1]. These results for SAT and constraint satisfaction (CP) have had a major impact on the development of fast and robust solvers, significantly expanding their range of effectiveness [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results obtained for boolean satisfiability (SAT) [1, 39] and constraint satisfaction (CP) [32] have had a major impact on the development of fast and robust solvers, significantly expanding their range of effectiveness as general purpose tools for solving hard search and optimization problems arising in AI, and scientific and engineering applications.",
+       "Models for generating random instances of search problems have received much attention from the artificial intelligence community in the last twenty years.",
+       "Since we consider disjunctions of t t CNF formulas, where t t is fixed, the probability of such a disjunction being satisfiable is, in the limit, not affected by how we interpret the disjunction — as a set or an ordered tuple.",
+       "Under this constraint, the hardest formulas in the basic controlled model contain more universal variables than it is the case for the hardest formulas from the Chen-Interian model.",
+       "Further, multi-component model allows one to generate random instances with few components that are several orders of magnitude harder than those generated with the same number of variables from the underlying “single-component” model.",
+       "heoretical bounds for the phase transition region in our models,\nand show experimentally the presence of the easy-hard-easy pattern\nand its alignment with the location of the phase transition.\nWe show that boolean formulas and logic programs from our models are\nsignificantly harder than those obtained from the standard k k -CNF and\nChen-Interian models, and that their combination yields formulas a",
+       "new models for generating hard random boolean formulas and disjunctive logic programs",
+       "ρ l ​ ( k ) m/n \\rho_{l}(k) , a formula from the model is almost surely\nsatisfiable (SAT), and if m / n ρ u ​ ( k ) m/n \\rho_{u}(k) , almost surely unsatisfiable\n(UNSAT). 1 1 \n 1 \n \n \n We give a precise statement of these properties\nin Section 2.1 . It is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \\rho_{l}(k)=\\rho_{u}(k) . That conjecture\nis still open. However, it holds asymptotically, i.e., the",
+       "opment (MISE) under the project\n“PIUCultura – Paradigmi Innovativi per l’Utilizzo della Cultura”\n(n. F/020016/01-02/X27), and under project “Smarter Solutions in the Big\nData World (S2BDW)” (n. F/050389/01-03/X32) funded within the call\n“HORIZON2020” PON I C 2014-2020. The work of the third author has been\npartially supported by the the NSF grant IIS-1707371.\n\n \n \n \n\n## References\n\n \n \n [1] \n \nD.",
+       "ard random boolean formulas and disjunctive logic\nprograms.\n\n \n In Proceedings of the Twenty-Sixth International Joint\nConference on Artificial Intelligence, IJCAI 2017, Melbourne, Australia,\nAugust 19-25, 2017 , pages 532–538, 2017.\n\n \n\n \n [5] \n \nC. Ansótegui, M. L. Bonet, and J. Levy.\n\n \n Towards industrial-like random SAT instances.\n\n \n In C. Boutilier, editor, IJCAI 2009, Proceedings of the 21"
+      ],
+      "title": "new models for generating hard random boolean formulas and disjunctive logic programs",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1802.03828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "The boolean satisfiability problem is to determine whether it is possible to assign truth values to the Boolean variables in a propositional expression (formula) in such a way that the overall expression has the value true."
+      ],
+      "title": "weakening cardinality constraints creates harder satisfiability benchmarks",
+      "metadata": {
+       "year": 2015,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The satisfiability problem is a well-known NP-hard problem with relevant practical applications (cf., e.g. [3])."
+      ],
+      "title": "an adaptive evolutionary algorithm for the satisfiability problem",
+      "metadata": {
+       "year": 2000,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "New Generation Models",
+    "text": "Recent work proposes new models for generating hard random Boolean formulas and disjunctive logic programs [1]. These models exhibit an easy-hard-easy pattern that aligns with the location of the phase transition [1]. The generated Boolean formulas and programs are significantly harder than those produced by standard k-CNF and Chen-Interian models [1]. Furthermore, combining these approaches yields even harder instances [1]. A multi-component model allows for the generation of random instances with few components that are several orders of magnitude harder than those generated with the same number of variables from the underlying single-component model [1]. Under the constraint of fixing the number of existential variables to the same value, the hardest formulas in the basic controlled model contain more universal variables than the hardest formulas from the Chen-Interian model [1]. Since the models consider disjunctions of t CNF formulas where t is fixed, the probability of such a disjunction being satisfiable is, in the limit, not affected by how the disjunction is interpreted as a set or an ordered structure [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results obtained for boolean satisfiability (SAT) [1, 39] and constraint satisfaction (CP) [32] have had a major impact on the development of fast and robust solvers, significantly expanding their range of effectiveness as general purpose tools for solving hard search and optimization problems arising in AI, and scientific and engineering applications.",
+       "Models for generating random instances of search problems have received much attention from the artificial intelligence community in the last twenty years.",
+       "Since we consider disjunctions of t t CNF formulas, where t t is fixed, the probability of such a disjunction being satisfiable is, in the limit, not affected by how we interpret the disjunction — as a set or an ordered tuple.",
+       "Under this constraint, the hardest formulas in the basic controlled model contain more universal variables than it is the case for the hardest formulas from the Chen-Interian model.",
+       "Further, multi-component model allows one to generate random instances with few components that are several orders of magnitude harder than those generated with the same number of variables from the underlying “single-component” model.",
+       "heoretical bounds for the phase transition region in our models,\nand show experimentally the presence of the easy-hard-easy pattern\nand its alignment with the location of the phase transition.\nWe show that boolean formulas and logic programs from our models are\nsignificantly harder than those obtained from the standard k k -CNF and\nChen-Interian models, and that their combination yields formulas a",
+       "new models for generating hard random boolean formulas and disjunctive logic programs",
+       "ρ l ​ ( k ) m/n \\rho_{l}(k) , a formula from the model is almost surely\nsatisfiable (SAT), and if m / n ρ u ​ ( k ) m/n \\rho_{u}(k) , almost surely unsatisfiable\n(UNSAT). 1 1 \n 1 \n \n \n We give a precise statement of these properties\nin Section 2.1 . It is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \\rho_{l}(k)=\\rho_{u}(k) . That conjecture\nis still open. However, it holds asymptotically, i.e., the",
+       "opment (MISE) under the project\n“PIUCultura – Paradigmi Innovativi per l’Utilizzo della Cultura”\n(n. F/020016/01-02/X27), and under project “Smarter Solutions in the Big\nData World (S2BDW)” (n. F/050389/01-03/X32) funded within the call\n“HORIZON2020” PON I C 2014-2020. The work of the third author has been\npartially supported by the the NSF grant IIS-1707371.\n\n \n \n \n\n## References\n\n \n \n [1] \n \nD.",
+       "ard random boolean formulas and disjunctive logic\nprograms.\n\n \n In Proceedings of the Twenty-Sixth International Joint\nConference on Artificial Intelligence, IJCAI 2017, Melbourne, Australia,\nAugust 19-25, 2017 , pages 532–538, 2017.\n\n \n\n \n [5] \n \nC. Ansótegui, M. L. Bonet, and J. Levy.\n\n \n Towards industrial-like random SAT instances.\n\n \n In C. Boutilier, editor, IJCAI 2009, Proceedings of the 21"
+      ],
+      "title": "new models for generating hard random boolean formulas and disjunctive logic programs",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1802.03828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Phase Transition and Complexity",
+    "text": "Theoretical bounds for the phase transition region are established for these models [1]. If the ratio m/n is less than rho_l(k), a formula from the model is almost surely satisfiable (SAT), and if m/n is greater than rho_u(k), it is almost surely unsatisfiable (UNSAT) [1]. The conjecture that rho_l equals rho_u remains open [1]. Related complexity results include the Valiant and Vazirani randomized polynomial time reduction from SAT to Unique SAT, which showed that deciding whether a CNF formula has zero or one solution is essentially as difficult as SAT in general [5]. For the PPSZ algorithm, the fastest known randomized algorithm for unique k-SAT, analysis results in a gap between k-SAT and unique k-SAT for k = 3 and 4 [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "Especially for PPSZ [9], the fastest known (randomized) algorithm for unique $k$ -SAT, the analysis results in a gap between $k$ -SAT and unique $k$ -SAT for $k = 3,4$ ."
+      ],
+      "title": "encyclopedia of algorithms",
+      "metadata": {
+       "year": 2016,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Valiant and Vazirani in [18] gave a randomized polynomial time reduction from SAT to Unique SAT, and showed that deciding whether a CNF formula has zero or one solution is essentially as difficult as SAT in general."
+      ],
+      "title": "uniquely satisfiable d-regular (k,s)-sat instances",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results obtained for boolean satisfiability (SAT) [1, 39] and constraint satisfaction (CP) [32] have had a major impact on the development of fast and robust solvers, significantly expanding their range of effectiveness as general purpose tools for solving hard search and optimization problems arising in AI, and scientific and engineering applications.",
+       "Models for generating random instances of search problems have received much attention from the artificial intelligence community in the last twenty years.",
+       "Since we consider disjunctions of t t CNF formulas, where t t is fixed, the probability of such a disjunction being satisfiable is, in the limit, not affected by how we interpret the disjunction — as a set or an ordered tuple.",
+       "Under this constraint, the hardest formulas in the basic controlled model contain more universal variables than it is the case for the hardest formulas from the Chen-Interian model.",
+       "Further, multi-component model allows one to generate random instances with few components that are several orders of magnitude harder than those generated with the same number of variables from the underlying “single-component” model.",
+       "heoretical bounds for the phase transition region in our models,\nand show experimentally the presence of the easy-hard-easy pattern\nand its alignment with the location of the phase transition.\nWe show that boolean formulas and logic programs from our models are\nsignificantly harder than those obtained from the standard k k -CNF and\nChen-Interian models, and that their combination yields formulas a",
+       "new models for generating hard random boolean formulas and disjunctive logic programs",
+       "ρ l ​ ( k ) m/n \\rho_{l}(k) , a formula from the model is almost surely\nsatisfiable (SAT), and if m / n ρ u ​ ( k ) m/n \\rho_{u}(k) , almost surely unsatisfiable\n(UNSAT). 1 1 \n 1 \n \n \n We give a precise statement of these properties\nin Section 2.1 . It is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \\rho_{l}(k)=\\rho_{u}(k) . That conjecture\nis still open. However, it holds asymptotically, i.e., the",
+       "opment (MISE) under the project\n“PIUCultura – Paradigmi Innovativi per l’Utilizzo della Cultura”\n(n. F/020016/01-02/X27), and under project “Smarter Solutions in the Big\nData World (S2BDW)” (n. F/050389/01-03/X32) funded within the call\n“HORIZON2020” PON I C 2014-2020. The work of the third author has been\npartially supported by the the NSF grant IIS-1707371.\n\n \n \n \n\n## References\n\n \n \n [1] \n \nD.",
+       "ard random boolean formulas and disjunctive logic\nprograms.\n\n \n In Proceedings of the Twenty-Sixth International Joint\nConference on Artificial Intelligence, IJCAI 2017, Melbourne, Australia,\nAugust 19-25, 2017 , pages 532–538, 2017.\n\n \n\n \n [5] \n \nC. Ansótegui, M. L. Bonet, and J. Levy.\n\n \n Towards industrial-like random SAT instances.\n\n \n In C. Boutilier, editor, IJCAI 2009, Proceedings of the 21"
+      ],
+      "title": "new models for generating hard random boolean formulas and disjunctive logic programs",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1802.03828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodological Approaches and References",
+    "text": "Specific techniques such as reweighted belief propagation and quiet planting are discussed for random k-SAT [6]. The literature includes references to D. Achlioptas's work on random satisfiability [1] and Ansótegui, Bonet, and Levy's paper \"Towards industrial-like random SAT instances\" presented at IJCAI 2009 [1]. The research was supported by projects including PIUCultura (n. F/020016/01-02/X27) and Smarter Solutions in the Big Data World (S2BDW) (n. F/050389/01-03/X32) [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The results obtained for boolean satisfiability (SAT) [1, 39] and constraint satisfaction (CP) [32] have had a major impact on the development of fast and robust solvers, significantly expanding their range of effectiveness as general purpose tools for solving hard search and optimization problems arising in AI, and scientific and engineering applications.",
+       "Models for generating random instances of search problems have received much attention from the artificial intelligence community in the last twenty years.",
+       "Since we consider disjunctions of t t CNF formulas, where t t is fixed, the probability of such a disjunction being satisfiable is, in the limit, not affected by how we interpret the disjunction — as a set or an ordered tuple.",
+       "Under this constraint, the hardest formulas in the basic controlled model contain more universal variables than it is the case for the hardest formulas from the Chen-Interian model.",
+       "Further, multi-component model allows one to generate random instances with few components that are several orders of magnitude harder than those generated with the same number of variables from the underlying “single-component” model.",
+       "heoretical bounds for the phase transition region in our models,\nand show experimentally the presence of the easy-hard-easy pattern\nand its alignment with the location of the phase transition.\nWe show that boolean formulas and logic programs from our models are\nsignificantly harder than those obtained from the standard k k -CNF and\nChen-Interian models, and that their combination yields formulas a",
+       "new models for generating hard random boolean formulas and disjunctive logic programs",
+       "ρ l ​ ( k ) m/n \\rho_{l}(k) , a formula from the model is almost surely\nsatisfiable (SAT), and if m / n ρ u ​ ( k ) m/n \\rho_{u}(k) , almost surely unsatisfiable\n(UNSAT). 1 1 \n 1 \n \n \n We give a precise statement of these properties\nin Section 2.1 . It is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \\rho_{l}(k)=\\rho_{u}(k) . That conjecture\nis still open. However, it holds asymptotically, i.e., the",
+       "opment (MISE) under the project\n“PIUCultura – Paradigmi Innovativi per l’Utilizzo della Cultura”\n(n. F/020016/01-02/X27), and under project “Smarter Solutions in the Big\nData World (S2BDW)” (n. F/050389/01-03/X32) funded within the call\n“HORIZON2020” PON I C 2014-2020. The work of the third author has been\npartially supported by the the NSF grant IIS-1707371.\n\n \n \n \n\n## References\n\n \n \n [1] \n \nD.",
+       "ard random boolean formulas and disjunctive logic\nprograms.\n\n \n In Proceedings of the Twenty-Sixth International Joint\nConference on Artificial Intelligence, IJCAI 2017, Melbourne, Australia,\nAugust 19-25, 2017 , pages 532–538, 2017.\n\n \n\n \n [5] \n \nC. Ansótegui, M. L. Bonet, and J. Levy.\n\n \n Towards industrial-like random SAT instances.\n\n \n In C. Boutilier, editor, IJCAI 2009, Proceedings of the 21"
+      ],
+      "title": "new models for generating hard random boolean formulas and disjunctive logic programs",
+      "metadata": {
+       "year": 2018,
+       "doi": null,
+       "arxiv": "1802.03828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "reweighted belief propagation and quiet planting for random k-sat"
+      ],
+      "title": "reweighted belief propagation and quiet planting for random k-sat",
+      "metadata": {
+       "year": 2012,
+       "doi": null,
+       "arxiv": "1203.5521",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 15,
+   "n_claims_usable": 15,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 450,
+   "n_sections": 4,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]"
+   ]
+  }
+ },
+ {
+  "qid": "6f526f72804ce3eb59feb704",
+  "question": "What are good practices for detecting AI-generated texts in situations where false positives are extremely expensive?",
+  "sections": [
+   {
+    "title": "Threshold-Free Architectures and Calibration",
+    "text": "To minimize false positives, detection systems should avoid reliance on external calibration datasets, which are often unavailable and introduce variability in real-world accuracy [1]. Agent-X employs a threshold-free aggregation strategy that eliminates this dependency, making accuracy a more practical metric than AUROC, which inherently favors threshold-dependent methods and is inadequate for strict FPR control [1]. This multi-agent framework circumvents the calibration issues of single-LLM approaches, where uncalibrated predictions exhibit systematic overconfidence or underconfidence [1]. Specifically, semantic-steering calibration significantly reduces the gap between predicted confidence and true accuracy, resulting in a better-aligned and more reliable confidence distribution [1]. While existing methods rely on large annotated datasets and external threshold tuning, restricting zero-shot effectiveness, Agent-X provides a practical solution for real-world scenarios [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Existing AI-generated text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, and zero-shot effectiveness.",
+       "Our approach provides a practical, threshold-free solution, significantly advancing AI-generated text detection in real-world zero-shot scenarios.",
+       "it significantly reduces the gap between predicted confidence and true accuracy.",
+       "whereas steer-based calibration results in a better-aligned, more reliable confidence distribution (Figure 3(b)).",
+       "semanticsteering calibration substantially enhances the reliability and interpretability of confidence scores in our threshold-free AI-generated text detection framework.",
+       "uncalibrated LLM predictions (Figure 3(a)) tend to systematically exhibit overconfidence or underconfidence",
+       "In contrast, our proposed multi-agent framework inherently circumvents these calibration challenges through its confidence-aware, threshold-free aggregation mechanism. Consequently, $AGENT-X$ substantially improves accuracy, interpretability, and real-world applicability.",
+       "Existing detection methods (Mitchell et al., 2023a; Bao et al., 2024) frequently rely on metrics like AUROC, which, while theoretically informative, require selecting optimal thresholds based on external, domain-specific calibration datasets.",
+       "In contrast, our proposed method uniquely employs a threshold-free aggregation strategy, eliminating dependency on external calibration sets, thereby making Accuracy an inherently more practical and relevant metric for evaluation.",
+       "Although AUROC metrics inherently favor threshold-dependent methods and thus are less aligned with our threshold-free design, $AGENT-X$ consistently exhibits strong and competitive performance across all evaluated datasets and language models.",
+       "In practical scenarios, such datasets are often unavailable, significantly limiting these methods' applicability and scalability.",
+       "This external threshold calibration introduces variability and often leads to inconsistent and suboptimal accuracy performance in real-world applications.",
+       "Additionally, an adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics.",
+       "Employing less powerful or smaller-scale LLMs could pose challenges in comprehensively understanding the detection guidelines or accurately performing agent-specific tasks.",
+       "A meta agent integrates these assessments through confidence-aware aggregation, enabling threshold-free, interpretable classification.",
+       "Specifically, we organize detection guidelines into semantic, stylistic, and structural dimensions, each independently evaluated by specialized linguistic agents that provide explicit reasoning and robust calibrated confidence via semantic steering.",
+       "The framework consists of three main components: a router agent for adaptive activation of guideline-specific base agents, guideline-specific base agents organized into three stylistic dimensions (semantic, stylistic, and structural), and a meta agent synthesizing these analyses into a final interpretable classification.",
+       "White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank (Gehrmann et al., 2019a; Bao et al., 2024; Tulchinskii et al., 2024).",
+       "While Fast-DetectGPT performs strongly in specific scenarios (e.g., XSum, Writing for ChatGPT), it generalizes poorly to biomedical texts (PubMed), highlighting the superior domain adaptability of our threshold-free method.",
+       "An optimized zero-shot detector that replaces the perturbation step of DetectGPT with a more efficient sampling step.",
+       "Black-box approaches like DetectGPT (Mitchell et al., 2023a), NPR (Su et al., 2023a), and DNA-GPT (Yang et al., 2023) typically involve multiple evaluations or generations, incurring high computational overhead."
+      ],
+      "title": "agent-x: adaptive guideline-based expert network for threshold-free ai-generated text detection",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+         "chunk_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Interpretability and Human Oversight",
+    "text": "In high-stakes environments, algorithms must clearly interpret and explain the critical factors leading to classification to prevent false accusations [3]. Agent-X organizes detection guidelines into semantic, stylistic, and structural dimensions, each evaluated by specialized linguistic agents that provide explicit reasoning [1]. A meta agent integrates these assessments via confidence-aware aggregation, enabling interpretable classification [1]. An adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics, though smaller LLMs may struggle to comprehend these guidelines or perform agent-specific tasks [1]. Despite automated capabilities, labeling results should be regarded as reference guidance rather than definitive judgments, with final decisions made under careful human supervision [2]. This approach is particularly relevant as current SOTA detectors often flag minimally polished text as AI and struggle to differentiate degrees of AI involvement.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Therefore, the labeling results should be regarded as reference guidance rather than definitive judgments, and all final decisions should be made under careful human supervision.",
+       "Languages such as Vietnamese typically exhibit lower True Positive Rates at low False Positive Rates and are more prone to mispredictions compared to languages that are well represented in the LLM.",
+       "Based on the distribution plot and the TPR@0.06%FPR threshold, we can reasonably trust that texts with scores below this threshold are highly likely to be AI-generated.",
+       "VietBinoculars with the Closest Point threshold achieves the highest performance",
+       "with prediction failures occurring only for Qwen3-235B-A22B-FW, DeepSeek-V3, Claude-3.5-Sonnet, and GPT-4o.",
+       "The evaluation results of the VietBinoculars method on out-of-domain datasets such as Gemma-3-12B-News, Gemma-3-12B-VuTrongPhung, and Sailor2-8B-VuTrongPhung show that it achieved performance levels of at least $99\\%$ in terms of accuracy, F1-score, and AUC.",
+       "According to the paper [12], Binoculars demonstrates superior reliability compared to Ghostbuster on out-of-domain datasets.",
+       "More importantly, Binoculars has practical significance in evaluating detection performance, achieving over $90\\%$ accuracy in detecting English text generated by ChatGPT at a False Positive Rate (FPR) of $0.01\\%$ , even though it was not trained on ChatGPT.",
+       "Second, for practical applications, it is essential to carefully evaluate the effectiveness of the detector using the FPR metric.",
+       "Only systems based on low FPR criteria are considered good and reliable for commercial applications while minimizing potential harm to users.",
+       "Moreover, VietBinoculars can be applied as a data-cleaning tool to improve the quality of Vietnamese training datasets. By identifying and filtering out AI-generated texts that may have been unintentionally included, we can ensure higher dataset integrity and reliability, ultimately leading to better model performance in downstream tasks."
+      ],
+      "title": "vietbinoculars: a zero-shot approach for detecting vietnamese llm-generated text",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4 Discussion",
+         "chunk_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text#c12",
+         "char_start": 44063
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Existing AI-generated text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, and zero-shot effectiveness.",
+       "Our approach provides a practical, threshold-free solution, significantly advancing AI-generated text detection in real-world zero-shot scenarios.",
+       "it significantly reduces the gap between predicted confidence and true accuracy.",
+       "whereas steer-based calibration results in a better-aligned, more reliable confidence distribution (Figure 3(b)).",
+       "semanticsteering calibration substantially enhances the reliability and interpretability of confidence scores in our threshold-free AI-generated text detection framework.",
+       "uncalibrated LLM predictions (Figure 3(a)) tend to systematically exhibit overconfidence or underconfidence",
+       "In contrast, our proposed multi-agent framework inherently circumvents these calibration challenges through its confidence-aware, threshold-free aggregation mechanism. Consequently, $AGENT-X$ substantially improves accuracy, interpretability, and real-world applicability.",
+       "Existing detection methods (Mitchell et al., 2023a; Bao et al., 2024) frequently rely on metrics like AUROC, which, while theoretically informative, require selecting optimal thresholds based on external, domain-specific calibration datasets.",
+       "In contrast, our proposed method uniquely employs a threshold-free aggregation strategy, eliminating dependency on external calibration sets, thereby making Accuracy an inherently more practical and relevant metric for evaluation.",
+       "Although AUROC metrics inherently favor threshold-dependent methods and thus are less aligned with our threshold-free design, $AGENT-X$ consistently exhibits strong and competitive performance across all evaluated datasets and language models.",
+       "In practical scenarios, such datasets are often unavailable, significantly limiting these methods' applicability and scalability.",
+       "This external threshold calibration introduces variability and often leads to inconsistent and suboptimal accuracy performance in real-world applications.",
+       "Additionally, an adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics.",
+       "Employing less powerful or smaller-scale LLMs could pose challenges in comprehensively understanding the detection guidelines or accurately performing agent-specific tasks.",
+       "A meta agent integrates these assessments through confidence-aware aggregation, enabling threshold-free, interpretable classification.",
+       "Specifically, we organize detection guidelines into semantic, stylistic, and structural dimensions, each independently evaluated by specialized linguistic agents that provide explicit reasoning and robust calibrated confidence via semantic steering.",
+       "The framework consists of three main components: a router agent for adaptive activation of guideline-specific base agents, guideline-specific base agents organized into three stylistic dimensions (semantic, stylistic, and structural), and a meta agent synthesizing these analyses into a final interpretable classification.",
+       "White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank (Gehrmann et al., 2019a; Bao et al., 2024; Tulchinskii et al., 2024).",
+       "While Fast-DetectGPT performs strongly in specific scenarios (e.g., XSum, Writing for ChatGPT), it generalizes poorly to biomedical texts (PubMed), highlighting the superior domain adaptability of our threshold-free method.",
+       "An optimized zero-shot detector that replaces the perturbation step of DetectGPT with a more efficient sampling step.",
+       "Black-box approaches like DetectGPT (Mitchell et al., 2023a), NPR (Su et al., 2023a), and DNA-GPT (Yang et al., 2023) typically involve multiple evaluations or generations, incurring high computational overhead."
+      ],
+      "title": "agent-x: adaptive guideline-based expert network for threshold-free ai-generated text detection",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+         "chunk_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "A detection algorithm must clearly interpret and explain the critical factors that lead to its classification of a paragraph as AI-generated to prevent false accusations.",
+       "A detection algorithm should be cost-effective and possess the capability to accurately detect both long and short texts [43]."
+      ],
+      "title": "when ai eats itself: on the caveats of data pollution in the era of generative ai",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance Metrics and Domain Specificity",
+    "text": "For practical applications, it is essential to evaluate detector effectiveness using the False Positive Rate (FPR) metric, as only low-FPR systems are considered reliable for commercial use [2]. Detection algorithms should also be cost-effective and capable of accurately detecting both long and short texts [3]. Binoculars demonstrates practical significance by achieving over 90% accuracy in detecting ChatGPT-generated English text at an FPR of 0.01%, even without training on ChatGPT data [2]. It also shows superior reliability compared to Ghostbuster on out-of-domain datasets [2]. In Vietnamese contexts, VietBinoculars achieves at least 99% accuracy, F1, and AUC on out-of-domain datasets such as Gemma-3-12B-News and Sailor2-8B-VuTrongPhung [2]. Using a Closest Point threshold, it achieves the highest performance, with prediction failures occurring only for Qwen3-235B-A22B-FW, DeepSeek-V3, Claude-3.5-Sonnet, and GPT-4o [2]. Texts with scores below the TPR@0.06%FPR threshold are highly likely to be AI-generated [2]. However, Vietnamese text typically exhibits lower True Positive Rates at low FPRs compared to well-represented languages like those processed by Falcon-7B [2]. Identified thresholds may not fully capture the statistical characteristics of Vietnamese.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Therefore, the labeling results should be regarded as reference guidance rather than definitive judgments, and all final decisions should be made under careful human supervision.",
+       "Languages such as Vietnamese typically exhibit lower True Positive Rates at low False Positive Rates and are more prone to mispredictions compared to languages that are well represented in the LLM.",
+       "Based on the distribution plot and the TPR@0.06%FPR threshold, we can reasonably trust that texts with scores below this threshold are highly likely to be AI-generated.",
+       "VietBinoculars with the Closest Point threshold achieves the highest performance",
+       "with prediction failures occurring only for Qwen3-235B-A22B-FW, DeepSeek-V3, Claude-3.5-Sonnet, and GPT-4o.",
+       "The evaluation results of the VietBinoculars method on out-of-domain datasets such as Gemma-3-12B-News, Gemma-3-12B-VuTrongPhung, and Sailor2-8B-VuTrongPhung show that it achieved performance levels of at least $99\\%$ in terms of accuracy, F1-score, and AUC.",
+       "According to the paper [12], Binoculars demonstrates superior reliability compared to Ghostbuster on out-of-domain datasets.",
+       "More importantly, Binoculars has practical significance in evaluating detection performance, achieving over $90\\%$ accuracy in detecting English text generated by ChatGPT at a False Positive Rate (FPR) of $0.01\\%$ , even though it was not trained on ChatGPT.",
+       "Second, for practical applications, it is essential to carefully evaluate the effectiveness of the detector using the FPR metric.",
+       "Only systems based on low FPR criteria are considered good and reliable for commercial applications while minimizing potential harm to users.",
+       "Moreover, VietBinoculars can be applied as a data-cleaning tool to improve the quality of Vietnamese training datasets. By identifying and filtering out AI-generated texts that may have been unintentionally included, we can ensure higher dataset integrity and reliability, ultimately leading to better model performance in downstream tasks."
+      ],
+      "title": "vietbinoculars: a zero-shot approach for detecting vietnamese llm-generated text",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4 Discussion",
+         "chunk_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text#c12",
+         "char_start": 44063
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "A detection algorithm must clearly interpret and explain the critical factors that lead to its classification of a paragraph as AI-generated to prevent false accusations.",
+       "A detection algorithm should be cost-effective and possess the capability to accurately detect both long and short texts [43]."
+      ],
+      "title": "when ai eats itself: on the caveats of data pollution in the era of generative ai",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Computational Efficiency and Generalization",
+    "text": "Black-box approaches like DetectGPT, NPR, and DNA-GPT incur high computational overhead due to multiple evaluations or generations [1]. In contrast, Fast-DetectGPT is an optimized zero-shot detector that replaces the perturbation step of DetectGPT with a more efficient sampling step [1]. However, Fast-DetectGPT generalizes poorly to biomedical texts such as those in PubMed, highlighting the superior domain adaptability of threshold-free methods [1]. White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank [1]. Cross-domain and cross-generator evaluations reveal substantial generalization gaps, as seen in frameworks using 30 linguistic features. Other tools like DoGEN use Domain Gating Ensemble Networks to weight domain expert detectors , while EditLens quantifies the degree of AI editing through binary and ternary classification. A recent survey summarizes SOTA detection methods, including watermarking and statistical analysis, identifying salient factors affecting detectability. Additionally, a dataset of 788,984 AI-written peer reviews from ICLR and NeurIPS over 8 years benchmarks detection in this specific context. VietBinoculars can also serve as a data-cleaning tool to filter AI-generated texts from training datasets [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Therefore, the labeling results should be regarded as reference guidance rather than definitive judgments, and all final decisions should be made under careful human supervision.",
+       "Languages such as Vietnamese typically exhibit lower True Positive Rates at low False Positive Rates and are more prone to mispredictions compared to languages that are well represented in the LLM.",
+       "Based on the distribution plot and the TPR@0.06%FPR threshold, we can reasonably trust that texts with scores below this threshold are highly likely to be AI-generated.",
+       "VietBinoculars with the Closest Point threshold achieves the highest performance",
+       "with prediction failures occurring only for Qwen3-235B-A22B-FW, DeepSeek-V3, Claude-3.5-Sonnet, and GPT-4o.",
+       "The evaluation results of the VietBinoculars method on out-of-domain datasets such as Gemma-3-12B-News, Gemma-3-12B-VuTrongPhung, and Sailor2-8B-VuTrongPhung show that it achieved performance levels of at least $99\\%$ in terms of accuracy, F1-score, and AUC.",
+       "According to the paper [12], Binoculars demonstrates superior reliability compared to Ghostbuster on out-of-domain datasets.",
+       "More importantly, Binoculars has practical significance in evaluating detection performance, achieving over $90\\%$ accuracy in detecting English text generated by ChatGPT at a False Positive Rate (FPR) of $0.01\\%$ , even though it was not trained on ChatGPT.",
+       "Second, for practical applications, it is essential to carefully evaluate the effectiveness of the detector using the FPR metric.",
+       "Only systems based on low FPR criteria are considered good and reliable for commercial applications while minimizing potential harm to users.",
+       "Moreover, VietBinoculars can be applied as a data-cleaning tool to improve the quality of Vietnamese training datasets. By identifying and filtering out AI-generated texts that may have been unintentionally included, we can ensure higher dataset integrity and reliability, ultimately leading to better model performance in downstream tasks."
+      ],
+      "title": "vietbinoculars: a zero-shot approach for detecting vietnamese llm-generated text",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "4 Discussion",
+         "chunk_id": "sciverse_vietbinoculars_a_zero_shot_approach_for_detecting_vietnamese_llm_generated_text#c12",
+         "char_start": 44063
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "Existing AI-generated text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, and zero-shot effectiveness.",
+       "Our approach provides a practical, threshold-free solution, significantly advancing AI-generated text detection in real-world zero-shot scenarios.",
+       "it significantly reduces the gap between predicted confidence and true accuracy.",
+       "whereas steer-based calibration results in a better-aligned, more reliable confidence distribution (Figure 3(b)).",
+       "semanticsteering calibration substantially enhances the reliability and interpretability of confidence scores in our threshold-free AI-generated text detection framework.",
+       "uncalibrated LLM predictions (Figure 3(a)) tend to systematically exhibit overconfidence or underconfidence",
+       "In contrast, our proposed multi-agent framework inherently circumvents these calibration challenges through its confidence-aware, threshold-free aggregation mechanism. Consequently, $AGENT-X$ substantially improves accuracy, interpretability, and real-world applicability.",
+       "Existing detection methods (Mitchell et al., 2023a; Bao et al., 2024) frequently rely on metrics like AUROC, which, while theoretically informative, require selecting optimal thresholds based on external, domain-specific calibration datasets.",
+       "In contrast, our proposed method uniquely employs a threshold-free aggregation strategy, eliminating dependency on external calibration sets, thereby making Accuracy an inherently more practical and relevant metric for evaluation.",
+       "Although AUROC metrics inherently favor threshold-dependent methods and thus are less aligned with our threshold-free design, $AGENT-X$ consistently exhibits strong and competitive performance across all evaluated datasets and language models.",
+       "In practical scenarios, such datasets are often unavailable, significantly limiting these methods' applicability and scalability.",
+       "This external threshold calibration introduces variability and often leads to inconsistent and suboptimal accuracy performance in real-world applications.",
+       "Additionally, an adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics.",
+       "Employing less powerful or smaller-scale LLMs could pose challenges in comprehensively understanding the detection guidelines or accurately performing agent-specific tasks.",
+       "A meta agent integrates these assessments through confidence-aware aggregation, enabling threshold-free, interpretable classification.",
+       "Specifically, we organize detection guidelines into semantic, stylistic, and structural dimensions, each independently evaluated by specialized linguistic agents that provide explicit reasoning and robust calibrated confidence via semantic steering.",
+       "The framework consists of three main components: a router agent for adaptive activation of guideline-specific base agents, guideline-specific base agents organized into three stylistic dimensions (semantic, stylistic, and structural), and a meta agent synthesizing these analyses into a final interpretable classification.",
+       "White-box methods utilize model-internal metrics such as entropy, likelihood, and log-rank (Gehrmann et al., 2019a; Bao et al., 2024; Tulchinskii et al., 2024).",
+       "While Fast-DetectGPT performs strongly in specific scenarios (e.g., XSum, Writing for ChatGPT), it generalizes poorly to biomedical texts (PubMed), highlighting the superior domain adaptability of our threshold-free method.",
+       "An optimized zero-shot detector that replaces the perturbation step of DetectGPT with a more efficient sampling step.",
+       "Black-box approaches like DetectGPT (Mitchell et al., 2023a), NPR (Su et al., 2023a), and DNA-GPT (Yang et al., 2023) typically involve multiple evaluations or generations, incurring high computational overhead."
+      ],
+      "title": "agent-x: adaptive guideline-based expert network for threshold-free ai-generated text detection",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+         "chunk_id": "sciverse_agent_x_adaptive_guideline_based_expert_network_for_threshold_free_ai_generated_#c0",
+         "char_start": 0
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 44,
+   "n_claims_usable": 44,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C20",
+     "sentence": "This approach is particularly relevant as current SOTA detectors often flag minimally polished text as AI and struggle to differentiate degrees of AI involvement ."
+    },
+    {
+     "cid": "C19",
+     "sentence": "Identified thresholds may not fully capture the statistical characteristics of Vietnamese ."
+    },
+    {
+     "cid": "C44",
+     "sentence": "Additionally, a dataset of 788,984 AI-written peer reviews from ICLR and NeurIPS over 8 years benchmarks detection in this specific context ."
+    },
+    {
+     "cid": "C43",
+     "sentence": "A recent survey summarizes SOTA detection methods, including watermarking and statistical analysis, identifying salient factors affecting detectability ."
+    },
+    {
+     "cid": "C39",
+     "sentence": "Other tools like DoGEN use Domain Gating Ensemble Networks to weight domain expert detectors [C21], while EditLens quantifies the degree of AI editing through binary and ternary classification ."
+    },
+    {
+     "cid": "C21",
+     "sentence": "Other tools like DoGEN use Domain Gating Ensemble Networks to weight domain expert detectors , while EditLens quantifies the degree of AI editing through binary and ternary classification ."
+    },
+    {
+     "cid": "C38",
+     "sentence": "Cross-domain and cross-generator evaluations reveal substantial generalization gaps, as seen in frameworks using 30 linguistic features ."
+    }
+   ],
+   "word_count": 593,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]",
+    "[2]"
+   ]
+  }
+ }
+]

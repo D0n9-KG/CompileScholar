@@ -1,0 +1,457 @@
+# Prediction of Speech Intelligibility by Means of EEG Responses to Sentences in Noise
+
+Jan Muncke<sup>1</sup>, Irvine Kuruvila<sup>1,2</sup> and Ulrich Hoppe<sup>1*</sup>
+
+$^{1}$ Department of Audiology, ENT-Clinic, University Hospital Erlangen, Erlangen, Germany, $^{2}$ WS Audiology, Erlangen, Germany
+
+Objective: Understanding speech in noisy conditions is challenging even for people with mild hearing loss, and intelligibility for an individual person is usually evaluated by using several subjective test methods. In the last few years, a method has been developed to determine a temporal response function (TRF) between speech envelope and simultaneous electroencephalographic (EEG) measurements. By using this TRF it is possible to predict the EEG signal for any speech signal.
+
+Recent studies have suggested that the accuracy of this prediction varies with the level of noise added to the speech signal and can predict objectively the individual speech intelligibility. Here we assess the variations of the TRF itself when it is calculated for measurements with different signal-to-noise ratios and apply these variations to predict speech intelligibility.
+
+Methods: For 18 normal hearing subjects the individual threshold of $50\%$ speech intelligibility was determined by using a speech in noise test. Additionally, subjects listened passively to speech material of the speech in noise test at different signal-to-noise ratios close to individual threshold of $50\%$ speech intelligibility while an EEG was recorded. Afterwards the shape of TRFs for each signal-to-noise ratio and subject were compared with the derived intelligibility.
+
+Results: The strongest effect of variations in stimulus signal-to-noise ratio on the TRF shape occurred close to 100 ms after the stimulus presentation, and was located in the left central scalp region. The investigated variations in TRF morphology showed a strong correlation with speech intelligibility, and we were able to predict the individual threshold of $50\%$ speech intelligibility with a mean deviation of less than 1.5 dB.
+
+Conclusion: The intelligibility of speech in noise can be predicted by analyzing the shape of the TRF derived from different stimulus signal-to-noise ratios. Because TRFs are interpretable, in a manner similar to auditory evoked potentials, this method offers new options for clinical diagnostics.
+
+Keywords: speech intelligibility, objective speech audiometry, EEG measures, speech tracking, auditory evoked potentials, speech in noise
+
+# OPEN ACCESS
+
+# Edited by:
+
+Fei Chen,
+
+Southern University of Science and
+
+Technology, China
+
+# Reviewed by:
+
+Jonas Vanthornhout,
+
+KU Leuven, Belgium
+
+Chiara Visentin,
+
+University of Ferrara, Italy
+
+# *Correspondence:
+
+Ulrich Hoppe
+
+ulrich.hoppe@uk-erlangen.de
+
+# Specialty section:
+
+This article was submitted to
+
+Original Research Article,
+
+a section of the journal
+
+Frontiers in Neuroscience
+
+Received: 15 February 2022
+
+Accepted: 13 March 2022
+
+Published: 01 June 2022
+
+# Citation:
+
+Muncke J, Kuruvila I and Hoppe U
+
+(2022) Prediction of Speech
+
+Intelligibility by Means of EEG
+
+Responses to Sentences in Noise.
+
+Front. Neurosci. 16:876421.
+
+doi: 10.3389/fnins.2022.876421
+
+frontiers | Frontiers in Neuroscience
+
+ORIGINAL RESEARCH published:01 June 2022 doi:10.3389/fnins.2022.876421
+
+Check for updates
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+1
+
+June 2022 | Volume 16 | Article 876421
+
+# 1. INTRODUCTION
+
+According to the latest World Health Organization world report on hearing, more than 430 million people suffer from hearing impairment and hearing loss (HL) is the third largest cause of disability during a person's lifetime (World Health Organization, 2021). Even mild HL may lead to communication deficits caused by impaired speech intelligibility, particularly in noisy conditions (Dubno et al., 1984). The primary aims of audiological diagnosis are (1) to identify the underlying pathology for HL, and (2) to quantify the amount of HL and its effects on communication in daily life.
+
+A number of objective audiological tests—such as measurements of acoustic impedance, of otoacoustic emissions, and of auditory evoked responses—are aimed at localizing the source of the deficiency. The determination of the degree of HL is usually carried out by subjective tests, in which the test person has to cooperate actively and to indicate the perception of auditory stimuli. The problem gets worse when we want to quantify the impact of a person's HL on their social life. Most often, this is carried out by using speech tests in quiet and in noise.
+
+These tests are usually performed by counting the number of words repeated correctly from certain test lists in a specific acoustic situation. Speech intelligibility measurements, especially in noise, require a high level of vigilance and cooperation. Hence, methods to measure the intelligibility of speech in noise (SiN) without active cooperation by the subjects are highly desirable in clinical audiological diagnosis.
+
+A commonly used objective method for diagnosis is the measurement of auditory evoked potential (AEP) using electroencephalography (EEG). From repeated EEG measurements synchronized with the beginning of the auditory stimuli, as tone-bursts or clicks, specific waveforms can be derived. EEG changes caused by auditory processing can last up to $500~\mathrm{ms}$ after the stimulus onset (Burkard et al., 2007). The AEPs are classified as short (1-10 ms, cochlear), middle (10-50 ms, auditory brainstem), and long (50-300 ms, auditory cortex) latency.
+
+Long latency AEP possesses a waveform structure characterized by the peaks P1 (positive, around 50 ms), N1 (negative, around 100 ms), P2 (positive, around 150 ms), and N2 (negative, around 300 ms). Compared with the background EEG, AEPs are considerably smaller, with a signal to noise ratio (SNR) of about -10 dB (Hoppe et al., 2001). Hence, to extract an AEP, the stimulus needs to be presented over several iterations (trials), and the EEG signals should be averaged over these trials (Burkard et al., 2007).
+
+In the past few decades it has been shown that short speech stimuli, presented as syllables, can be used for AEP measurements (Burger et al., 2009; Digeser et al., 2009). However, it was observed that the latency of the N1 peak and the P2 peak differs between syllables depending on the stimulus onset time (Sharma and Dorman, 1999), making it difficult to compare or average them. Moreover, presenting the speech stimulus repeatedly over several trials may not be the best choice because of altered speech processing caused by repetition.
+
+The analysis becomes more challenging when cortical responses to continuous speech are measured. Contrarily, to short and isolated stimuli, a continuous and time varying stimulus that
+
+elicits a lot of concatenated responses, can not be averaged over several trials. Hence, an alternative method to estimate cortical responses to continuous speech would be highly attractive.
+
+Different methods that circumvent the aforementioned constraints in estimating the response to continuous speech by using ridge regression (Machens et al., 2004), boosting (David et al., 2007), or the Bayesian principle (Kuruvila et al., 2020) have been described recently. Roughly, these methods consider speech evoked EEG responses as a linear convolution of the speech envelope and an unknown impulse response plus internal noise.
+
+The impulse response function is determined by the auditory system and is referred to as the temporal response function (TRF), or the forward model (Speech $\rightarrow$ EEG). The method to estimate the TRF used in this paper is a regularized ridge regression based on the least-squares estimation principle (Lalor et al., 2006, 2009).
+
+Numerous studies have used the intensity of the stimulus as the acoustic cue to estimate the TRF (Aiken and Picton, 2008; Lalor and Foxe, 2010; Ding and Simon, 2012a; Mesgarani and Chang, 2012), and intensity is represented to a good approximation by the acoustic envelope of the stimulus. Since TRF describes the impulse response, once determined, it can be used to predict the EEG response to any input signal. Conversely, the response function could be estimated in the backward direction (EEG $\rightarrow$ Speech).
+
+The estimated backward model could then be used to reconstruct the stimulus from the EEG, accordingly this method is known as stimulus reconstruction (O'Sullivan et al., 2014). The accuracy of prediction, or reconstruction, can be estimated as the correlation coefficient between the derived and the predicted EEG, or between the original and the reconstructed envelope.
+
+The relationship between recognition of speech in noise and the accuracy of stimulus reconstruction has been the focus of several recent studies (Etard and Reichenbach, 2019; Iotzov and Parra, 2019; Zou et al., 2019). Vanthornhout et al. (2018) investigated stimulus reconstruction accuracy for measurements with different SNRs using EEG measurements from 64 electrodes. They found a strong correlation between speech envelope reconstruction and actual speech envelopes. The method was refined by Lesenfants et al. (2019) using a forward model and the prediction accuracy of selected electrodes.
+
+They were able to predict individual's speech recognition thresholds (i.e. the SNR at which $50\%$ is understood, $\mathrm{SRT}_{50}$ ) with an accuracy of 1-2 decibels. In all of the studies mentioned, EEG measurements were used for speech in quiet to estimate the TRF, and these TRFs were applied to SiN measurements. Hence, those authors did not take account of possible changes in TRF morphology caused by the noise, even though such changes are well known (Zou et al., 2019; McHaney et al., 2021). Accou et al.
+
+(2021) chose a nonlinear approach by using a convolutional model, trained on speech in quiet, to solve a match—mismatch paradigm at different stimulus SNR and predict the $\mathrm{SRT}_{50}$ . As the convolutional model canbee seen as a black-box, it is hardly physiologically interpretable.
+
+The aim of this study was to determine the TRFs associated with speech signals in noise, at different SNRs covering the complete transition region of speech intelligibility. The shape of the individual TRFs was used to extract intelligibility relevant parameters as an objective and physiologically interpretable
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+2
+
+June 2022 | Volume 16 | Article 876421
+
+measure of speech intelligibility. By comparing these parameters with individual speech intelligibility scores, we aimed to derive EEG based measures of SiN. Finally, the combination of scalp electrodes and features yielding the highest correlation with changes of SNR were compared with subjective evaluation of speech intelligibility.
+
+# 2. MATERIALS AND METHODS
+
+# 2.1. Participants
+
+Eighteen normal hearing, right-handed German native speakers (6 male / 12 female) with a median age of 31 years (range 20-60 years) were recruited for this study. All subjects reported no history of neurological disorders and underwent an audiological examination including pure tone audiometry and otoscopy before the experiment. Normal hearing was defined as a maximum pure tone threshold of $25\mathrm{dB}$ HL for all octave frequencies between 0.5 and $4\mathrm{kHz}$ at the better ear. Additionally, the speech recognition for Freiburg monosyllabic words had to be $100\%$ at a presentation level of 50 dB SPL.
+
+# 2.2. Test Procedure
+
+Figure 1 displays an overview of the entire test procedure. Measurements were carried out on two different days in order to avoid effects of fatigue. On the first day, otological and audiological assessments were carried out. Thereafter, the behavioral SiN measurements were performed by using the Oldenburg Sentence test (Wagener et al., 1999c). At first, the individual's speech recognition threshold, $\mathrm{SRT}_{50}$ (i.e. the SNR at which $50\%$ of the speech material can be repeated correctly) was measured by using an adaptive routine (Kollmeier et al.
+
+, 2015) with constant speech level at 60 dB SPL. Thereafter, the speech recognition rate at each of six different SNRs below and above the individual $\mathrm{SRT}_{50}$ ( $\mathrm{SRT}_{50} + 4$ dB, $+2$ dB, $+0.5$ dB, $-0.5$ dB, $-2$ dB, and $-4$ dB) was determined by evaluating 20 sentences per condition. The masker noise was played without interruption during every test. According to the psychometric function of Wagener et al. (1999b), recognition rates of 93, 80, 60, 40, 20, and $6\%$ are expected (Wagener et al., 1999c).
+
+The different SNR conditions will hereinafter be referred to as $\Delta$ SNR. With the aim of comparing theoretical and measured values, the psychometric function $f(SNR) = \frac{1}{1 + \exp(-\frac{\mathrm{SNR} - \mathrm{SRT}_{50}}{s})}$ of Wagener et al. (1999b), with s indicating the slope, was fitted to the evaluated intelligibility over all subjects by using a non linear least squares approach.
+
+All stimuli were presented diotically via Etymotec ER-2 insert phones connected to a Fireface UC sound card (RME Haimhausen Germany). The insert phones were calibrated to a speech level of $\mathrm{L}_s = 60$ dB with a 2 cc coupler. EEGs were recorded by using a 32-channel gTec USBAMP device with active electrodes (g.tec, Schiedlberg, Austria) and all the measurements took place in a soundproof and acoustically damped room. Analyses and results presented in this paper were carried out with MATLAB R2019b (MathWorks, Nattick, MA; USA) in combination with the EEGLAB Toolbox (Brunner et al., 2013;
+
+Iversen and Makeig, 2019) and SPSS 24 (IBM, New York, NY, USA).
+
+# 2.2.1. EEG Experiments
+
+EEG measurements were performed on a single day, 1 week later. Subjects listened passively to sentences of the Oldenburg Sentence test (OLSa). For each $\Delta$ SNR condition the same 10 sentences of the Olsa content where put in a complete randomized order, with every sentence appearing 15 times. When presenting the sentences, they were concatenated per condition while the masking noise (randomly overlapped sentences of the Olsa content; Wagener et al., 1999a) was played without interruption.
+
+The speech level was kept fixed at a level $L_S = 60$ dB SPL in all trials, to avoid effects of stimulus intensity on the derived TRFs (Verschueren et al., 2021). The noise level was adjusted per condition. The mean interval between sentences was $1.4\mathrm{~s}$ (ranging from 0.9 to $1.8\mathrm{~s}$ ) and as a result, the duration of the experiment per $\Delta$ SNR condition was about $9\mathrm{~min}$ . In order to keep the vigilance constant over the test duration (Vanthornhout et al., 2019) and to reduce eye movement (Kong et al., 2014), subjects were allowed to watch a silent movie.
+
+After measurement under each condition short breaks were taken. EEG and stimuli were synchronized to the recording system at the beginning and at the end of each sentence. Electrodes were mounted according to the international 10-20 system: the reference electrode was placed at the right earlobe and ground was placed at the F9 location. EEG was recorded at a sampling rate of $4,800\mathrm{~Hz}$ .
+
+# 2.3. Data Processing
+
+The quality and reliability of the estimated TRF depends on the upper and lower cut-off frequencies of the bandpass filter applied to the raw EEG-recordings. While some studies reported that the highest correlation between speech intelligibility and analyzed EEG was obtained when a filter in the delta band (1–4 Hz) was used (Ding and Simon, 2014; Etard and Reichenbach, 2019; Iotzov and Parra, 2019), other studies reported the highest correlation when the theta band (4–8 Hz) was used (Lesenfants et al., 2019).
+
+However, we found the most highly significant results when we applied a filter including the delta and theta bands, resulting in a frequency band from 1 to 10 Hz. The chosen range includes the mean matrix test syllable rate of 3.8 Hz (Wagener et al., 1999a), which is close to the cut off frequency between delta and theta band.
+
+The EEG-recording was down sampled to $120\mathrm{Hz}$ . Subsequently the signal was band-pass filtered non causal, zero phase between 1 and $10\mathrm{Hz}$ by applying a Hamming windowed-sinc FIR filter, order 397. Finally, an independent component analysis was applied to the EEG recordings in order to reduce the influence of eye blinks (Mennes et al., 2010). The envelope of the speech signal was obtained by taking the absolute value of the speech signal followed by power law compression by 0.6 according to Biesmans et al. (2017).
+
+Afterwards, the speech signal was down sampled to to $120\mathrm{Hz}$ to apply the same band-pass filter as had been used for filtering the EEG recordings. The standard functions of the EEGLAB Toolbox (Brunner et al., 2013; Iversen and Makeig, 2019) were used for the preprocessing procedure.
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+3
+
+June 2022 | Volume 16 | Article 876421
+
+![](dt=2026-03-25/ht=08/87e709d2a00e7f356f8c7428566cb4b6b63b5ffb642e909ffda9a580811d2470.jpg)
+
+# 2.4. TRF Using Regularized Linear Regression
+
+For a given input stimulus $s$ and the observed response $r(t)$ at an EEG electrode, the TRF of the system can be approximated by a linear regression model (Lalor et al., 2006, 2009). Mathematically, the predicted response $\hat{r}$ at time $t$ can be expressed as a linear convolution between the input stimulus $s$ and the TRF for the specified time lags $\tau$ , such that
+
+$$
+\hat {r} (t) = \sum_ {\tau} T R F (\tau) s (t - \tau). \tag {1}
+$$
+
+The cost function $J(t)$ , which is defined as the squared error between the measured response and the predicted response, can be written as
+
+$$
+J (t) = \sum_ {t} [ r (t) - \hat {r} (t) ] ^ {2}. \tag {2}
+$$
+
+An optimum estimate of the TRF can be obtained by minimizing the cost function $J(t)$ (Kay, 1993). At minima, the gradient of $J(t)$ vanishes and the estimated TRF can be expressed as
+
+$$
+T R F = (S ^ {T} S) ^ {- 1} S ^ {T} r. \tag {3}
+$$
+
+The columns of the correlation matrix $S$ are generated from the time-lagged versions of the stimulus envelope $s$ . As a result, the TRF may overfit to fast fluctuations of the specific data set, particularly in noisy conditions (Crosse et al., 2016). Hence, regularization is employed by penalizing the $L_{2}$ norm of the
+
+solution (Lampe and Voss, 2013) in order to smooth the TRF. The regularized solution of (3) is given by
+
+$$
+T R F _ {r e g} = \left(S ^ {T} S + \lambda I\right) ^ {- 1} S ^ {T} r, \tag {4}
+$$
+
+where $\lambda$ is the regularization parameter and $I$ is the identity matrix.
+
+In our analysis, a single TRF was calculated at every electrode, for each $\Delta$ SNR condition and subject. Time lags $\tau$ considered to generate the correlation matrix $S$ were chosen from $-200\mathrm{ms}$ to $500~\mathrm{ms}$ in steps of 8,3 ms. Since the regularization parameter $\lambda$ has an effect on the shape and the amplitude of TRF, it was kept constant $(\lambda = 2^{15})$ through out the analysis. The $\lambda$ parameter was optimized iterative in order to maximize Spearman correlation (see Section 2.6). The TRF estimations were performed using the mTRF Toolbox for MATLAB (Crosse et al., 2016).
+
+# 2.5. TRF Feature Extraction
+
+From the evaluated data, we calculated a total of 192 TRFs for each subject, corresponding to 32 channels and six SNR conditions. Because a TRF can be interpreted similarly to slow AEP (Picton, 2013; Di Liberto et al., 2015; Fiedler et al., 2019; Kuruvila et al., 2021), peaks corresponding to the waves N1 and P2 of AEP can be detected. Here they are designated as $\mathrm{N1}_{\mathrm{TRF}}$ and $\mathrm{P2}_{\mathrm{TRF}}$ (see Figure 1).
+
+Five features (the absolute amplitude and latency of $\mathrm{N1}_{\mathrm{TRF}}$ , the amplitude and latency of $\mathrm{P2}_{\mathrm{TRF}}$ , and a windowed root mean square (RMS) value (Zou et al., 2019) were extracted for each TRF in order to analyze speech intelligibility. $\mathrm{N1}_{\mathrm{TRF}}$ was determined as the center of the first local minimum in the latency range between 75 and $175~\mathrm{ms}$ , identified by evaluating
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+4
+
+June 2022 | Volume 16 | Article 876421
+
+the first derivative. Similarly $\mathrm{P2}_{\mathrm{TRF}}$ was identified as the first local maximum in a range from $175~\mathrm{ms}$ to $300~\mathrm{ms}$ . If no $\mathrm{N1}_{\mathrm{TRF}}$ and $\mathrm{P2}_{\mathrm{TRF}}$ were detected, latency was set to its maximum value and amplitude was set to zero. The RMS value was calculated as the root mean square of the TRF per EEG channel, after applying a time window to the TRF. The lower (0 to $100~\mathrm{ms}$ ) and the upper (108 to $200~\mathrm{ms}$ ) limits of the windows were optimized around the prominent N1 peak (Billings et al., 2013; Bidelman and Howell, 2016) for each electrode in order to achieve maximum Spearman correlation with $\Delta \mathrm{SNR}$ over all subjects (see Section 2.6).
+
+# 2.6. Statistical Analysis
+
+We expected a lower amplitude and a higher latency of waves $\mathrm{N1}_{\mathrm{TRF}}$ and $\mathrm{P2}_{\mathrm{TRF}}$ with decreasing SNR (Mirkovic et al., 2019; Zou et al., 2019). Consequently, we expected smaller RMS values for lower SNRs. To find out which electrodes best fulfilled this expectation (e.g.
+
+higher SNR $\widehat{\underline{\underline{\mathbf{\Pi}}}}$ lower latency; higher SNR $\widehat{\underline{\underline{\mathbf{\Pi}}}}$ higher amplitude), the monotonicity was evaluated by calculating Spearman's $\rho$ of $\Delta \mathrm{SNR}$ and the investigated feature for each subject and electrode. Furthermore, for each electrode the mean over all subjects was determined. In order to test the hypothesis that $\Delta \mathrm{SNR}$ conditions have the same mean, a Kruskal-Wallis test was performed for each electrode and feature.
+
+If the hypothesis was rejected, a Dunn-Bonferroni post-hoc test was performed for a pairwise comparison of $\Delta \mathrm{SNR}$ conditions.
+
+# 3. RESULTS
+
+# 3.1. Behavioral Test
+
+The individual $\mathrm{SRT}_{50}$ for the SiN test was used as the baseline for all tests for each subject. Mean $\mathrm{SRT}_{50}$ was $-7.0\mathrm{dB} \pm 0.9\mathrm{dB}$
+
+![](dt=2026-03-25/ht=08/74f0469e8e0d2b21ff29d4f40685b300592283d3b28e95940ae0fe3be6b7975d.jpg)
+
+(standard deviation), ranging from $-4.9$ to $-8.9\mathrm{dB}$ . Individual speech intelligibility scores evaluated at the six $\Delta$ SNR conditions are shown in Figure 2 together with the sigmoid fit (Wagener et al., 1999b) and the reference psychometric function according to Wagener et al. (1999c). The root mean square error of actual values and the reference function was $6.9\%$ , the largest difference was $29\%$ .
+
+# 3.2. TRF Analysis
+
+EEG measurements for six $\mathrm{SNR} \times 32$ electrodes $\times 18$ subjects were performed resulting in estimations of 3456 TRFs which were further analyzed. Figure 3 shows the grand average for the TRFs from electrode C3 at $\Delta$ SNR from $-4$ to $+4$ dB. At the highest SNR a clear negative deflection at about $100~\mathrm{ms}$ is seen followed by a positive deflection at about $200~\mathrm{ms}$ . TRF morphologies and latencies are congruent with those obtained from tone evoked AEP measurements. With decreasing SNR,
+
+![](dt=2026-03-25/ht=08/0d58c8fb6d4f1106c1f66dbda96dc0a865ad20d633e3154b6fd8304e0ddf0f36.jpg)
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+5
+
+June 2022 | Volume 16 | Article 876421
+
+$\mathrm{N1}_{\mathrm{TRF}}$ and $\mathrm{P2}_{\mathrm{TRF}}$ amplitudes decrease while corresponding latencies increase.
+
+# 3.2.1. Amplitude and Latency for N1TRF
+
+For each subject and electrode the Spearman correlation as described in Section 2.6 was calculated. The highest correlation for feature $\mathrm{N1}_{\mathrm{TRF}}$ amplitude was found at electrode C3 ( $\rho = 0.78$ ; $p < 0.001$ ). The distribution of Spearman's $\rho$ is displayed in detail in Figure 4A and shows a slight dominance in the left hemisphere. Amplitude decreased significantly with decreasing SNR for 27 out of 32 electrodes, reaching highest significance on electrode C3 ( $\chi^2 = 53.3$ ; $p < 0.001$ ). The values of $\mathrm{N1}_{\mathrm{TRF}}$ amplitude obtained for the electrode with the highest correlation are shown in Figure 4B.
+
+The highest correlation for $\mathrm{N1}_{\mathrm{TRF}}$ latency was also found on electrode C3 ( $\rho = -0.59$ ; $p < 0.001$ ). The distribution of Spearman's $\rho$ for $\mathrm{N1}_{\mathrm{TRF}}$ latency, displayed in detail in Figure 4C, shows a slight dominance of the left hemisphere. Latency increased significantly with decreasing SNR for 19 out of 32 electrodes, reaching the highest significance at electrode C3 ( $\chi^2 = 32.7$ ; $p < 0.001$ ). The values of $\mathrm{N1}_{\mathrm{TRF}}$ latency obtained for the electrode with the highest correlation are shown in Figure 4D.
+
+# 3.2.2. Amplitude and Latency for $\mathsf{P2}_{\mathsf{TRF}}$
+
+Spearman correlation for $\mathrm{P2}_{\mathrm{TRF}}$ features reached a medium effect size, with a maximum for amplitude of $\rho = 0.35 (p < 0.001)$ and a maximum for latency of $\rho = -0.45 (p < 0.001)$ . For the amplitude feature, the mean of amplitude was found to be the same across different conditions at all electrodes. Findings were the same for the latency feature except for three frontotemporal electrodes (maximum $\chi^2 = 20.1; p = 0.001$ ). Therefore, detection of P2 seems not to be appropriate for evaluating speech intelligibility.
+
+# 3.2.3. Windowed RMS-Power
+
+The RMS value of every TRF was calculated by applying a rectangular time window to each TRF that was optimized in order to reach maximum correlation for each electrode. The resulting lower and upper limits of the windows are displayed in Figures 5A,B. The highest Spearman correlation for feature RMS was found at electrode CP3 ( $\rho = 0.81$ ; $p < 0.001$ ). The distribution of Spearman's $\rho$ is displayed in Figure 5C, showing a slight dominance of the left hemisphere. The RMS value decreased significantly with decreasing SNR for 30 out of 32 electrodes, reaching highest significance at electrode CPz ( $\chi^2 = 60.7$ ; $p < 0.001$ ) for a window from 83 to 133 ms, followed
+
+![](dt=2026-03-25/ht=08/7dd529f41ac9c46bb2dec2ba4b582538e3a6f097eebaacc7ff652f86cf766b71.jpg)
+
+![](dt=2026-03-25/ht=08/fd234bb05ed6ec152c4cfa363c14e411272cdcd5b923602b1106ba2d5ac5d237.jpg)
+
+![](dt=2026-03-25/ht=08/e68e3e28cf8176a208e6f6ad4f08be1311faf58f1ab2a84d164bcbf9a931d669.jpg)
+
+![](dt=2026-03-25/ht=08/c51d618073eaa858bf26e488359e4820f5966a3fc7f16d8c43dbab3435c7a38f.jpg)
+
+![](dt=2026-03-25/ht=08/064fe8fd8abfa77eff64884d87e0feca8dadfccc7cd48b167e70827e2ff0d33d.jpg)
+
+![](dt=2026-03-25/ht=08/c04f6680a4f4e915996619cfa19a4dbeec02a2ab75a0a6cae68584a52d0c3e9b.jpg)
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+6
+
+June 2022 | Volume 16 | Article 876421
+
+![](dt=2026-03-25/ht=08/1261330906f8b6003f00dcd55d28100b44e040ac60d3ed696464577a957f39cb.jpg)
+
+![](dt=2026-03-25/ht=08/1bc05f414bca4236a7a37f2d3e3a5b24a032bd62abf7a0c51ceb0e308aa6ead4.jpg)
+
+![](dt=2026-03-25/ht=08/3ca8a1cf6aa9bb64c89e61c685c1a63b055ade9ca438ae0ffe6d4674c66038e9.jpg)
+
+![](dt=2026-03-25/ht=08/725a7ac516937cd2604f6ae85ce9587c32a140f97a0fb3f6445be774f7ff027f.jpg)
+
+by electrodes CP3 (92 ms to 125 ms), and C3 (83-125 ms). It can be observed that the highest Spearman's $\rho$ are related to narrow windows around the N1 peak.
+
+For further investigations the RMS values for the three electrodes CPz, CP3, and C3 were summed up to give $\mathrm{RMS}_{\mathrm{sum}}$ . $\mathrm{RMS}_{\mathrm{sum}}$ achieved a strong Spearman correlation ( $\rho = 0.82$ ; $p < 0.001$ ) and increased significantly with increasing SNR ( $\chi^2 = 60.0$ ; $p < 0.001$ ). Detailed results of $\mathrm{RMS}_{\mathrm{sum}}$ displayed in Figure 5D show increasing variance with increasing SNR.
+
+# 3.2.4. Features vs. Speech Intelligibility
+
+A high Spearman correlation and a good ability to discriminate between the six $\Delta$ SNR conditions were achieved by the $\mathrm{RMS}_{\mathrm{sum}}$ feature. The optimum time windows of the three electrodes for evaluating $\mathrm{RMS}_{\mathrm{sum}}$ cover a narrow region close around the prominent $\mathrm{N1}_{\mathrm{TRF}}$ peak. Finally, the simple $\mathrm{RMS}_{\mathrm{sum}}$ feature was chosen as the single feature to be compared with speech intelligibility.
+
+To estimate individual $\mathrm{SRT}_{50}$ a psychometric function was fitted to the speech intelligibility evaluated at the different $\Delta$ SNRs. In the same way, to obtain the threshold related to an intelligibility of $50\%$ $(\mathrm{RMS}_{50})$ , we fitted the exponential function Intelligibility = 100 $\cdot$ (1 - $e^{(-b \cdot RMS_{sum})}$ ), with b being
+
+the optimized parameter, by using a non-linear least squares approach. The resulting function starts from zero % for a $\mathrm{RMS}_{\mathrm{sum}}$ of zero and converges to $100\%$ for higher values. When using the $\mathrm{RMS}_{\mathrm{sum}}$ data of all subjects to fit the function, the $\mathrm{RMS}_{50}$ thus determined was 0.287 (Figure 6) and b was 2.415 with a $95\%$ confidence interval from 2.03 to 2.799.
+
+In order to prevent from over fitting, a leave one out method was applied to predict the individual $\mathrm{SRT}_{50}$ per subject. This was done by calculating the $\mathrm{RMS}_{50}$ , without considering the $\mathrm{RMS}_{\mathrm{sum}}$ data of the investigated subject. Subsequently, the value of $\Delta \mathrm{SNR}$ at which $\mathrm{RMS}_{\mathrm{sum}}$ exceeds the threshold $\mathrm{RMS}_{50}$ for the first time with increasing SNR and increasing $\mathrm{RMS}_{\mathrm{sum}}$ , indicates the predicted $\mathrm{SRT}_{50}$ .
+
+Individual speech intelligibility and $\mathrm{RMS}_{sum}$ are compared with respect to $\Delta$ SNR in Figure 7, showing a strong correlation (Spearman's $\rho = 0.71$ ; $p < 0.001$ ). The mean deviation between predicted and behavioral $\mathrm{SRT}_{50}$ was $1.2\mathrm{dB}$ in a range from $-1.8\mathrm{dB}$ to $+3.1\mathrm{dB}$ .
+
+# 4. DISCUSSION
+
+Reduced understanding of speech in noise is one of the first symptoms of hearing loss. All available tests to evaluate the
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+7
+
+June 2022 | Volume 16 | Article 876421
+
+![](dt=2026-03-25/ht=08/bb8fd22d1cddac4be9c4ca119bb3a2972a2aa4c4e396fe4724cc43cea9affdbb.jpg)
+
+intelligibility for an individual person are subjective tests that require subjects to repeat the words that they understood. First attempts to evaluate the $\mathrm{SRT}_{50}$ of a SiN test using EEG techniques was recently undertaken by Vanthornhout et al. (2018) and Lesenfants et al. (2019). In one procedure the reconstruction accuracy, and in the other procedure the prediction accuracy was chosen as predictor for $\mathrm{SRT}_{50}$ .
+
+Regrettably, the authors of both studies used prediction or reconstruction accuracy to indicate intelligibility, without taking a closer look at changes in TRF morphology. Our results presented here show that changes in the TRF obtained at different SNRs can be used as a feature to predict individual $\mathrm{SRT}_{50}$ values for an SiN test. Because a TRF shows a waveform similar to an AEP (Ding and Simon, 2012b; Picton, 2013; Di Liberto et al., 2015; Fiedler et al.
+
+, 2019), TRF morphology can be regarded as more amenable to physiological interpretation for clinical diagnostics than reconstruction or prediction accuracy. In order to find the features of TRF that are most strongly correlated with speech intelligibility we analyzed five features of TRF (N1TRF amplitude, N1TRF latency, P2TRF amplitude, P2TRF latency and $\mathrm{RMS}_{\mathrm{sum}}$ ) evaluated for 18 subjects at six SNR values close to the respective individual $\mathrm{SRT}_{50}$ .
+
+The largest Spearman correlation with changes in SNR was found for the $\mathrm{RMS}_{\mathrm{sum}}$ feature, using optimum windows, i.e., in the range from 82 to $133~\mathrm{ms}$ . This range covers the latency of $\mathrm{N1}_{\mathrm{TRF}}$ , and $\mathrm{N1}_{\mathrm{TRF}}$ amplitude also revealed a high Spearman correlation. In contrast, $\mathrm{P2}_{\mathrm{TRF}}$ features showed only weak correlations with changes in SNR. Our findings correspond to those described in Billings et al. (2013) and Bidelman and Howell (2016), the authors of which investigated AEP evoked by syllables at different SNRs. The authors of both publications found the best correlation with speech intelligibility for the amplitude of wave
+
+N1, and the $\mathrm{RMS}_{\mathrm{sum}}$ feature was finally used for comparison with speech intelligibility in our study.
+
+We found the highest amplitudes for $\mathrm{N1}_{\mathrm{TRF}}$ and $\mathrm{RMS}_{\mathrm{sum}}$ in the central and fronto central scalp region, corresponding to the N1 wave of an AEP measurement that is known to be evoked in the planum temporale and Heschl's gyrus (Woods, 1995; Picton et al., 1999). Highest reconstruction accuracy is also often found in this scalp region (Etard and Reichenbach, 2019; Zou et al., 2019). Electrodes in the central and the fronto-central region have also been used by Lesenfants et al. (2019) to predict speech intelligibility.
+
+In contrast to those authors' findings, the electrodes found in our study to be best suited for prediction of speech intelligibility were located in the central and the left-central scalp area (CPz, C3, and CP3). The distribution of monotonicity shows that the region crucial for speech intelligibility is concentrated slightly more in a posterior orientation with dominance of the left hemisphere. Our results correspond to the findings of other authors (Leff et al., 2008; Abrams et al.
+
+, 2013) that the posterior superior temporal sulcus has a strong influence on processing speech intelligibility.
+
+Even in a passive listening task the focal attention of the subject could vary with the perceived stimulus quality (e.g. SNR). The focal attention could affect the quality and amplitude of the derived TRF and probably has an effect on this study (Lesenfants and Francart, 2020). Speech in noise measurements for native and non-native speakers has been investigated by Etard and Reichenbach (2019) and by Zou et al. (2019). Those authors described similar behavior for both groups tested for reconstruction accuracy and power of a TRF by using the EEG theta band.
+
+Additionally, differences have been described between the groups only in the low-frequency EEG delta band (Etard and Reichenbach, 2019). We used a combination of both frequency bands and thus presumably included both effects. The correspondence of the location of best electrodes with earlier findings (Leff et al., 2008; Abrams et al., 2013) indicates a connection with speech intelligibility, whereas the presentation of the silent movie may have reduced slightly the subjects active listening and comprehension (Vanthornhout et al., 2019).
+
+On the contrary to repeating the same stimulus (Billings et al., 2013), we presented 10 different sentences in a random order and there was no a priori knowledge about the next sentence. Hence, listening to every sentence 15 times should have no effect due to the complete random order.
+
+The theory of a network of speech comprehension (Leff et al., 2008; Abrams et al., 2013) and phonetic detection (Zatorre et al., 1992) located in different cortical areas and initialized at the posterior and anterior superior temporal sulcus corresponds to the electrodes used for $\mathrm{RMS}_{\mathrm{sum}}$ . It seems possible that our findings relate primarily to investigation of the auditory pathway to a certain stage depending on electrode localization. Not all cognitive requirements for a complete understanding of speech can be investigated by these measurements (Decruy et al.
+
+, 2020a; Devaraju et al., 2021). Additionally, the chosen stimuli aim to imitate a matrix sentence test, resulting in periods between the single sentences, which only contain noise. Consequently, the sentence onset responses may have a slightly larger effect on the $\mathrm{N1}_{\mathrm{TRF}}$ amplitude than the continuous speech
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+8
+
+June 2022 | Volume 16 | Article 876421
+
+![](dt=2026-03-25/ht=08/f510e5f5baa48f58fd1c133d29a1530dcc6a5060664e7db653990bd6d7df9f2b.jpg)
+
+(Brodbeck et al., 2018), suppressed with a higher noise level. Further investigations will be required to elucidate which stage of auditory processing is being examined here. This will be a prerequisite for using this method for differential diagnostics.
+
+We achieved an $\mathrm{RMS}_{\mathrm{sum}}$ level that was comparable across all subjects with increasing standard deviation for increasing SNR. The constancy of the TRF amplitude was supported by using active electrodes, which are less prone to quality of connection
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+9
+
+June 2022 | Volume 16 | Article 876421
+
+(Laszlo et al., 2014) and by applying a least squares approach with a constant regularization (Lalor et al., 2009; Power et al., 2012). Due to these facts the threshold for $\mathrm{RMS}_{\mathrm{sum}}$ value in relation to speech intelligibility $(\mathrm{RMS}_{50})$ was evaluated. The intersection point of $\mathrm{RMS}_{50}$ and $\mathrm{RMS}_{\mathrm{sum}}$ for individual subjects is in a range of $\pm 1$ dB for 7 and $\pm 2$ dB for 16 out of 18 subjects. Our results compare well with the prediction made in Lesenfants et al.
+
+(2019), even though the earlier study was based on a relatively technical approach while our results are more physiologically based. It seems possible to examine the physiological requirements for speech intelligibility in noise within a range of $\pm 2$ dB using features extracted from TRF at different SNR values. Part of the variance can be explained by behavioral test-retest deviation (Wagener and Brand, 2005) and by the spread of behavioral speech intelligibility at fixed $\Delta$ SNR.
+
+Many subjects reported that they got tired during the experiment. It would approve the practicability of the procedure if the time required could be reduced, maybe by increasing the steps between SNR conditions. Additionally, a reduction in the time required could reduce the influence of focal attention on the derived TRFs (Lesenfants and Francart, 2020). The procedure and the $\mathrm{RMS}_{50}$ value will have to be verified with younger and with hearing-impaired subjects, because the reconstruction accuracy is known to increase with hearing impairment (Decruy et al., 2020b), and AEPs are known to mature with age for children (Kummer et al., 2007).
+
+# 5. CONCLUSION
+
+We have shown that single features of the shape of TRFs are highly correlated with intelligibility for speech in noise. The detection of a $\mathrm{RMS}_{\mathrm{sum}}$ level in the area of $\mathrm{N1}_{\mathrm{TRF}}$ allowed at least approximate prediction of individual $\mathrm{SRT}_{50}$ values. Because TRFs are interpretable in a manner similar to AEPs, the method developed may offer new options for clinical diagnostics of difficulties during speech understanding in noise. With the aim of closer localizing the source of the deficit, it can be combined with other audiometric diagnostics starting from pure tone audiometry up to short and middle latency AEP which are related to the cochlear and the auditory brainstem. Additionally
+
+# REFERENCES
+
+it can be possible to test subjects who may be less cooperative. It will be necessary to investigate to which stage of auditory processing the requirements for speech comprehension are examined and the method should be improved by fine tuning to make shorter trials possible. Additionally, further research should focus on testing the procedure with hearing-impaired and with younger subjects.
+
+# DATA AVAILABILITY STATEMENT
+
+The raw data supporting the conclusions of this article will be made available by the authors, without undue reservation.
+
+# ETHICS STATEMENT
+
+The studies involving human participants were reviewed and approved by Ethics Committee at the University of Erlangen-Nuremberg (Ref. No. 449 18B). The patients/participants provided their written informed consent to participate in this study.
+
+# AUTHOR CONTRIBUTIONS
+
+JM: conceived and designed the research, carried out the experiment, and performed the analysis. IK: verified the analytical methods. UH: conceived and designed the research and supervised the project. All authors discussed the results, contributed to the final article, and approved the submitted version.
+
+# FUNDING
+
+This work was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)—419293003—HO 2177/6.
+
+# ACKNOWLEDGMENTS
+
+The authors would like to thank all participants who took part in the study and Peter Woolley for his careful revision of language and proofreading.
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+10
+
+June 2022 | Volume 16 | Article 876421
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+11
+
+June 2022 | Volume 16 | Article 876421
+
+Muncke et al.
+
+Speech Intelligibility Prediction
+
+Frontiers in Neuroscience | www.frontiersin.org
+
+12
+
+June 2022 | Volume 16 | Article 876421

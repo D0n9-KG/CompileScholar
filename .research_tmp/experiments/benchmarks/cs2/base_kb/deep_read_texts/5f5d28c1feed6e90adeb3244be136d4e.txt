@@ -1,0 +1,2842 @@
+New Models for Generating HardRandom Boolean Formulas andDisjunctive Logic Programs 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+ Title: 
+ 
+
+ Content selection saved. Describe the issue below:
+
+ Description: 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ arXiv is now an independent nonprofit! 
+ Learn more 
+ 
+ 
+
+ 
+ 
+ 
+ 
+ License: arXiv.org perpetual non-exclusive license
+ 
+ 
+arXiv:1802.03828v1 [cs.LO] 11 Feb 2018 
+ 
+ 
+
+# New Models for Generating Hard
+ Random Boolean Formulas and
+ Disjunctive Logic Programs
+
+ Some of the results were presented in preliminary form at IJCAI 2017  [ 4 ] . 
+ 
+ 
+ Giovanni Amendola
+ 
+ Affiliation:  University of Calabria, Italy,
+ { \{ amendola,ricca } \} @mat.unical.it
+ 
+    
+ Francesco Ricca
+ 
+ Affiliation:  University of Calabria, Italy,
+ { \{ amendola,ricca } \} @mat.unical.it
+ 
+    
+ Miroslaw Truszczynski
+ 
+ Affiliation:  University of Kentucky, USA,
+mirek@cs.uky.edu
+ 
+
+ Abstract 
+ 
+ We propose two models of random quantified boolean formulas and their natural
+random disjunctive logic program counterparts.
+The models extend the standard models of random k k -CNF formulas
+and the Chen-Interian model of random 2QBFs.
+The first model controls the generation of programs and QSAT formulas
+by imposing a specific structure on rules and clauses, respectively.
+The second model is based on a family of QSAT formulas in a non-clausal form.
+We provide theoretical bounds for the phase transition region in our models,
+and show experimentally the presence of the easy-hard-easy pattern
+and its alignment with the location of the phase transition.
+We show that boolean formulas and logic programs from our models are
+significantly harder than those obtained from the standard k k -CNF and
+Chen-Interian models, and that their combination yields formulas and
+programs that are “super-hard” to evaluate. We also provide evidence
+suggesting that formulas from one of our models are well suited for
+assessing solvers tuned to real-world instances. Finally, it is noteworthy
+that, to the best of our knowledge, our models and results on random
+disjunctive logic programs are the first of their kind.
+
+ 
+ 
+ 
+
+## 1 Introduction
+
+ 
+ Models for generating random instances of search problems have
+received much attention from the artificial intelligence community
+in the last twenty years. The results obtained for boolean
+satisfiability (SAT)  [ 1 , 39 ] and constraint satisfaction
+(CP)  [ 32 ] have had a major impact on the development of fast and robust
+solvers, significantly expanding their range of effectiveness as general
+purpose tools for solving hard search and optimization problems arising in
+AI, and scientific and engineering applications. They also revealed an
+intriguing phase-transition phenomenon often associated with the inherent
+hardness of instances, and provided theoretical and experimental basis for
+a good understanding of the “region” where the phase-transition occurs.
+
+ 
+ 
+ Models of random propositional formulas and QBFs that can reliably generate
+large numbers of instances of a desired hardness are
+important  [ 23 ] . Inherently hard instances for SAT and QBF solvers
+are essential for designing and testing search methods employed by
+solvers  [ 1 ] ,
+and are used to assess their performance in solver competitions  [ 27 , 35 , 11 ] .
+On the flip side, large collections of easy instances
+support the so-called fuzz testing, used to reveal problems in solver
+implementation, as well as defects in solver design  [ 10 ] .
+
+ 
+ 
+ Previous work on models of random formulas focused on
+random CNF formulas and random prenex-form QBFs with the matrix in CNF or DNF
+(depending on the quantifier sequence).
+The fixed-length
+clause model of k k -CNF formulas and its 2QBF extension
+have been especially well studied.
+Formulas in the fixed-length clause model consist of m m clauses over
+a (fixed) set of n n variables, each clause
+with
+ k k non-complementary literals. All formulas are assumed to be equally
+likely. For that model it is known that there are reals ρ l ​ ( k ) \rho_{l}(k) and
+ ρ u ​ ( k ) \rho_{u}(k) 
+such that if m / n ρ l ​ ( k ) m/n \rho_{l}(k) , a formula from the model is almost surely
+satisfiable (SAT), and if m / n ρ u ​ ( k ) m/n \rho_{u}(k) , almost surely unsatisfiable
+(UNSAT). 1 1 
+ 1 
+ 
+ 
+ We give a precise statement of these properties
+in Section 2.1 . It is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \rho_{l}(k)=\rho_{u}(k) . That conjecture
+is still open. However, it holds asymptotically, i.e., the two bounds
+converge to each other with k → ∞ k\rightarrow\infty [ 2 ] . For
+the best studied case of k = 3 k=3 , we have ρ l ​ ( 3 ) ≥ 3.52 \rho_{l}(3)\geq 3.52 [ 28 ] 
+and ρ u ​ ( 3 ) ≤ 4.49 \rho_{u}(3)\leq 4.49 [ 17 ] , and
+experiments show that the phase transition ratio m / n m/n is
+close to 4.26 4.26 [ 14 ] .
+Important for the solver design and testing is that instances
+from the phase transition region are hard
+and those from regions on
+both sides of the phase transition are easy, a property called the
+ easy-hard-easy pattern [ 33 ] or, more accurately,
+the “easy-hard-less hard” pattern [ 13 ] .
+Empirical studies suggest that SAT solvers devised for solving random formulas
+are usually not effective with real world instances; vice versa 
+solvers for industrial instances are less efficient on random
+formulas  [ 27 ] . This is often attributed
+to some form of (hidden) structure present in industrial problems that
+solvers designed for industrial applications can
+exploit  [ 6 ] . Finding models to generate
+random formulas with “structure” that behave similarly to those arising
+in practice is an important challenge  [ 29 ] .
+Ansotegui et al. [ 5 ] 
+presented the first
+model that may have this property: despite the “randomness” of its
+instances, they are better solved by solvers tuned to
+industrial applications.
+More recently, Giráldez-Cru and Levy [ 24 ] proposed a model of random
+SAT based on the notion of modularity , and showed that formulas
+with high modularity behave similarly to industrial ones.
+
+ 
+ 
+ The fixed-length clause model was extended to QBFs by Chen and Interian  [ 12 ] .
+In addition to n n and m m (understood as above), their model includes
+parameters controlling the structure of formulas.
+Once these parameters are fixed, similar properties as in
+the case of the k k -CNF model emerge. There is a phase transition region
+associated with a specific value of the ratio m / n m/n (that does not
+depend on n n ) and the easy-hard-easy pattern can be experimentally
+verified.
+
+ 
+ 
+ These two models are based on formulas in normal forms. However, many
+applications give rise to formulas in non-normal forms motivating
+studies of solvers of non-normal form formulas and QBFs, and raising
+the need of models of random non-normal form formulas. The fixed-shape 
+model proposed by Navarro and Voronkov [ 36 ] , and studied
+by Creignou et al. [ 15 ] , is a response to that challenge.
+The model is similar to that of the k k -CNF one (or its extensions to QBFs),
+but fixed shape (and size) non-normal form formulas are used in place
+of k k -clauses as the key building blocks.
+Experimental studies again show the phase-transition and the easy-hard-easy pattern.
+
+ 
+ 
+ Motivated by the work on random SAT and QBF models,
+researchers proposed models of random logic programs,
+and obtained empirical and theoretical
+results concerning their properties
+ [ 44 , 43 , 34 , 41 , 42 ] .
+Those results are limited to non-disjunctive logic programs. No
+models for disjunctive logic programs have been proposed so far.
+Such results would be of substantial interest to answer set programming
+(ASP) [ 9 ] , a popular computational formalism based on
+disjunctive logic programs.
+
+ 
+ 
+ In this paper we propose two models of random QBF formulas and
+the corresponding models of disjunctive logic programs.
+First, we propose a controlled version of the Chen-Interian model
+in which CNF formulas that are used as matrices are subject to additional
+conditions restricting their structure.
+Second, we propose multi-component versions of the earlier models. 2 2 
+ 2 
+ 
+ 
+ When we use the term “multi-component model,” we
+understand that the notion is parameterized by the underlying “standard,”
+or single-component, model. 
+In the multi-component models, propositional formulas and matrices of QBFs
+are disjunctions of t t k k -CNF formulas (either standard or “controlled”).
+They are not formulas from the fixed-shape model of Navarro and
+Voronkov, as their building blocks (CNF or DNF formulas) do not have a
+fixed size. In each case, the standard translation from QBFs to disjunctive
+programs suggests random models for the latter.
+
+ 
+ 
+ For the new models, we present theoretical bounds on the region where
+the phase transition is located, and study experimentally their behavior.
+In our experiments, we consider several ASP, SAT and QBF solvers
+to exclude any possible bias that could be an artifact of a particular solver.
+We study the regions of hardness for the models and show empirically that
+they lie within their phase transition regions.
+We compare the hardness of the controlled model with the corresponding Chen-Interian model
+and find that the former can generate formulas that are significantly harder.
+For the multi-component versions of the standard random CNF and the Chen-Interian models
+we study hardness as a function of the ratio m / n m/n and of the number of components t t .
+The latter was of main interest to us. The results show that
+the multi-component model allows for controlling hardness of formulas
+and programs in such a way that, even when the number of variables is
+fixed, raising t t may result in instances that are orders of magnitude harder to evaluate.
+Moreover, we show that the combination of controlled and multi-component model allows
+to generate instances that are “super-hard” to evaluate.
+
+ 
+ 
+ As Ansótegui et al. [ 5 ] ,
+we compare SAT/QBF solvers designed for random instances with
+those designed for real-world ones. We find that for t ≥ 2 t\geq 2 our
+models generate instances better solved by solvers for real-world instances,
+and that the difference becomes more pronounced as t t grows.
+For disjunctive logic programs,
+we measure the effect of t t on processing them and show that t t allows us to control the amount of computation dedicated
+to stable model checking  [ 31 ] .
+
+ 
+ 
+ Our results provide new ways to generate hard and easy instances of
+propositional formulas, QBFs and disjunctive programs. Our models can
+generate instances of increasing hardness with properties affecting
+solver performance in a similar way real-world instances do.
+The results are particularly important to the development of disjunctive
+ASP solvers, as no models for generating random disjunctive programs of
+desired hardness have been known before.
+
+ 
+ 
+ 
+
+## 2 Preliminaries
+
+ 
+ A clause is a set of literals that contains no pair of
+complementary literals. By a CNF formula we mean an (ordered)
+tuple of clauses with repetitions of clauses allowed. Disjunctions
+of CNF formulas are also assumed to be (ordered) tuples and they also
+allow repetitions. The dual concepts (such as DNF formulas)
+are defined similarly.
+In other models, CNF formulas are viewed as sets of clauses,
+and disjunctions of CNF formulas are viewed as sets of CNF
+formulas. However, assuming some reasonable limit on the number of
+clauses in a formula, and assuming in each case the uniform distribution,
+the two probabilistic models are asymptotically equivalent for properties that
+do not depend on the order (such as satisfiability). Specifically, as the number of atoms tends to infinity, the probability
+that such a property holds in one model and the corresponding probability
+for the other model converge to each other. (We offer
+a technical justification for this claim in Appendix B.)
+Thus, there is no essential difference between the two models
+and we use them interchangeably.
+
+ 
+ 
+ By C ⁡ ( k , n , m ) \mathit{C}(k,n,m) we denote the set of all k k -CNF formulas consisting of
+ m m clauses over (some fixed) set of n n propositional variables.
+Similarly, D ⁡ ( k , n , m ) \mathit{D}(k,n,m) stands for the set of all k k -DNF formulas of
+ m m products (conjunctions of non-complementary literals) over an
+ n n -element set of atoms.
+
+ 
+ 
+
+### 2.1 The fixed-length clause model
+
+ 
+ The model is given by
+the set C ⁡ ( k , n , m ) \mathit{C}(k,n,m) of CNF formulas, with all formulas assumed equally
+likely. Formulas from the model can be generated by selecting m m k k -literal clauses over a set of n n variables uniformly, independently and with replacement. As we noted,
+the model is well understood. In particular, let us denote by
+ p ⁡ ( k , n , m ) p(k,n,m) the probability that a random formula in C ⁡ ( k , n , m ) \mathit{C}(k,n,m) is SAT.
+We define ρ l ​ ( k ) \rho_{l}(k) to be the supremum over all
+real numbers ρ \rho such that lim n → ∞ p ⁡ ( k , n , ⌊ ρ ​ n ⌋ ) = 1 \lim_{n\rightarrow\infty}p(k,n,\lfloor\rho n\rfloor)=1 .
+Similarly, we define ρ u ​ ( k ) \rho_{u}(k) to be the infimum over all real numbers
+ ρ \rho such that lim n → ∞ p ⁡ ( k , n , ⌊ ρ ​ n ⌋ ) = 0 \lim_{n\rightarrow\infty}p(k,n,\lfloor\rho n\rfloor)=0 .
+As we mentioned, ρ l ​ ( k ) \rho_{l}(k) and ρ u ​ ( k ) \rho_{u}(k) are well defined. Moreover,
+ ρ l ​ ( k ) ≤ ρ u ​ ( k ) \rho_{l}(k)\leq\rho_{u}(k) and, it is conjectured that ρ l ​ ( k ) = ρ u ​ ( k ) \rho_{l}(k)=\rho_{u}(k) .
+Experimental results agree with these
+theoretical predictions.
+
+ 
+ 
+ 
+
+### 2.2 The Chen-Interian model
+
+ 
+ The model generates QBFs of the form ∀ X ​ ∃ Y ​ F \forall X\exists YF . Sets X X and
+ Y Y are disjoint and contain all propositional variables that may appear
+in F F . The sizes of X X and Y Y are prescribed to some specific integers
+ A A and E E , respectively. Moreover, each clause in F F contains a a 
+literals over X X and e e literals over Y Y for some specific values
+ a a and e e . We denote the set of all such CNF formulas F F with m m 
+clauses by C ⁡ ( a , e , A , E , m ) \mathit{C}(a,e;A,E;m) . Clearly, C ⁡ ( a , e , A , E , m ) ⊆ C ⁡ ( a + e , A + E , m ) \mathit{C}(a,e;A,E;m)\subseteq\mathit{C}(a+e,A+E,m) . We write Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) for the set of all QBFs
+ ∀ X ​ ∃ Y ​ F \forall X\exists YF , where F ∈ C ⁡ ( a , e , A , E , m ) F\in\mathit{C}(a,e;A,E;m) . The Chen-Interian
+model generates QBFs from Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) , with all formulas equally likely.
+
+ 
+ 
+ Chen and Interian [ 12 ] presented a comprehensive
+experimental study of the model.
+Let us denote by
+ q ⁡ ( a , e , A , E , m ) q(a,e;A,E;m) the probability that a random QBF from Q ⁡ ( a , e , A , E , m ) \mathit{Q}(a,e;A,E;m) 
+is true. Let r 0 r 0 be fixed real. We set ν l ​ ( a , e , r ) \nu_{l}(a,e;r) 
+to be the supremum over all real numbers ν \nu such that lim n → ∞ q ⁡ ( a , e , A , E , ⌊ ν ​ n ⌋ ) = 1 \lim_{n\rightarrow\infty}q(a,e;A,E;\lfloor\nu n\rfloor)=1 ,
+where A = ⌊ r ​ E ⌋ A=\lfloor rE\rfloor and n = A + E n=A+E . Similarly, we set ν u ​ ( a , e , r ) \nu_{u}(a,e;r) 
+to be the infimum over all real numbers ν \nu such that lim n → ∞ q ⁡ ( a , e , A , E , ⌊ ν ​ n ⌋ ) = 0 \lim_{n\rightarrow\infty}q(a,e;A,E;\lfloor\nu n\rfloor)=0 ,
+again with A = ⌊ r ​ E ⌋ A=\lfloor rE\rfloor and n = A + E n=A+E . Chen and Interian proved the following result.
+
+ 
+ 
+ Theorem 2.1 . 
+ 
+ ν l ​ ( a , e , r ) \nu_{l}(a,e;r) and ν u ​ ( a , e , r ) \nu_{u}(a,e;r) are well defined. 
+
+ 
+ 
+ 
+ Clearly, ν l ​ ( a , e , r ) ≤ ν u ​ ( a , e , r ) \nu_{l}(a,e;r)\leq\nu_{u}(a,e;r) . Whether ν l ​ ( a , e , r ) = ν u ​ ( a , e , r ) \nu_{l}(a,e;r)=\nu_{u}(a,e;r) is an open problem. The quantities ν l ​ ( a , e , r ) \nu_{l}(a,e;r) and
+ ν u ​ ( a , e , r ) \nu_{u}(a,e;r) delineate the phase-transition region.
+For QBFs generated from the model Q ⁡ ( a , e , ⌊ r ​ E ⌋ , E , ⌊ ν ​ n ⌋ ) Q(a,e;\lfloor rE\rfloor,E;\lfloor\nu n\rfloor) (with fixed n n and r r ), Chen and Interian experimentally
+observed the easy-hard-easy pattern as ν \nu grows. They showed that the
+hard region is aligned
+with the phase transition, and that the same behavior emerges no matter what
+concrete r r is fixed as the ratio A / E A/E .
+
+ 
+ 
+ 
+ 
+
+## 3 New models of random formulas and QBFs
+
+ 
+ We propose several variations of the models described above. They are based
+on two ideas. First, we impose an additional structure on clauses in CNF
+formulas
+that serve as matrices of QBFs. Second, we consider disjunctions of CNF
+formulas both in the SAT and QBF setting.
+
+ 
+ 
+
+### 3.1 The controlled model
+
+ 
+ To describe the model, we define first a version of a model of a random
+CNF formula. In this model, clauses are built
+of variables in a set X ∪ Y X\cup Y , where X ∩ Y = ∅ X\cap Y=\emptyset ; we set | X | = A |X|=A and | Y | = E |Y|=E . A formula in the model consists of 2 ​ A 2A k k -literal
+clauses.
+Each clause consists of a single literal over X X and k − 1 k-1 literals over Y Y ,
+and for each literal over X X there is a single clause in the formula that
+contains it. A formula in this model is generated taking 2 ​ A 2A ( k − 1 ) (k-1) -literal
+clauses
+over Y Y and extending each of them by a literal over X X (following some fixed
+one-to-one mapping between the clauses and the literals over X X ). We denote
+this model (and the corresponding set of
+formulas) by C 𝑐𝑡𝑑 ​ ( k , A , E ) C^{\mathit{ctd}}(k,A,E) . We write Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) for the model
+(and the set) of QBFs whose matrix is a formula from C 𝑐𝑡𝑑 ​ ( k , A , E ) C^{\mathit{ctd}}(k,A,E) . We
+refer to both models as controlled . In our work we are primarily
+interested in the controlled model for QBFs.
+
+ 
+ 
+ Clearly, Q 𝑐𝑡𝑑 ​ ( k , A , E ) ⊆ Q ⁡ ( 1 , k − 1 , A , E , 2 ​ A ) Q^{\mathit{ctd}}(k,A,E)\subseteq Q(1,k-1;A,E;2A) . Thus, the controlled
+model is related to the Chen-Interian model. The main difference is that
+the clauses, while random with respect to existential variables are not
+random with respect to universal variables. For each x ∈ X x\in X there is
+exactly one clause involving x x and exactly one clause involving ¬ x \neg x .
+Consequently, the number of clauses is 2 ​ A 2A and, moreover,
+for every truth assignment to X X , once we simplify the matrix accordingly,
+we are left with exactly (hence, the term “controlled”) A A 
+ ( k − 1 ) (k-1) -literal clauses
+over E E variables. In contrast, in the case of the
+Chen-Interian model Q ⁡ ( 1 , k − 1 , A , E , 2 ​ A ) Q(1,k-1;A,E;2A) , similar simplifications leave us
+with ( k − 1 ) (k-1) -CNF formulas with varying number of clauses, with the
+ average number being A A .
+
+ 
+ 
+ Let q 𝑐𝑡𝑑 ​ ( k , A , E ) q^{\mathit{ctd}}(k,A,E) denote the probability that a random formula in
+ Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) is true. As before, we define μ l 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{l}(k) 
+to be the supremum over all positive real numbers ρ \rho such that
+ lim E → ∞ q 𝑐𝑡𝑑 ​ ( k CLOSE , \lim_{E\rightarrow\infty}q^{\mathit{ctd}}(k, OPEN ⌊ ρ ​ E ⌋ , E ) = 1 \lfloor\rho E\rfloor,E)=1 ,
+and μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{u}(k) to be the infimum over all positive real numbers ρ \rho such that
+ lim E → ∞ q 𝑐𝑡𝑑 ​ ( k CLOSE , \lim_{E\rightarrow\infty}q^{\mathit{ctd}}(k, OPEN ⌊ ρ ​ E ⌋ , E ) = 0 \lfloor\rho E\rfloor,E)=0 .
+
+ 
+ 
+ We will now derive bounds on μ l 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{l}(k) and μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{u}(k) by
+exploiting results on random ( k − 1 ) (k-1) -CNF formulas.
+
+ 
+ 
+ Theorem 3.1 . 
+ 
+ For every k ≥ 2 k\geq 2 , μ l 𝑐𝑡𝑑 ​ ( k ) ≥ ρ l ​ ( k − 1 ) 2 \mu^{\mathit{ctd}}_{l}(k)\geq\frac{\rho_{l}(k-1)}{2} and μ u 𝑐𝑡𝑑 ​ ( k ) ≤ ρ u ​ ( k − 1 ) \mu^{\mathit{ctd}}_{u}(k)\leq\rho_{u}(k-1) . 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ Let Φ ∈ Q 𝑐𝑡𝑑 ​ ( k , A , E ) \Phi\in Q^{\mathit{ctd}}(k,A,E) ,
+ X = { x 1 , … , x A } X=\{x_{1},...,x_{A}\} , and Y = { y 1 , … , y E } Y=\{y_{1},...,y_{E}\} .
+By the definition, Φ = ∀ X ​ ∃ Y ​ F \Phi=\forall X\exists YF , where F = C 1 ∧ … ∧ C 2 ​ A F=C_{1}\wedge\ldots\wedge C_{2A} 
+is a k k -CNF formula of 2 ​ A 2A 
+clauses C i = l i ​ 1 ∨ … ∨ l i ​ k C_{i}=l_{i1}\vee\ldots\vee l_{ik} , and where l i ​ 1 l_{i1} is a literal
+over X X and l i ​ 2 , … , l i ​ k l_{i2},\ldots,l_{ik} are literals over
+ Y Y . We define C i Y = l i ​ 2 ∨ … ∨ l i ​ k C_{i}^{Y}=l_{i2}\vee\ldots\vee l_{ik} and F Y = C 1 Y ∧ … ∧ C 2 ​ A Y F^{Y}=C_{1}^{Y}\land\ldots\land C_{2A}^{Y} . Moreover, for every
+interpretation I I of X X we define F | I = ⋀ { C i Y ∣ C i ∈ F ​  and  ​ I ⊧̸ l i ​ 1 } F|_{I}=\bigwedge\{C_{i}^{Y}\mid C_{i}\in F\mbox{ and }I\not\models l_{i1}\} . 
+
+ 
+ 
+ Let us assume that Φ \Phi is selected from Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) uniformly at random. By the definition of the model Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) , F Y F^{Y} can be regarded as selected from C ⁡ ( k − 1 , 2 ​ A , E ) C(k-1,2A,E) uniformly at random and, for each interpretation I I of X X , F | I F|_{I} can be regarded as selected uniformly at random from C ⁡ ( k − 1 , A , E ) C(k-1,A,E) . 
+
+ 
+ 
+ To derive an upper bound on μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{u}(k) , let us fix an interpretation I I of X X . Clearly, if F | I F|_{I} is unsatisfiable, then Φ \Phi is false. Let us choose any real ρ ρ u ​ ( k − 1 ) \rho \rho_{u}(k-1) . If A / E ≥ ρ A/E\geq\rho , the probability that F | I F|_{I} is unsatisfiable
+tends to 1 with E E and, consequently, the probability that Φ \Phi is false tends
+to 0 with E E , too. It follows that if ρ ρ u ​ ( k − 1 ) \rho \rho_{u}(k-1) and A / E ≥ ρ A/E\geq\rho , the probability
+that Φ \Phi is true tends to 0 with E E .
+Since ρ \rho is an arbitrary real such that ρ ρ u ​ ( k − 1 ) \rho \rho_{u}(k-1) ,
+ μ u 𝑐𝑡𝑑 ​ ( k ) ≤ ρ u ​ ( k − 1 ) \mu^{\mathit{ctd}}_{u}(k)\leq\rho_{u}(k-1) follows. 
+
+ 
+ 
+ To prove the lower bound, we observe that if the formula F Y F^{Y} 
+is satisfiable, then for every interpretation I I of X X , the formula
+ F | I F|_{I} is satisfiable or, equivalently, Φ \Phi is true.
+Let ρ \rho be a positive real number such that ρ ρ l ​ ( k − 1 ) 2 \rho \frac{\rho_{l}(k-1)}{2} .
+By the definition of ρ l ​ ( k − 1 ) \rho_{l}(k-1) , if we assume that
+ A / E ≤ ρ A/E\leq\rho , that is, 2 ​ A / E ≤ 2 ​ ρ ρ l ​ ( k − 1 ) 2A/E\leq 2\rho \rho_{l}(k-1) , the probability that F Y F^{Y} 
+is satisfiable tends to 1 with E E . Thus, the probability that Φ \Phi is true tends
+to 1 with E E . It follows that μ l 𝑐𝑡𝑑 ​ ( k ) ≥ ρ l ​ ( k − 1 ) 2 \mu^{\mathit{ctd}}_{l}(k)\geq\frac{\rho_{l}(k-1)}{2} .
+∎ 
+
+ 
+ 
+ 
+ It follows that as ρ \rho grows, the properties of Q 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) Q^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E) change. For small values of ρ \rho , randomly selected QBFs are almost
+surely true. As ρ \rho grows beyond μ l 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{l}(k) the proportion of false
+formulas grows until, eventually, when ρ \rho grows beyond μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{u}(k) ,
+the formulas in the model are almost surely false.
+Clearly, μ l 𝑐𝑡𝑑 ​ ( k ) ≤ μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{l}(k)\leq\mu^{\mathit{ctd}}_{u}(k) .
+As in the other cases, the question whether
+ μ l 𝑐𝑡𝑑 ​ ( k ) = μ u 𝑐𝑡𝑑 ​ ( k ) \mu^{\mathit{ctd}}_{l}(k)=\mu^{\mathit{ctd}}_{u}(k) is open.
+
+ 
+ 
+ 
+
+### 3.2 The multi-component models
+
+ 
+ Let ℱ \mathcal{F} be a class of propositional formulas (or a model of a random formula).
+By t t - ℱ \mathcal{F} we denote the class of all disjunctions of t t formulas from
+ ℱ \mathcal{F} (or a model generating disjunctions of random formulas from ℱ \mathcal{F} ).
+Similarly, if 𝒬 \mathcal{Q} is a class (model) of QBFs of the form ∀ X ​ ∃ Y ​ F \forall X\exists YF , where F ∈ ℱ F\in\mathcal{F} , we write t t - 𝒬 \mathcal{Q} for the class (model) of all QBFs
+of the form ∀ X ​ ∃ Y ​ F \forall X\exists YF , where F ∈ t - ℱ F\in\mbox{$t$-$\mathcal{F}$} . We refer
+to models t t - ℱ \mathcal{F} and t t - 𝒬 \mathcal{Q} as multi-component . For QBFs we also
+consider the dual model to t t - 𝒬 \mathcal{Q} , based on conjunctions of t t DNF
+formulas. It gives rise to a multi-component model of disjunctive logic
+programs via the Eiter-Gottlob translation. In all cases, we assume that
+formulas (QBFs, respectively) are equally likely.
+
+ 
+ 
+ We first observe that the multi-component model t t - C ⁡ ( k , n , m ) \mathit{C}(k,n,m) has similar
+satisfiability properties as C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , and that the phase transition regions in the two
+models are closely related. Let p t ​ ( k , n , m ) p_{t}(k,n,m) be the probability that a
+random formula in t t - C ⁡ ( k , n , m ) \mathit{C}(k,n,m) is SAT. Clearly, p 1 ​ ( k , n , m ) = p ⁡ ( k , n , m ) p_{1}(k,n,m)=p(k,n,m) .
+
+ 
+ 
+ Theorem 3.2 . 
+ 
+ Let t ≥ 1 t\geq 1 be a fixed integer. Then, for every ρ ρ l ​ ( k ) \rho \rho_{l}(k) ,
+ lim n → ∞ p t ​ ( k , n , ⌊ ρ ​ n ⌋ ) = 1 \lim_{n\rightarrow\infty}p_{t}(k,n,\lfloor\rho n\rfloor)=1 ,
+and for every ρ ρ u ​ ( k ) \rho \rho_{u}(k) ,
+ lim n → ∞ p t ​ ( k , n , ⌊ ρ ​ n ⌋ ) = 0 \lim_{n\rightarrow\infty}p_{t}(k,n,\lfloor\rho n\rfloor)=0 . 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ As we discussed earlier, we can assume that our model actually generates
+ordered t t -tuples of C ⁡ ( k , n , m ) \mathit{C}(k,n,m) formulas (they represent disjunctions
+of t t formulas from the model C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , where repetitions of disjuncts
+are allowed, and disjunctions differing in the order of disjuncts are viewed
+as different). Thus, it is clear that 
+
+ 
+
+ 
+ | 
+ p t ​ ( k , n , m ) = 1 − ( 1 − p ⁡ ( k , n , m ) ) t . p_{t}(k,n,m)=1-(1-p(k,n,m))^{t}. | 
+ | 
+ (1) | 
+ 
+
+ It follows that for every fixed t t , and every ρ \rho , 
+
+ 
+
+ 
+ | 
+ lim n → ∞ p t ​ ( k , n , ⌊ ρ ​ n ⌋ ) = 0 if and only if lim n → ∞ p ⁡ ( k , n , ⌊ ρ ​ n ⌋ ) = 0 \lim_{n\rightarrow\infty}p_{t}(k,n,\lfloor\rho n\rfloor)=0\quad\mbox{if and only if}\quad\lim_{n\rightarrow\infty}p(k,n,\lfloor\rho n\rfloor)=0 | 
+ | 
+ 
+
+ and 
+
+ 
+
+ 
+ | 
+ lim n → ∞ p t ​ ( k , n , ⌊ ρ ​ n ⌋ ) = 1 if and only if lim n → ∞ p ⁡ ( k , n , ⌊ ρ ​ n ⌋ ) = 1 . \lim_{n\rightarrow\infty}p_{t}(k,n,\lfloor\rho n\rfloor)=1\quad\mbox{if and only if}\quad\lim_{n\rightarrow\infty}p(k,n,\lfloor\rho n\rfloor)=1. | 
+ | 
+ 
+
+ Thus, the assertion follows.
+∎ 
+
+ 
+ 
+ 
+ Theorem 3.2 implies that if the phase transition conjecture holds for the single
+component model C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , it also holds for the multi-component model
+ t t - C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , and the threshold value is the same for every t t .
+
+ 
+ 
+ Theorem 3.2 describes the situation when t t is fixed and n n 
+is large. When n n is fixed and t t grows, the identity ( 1 )
+shows that the region of the transition from SAT to UNSAT shifts to the
+right. (Of course, by Theorem 3.2 , once we stop growing t t 
+and start increasing n n again, the phase transition region will move back
+to the left.) Our experimental study discussed later provides results
+consistent with this theoretical analysis. Moreover, our experiments also
+show that
+the phase transition region is where the hard formulas are located, and
+that hardness depends significantly on t t .
+
+ 
+ 
+ We also considered the multi-component model t t - Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) of QBFs,
+with the Chen-Interian model as its single-component specialization.
+Let q t ​ ( a , e , A , E , m ) q_{t}(a,e;A,E;m) be the probability that a random QBF
+from t t - Q ⁡ ( a , e , A , E , m ) \mathit{Q}(a,e;A,E;m) is true (in particular, q 1 ​ ( a , e , A , E , m ) = q_{1}(a,e;A,E;m)= 
+ q ⁡ ( a , e , A , E , m ) q(a,e;A,E;m) ).
+Using Theorem 2.1 and reasoning as above, we can prove that
+the phase transition regions for different values of t t coincide (and
+coincide with the phase transition region in the Chen-Interian model).
+
+ 
+ 
+ Theorem 3.3 . 
+ 
+ For every integer t ≥ 1 t\geq 1 and real r 0 r 0 , if
+ ν ν l ​ ( a , e , r ) \nu \nu_{l}(a,e;r) , then
+ lim n → ∞ q t ​ ( a , e , A , E , ⌊ ν ​ n ⌋ ) = 1 \lim_{n\rightarrow\infty}q_{t}(a,e;A,E;\lfloor\nu n\rfloor)=1 ,
+and if ν ν u ​ ( a , e , r ) \nu \nu_{u}(a,e;r) ,
+ lim n → ∞ q t ​ ( a , e , A , E , ⌊ ν ​ n ⌋ ) = 0 \lim_{n\rightarrow\infty}q_{t}(a,e;A,E;\lfloor\nu n\rfloor)=0 
+(where A = ⌊ r ​ E ⌋ A=\lfloor rE\rfloor and n = A + E n=A+E ). 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ For the proof, we will assume that the model t t - Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) generates
+QBFs with matrices that are ordered t t -tuples of formulas generated from
+the model C ⁡ ( a , e , A , E , n ) C(a,e;A,E;n) . As before, we have that for each fixed
+positive integer t t , 
+
+ 
+
+ 
+ | 
+ q t ​ ( a , e , A , E , ⌊ ν ​ n ⌋ ) = 1 − ( 1 − q ⁡ ( a , e , A , E , ⌊ ν ​ n ⌋ ) ) t . q_{t}(a,e;A,E;\lfloor\nu n\rfloor)=1-(1-q(a,e;A,E;\lfloor\nu n\rfloor))^{t}. | 
+ | 
+ (2) | 
+ 
+
+ This identity implies the claim in the same way as ( 1 ) implied the
+assertion of Theorem 3.2 .
+
+∎ 
+
+ 
+ 
+ 
+ The experimental results on satisfiability of QBFs from t t - Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) ,
+which we present in Section 5 , agree with our theoretical analysis; we will also see
+there the easy-hard-easy
+pattern and a strong dependence of hardness on t t .
+
+ 
+ 
+ Finally, we considered the multi-component model t t - Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) , which
+incorporates both ideas we proposed in the paper. As in the other two cases,
+it is easy to derive the existence of the phase transition region and its
+invariance with respect to t t from the results on the underlying
+single-component model which, for the controlled model are given in
+Theorem 3.1 . Let q t 𝑐𝑡𝑑 ​ ( k , A , E ) q_{t}^{\mathit{ctd}}(k,A,E) denote the
+probability that a random formula in t t - Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) is true.
+
+ 
+ 
+ Theorem 3.4 . 
+ 
+ For every integer t ≥ 1 t\geq 1 , if ρ μ l 𝑐𝑡𝑑 ​ ( k ) \rho \mu_{l}^{\mathit{ctd}}(k) , then
+ lim E → ∞ q t 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) = 1 \lim_{E\rightarrow\infty}q_{t}^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E)=1 ,
+and if ρ μ u 𝑐𝑡𝑑 ​ ( k ) \rho \mu_{u}^{\mathit{ctd}}(k) ,
+ lim E → ∞ q t 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) = 0 \lim_{E\rightarrow\infty}q_{t}^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E)=0 , 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ For the proof, we will assume that the model t t - Q 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) Q^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E) generates
+QBFs with matrices that are ordered t t -tuples of formulas generated from
+the model C 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) C^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E) (disjunctions of t t formulas
+from the model, where repetitions of disjuncts are allowed and the order
+matters). As in the two classes of multi-component models we considered above,
+we have that for each fixed positive integer t t , 
+
+ 
+
+ 
+ | 
+ q t 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) = 1 − ( 1 − q 𝑐𝑡𝑑 ​ ( k , ⌊ ρ ​ E ⌋ , E ) ) t . q_{t}^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E)=1-(1-q^{\mathit{ctd}}(k,\lfloor\rho E\rfloor,E))^{t}. | 
+ | 
+ (3) | 
+ 
+
+ This identity, when combined with Theorem 3.1 ,
+implies the assertion.
+∎ 
+
+ 
+ 
+ 
+ We also studied the model t t - Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) experimentally. The results are
+reported in Section 5 . As in other cases, they agree with
+the predictions of the theoretical anaylysis above. Importantly, they show
+that formulas from the model t t - Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) can be “super-hard.” That
+is, using “controlled form” CNF formulas in the disjunctions of a
+multi-component model, yields a way to generate formulas that are much
+harder than those generated from any other model considered before.
+
+ 
+ 
+ 
+ 
+
+## 4 Random Disjunctive Programs
+
+ 
+ Our results on QBFs imply models of random disjunctive logic programs. This
+is important as disjunctive logic programs increase the expressive power of
+answer set programming posing, at the same time, a computational challenge
+ [ 9 , 22 ] .
+
+ 
+ 
+ Our approach to design models of random disjunctive programs is based on
+the translation from QBFs to programs due to Eiter and Gottlob
+ [ 18 ] . The Eiter-Gottlob translation works on QBFs Φ = ∃ X ​ ∀ Y ​ G \Phi=\exists X\forall YG , where G G is a DNF formula.
+
+ 
+ 
+ To describe the translation, let us assume that X = { x 1 , … , x E } X=\{x_{1},\ldots,x_{E}\} ,
+ Y = { y 1 , … , y A } Y=\{y_{1},\ldots,y_{A}\} and G = D 1 ∨ … ∨ D m G=D_{1}\lor\ldots\lor D_{m} , where
+ D i = L i , 1 ∧ … ∧ L i , k i D_{i}=L_{i,1}\land\ldots\land L_{i,k_{i}} 
+and L i , j L_{i,j} are literals over X ∪ Y X\cup Y .
+For every atom z ∈ X ∪ Y z\in X\cup Y we introduce a fresh atom z ′ z^{\prime} . For every
+ z ∈ X ∪ Y z\in X\cup Y , we set σ ⁡ ( z ) = z \sigma(z)=z and σ ⁡ ( ¬ z ) = z ′ \sigma(\neg z)=z^{\prime} . Finally,
+we introduce one more fresh atom, say w w , and define a disjunctive logic
+program P Φ P_{\Phi} to consist of the following rules:
+
+ 
+ 
+ 
+ 
+ z ∨ z ′ z\lor z^{\prime} | 
+ for each z ∈ X ∪ Y z\in X\cup Y | 
+
+ 
+ y ← w and y ′ ← w y\leftarrow w\ \ \mbox{and}\ \ y^{\prime}\leftarrow w | 
+ for each y ∈ Y y\in Y | 
+
+ 
+ w ← σ ⁡ ( L i , 1 ) , … , σ ⁡ ( L i , k i ) w\leftarrow\sigma(L_{i,1}),\ldots,\sigma(L_{i,k_{i}}) | 
+ for each D i D_{i} , i = 1 , … , m i=1,\ldots,m | 
+
+ 
+ w ← 𝑛𝑜𝑡 ​ w w\leftarrow\mathit{not}\;w | 
+
+ 
+ 
+ Theorem 4.1 (Eiter and Gottlob [ 18 ] ) . 
+ 
+ Let Φ \Phi be a QBF ∃ X ​ ∀ Y ​ G \exists X\forall YG , where G G is a DNF formula over
+ X ∪ Y X\cup Y . Then Φ \Phi is true if and only if P Φ P_{\Phi} has an answer set. 
+
+ 
+ 
+ 
+ We will use this result to derive models of disjunctive logic programs
+from the models of QBFs that we considered above. We recall that these
+models consist of formulas of the form ∀ X ​ ∃ Y ​ F \forall X\exists YF , where
+ F F is a CNF formula. Before we can apply the Eiter-Gottlob translation,
+we have to transform these models (their formulas) into their dual
+counterparts.
+
+ 
+ 
+ To this end, for a CNF formula F F , we denote by F ¯ \overline{F} the formula
+obtained from ¬ F \neg F by applying the De Morgan laws (thus, transforming
+ ¬ F \neg F into DNF). Extending the notation, for each QBF Φ = ∀ X ​ ∃ Y ​ F \Phi=\forall X\exists YF , where F F is a CNF formula, we write Φ ¯ \overline{\Phi} for
+the QBF ∃ X ​ ∀ Y ​ F ¯ \exists X\forall Y\overline{F} . Clearly, Φ \Phi is true if and
+only if Φ ¯ \overline{\Phi} is false (or equivalently, Φ \Phi is false if
+and only if Φ ¯ \overline{\Phi} is true).
+
+ 
+ 
+ Corollary 4.1 . 
+ 
+ Let Φ \Phi be a QBF ∀ X ​ ∃ Y ​ G \forall X\exists YG , where G G is a CNF formula over
+ X ∪ Y X\cup Y . Then Φ \Phi is false if and only if P Φ ¯ P_{\overline{\Phi}} has
+an answer set. 
+
+ 
+ 
+ 
+ Given a model (set) of QBFs of the form ∀ X ​ ∃ Y ​ F \forall X\exists YF , where F F 
+is a CNF formula, the mapping Φ ↦ Φ ¯ \Phi\mapsto\overline{\Phi} transforms
+the model into its dual, consisting of QBFs with a DNF formula in the matrix.
+To these formulas we can apply the Eiter-Gottlob translation, thus
+obtaining a model (set) of disjunctive logic programs.
+ By Corollary 4.1 , this model has the
+same satisfiability properties as the original QBF model modulo
+the switch between true and false.
+
+ 
+ 
+ We now define Q ¯ ​ ( e , a , E , A , m ) = { Φ ¯ : Φ ∈ Q ⁡ ( e , a , E , A , m ) } \overline{Q}(e,a;E,A;m)=\{\overline{\Phi}\colon\Phi\in Q(e,a;E,A;m)\} . The model (set) Q ¯ ​ ( e , a , E , A , m ) \overline{Q}(e,a;E,A;m) is the dual
+to the Chen-Interian model Q ⁡ ( e , a , E , A , m ) Q(e,a;E,A;m) . Applying the Eiter-Gottlob
+translation Ψ ↦ P Ψ \Psi\mapsto P_{\Psi} to QBFs Ψ ∈ Q ¯ ​ ( e , a , E , A , m ) \Psi\in\overline{Q}(e,a;E,A;m) ,
+yields a model (set) of disjunctive logic programs, which we denote by
+ D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) . It follows from our comments after
+Corollary 4.1 
+that the theoretical results we obtained for the Chen-Interian model
+ Q ⁡ ( e , a , E , A , m ) Q(e,a;E,A;m) apply directly to the model D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) 
+(modulo the switch between true and false). 
+
+ 
+ 
+ Next, we define Q 𝑐𝑡𝑑 ¯ ​ ( k , E , A ) = { Φ ¯ : Φ ∈ Q 𝑐𝑡𝑑 ​ ( k , E , A ) } \overline{Q^{\mathit{ctd}}}(k,E,A)=\{\overline{\Phi}\colon\Phi\in Q^{\mathit{ctd}}(k,E,A)\} . The model Q 𝑐𝑡𝑑 ¯ ​ ( k , E , A ) \overline{Q^{\mathit{ctd}}}(k,E,A) is dual to
+our controlled model of QBFs. By applying the Gottlob-Eiter translation
+to QBFs in Q 𝑐𝑡𝑑 ¯ ​ ( k , E , A ) \overline{Q^{\mathit{ctd}}}(k,E,A) , we obtain the model (set) of
+disjunctive logic programs, which we denote by D 𝑑𝑙𝑝 𝑐𝑡𝑑 ​ ( k , E , A ) \mathit{D}^{\mathit{ctd}}_{\mathit{dlp}}(k,E,A) .
+As before, by our comments following Corollary 4.1 ,
+the models Q 𝑐𝑡𝑑 ​ ( k , E , A ) Q^{\mathit{ctd}}(k,E,A) and D 𝑑𝑙𝑝 𝑐𝑡𝑑 ​ ( k , E , A ) \mathit{D}^{\mathit{ctd}}_{\mathit{dlp}}(k,E,A) have the same
+satisfiability properties (modulo the switch between true and false). 
+
+ 
+ 
+
+### 4.1 Multi-component models of disjunctive logic programs
+
+ 
+ The translation proposed by Eiter and Gottlob can be extended to QBFs of
+the form Φ = ∃ X ​ ∀ Y ​ G \Phi=\exists X\forall YG , where G = G 1 ∧ … ∧ G t G=G_{1}\land\ldots\land G_{t} 
+and each G i G_{i} is a DNF formula. The translation is similar, except that we
+need t t additional variables w 1 , … , w t w_{1},\ldots,w_{t} to represent DNF formulas
+ G i G_{i} . The translation consists of rules
+
+ 
+ 
+ 
+ 
+ z ∨ z ′ z\lor z^{\prime} | 
+ for each z ∈ Z z\in Z | 
+
+ 
+ y ← w y\leftarrow w and y ′ ← w y^{\prime}\leftarrow w | 
+ for each y ∈ Y y\in Y | 
+
+ 
+ w ← w 1 , … , w t w\leftarrow w_{1},\ldots,w_{t} and w ← 𝑛𝑜𝑡 ​ w w\leftarrow\mathit{not}\;w | 
+
+ 
+ 
+ that form the fixed part of the translation, and its core 
+consisting of Horn rules
+
+ 
+ 
+ 
+ 
+ w h ← z 1 , … , z ℓ w_{h}\leftarrow z_{1},\ldots,z_{\ell} | 
+
+ 
+ 
+ where h = 1 , … , t h=1,\ldots,t , and the rules with the head w h w_{h} 
+are obtained from the formula G h G_{h} just as in the original Eiter-Gottlob
+translation (except that w h w_{h} is now used as the head and not w w ).
+In fact, in the case when t = 1 t=1 the program above coincides with the
+result of the Eitr-Gottlob translation modulo a rewriting, in which we
+eliminate the rule w ← w 1 w\leftarrow w_{1} and replace w 1 w_{1} in the head of each rule
+in the core with w w .
+
+ 
+ 
+ Extending the earlier notation, we denote the program described above by
+ P Φ P_{\Phi} . The following result can be derived by an argument similar to
+that Eiter and Gottlob used to prove their theorem.
+
+ 
+ 
+ Theorem 4.2 . 
+ 
+ Let Φ = ∃ X ​ ∀ Y ⁡ ( G 1 ∧ … ∧ G t ) \Phi=\exists X\forall Y(G_{1}\land\ldots\land G_{t}) , where each G i G_{i} 
+is a DNF formula. Then Φ \Phi is true if and only if P Φ P_{\Phi} has an answer
+set. 
+
+ 
+ 
+ 
+ We can now derive multi-component models of disjunctive logic programs
+from the multicomponent models of QBFs. The basic idea is the same as before.
+A multi-component model of QBFs gives rise to its dual via a transformation
+ Φ ↦ Φ ¯ \Phi\mapsto\overline{\Phi} (it consists of negating Φ \Phi and applying
+De Morgan laws). Next, the translation above transforms QBFs from that dual
+model into disjunctive programs, yielding the corresponding multi-component
+model of programs. We apply this approach to two multi-component models of
+QBFs we considered in this paper: t t - Q ⁡ ( e , a , E , A , m ) Q(e,a;E,A;m) and t t - Q 𝑐𝑡𝑑 ​ ( k , E , A ) Q^{\mathit{ctd}}(k,E,A) .
+We denote the corresponding models of disjunctive logic programs by
+ t t - D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) and t t - D 𝑑𝑙𝑝 𝑐𝑡𝑑 ​ ( k , E , A ) \mathit{D}_{\mathit{dlp}}^{\mathit{ctd}}(k,E,A) .
+
+ 
+ 
+ Corollary 4.2 . 
+ 
+ Let Φ = ∃ X ​ ∀ Y ​ F \Phi=\exists X\forall YF , where F ∈ t - Q ( e , a ; E , A ; , m ) F\in\mbox{$t$-$Q(e,a;E,A;,m)$} 
+or F ∈ t - Q 𝑐𝑡𝑑 ​ ( k , E , A ) F\in\mbox{$t$-$Q^{\mathit{ctd}}(k,E,A)$} . Then, Φ \Phi is false ( Φ ¯ \overline{\Phi} 
+is true) if and only if P Φ ¯ P_{\overline{\Phi}} has an answer set. 
+
+ 
+ 
+ 
+ By Corollary 4.2 , the models t t - Q ( e , a ; E , A ; , m ) Q(e,a;E,A;,m) 
+( t t - Q 𝑐𝑡𝑑 ​ ( k , E , A ) Q^{\mathit{ctd}}(k,E,A) , respectively) and t t - D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) 
+( t t - D 𝑑𝑙𝑝 𝑐𝑡𝑑 ​ ( k , E , A ) \mathit{D}_{\mathit{dlp}}^{\mathit{ctd}}(k,E,A) , respectively) have the same satisfiability
+properties (modulo the switch between true and false). 
+
+ 
+ 
+ 
+ 
+
+## 5 Empirical analysis
+
+ 
+ We now describe an experimental analysis of the behavior of our models
+and discuss their properties.
+
+ 
+ 
+
+### 5.1 Experiment Setup
+
+ 
+ 
+ 
+ 
+ (a) Phase transition (Controlled) 
+ 
+ 
+ (b) Hardness (Controlled) 
+ 
+ Figure 1 : Behavior of controlled model: phase transition and hardness. 
+ 
+ 
+ 
+ 
+ 
+ (a) Bounds on Satisfiability (Controlled) 
+ 
+ 
+ (b) Solver Independence (Controlled) 
+ 
+ Figure 2 : Behavior of controlled model: bounds and solver independence. 
+ 
+ 
+ To claim that properties and patterns are inherent to a model and not an
+artifact of a solver used, we performed our experiments with several
+well-known SAT, QBF and ASP solvers. The SAT solvers included
+ glucose 4.0  [ 7 ] ;
+ lingeling , version of 2015  [ 8 ] ;
+and kcnfs , version of SAT’07 competition  [ 16 ] .
+The QBF solvers included bq-Cegar (a combination of bloqqer 
+preprocessor  [ 25 ] and
+ ghostq   [ 30 ] solver from QBF gallery 2014);
+ Aigsolve   [ 38 ] ;
+ RAReQS   [ 26 ] , version 1.2 from QBF competition 2016;
+and AQuA-S2V 3 3 
+ 3 
+ 
+ 
+ www.qbflib.org/DESCRIPTIONS/aqua16.pdf .
+Finally, the two ASP solvers we used in experiments were
+ clasp 3.1.3  [ 20 ] 
+and wasp 2.1  [ 3 ] , both paired with
+ gringo 4.5.3  [ 19 ] .
+All solvers were run in their default configurations.
+We stress that we did not aim at comparing solver performance, instead
+ our goal was to identify solver-independent properties inherent to a model .
+
+ 
+ 
+ To support experiments, we developed a tool in Java to generate random
+CNF formulas from C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , QBFs from Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) and Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) ,
+and programs from D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) and D 𝑑𝑙𝑝 ​ ( k , E , A ) \mathit{D}_{\mathit{dlp}}(k,E,A) (“dual”
+to QBFs from Q ⁡ ( e , a , E , A , m ) Q(e,a;E,A;m) and Q 𝑐𝑡𝑑 ​ ( k , E , A ) Q^{\mathit{ctd}}(k,E,A) ). For each
+class 𝒞 \mathcal{C} of formulas and programs listed, our tool generates
+also formulas (programs) from the corresponding multicomponent model
+ t t - 𝒞 \mathcal{C} .
+
+ 
+ 
+ Formulas and QBFs generated according to the multi-component models
+ t t - C ⁡ ( k , n , m ) \mathit{C}(k,n,m) , t t - Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) and t t - Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) , where
+ t 1 t 1 , are non-clausal or have non-clausal matrices (in the case of QBFs).
+As they do not adhere to the (Q)DIMACS format required by SAT/QBF solvers, the generator
+transforms non-clausal formulas to CNF using the Tseitin transformation
+ [ 40 ] .
+That transformation introduces fresh auxiliary variables (while replacing binary subformulas) and new clauses (modeling the equivalence of each replacement) to obtain a CNF formula that is equisatisfiable to the original one.
+The Tseiting transformation is efficient, since it only causes a linear growth in size (whereas doing the same normalization via distributivity laws may lead to an exponential blow-up). 4 4 
+ 4 
+ 
+ 
+ For this reason the Tseitin transformation is employed very often in real-world applications of SAT/QBF. Actually, many formulas used in SAT and QBF competitions  [ 27 , 35 ] come from applying it to non-normal form inputs suggested by problem statements. 
+Interestingly, the logic programs in the models t t - D 𝑑𝑙𝑝 ​ ( e , a , E , A , m ) \mathit{D}_{\mathit{dlp}}(e,a;E,A;m) and
+ t t - D 𝑑𝑙𝑝 ​ ( k , E , A ) \mathit{D}_{\mathit{dlp}}(k,E,A) have a much simpler structure than the corresponding
+Tseitin-transformed formulas from the “dual” models t t - Q ⁡ ( e , a , E , A , m ) Q(e,a;E,A;m) and
+ t t - Q 𝑐𝑡𝑑 ​ ( k , E , A ) Q^{\mathit{ctd}}(k,E,A) ). As can be seen from the translation, these programs need
+new variables only to represent each of the t t components (disjuncts) of
+the matrix formula.
+ 
+
+ 
+ 
+ Once a formula Φ \Phi is generated, it is stored in two files:
+one with an encoding of Φ \Phi in the (Q)DIMACS numeric
+format of (Q)SAT solvers  [ 27 , 35 ] , and the
+other one with the disjunctive logic program corresponding to Φ \Phi 
+in the ASPCore 2.0 syntax  [ 11 ] .
+As discussed in the previous section, since the programs are generated
+from the negations of the QBFs in our random QBF models, they have answer
+sets if and only if the original formulas are false. Thus, when we analyze
+satisfiability we plot only the curves obtained by evaluating either the
+formulas or the corresponding logic programs (the plots are symmetric to
+each other). In all the experiments the results are averaged over 128
+samples of the same size.
+
+ 
+ 
+ Experiments were run on a Debian Linux with 2.30GHz Intel Xeon E5-4610 v2 CPUs and 128GB of RAM.
+Each execution was constrained to one single core by using the taskset command.
+Time measurements were performed by using the runlim tool.
+The generator used in the experiments is publicly available
+at  https://www.mat.unical.it/ricca/RandomLogicProgramGenerator .
+
+ 
+ 
+ 
+ 
+ 
+ (a) Phase transition (Chen-Interian) 
+ 
+ 
+ (b) Hardness (Chen-Interian) 
+ 
+ Figure 3 : Chen-Interian: Phase transition and Hardness. 
+ 
+ 
+ Figure 4 : Comparing Chen-Interian and Controlled model: hardness comparison. 
+ 
+ 
+ 
+
+### 5.2 Behavior of the controlled model
+
+ 
+ We first study the satisfiability and hardness of formulas and corresponding
+programs generated according to the controlled model.
+We generated QBF instances from the model Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) and program
+instances from the dual model D 𝑑𝑙𝑝 ​ ( 4 , A , E ) \mathit{D}_{\mathit{dlp}}(4,A,E) ) for the parameters E E 
+and A A ranging over [ 10..60 ] [10..60] and [ 20..180 ] [20..180] , respectively (consequently,
+the number of clauses ranges from 40 40 to 360 360 ).
+
+ 
+ 
+ Figure  1(a) shows the satisfiability results for the model
+ Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) . The picture for D 𝑑𝑙𝑝 ​ ( 4 , A , E ) \mathit{D}_{\mathit{dlp}}(4,A,E) is dual (symmetric
+with respect to the plane given by the frequency of satisfiability equal
+to 1 / 2 1/2 ); the results we show were in fact obtained by running clasp on programs from D 𝑑𝑙𝑝 ​ ( 4 , A , E ) \mathit{D}_{\mathit{dlp}}(4,A,E) and adapted to the case of
+ Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) ).
+The gradient of colors ranging from yellow (QBF true)
+to black (QBF false) helps to identify the phase transition region, which
+is also projected on the A A - E E plane below. We observe that phase transitions occur for a specific value of the ratio
+between universal and existential variables, specifically, for A / E ≃ 2.37 A/E\simeq 2.37 . A different perspective on the same data is presented in
+Figure  2(a) , where the frequency of satisfiability is
+depicted with respect to the ratio A / E A/E , and where the two straight lines
+show the bounds predicted by Theorem  3.1 , assuming
+the bounds for satisfiability and unsatisfiability of 3-CNF formulas  [ 28 , 17 ] 
+(i.e., μ l 𝑐𝑡𝑑 ​ ( 4 ) ≥ 3.52 2 = 1.76 \mu^{\mathit{ctd}}_{l}(4)\geq\frac{3.52}{2}=1.76 and μ u 𝑐𝑡𝑑 ​ ( 4 ) ≤ 4.49 \mu^{\mathit{ctd}}_{u}(4)\leq 4.49 ).
+We observe that the transition sharpens when the number of variables grows, and the transition occurs within the bounds predicted by the theoretical results.
+
+ 
+ 
+ To study the hardness of formulas, the average running times are plotted in Figure  1(b) .
+Here the gradient of colors ranging from black (basically instantaneous execution) to yellow (the maximum average
+running time) helps to identify the hardness region.
+As before the region is also projected on the A A - E E plane below.
+As expected hardness arises around the phase transition region and grows
+with the number of variables.
+To provide evidence that the hardness of the controlled model is independent of the solver used,
+Figure  2(b) plots the average execution times when
+running two QBF solvers ( RAReQS and AQuA-S2V ) and two ASP solvers ( clasp and wasp )
+on formulas/programs implied by formulas
+from Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) with 48 existential variables, and the QBF solver bq-Cegar on formulas with 24 existential variables (for
+that solver, we had to decrease the size of formulas to ensure termination
+within a reasonable time).
+We note that all solvers find hard formulas in the same region, and the maximum hardness
+coincides with the transition zone marked by the red vertical strip.
+No data is reported in Figure  2(b) for Aigsolve because it terminated abruptly in some instances
+(throwing std::bad_alloc ) and in some other we had to kill the process after 15 days of execution.
+(This behavior is probably due to a memory access problem.)
+
+ 
+ 
+ 
+
+### 5.3 Controlled vs Chen-Interian model
+
+ 
+ We now compare the controlled and the Chen-Interian models with respect to
+the hardness of formulas having the same number of variables.
+
+ 
+ 
+ We start by presenting results on the behavior of the
+Chen-Interian model Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) , where we set a = 1 a=1 , e = 3 e=3 , and E = 70 E=70 ,
+and vary the number A A of universal variables over the range [ 2..300 ] [2..300] 
+and the number m m of clauses over the range [ 200..700 ] [200..700] .
+These results are shown in Figure  3 . They confirm and
+extend the findings by Chen and Interian [ 12 ] . As before the
+gradient of colors in Figure  3 , ranging from black to
+yellow, outlines the phase transition and the easy-hard-easy pattern. The
+surface is also projected onto the A A - m m plane for an alternative
+visualization. For every value of A A 
+(in fact, for every value of the ratio A / E A/E ; indeed, we recall that in
+our experiment the we fixed the value of E E to 70 70 ), as we grow m m we
+observe the phase
+transition. The place where this phase transition occurs depends on A A 
+(more generally, on the ratio A / E A/E ; but in our experiments E E is fixed).
+For each value of A A (more precisely, for each value of A / E A/E ), the
+hardest formulas are located around the phase transition area, as evidenced
+by Figure 3 (b). The behavior presents there only
+for the values of A A of up to about 85 85 ; for higher values of A A , the
+running times even on the formulas from the phase transition region are very
+small. Figure 3 (b) also shows that the overall peak of
+hardness occurs in the phase transition region for a specific value of A A 
+or, as explained earlier, for a specific value of the ratio A / E A/E .
+
+ 
+ 
+ Next, we compare the hardness properties of the controlled and the
+Chen-Interian models with the same number of existential variables, which
+can be viewed as a measure of the hardness of individual SAT instances that
+arise while solving a QBF of the form ∀ ∃ ⁡ F \forall\exists F . The graphs in
+Figure  4 capture the behavior of the hardness
+for the two models under this constraint. For the controlled model, for
+each value of A A , the value on the corresponding hardness graph (the blue
+line) is obtained by averaging the solve times on formulas generated from
+the model Q 𝑐𝑡𝑑 ​ ( 4 , A , 70 ) Q^{\mathit{ctd}}(4,A,70) . The matrices of these formulas are 4-CNF
+formulas over A + 70 A+70 variables and with 2 ​ A 2A clauses. The corresponding
+point on the hardness graph for the Chen-Interian model is obtained by
+averaging the solve times on formulas generated from the model
+ Q ⁡ ( 1 , 3 , A , 70 , m ​ a ​ x ) Q(1,3;A,70;max) , where for each A A (and E = 70 E=70 ), m ​ a ​ x max is selected to
+maximize the solve times (in particular, m ​ a ​ x max falls in the phase transition
+region for the combination of the values A A and E = 70 E=70 ). The matrices of
+these formulas are 4-CNF formulas over A + 70 A+70 variables and m ​ a ​ x max clauses.
+
+ 
+ 
+ The results show that the peak hardness regions for the
+two models are not aligned. The hardest formulas over 70 existential
+variables from the Chen-Interian models have A ≈ 50 ​ - ​ 55 A\approx 50\mbox{-}55 
+universal variables and m = 350 m=350 clauses. The hardest formulas over 70
+existential variables from the controlled model have A ≈ 170 A\approx 170 and
+ m ≈ 340 m\approx 340 . Our results show that the hardest formulas from the
+controlled model are almost two orders of magnitude harder than the hardest
+formulas from the Chen-Interian model. On the other hand, while the hardest
+formulas (for a fixed value of E E , here E = 70 E=70 ) in the two models have
+similar numbers of clauses (about 340-350), the Chen-Interian model formulas
+have fewer universal variables (about 50-55 versus 170 in the controlled model).
+
+ 
+ 
+ It is also useful to look at the point where the hardness of one model meets
+the other. It happens for A ≈ 150 A\approx 150 . At this point, the CNF formulas
+that are the matrices of QBFs from the controlled model have 70 existential
+and about 150 universal variables, and about 300 clauses. The corresponding
+parameters for the formulas from the Chen-Interian model have very similar
+values. Indeed, the hardest formulas for the Chen-Interian model when E = 70 E=70 
+and A = 150 A=150 have about 300 clauses (cf. Figure 3 ).
+
+ 
+ 
+ To summarize, a direct comparison for the hardness of the two models is not
+clear cut. On the one hand, our results show that if we make the comparison
+for models with the same number of existential variables the points, in terms
+of A A , in which the two model generate their hardest instances are very
+different. On the other hand, there is a setting (corresponding to the phase
+transition for the controlled model) in which the controlled model generates
+much harder formulas than any other setting (corresponding to a phase
+transition) for the Chen-Interian model.
+
+ 
+ 
+ For the sake of completeness, we report that we obtained
+results consistent with those discussed above experimenting with other settings
+of existential variables and clause lengths.
+
+ 
+ 
+ 
+ 
+ 
+ (a) Phase transition shift (SAT) 
+ 
+ 
+ (b) Easy-hard-easy pattern (SAT) 
+ 
+ 
+ (c) Hardness of multi-component model (SAT) 
+ 
+ Figure 5 : Behavior of multi-component model (SAT): phase transition and hardness. 
+ 
+ 
+ 
+ 
+ 
+ (a) Phase transition shift (QBF) 
+ 
+ 
+ (b) Easy-hard-easy pattern (QBF) 
+ 
+ 
+ (c) Hardness of multi-component model (QBF) 
+ 
+ Figure 6 : Behavior of multi-component model (QBF): phase transition and hardness. 
+ 
+ 
+ 
+ 
+ 
+ (a) Combined effect of variables and components (SAT) 
+ 
+ 
+ (b) Combined effect of variables and components (QBF) 
+ 
+ Figure 7 : Combined effect of variables and components: phase transition and hardness. 
+ 
+ 
+ 
+
+### 5.4 Behavior of Multi-component Model
+
+ 
+ To study the satisfiability of multi-component model instances (the
+location of the phase transition), we considered the setting with the number
+of variables (propositional atoms) fixed. Figure  5(a) shows
+the results for the t t component model t t - C ⁡ ( 3,200 , m ) C(3,200,m) , with
+ t ∈ { 1 , 3 , 5 , 7 , 9 , 11 } t\in\{1,3,5,7,9,11\} . The x x -axis gives the ratio of
+the numbers of clauses and variables ( m / 200 m/200 ), the y y -axis shows the
+frequency of SAT. Consistently with our theoretical results, the phase
+transition shifts from left to right, and it sharpens for growing values
+of t t . The same can be observed in Figure  6(a) , showing
+the frequency of QBFs from t t - Q ⁡ ( 1 , 3 , 24 , 12 , m ) Q(1,3;24,12;m) that are true, for
+ t ∈ { 1 , 3 , 5 , 7 , 9 , 11 } t\in\{1,3,5,7,9,11\} .
+The satisfiability plots obtained for logic programs from the corresponding
+models t t - D 𝑑𝑙𝑝 ​ ( 1 , 3 , 24 , 12 , m ) \mathit{D}_{\mathit{dlp}}(1,3;24,12;m) are symmetric with respect to the line
+ y = 0.5 y=0.5 and are not reported.
+
+ 
+ 
+ To study the hardness of the multi-component model we computed the average
+solver running times.
+The results (on the same instances as before) for the
+ glucose SAT solver and the bq-Cegar QBF solver are in
+Figures  5(b)  and  6(b) .
+The plots show a strong dependency of the hardness on the
+number of components: the peak of hardness moves right and
+grows visibly with t t .
+In more detail, the CNF formulas (one component) are solved by glucose in less than 0.42s, whereas instances with
+11 components require about 7 minutes, i.e, they are more than
+3 orders of magnitude harder. Analogous behavior is observed when running
+ bq-Cegar on QBF formulas. Those from the one-component model are solved
+instantaneously (average time ≤ \leq 0.01s), those from the 11-component
+model require about one minute.
+The experiments with other solvers gave similar results.
+
+ 
+ 
+ To underline the dependency of the hardness on the number of components,
+for each solver we compute the average time over samples of the same size and plot its maximum (for simplicity maximum execution time ) for several values of t t in
+Figures  5(c) (SAT) and  6(c) 
+(QBF, programs).
+In particular, Figure  5(c) reports the results
+obtained by running glucose and lingeling , and
+Figure  6(c) — the results obtained by running
+ bq-Cegar , Aigsolve , AQuA-S2V , RAReQS and the results obtained by running clasp and
+ wasp on the corresponding programs. The picture shows that the peak of
+difficulty grows with the number of components no matter the implementation
+or the representation roughly, at a rate that is more than quadratic with
+ t t ( y y -axis in logarithmic scale).
+
+ 
+ 
+ Next, we discuss the behavior of formulas when both the number of variables
+and the number of components grow.
+Figure  7(a) reports on the behavior of CNF formulas with n ∈ { 100,200 } n\in\{100,200\} and t ∈ { 1 , 10 } t\in\{1,10\} .
+Formulas with 100 variables are plotted in red, and those with 200 variables
+in blue. We use squares to identify graphs for formulas with
+one component and stars for graphs concerning formulas with ten
+components.
+Figure  7(a) shows that when the number of variables grows
+the phase transition moves to the left, and the transition becomes
+sharper.
+By Theorem 3.2 , we expect that
+the bounds on (un)satisfiability do not depend on t t , indeed when the number
+of variables grows the right shift due to an increase in the number of
+components is compensated, and becomes negligible.
+Our experiments also confirm that hardness grows with both the number of components and the number of variables.
+This is seen in Figure  7(a) 
+in the bottom, which plots the average number of choices
+taken by clasp (we consider choices since
+execution times are negligible).
+Note that CNF formulas with 100 variables and 10 components are already harder than formulas with 200 variables and one component.
+Figure  7(b) shows the same picture for QBFs
+in t t - Q ⁡ ( 1 , 3 , 50 , 25 , m ) Q(1,3;50,25;m) (plotted in red) and t t - Q ⁡ ( 1 , 3 , 100 , 50 , m ) Q(1,3;100,50;m) 
+(plotted in blue), with t ∈ { 1 , 3 } t\in\{1,3\} . These results were obtained
+by running clasp on the corresponding programs.
+
+ 
+ 
+ 
+
+### 5.5 Combination of Controlled and Multi-component model
+
+ 
+ We now present the results obtained by combining the two models presented
+in this paper. We focus on the effect of the combination of models on the
+hardness of formulas.
+The results are summarized in Figure  8 where
+a bar plot depicts the maximum average execution times
+ (i.e., the average execution times measured evaluating the hardest instances at the phase transition) 
+obtained by running
+ASP and QBF solvers on instances of models t t - Q ⁡ ( 1 , 3 , A , E , m ) Q(1,3;A,E;m) 
+(multi-component with Chen-Interian) and t t - Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) 
+(multi-component with controlled) varying the number of components
+ t ∈ { 1 , 3 , 5 , 7 , 9 , 11 } t\in\{1,3,5,7,9,11\} .
+To obtain comparable execution times with both ASP and QBF solvers,
+ clasp and wasp were run on instances with E = 24 E=24 ,
+ RAReQS and AQuA-S2V on instances with E = 18 E=18 ,
+whereas bq-Cegar and Aigsolve on instances with E = 12 E=12 , and A ∈ [ 2,120 ] A\in[2,120] 
+and m ∈ [ 2,300 ] m\in[2,300] . Figure  8 shows histograms for
+each solver. The results obtained for each setting of t t in
+ t t - Q ⁡ ( 1 , 3 , A , E , m ) Q(1,3;A,E;m) and t t - Q 𝑐𝑡𝑑 ​ ( 4 , A , E ) Q^{\mathit{ctd}}(4,A,E) are reported side by side in
+blue and orange bars, respectively.
+The red horizontal line helps identifying a timeout of 24 hours,
+and a red bar ending with an arrow indicates that some execution required more than 24 hours.
+A red exclamation mark identifies abrupt termination of a solver.
+
+ 
+ 
+ We observe that, no matter the solver, the hardest instances of multi-component with controlled are at least one order of magnitude harder than the Chen-Interian-based counterparts for all settings of t t . 
+Notably, the combination of the two new models allows to generate instance that are “super-hard”;
+indeed instances with one component are solved in less than 0.9 0.9 s and it was sufficient to set t = 11 t=11 to obtain instances that are more than six orders of magnitude harder to evaluate (some “controlled” instances with E ≥ 18 E\geq 18 could not even be solved in 24 hours).
+
+ 
+ 
+ Figure 8 : Comparing Chen-Interian and Controlled model: effect of components. 
+ 
+ 
+ 
+
+### 5.6 Impact on SAT Solving
+
+ 
+ A desirable property of a random model is to generate instances
+that behave similarly to real-world ones  [ 29 , 5 ] .
+This similarity has been measured empirically by comparing the performance of solvers for random and industrial instances.
+Following Ansótegui et al.  [ 5 ] ,
+we measure the ratio of the execution times of solvers.
+We compared kcnfs (a well-known SAT solver specialized in random instances) with glucose and lingeling (both specialized in real-world instances) to assess whether our model allows to generate instances that are better solved by solvers for real-world instances.
+Figure  9 shows the
+results for the model t t - C ⁡ ( 3,100 , m ) C(3,100,m) , while varying the number of
+components t ∈ { 1 , 2 , 3 , 4 , 5 } t\in\{1,2,3,4,5\} .
+In particular, the x x -axis gives the ratio of the numbers of clauses and variables ( m / 100 m/100 ),
+and the y y -axis shows glucose versus kcnfs (in Figure  9(a) )
+and lingeling versus kcnfs (in Figure  9(b) ).
+
+ 
+ 
+ We observe that, kcnfs is faster (ratios 1 1 ) than both glucose and lingeling when t = 1 t=1 , i.e., when our model coincides with the classical one for random formulas.
+Once we increase the number of components the result is reverted, glucose and lingeling are faster than kcnfs (ratios 1 1 ), and the difference grows significantly with t t .
+This is independent of the clauses/variables ratio.
+
+ 
+ 
+ The difference between random and real-world instances is
+often attributed to the presence of some hidden structure in
+the latter  [ 6 ] . We observed that
+multi-component models yield instances that are solved faster by
+solvers designed for real-world instances. We conjecture this is due
+to the component structure introduced by the model. This structure can
+be controlled by varying the number of components, yielding instances
+of varying hardness.
+
+ 
+ 
+ 
+ 
+ 
+ (a) CPU time ratio glucose/kcnfs 
+ 
+ 
+ (b) CPU time ratio lingeling/kcnfs 
+ 
+ Figure 9 : Impact on SAT solving. 
+ 
+ 
+ 
+
+### 5.7 Impact on QBF and ASP Solving
+
+ 
+ An analysis distinguishing the behavior of random and industrial instances
+is not possible for ASP and QBF solvers.
+Indeed, no QBF/ASP solvers have ever been designated (or known) as
+ specialized to random instances in ASP and QBF Evaluations so far
+(cf. [ 11 , 35 ] and http://www.qbflib.org ).
+Nonetheless our models has other interesting implications for QBF and ASP solvers.
+
+ 
+ 
+
+#### Impact on QBF Solving
+
+ 
+ To assess the validity of our multicomponent Chen-Interian model for QBF,
+we submitted several instances to the QBF Evaluation 2016.
+All our instances (with n = 100 n=100 only, and t ≤ 6 t\leq 6 ) were classified as hard by the organizers, and helped identify a bug in one of the participating solvers,
+demonstrating the efficacy of our model in performance analysis
+and in correctness testing.
+
+ 
+ 
+ 
+
+#### Impact on ASP Solving
+
+ 
+ For ASP solvers,
+Figure  10(a) outlines the impact of our model on answer set search for programs corresponding to QBF formulas t t - Q ⁡ ( 1 , 3 , 24 , 12 , m ) Q(1,3,24,12,m) with t ∈ { 1 , 3 , 5 , 7 , t\in\{1,3,5,7, 9 , 11 } 9,11\} .
+ASP solvers evaluate disjunctive programs by first computing a candidate
+model, and then checking its stability (the latter task is co-NP complete).
+Thus, we plot ( i ) (i) the ratio between the number of choices made during the search phase and the number of stable model checks performed by wasp and clasp , and ( i ​ i ) (ii) the ratio between the time spent in stable model checking and the total execution time for the solver wasp (results for clasp are analogous)
+both for growing t t . The ratio between the numbers of choices and model checks
+decreases when the number of components grows, following a similar behavior
+for both solvers. This is a machine-independent measure
+of the impact of the two activities, and we observe that
+the role of the model checker grows with t t .
+Specifically, the impact of the model checking on the total solving time
+grows from about about 3% ( t = 1 t=1 ) to 88% ( t = 11 t=11 ).
+Analogous considerations are supported by Figure  10(b) , which
+outlines the impact of the combination of controlled and multi-component model on answer set search for programs corresponding to QBF formulas t t - Q c ​ t ​ d ​ ( 4 , 32 , 16 , m ) Q^{ctd}(4,32,16,m) with t ∈ { 1 , 3 , 5 , 7 , 9 , 11 } t\in\{1,3,5,7,9,11\} . Also in this case, and increase of t t causes both ( i ) (i) a decrease of the ratio between the number of choices made during the search phase and the number of stable model checks, and ( i ​ i ) (ii) an increase of the the time spent in stable model checking and the total execution time for the solver
+ wasp (results for clasp are analogous).
+Specifically, the impact of the model checking on the total solving time
+grows from about about 0.05% ( t = 1 t=1 ) to 51% ( t = 11 t=11 ).
+
+ 
+ 
+ 
+ 
+ 
+ (a) Answer set computation: Multi-component 
+ 
+ 
+ (b) Answer set computation: Multi-component Controlled Model 
+ 
+ Figure 10 : Impact on ASP solving: answer set computation. 
+ 
+ 
+ 
+ 
+ 
+ (a) Partial checking: Multi-component 
+ 
+ 
+ (b) Partial checking: Multi-component Controlled Model 
+ 
+ Figure 11 : Impact on ASP solving: impact of partial checking. 
+ 
+ 
+ It is known that on usual benchmarks ASP solvers spend more time in
+the model search phase than in the final model checking phase  [ 37 ] 
+(this also happens on benchmarks we generated for t = 1 t=1 ). However, our multi-component models
+allow us to generate in a controllable way instances that put emphasis on the model checking phase.
+
+ 
+ 
+ Finally, we report some other observations that point to a potential
+impact of our models in detecting areas of improvement for solvers.
+Let us recall that the two ASP solvers we studied, clasp and wasp ,
+employ different strategies for stable model checking. clasp searches
+for unfounded sets  [ 21 ] , while wasp searches
+for a minimal model of the program reduct  [ 3 ] . Both solvers
+are able to check partial interpretations, but they employ different
+heuristics for enabling this search space pruning technique.
+Figure  11 compares wasp and clasp by
+plotting the ratio between the time required by the two solvers for finding
+an answer set (labeled wasp / clasp ) and the ratio between the number of
+partial
+and total checks performed by wasp (labeled pc/c( wasp )) and clasp (labeled pc/c( clasp )) for the two multi-component models we studied.
+The results on the multi-component Chen-Interian model are in
+Figure  11(a) . The results on the multi-component
+controlled model are in Figure  11(b) . One can
+see that wasp is faster than clasp when the number of components
+is small. When the number of components grows clasp becomes faster
+and takes over. Interestingly, the deterioration in the
+performance of wasp corresponds to the point in which the ratio pc/c
+starts increasing. In contrast, clasp maintains consistently the ratio
+of about 70% of the numbers of partial and total checks, and this seems
+to pay off for larger values of t t . The results suggest that partial
+checking in wasp was implemented in a less efficient way then in clasp ,
+and it hinders wasp when the number of components grows. It seems also
+that for easier instances better performance could be obtained by disabling
+or reducing the number of partial checks as they do not
+seem to be essential for the performance. These observation suggest that
+there is space for solver developers to devise smarter heuristics for
+improving the usage of partial checking.
+
+ 
+ 
+ 
+ 
+ 
+
+## 6 Conclusions
+
+ 
+ In this paper we proposed the controlled and multi-component models for random
+propositional formulas, and disjunctive logic programs.
+The models extend the well-known fixed clause length model for k-SAT,
+and the Chen-Interian model for QBF.
+
+ 
+ 
+ We provide theoretical bounds that predict the location of
+the region where the phase-transition occurs, and we present the results
+of an experimental analysis that confirms our theoretical findings in
+practice. Our experiments also show that the hardest instances are located
+in the phase transition region. Moreover, in the multi-component model the
+hardness of formulas depends significantly on the number of components.
+
+ 
+ 
+ Comparing models, we observed that the controlled model allows one to
+generate random instances that are much harder than those obtained with
+the Chen-Interian model with the same number of existential variables.
+Further, multi-component model allows one to generate random instances with
+few components that are several orders of magnitude harder than those
+generated with the same number of variables from the underlying
+“single-component” model. Finally, a combination of the two new models
+results in the generation of programs and formulas that are “super-hard”
+to evaluate.
+
+ 
+ 
+ Our experiments with different solvers and encodings gave consistent results.
+This supports our claim that the phenomena we observed are inherent properties
+of the models rather than an artifact of the solver used.
+
+ 
+ 
+ Despite their simple structure the models have theoretical and empirical
+properties that make them important for further advancement of the SAT, QBF
+and ASP solvers.
+
+ 
+ 
+ First, the hardness of formulas/programs can be controlled and, unlike
+in the earlier models, not only in terms of the ratio of clauses to variables.
+Our experiments showed that the hardness strongly depends on the number
+of components. Thus, it can also be controlled by varying that parameter,
+and even a small number of components can lead to extremely hard instances.
+Further, in our experiments (as well as in the QBF Competition 2016) instances
+generated according to our models helped identifying bugs in existing solvers.
+Moreover, the multi-component model generates formulas that in at least one
+aspect are similar to instances arising in practice: they are solved better
+by SAT solvers specialized in industrial benchmarks than by SAT solvers
+specialized in random ones.
+This makes them useful for development and testing of solvers intended
+for practical applications. Finally, our models of random disjunctive
+programs are the first such models for that class of logic objects. This
+and the fact that it allows us to control the role of the stable model
+checking phase point to its potential for the development of ASP solvers.
+
+ 
+ 
+ Our work raises an interesting open question. The controlled model we proposed
+and studied stipulates that clauses in the matrix of QBFs contain exactly one
+universal variable. It is possible to lift this requirement. We discuss some
+natural extensions in Generalized Controlled Model . It turns out that when the
+number of universal variables per clause is greater than one, the generalized
+model generates instances that exhibit a qualitatively different behavior.
+Arguably, they are easier then formulas from the corresponding Chen-Interian
+model.
+
+ 
+ 
+ However, a comparison to the Chen-Interian model is not clear cut, a problem
+we already noted for the one universal variable case. In particular, we chose
+to compare for hardness formulas from the two models by fixing in each model
+the number of existential variables to the same value. Under this constraint,
+the hardest formulas in the basic controlled model contain more universal
+variables than it is the case for the hardest formulas from the Chen-Interian
+model. However, for the generalized controlled model and its smooth 
+version, both discussed in Generalized Controlled Model , this relationship
+reverses. The hardest formulas from the (smooth) generalized controlled model
+have many fewer universal variables than the hardest ones from the
+Chen-Interian model. Developing alternative perspectives on formulas from
+the two models might provide a better understanding of the relative hardness.
+This is an important avenue to explore and it requires further studies.
+
+ 
+ 
+ 
+
+## Acknowledgments
+
+ 
+ The work of the first two authors has been partially supported by
+the Italian Ministry for Economic Development (MISE) under the project
+“PIUCultura – Paradigmi Innovativi per l’Utilizzo della Cultura”
+(n. F/020016/01-02/X27), and under project “Smarter Solutions in the Big
+Data World (S2BDW)” (n. F/050389/01-03/X32) funded within the call
+“HORIZON2020” PON I C 2014-2020. The work of the third author has been
+partially supported by the the NSF grant IIS-1707371.
+
+ 
+ 
+ 
+
+## References
+
+ 
+ 
+ [1] 
+ 
+D. Achlioptas.
+
+ 
+ Random satisfiability.
+
+ 
+ In A. Biere, M. Heule, H. van Maaren, and T. Walsh, editors, Handbook of Satisfiability , volume 185 of Frontiers in Artificial
+Intelligence and Applications , pages 245–270. IOS Press, 2009.
+
+ 
+
+ 
+ [2] 
+ 
+D. Achlioptas and C. Moore.
+
+ 
+ The asymptotic order of the random k -sat threshold.
+
+ 
+ In 43rd Symposium on Foundations of Computer Science (FOCS
+2002), 16-19 November 2002, Vancouver, BC, Canada, Proceedings , pages
+779–788. IEEE Computer Society, 2002.
+
+ 
+
+ 
+ [3] 
+ 
+M. Alviano, C. Dodaro, N. Leone, and F. Ricca.
+
+ 
+ Advances in WASP.
+
+ 
+ In F. Calimeri, G. Ianni, and M. Truszczynski, editors, Logic
+Programming and Nonmonotonic Reasoning - 13th International Conference,
+LPNMR 2015, Lexington, KY, USA, September 27-30, 2015. Proceedings , volume
+9345 of Lecture Notes in Computer Science , pages 40–54. Springer,
+2015.
+
+ 
+
+ 
+ [4] 
+ 
+G. Amendola, F. Ricca, and M. Truszczynski.
+
+ 
+ Generating hard random boolean formulas and disjunctive logic
+programs.
+
+ 
+ In Proceedings of the Twenty-Sixth International Joint
+Conference on Artificial Intelligence, IJCAI 2017, Melbourne, Australia,
+August 19-25, 2017 , pages 532–538, 2017.
+
+ 
+
+ 
+ [5] 
+ 
+C. Ansótegui, M. L. Bonet, and J. Levy.
+
+ 
+ Towards industrial-like random SAT instances.
+
+ 
+ In C. Boutilier, editor, IJCAI 2009, Proceedings of the 21st
+International Joint Conference on Artificial Intelligence, Pasadena,
+California, USA, July 11-17, 2009 , pages 387–392, 2009.
+
+ 
+
+ 
+ [6] 
+ 
+C. Ansótegui, M. L. Bonet, J. Levy, and F. Manyà.
+
+ 
+ Measuring the hardness of SAT instances.
+
+ 
+ In D. Fox and C. P. Gomes, editors, Proceedings of the
+Twenty-Third AAAI Conference on Artificial Intelligence, AAAI 2008,
+Chicago, Illinois, USA, July 13-17, 2008 , pages 222–228. AAAI Press,
+2008.
+
+ 
+
+ 
+ [7] 
+ 
+G. Audemard, J. Lagniez, and L. Simon.
+
+ 
+ Improving glucose for incremental SAT solving with assumptions:
+Application to MUS extraction.
+
+ 
+ In M. Järvisalo and A. V. Gelder, editors, Theory and
+Applications of Satisfiability Testing - SAT 2013 - 16th International
+Conference, Helsinki, Finland, July 8-12, 2013. Proceedings , volume 7962 of
+ Lecture Notes in Computer Science , pages 309–317. Springer, 2013.
+
+ 
+
+ 
+ [8] 
+ 
+A. Biere.
+
+ 
+ Lingeling essentials, A tutorial on design and implementation
+aspects of the the SAT solver lingeling.
+
+ 
+ In D. L. Berre, editor, POS-14. Fifth Pragmatics of SAT
+workshop, a workshop of the SAT 2014 conference, part of FLoC 2014 during
+the Vienna Summer of Logic, July 13, 2014, Vienna, Austria , volume 27 of
+ EPiC Series in Computing , page 88. EasyChair, 2014.
+
+ 
+
+ 
+ [9] 
+ 
+G. Brewka, T. Eiter, and M. Truszczynski.
+
+ 
+ Answer set programming at a glance.
+
+ 
+ Commun. ACM , 54(12):92–103, 2011.
+
+ 
+
+ 
+ [10] 
+ 
+R. Brummayer, F. Lonsing, and A. Biere.
+
+ 
+ Automated testing and debugging of SAT and QBF solvers.
+
+ 
+ In O. Strichman and S. Szeider, editors, Theory and Applications
+of Satisfiability Testing - SAT 2010, 13th International Conference, SAT
+2010, Edinburgh, UK, July 11-14, 2010. Proceedings , volume 6175 of Lecture Notes in Computer Science , pages 44–57. Springer, 2010.
+
+ 
+
+ 
+ [11] 
+ 
+F. Calimeri, M. Gebser, M. Maratea, and F. Ricca.
+
+ 
+ Design and results of the fifth answer set programming competition.
+
+ 
+ Artif. Intell. , 231:151–181, 2016.
+
+ 
+
+ 
+ [12] 
+ 
+H. Chen and Y. Interian.
+
+ 
+ A model for generating random quantified boolean formulas.
+
+ 
+ In L. P. Kaelbling and A. Saffiotti, editors, IJCAI-05,
+Proceedings of the Nineteenth International Joint Conference on Artificial
+Intelligence, Edinburgh, Scotland, UK, July 30 - August 5, 2005 , pages
+66–71. Professional Book Center, 2005.
+
+ 
+
+ 
+ [13] 
+ 
+C. Coarfa, D. D. Demopoulos, A. S. M. Aguirre, D. Subramanian, and M. Y. Vardi.
+
+ 
+ Random 3-sat: The plot thickens.
+
+ 
+ In R. Dechter, editor, Principles and Practice of Constraint
+Programming - CP 2000, 6th International Conference, Singapore, September
+18-21, 2000, Proceedings , volume 1894 of Lecture Notes in Computer
+Science , pages 143–159. Springer, 2000.
+
+ 
+
+ 
+ [14] 
+ 
+J. M. Crawford and L. D. Auton.
+
+ 
+ Experimental results on the crossover point in random 3-sat.
+
+ 
+ Artif. Intell. , 81(1-2):31–57, 1996.
+
+ 
+
+ 
+ [15] 
+ 
+N. Creignou, U. Egly, and M. Seidl.
+
+ 
+ A framework for the specification of random SAT and QSAT
+formulas.
+
+ 
+ In A. D. Brucker and J. Julliand, editors, Tests and Proofs -
+6th International Conference, TAP 2012, Prague, Czech Republic, May 31 -
+June 1, 2012. Proceedings , volume 7305 of Lecture Notes in Computer
+Science , pages 163–168. Springer, 2012.
+
+ 
+
+ 
+ [16] 
+ 
+G. Dequen and O. Dubois.
+
+ 
+ An efficient approach to solving random k -satproblems.
+
+ 
+ J. Autom. Reasoning , 37(4):261–276, 2006.
+
+ 
+
+ 
+ [17] 
+ 
+J. Díaz, L. M. Kirousis, D. Mitsche, and X. Pérez-Giménez.
+
+ 
+ On the satisfiability threshold of formulas with three literals per
+clause.
+
+ 
+ Theor. Comput. Sci. , 410(30-32):2920–2934, 2009.
+
+ 
+
+ 
+ [18] 
+ 
+T. Eiter and G. Gottlob.
+
+ 
+ On the computational cost of disjunctive logic programming:
+Propositional case.
+
+ 
+ Ann. Math. Artif. Intell. , 15(3-4):289–323, 1995.
+
+ 
+
+ 
+ [19] 
+ 
+M. Gebser, R. Kaminski, A. König, and T. Schaub.
+
+ 
+ Advances in gringo series 3.
+
+ 
+ In J. P. Delgrande and W. Faber, editors, Logic Programming and
+Nonmonotonic Reasoning - 11th International Conference, LPNMR 2011,
+Vancouver, Canada, May 16-19, 2011. Proceedings , volume 6645 of Lecture
+Notes in Computer Science , pages 345–351. Springer, 2011.
+
+ 
+
+ 
+ [20] 
+ 
+M. Gebser, B. Kaufmann, A. Neumann, and T. Schaub.
+
+ 
+ clasp : A conflict-driven answer set solver.
+
+ 
+ In C. Baral, G. Brewka, and J. S. Schlipf, editors, Logic
+Programming and Nonmonotonic Reasoning, 9th International Conference, LPNMR
+2007, Tempe, AZ, USA, May 15-17, 2007, Proceedings , volume 4483 of Lecture Notes in Computer Science , pages 260–265. Springer, 2007.
+
+ 
+
+ 
+ [21] 
+ 
+M. Gebser, B. Kaufmann, and T. Schaub.
+
+ 
+ Advanced conflict-driven disjunctive answer set solving.
+
+ 
+ In F. Rossi, editor, IJCAI 2013, Proceedings of the 23rd
+International Joint Conference on Artificial Intelligence, Beijing, China,
+August 3-9, 2013 , pages 912–918. IJCAI/AAAI, 2013.
+
+ 
+
+ 
+ [22] 
+ 
+M. Gelfond.
+
+ 
+ Answer sets.
+
+ 
+ In F. van Harmelen, V. Lifschitz, and B. W. Porter, editors, Handbook of Knowledge Representation , volume 3 of Foundations of
+Artificial Intelligence , pages 285–316. Elsevier, 2008.
+
+ 
+
+ 
+ [23] 
+ 
+I. P. Gent and T. Walsh.
+
+ 
+ Beyond NP: the QSAT phase transition.
+
+ 
+ In J. Hendler and D. Subramanian, editors, Proceedings of the
+Sixteenth National Conference on Artificial Intelligence and Eleventh
+Conference on Innovative Applications of Artificial Intelligence, July 18-22,
+1999, Orlando, Florida, USA. , pages 648–653. AAAI Press / The MIT
+Press, 1999.
+
+ 
+
+ 
+ [24] 
+ 
+J. Giráldez-Cru and J. Levy.
+
+ 
+ Generating SAT instances with community structure.
+
+ 
+ Artif. Intell. , 238:119–134, 2016.
+
+ 
+
+ 
+ [25] 
+ 
+M. Heule, M. Järvisalo, F. Lonsing, M. Seidl, and A. Biere.
+
+ 
+ Clause elimination for SAT and QSAT.
+
+ 
+ J. Artif. Intell. Res. (JAIR) , 53:127–168, 2015.
+
+ 
+
+ 
+ [26] 
+ 
+M. Janota, W. Klieber, J. Marques-Silva, and E. M. Clarke.
+
+ 
+ Solving QBF with counterexample guided refinement.
+
+ 
+ Artif. Intell. , 234:1–25, 2016.
+
+ 
+
+ 
+ [27] 
+ 
+M. Järvisalo, D. L. Berre, O. Roussel, and L. Simon.
+
+ 
+ The international SAT solver competitions.
+
+ 
+ AI Magazine , 33(1), 2012.
+
+ 
+
+ 
+ [28] 
+ 
+A. C. Kaporis, L. M. Kirousis, and E. G. Lalas.
+
+ 
+ Selecting complementary pairs of literals.
+
+ 
+ Electronic Notes in Discrete Mathematics , 16:47–70, 2003.
+
+ 
+
+ 
+ [29] 
+ 
+H. A. Kautz and B. Selman.
+
+ 
+ Ten challenges redux: Recent progress in propositional reasoning and
+search.
+
+ 
+ In F. Rossi, editor, Principles and Practice of Constraint
+Programming - CP 2003, 9th International Conference, CP 2003, Kinsale,
+Ireland, September 29 - October 3, 2003, Proceedings , volume 2833 of Lecture Notes in Computer Science , pages 1–18. Springer, 2003.
+
+ 
+
+ 
+ [30] 
+ 
+W. Klieber, M. Janota, J. Marques-Silva, and E. M. Clarke.
+
+ 
+ Solving QBF with free variables.
+
+ 
+ In C. Schulte, editor, Principles and Practice of Constraint
+Programming - 19th International Conference, CP 2013, Uppsala, Sweden,
+September 16-20, 2013. Proceedings , volume 8124 of Lecture Notes in
+Computer Science , pages 415–431. Springer, 2013.
+
+ 
+
+ 
+ [31] 
+ 
+C. Koch, N. Leone, and G. Pfeifer.
+
+ 
+ Enhancing disjunctive logic programming systems by SAT checkers.
+
+ 
+ Artif. Intell. , 151(1-2):177–212, 2003.
+
+ 
+
+ 
+ [32] 
+ 
+D. G. Mitchell.
+
+ 
+ Resolution complexity of random constraints.
+
+ 
+ In P. V. Hentenryck, editor, Principles and Practice of
+Constraint Programming - CP 2002, 8th International Conference, CP 2002,
+Ithaca, NY, USA, September 9-13, 2002, Proceedings , volume 2470 of Lecture Notes in Computer Science , pages 295–309. Springer, 2002.
+
+ 
+
+ 
+ [33] 
+ 
+D. G. Mitchell, B. Selman, and H. J. Levesque.
+
+ 
+ Hard and easy distributions of SAT problems.
+
+ 
+ In W. R. Swartout, editor, Proceedings of the 10th National
+Conference on Artificial Intelligence. San Jose, CA, July 12-16, 1992. ,
+pages 459–465. AAAI Press / The MIT Press, 1992.
+
+ 
+
+ 
+ [34] 
+ 
+G. Namasivayam and M. Truszczynski.
+
+ 
+ Simple random logic programs.
+
+ 
+ In E. Erdem, F. Lin, and T. Schaub, editors, Logic Programming
+and Nonmonotonic Reasoning, 10th International Conference, LPNMR 2009,
+Potsdam, Germany, September 14-18, 2009. Proceedings , volume 5753 of Lecture Notes in Computer Science , pages 223–235. Springer, 2009.
+
+ 
+
+ 
+ [35] 
+ 
+M. Narizzano, L. Pulina, and A. Tacchella.
+
+ 
+ Report of the third QBF solvers evaluation.
+
+ 
+ JSAT , 2(1-4):145–164, 2006.
+
+ 
+
+ 
+ [36] 
+ 
+J. A. N. Pérez and A. Voronkov.
+
+ 
+ Generation of hard non-clausal random satisfiability problems.
+
+ 
+ In M. M. Veloso and S. Kambhampati, editors, Proceedings, The
+Twentieth National Conference on Artificial Intelligence and the Seventeenth
+Innovative Applications of Artificial Intelligence Conference, July 9-13,
+2005, Pittsburgh, Pennsylvania, USA , pages 436–442. AAAI Press / The
+MIT Press, 2005.
+
+ 
+
+ 
+ [37] 
+ 
+G. Pfeifer.
+
+ 
+ Improving the model generation/checking interplay to enhance the
+evaluation of disjunctive programs.
+
+ 
+ In V. Lifschitz and I. Niemelä, editors, Logic Programming
+and Nonmonotonic Reasoning, 7th International Conference, LPNMR 2004, Fort
+Lauderdale, FL, USA, January 6-8, 2004, Proceedings , volume 2923 of Lecture Notes in Computer Science , pages 220–233. Springer, 2004.
+
+ 
+
+ 
+ [38] 
+ 
+F. Pigorsch and C. Scholl.
+
+ 
+ An aig-based qbf-solver using SAT for preprocessing.
+
+ 
+ In S. S. Sapatnekar, editor, Proceedings of the 47th Design
+Automation Conference, DAC 2010, Anaheim, California, USA, July 13-18,
+2010 , pages 170–175. ACM, 2010.
+
+ 
+
+ 
+ [39] 
+ 
+B. Selman, D. G. Mitchell, and H. J. Levesque.
+
+ 
+ Generating hard satisfiability problems.
+
+ 
+ Artif. Intell. , 81(1-2):17–29, 1996.
+
+ 
+
+ 
+ [40] 
+ 
+G. Tseitin.
+
+ 
+ On the complexity of derivation in propositional calculus.
+
+ 
+ In Automation of Reasoning , Symbolic Computation, pages
+466–483. Springer Berlin Heidelberg, 1983.
+
+ 
+
+ 
+ [41] 
+ 
+K. Wang, L. Wen, and K. Mu.
+
+ 
+ Random logic programs: Linear model.
+
+ 
+ TPLP , 15(6):818–853, 2015.
+
+ 
+
+ 
+ [42] 
+ 
+L. Wen, K. Wang, Y. Shen, and F. Lin.
+
+ 
+ A model for phase transition of random answer-set programs.
+
+ 
+ ACM Trans. Comput. Log. , 17(3):22:1–22:34, 2016.
+
+ 
+
+ 
+ [43] 
+ 
+D. Wong, J. Schlipf, and M. Truszczyński.
+
+ 
+ On the distribution of programs with stable models.
+
+ 
+ Dagstuhl Seminar 05171: Nonmonotonic Reasoning, Answer Set
+Programming and Constraints, 2005.
+
+ 
+
+ 
+ [44] 
+ 
+Y. Zhao and F. Lin.
+
+ 
+ Answer set programming phase transition: A study on randomly
+generated programs.
+
+ 
+ In C. Palamidessi, editor, Logic Programming, 19th International
+Conference, ICLP 2003, Mumbai, India, December 9-13, 2003, Proceedings ,
+volume 2916 of Lecture Notes in Computer Science , pages 239–253.
+Springer, 2003.
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+
+## Appendix
+
+ 
+
+### Generalized Controlled Model
+
+ 
+ The controlled model Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) 
+introduced in Section  3.1 , stipulates
+that every clause in the matrix of a QBF from the model contains exactly one
+universal variable, and that each universal variable occurs in exactly two
+clauses, in one of them as a positive literal (not negated) and in the other
+one as the negative literal (negated). It follows that Q 𝑐𝑡𝑑 ​ ( k , A , E ) ⊆ Q ⁡ ( 1 , k − 1 , A , E , 2 ​ A ) Q^{\mathit{ctd}}(k,A,E)\subseteq Q(1,k-1;A,E;2A) , that is, the controlled model Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) 
+is a restriciton of the Chen-Interian model Q ⁡ ( 1 , k − 1 , A , E , 2 ​ A ) Q(1,k-1;A,E;2A) . Moreover,
+the key property of the controlled model Q 𝑐𝑡𝑑 ​ ( k , A , E ) Q^{\mathit{ctd}}(k,A,E) is that, for every
+truth assignment to the universal variables in X X , once we simplify the
+matrix accordingly we are left with exactly A A ( k − 1 ) (k-1) -literal clauses
+over E E variables, whereas in the case of the Chen-Interian model
+ Q ⁡ ( 1 , k − 1 , A , E , 2 ​ A ) Q(1,k-1;A,E;2A) , similar simplifications leave us with with varying number of ( k − 1 ) (k-1) -clauses, with the average number being
+ A A .
+
+ 
+ 
+ We now generalize the model to allow clauses with exactly h h occurrences of
+universal variables, where h h is a fixed integer satidfying 1 ≤ h ≤ k 1\leq h\leq k .
+More precisely, the model consists of QBFs ∀ X ​ ∃ Y ​ F \forall X\exists Y\ F , where
+ F F consists of ( A h ) ​ 2 h \binom{A}{h}2^{h} k k -literal clauses, each clause consists
+of h h literals over X X and k − h k-h literals over Y Y (with no repetitions of
+variables), and where for every consistent set of h h literals over X X there
+is a single clause in the formula that contains them. A QBF in this model
+(to be precise, its matrix) is obtained by generating ( A h ) ​ 2 h \binom{A}{h}2^{h} 
+ h h -literal clauses over X X and extending each of them by a randomly
+generated consistent ( k − h ) (k-h) -element set of literals over Y Y . We denote the
+set of QBFs obtained in this way by Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) and call it the
+ generalized controlled model .
+
+ 
+ 
+ Clearly, Q 𝑐𝑡𝑑 ​ ( k , A , E ) = Q 𝑔𝑐𝑡𝑑 ​ ( 1 , k − 1 , A , E ) Q^{\mathit{ctd}}(k,A,E)=Q^{\mathit{gctd}}(1,k-1,A,E) . Thus, the controlled model
+we discussed in the paper is a special case of the model described here.
+We also note that Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) ⊆ Q ⁡ ( h , k − h , A , E , ( A h ) ​ 2 h ) Q^{\mathit{gctd}}(h,k-h,A,E)\subseteq Q(h,k-h;A,E;\binom{A}{h}2^{h}) .
+Thus, the generalized controlled model is a restriction of the appropriate
+Chen-Interian model — while random with respect to variables in Y Y 
+(existentially quantified variables), the way variables in X X (universally
+quantified variables) are treated is fully deterministic. In particular, for
+every truth assignment on X X , once we simplify the matrix accordingly,
+we are left with exactly ( A h ) \binom{A}{h} ( k − h ) (k-h) -literal clauses
+over E E variables in Y Y , while in the case of the Chen-Interian model
+ Q ⁡ ( h , k − h , A , E , ( A h ) ​ 2 h ) Q(h,k-h;A,E;\binom{A}{h}2^{h}) , similar simplifications leave us with
+ ( k − h ) (k-h) -CNF formulas with varying number of clauses, with the
+ average number being ( A h ) \binom{A}{h} .
+
+ 
+ 
+ Example 6.1 . 
+ 
+ Consider a set X = { x 1 , x 2 , x 3 } X=\{x_{1},x_{2},x_{3}\} of A = 3 A=3 universal variables and a set
+ Y = { y 1 , y 2 , y 3 , y 4 } Y=\{y_{1},y_{2},y_{3},y_{4}\} of E = 4 E=4 existential variables. We are interested
+in “generalized controlled formulas” having k = 5 k=5 literals with h = 2 h=2 of
+them over X X . That is, we are interested in the model Q 𝑔𝑐𝑡𝑑 ​ ( 2 , 3 , 3 , 4 ) Q^{\mathit{gctd}}(2,3,3,4) .
+According to the definition, we have to build ( 3 2 ) ​ 2 2 = 12 \binom{3}{2}2^{2}=12 clauses
+of length 5 5 . For an appropriate enumeration C i C_{i} , i = 1 , … , 12 i=1,\ldots,12 , these
+clauses will satisfy: 
+
+ { x 1 , x 2 } ⊆ C 1 { x 1 , x 3 } ⊆ C 5 { x 2 , x 3 } ⊆ C 9 { ¬ x 1 , x 2 } ⊆ C 2 { ¬ x 1 , x 3 } ⊆ C 6 { ¬ x 2 , x 3 } ⊆ C 10 { x 1 , ¬ x 2 } ⊆ C 3 { x 1 , ¬ x 3 } ⊆ C 7 { x 2 , ¬ x 3 } ⊆ C 11 { ¬ x 1 , ¬ x 2 } ⊆ C 4 { ¬ x 1 , ¬ x 3 } ⊆ C 8 { ¬ x 2 , ¬ x 3 } ⊆ C 12 \begin{array}[]{rclrclrcl}\{x_{1},x_{2}\} \subseteq C_{1} \{x_{1},x_{3}\} \subseteq C_{5} \{x_{2},x_{3}\} \subseteq C_{9}\\
+\{\neg x_{1},x_{2}\} \subseteq C_{2} \{\neg x_{1},x_{3}\} \subseteq C_{6} \{\neg x_{2},x_{3}\} \subseteq C_{10}\\
+\{x_{1},\neg x_{2}\} \subseteq C_{3} \{x_{1},\neg x_{3}\} \subseteq C_{7} \{x_{2},\neg x_{3}\} \subseteq C_{11}\\
+\{\neg x_{1},\neg x_{2}\} \subseteq C_{4} \{\neg x_{1},\neg x_{3}\} \subseteq C_{8} \{\neg x_{2},\neg x_{3}\} \subseteq C_{12}\end{array} 
+
+ Let us choose any truth assignment σ \sigma on X X , for instance,
+ σ ⁡ ( x 1 ) = x 1 \sigma(x_{1})=x_{1} , σ ⁡ ( x 2 ) = ¬ x 2 \sigma(x_{2})=\neg x_{2} , and σ ⁡ ( x 3 ) = ¬ x 3 \sigma(x_{3})=\neg x_{3} .
+Once we simplify the clauses with respect to this assignment, exactly
+ ( 3 2 ) = 3 \binom{3}{2}=3 clauses
+ C 2 ∖ { ¬ x 1 , x 2 } C_{2}\setminus\{\neg x_{1},x_{2}\} ,
+ C 6 ∖ { ¬ x 1 , x 3 } C_{6}\setminus\{\neg x_{1},x_{3}\} and
+ C 9 ∖ { x 2 , x 3 } C_{9}\setminus\{x_{2},x_{3}\} 
+remain
+(all other
+clauses after the simplifications become tutologies and can be dropped). 
+
+ 
+ 
+ 
+ Let q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) q^{\mathit{gctd}}(h,k-h,A,E) denote the probability that a random formula in
+ Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) is true.
+We define μ l 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{l}(h,k-h) 
+to be the supremum over all positive real numbers ρ \rho such that
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ ρ ​ E 1 / h ⌋ , E ) = 1 , \lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor\rho E^{1/h}\rfloor,E)=1, | 
+ | 
+ 
+
+ and μ u 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{u}(h,k-h) to be the infimum over all positive real numbers ρ \rho such that
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ ρ ​ E 1 / h ⌋ , E ) = 0 . \lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor\rho E^{1/h}\rfloor,E)=0. | 
+ | 
+ 
+
+ 
+ 
+ We will now derive bounds on μ l 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{l}(h,k-h) and μ u 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{u}(h,k-h) by
+exploiting results on random ( k − h ) (k-h) -CNF formulas. The proof is an adaptation
+of the proof of Theorem 3.1 .
+
+ 
+ 
+ Theorem 6.1 . 
+ 
+ For every integers k k and h h such that k ≥ 2 k\geq 2 and 1 ≤ h k 1\leq h k ,
+ μ l 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{l}(h,k-h) and μ u 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{u}(h,k-h) are well defined. 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ Let Φ ∈ Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) \Phi\in Q^{\mathit{gctd}}(h,k-h,A,E) , X = { x 1 , … , x A } X=\{x_{1},...,x_{A}\} , and
+ Y = { y 1 , … , y E } Y=\{y_{1},...,y_{E}\} . By the definition, Φ = ∀ X ​ ∃ Y ​ F \Phi=\forall X\exists YF , where
+ F = C 1 ∧ … ∧ C N F=C_{1}\wedge\ldots\wedge C_{N} is a k k -CNF formula of N = ( A h ) ​ 2 h N=\binom{A}{h}2^{h} 
+clauses C i = l i , 1 ∨ … ∨ l i , k C_{i}=l_{i,1}\vee\ldots\vee l_{i,k} such that l i , 1 , … , l i , h l_{i,1},\ldots,l_{i,h} are literals over X X and l i , h + 1 , … , l i , k l_{i,h+1},\ldots,l_{i,k} are literals
+over Y Y . We define C i Y = l i , h + 1 ∨ … ∨ l i , k C_{i}^{Y}=l_{i,h+1}\vee\ldots\vee l_{i,k} and F Y = C 1 Y ∧ … ∧ C N Y F^{Y}=C_{1}^{Y}\land\ldots\land C_{N}^{Y} . Moreover, for every
+interpretation I I of X X we define F | I = ⋀ { C i Y ∣ C i ∈ F ​  and  ​ I ⊧̸ l i , 1 ∨ … ∨ l i , h } F|_{I}=\bigwedge\{C_{i}^{Y}\mid C_{i}\in F\mbox{ and }I\not\models l_{i,1}\lor\ldots\lor l_{i,h}\} . 
+
+ 
+ 
+ Let us assume that Φ \Phi is selected from Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) uniformly
+at random. By the definition of the model Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) , F Y F^{Y} can
+be regarded as selected from C ⁡ ( k − h , N , E ) C(k-h,N,E) uniformly at random and, for each
+truth assignment I I of X X , F | I F|_{I} can be regarded as selected uniformly at
+random from C ⁡ ( k − h , M , E ) C(k-h,M,E) , where M = ( A h ) M=\binom{A}{h} . 
+
+ 
+ 
+ To show that μ u 𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{gctd}}_{u}(h,k-h) are well defined, it is enough to show that
+there are r r and s s such that 
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ r ​ E 1 / h ⌋ , E ) = 0 and lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ s ​ E 1 / h ⌋ , E ) = 1 . \lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor rE^{1/h}\rfloor,E)=0\quad\mbox{and}\quad\lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor sE^{1/h}\rfloor,E)=1. | 
+ | 
+ 
+
+ The proof relies on an obvious property that for every fixed positive
+integer h h , there are positive constants α h \alpha_{h} and β h \beta_{h} such that
+for every sufficiently large positive integer A A , 
+
+ 
+
+ 
+ | 
+ β h ​ A h ≥ ( A h ) ≥ α h ​ A h . \beta_{h}A^{h}\geq\binom{A}{h}\geq\alpha_{h}A^{h}. | 
+ | 
+ 
+
+ 
+ 
+ To prove the existence of r r , let us fix any real r r such that
+ α h ​ ( r / 2 ) h ρ u ​ ( k − h ) \alpha_{h}(r/2)^{h} \rho_{u}(k-h) ,
+and let A = ⌊ r ​ E 1 / h ⌋ A=\lfloor rE^{1/h}\rfloor . Next, let Φ = ∀ X ​ ∃ Y ​ F \Phi=\forall X\exists YF be a QBF selected uniformly at random from Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) and
+ I I be a truth assingment on X X . Clearly, if F | I F|_{I} is unsatisfiable, then
+ Φ \Phi is false. 
+
+ 
+ 
+ For all sufficiently large E E , we have A ≥ ( r / 2 ) ​ E 1 / h A\geq(r/2)E^{1/h} .
+Consequently, A h ≥ ( r / 2 ) h ​ E A^{h}\geq(r/2)^{h}E and 
+
+ 
+
+ 
+ | 
+ ( A h ) ≥ α h ​ ( r / 2 ) h ​ E . \binom{A}{h}\geq\alpha_{h}(r/2)^{h}E. | 
+ | 
+ 
+
+ Since α h ​ ( r / 2 ) h ρ u ​ ( k − h ) \alpha_{h}(r/2)^{h} \rho_{u}(k-h) , it follows that the probability
+that F | I F|_{I} is unsatisfiable tends to 1 with E E . Thus, the probability that
+ Φ \Phi is false tends to 0 with E E , too. In other words, 
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ r ​ E 1 / h ⌋ , E ) = 0 . \lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor rE^{1/h}\rfloor,E)=0. | 
+ | 
+ 
+
+ 
+ 
+ To prove the existence of s s we proceed similarly. Let s s be any positive
+real such that 2 h ​ β h ​ s h ≤ ρ l ​ ( k − h ) 2^{h}\beta_{h}s^{h}\leq\rho_{l}(k-h) and let A = ⌊ s ​ E 1 / h ⌋ A=\lfloor sE^{1/h}\rfloor . Further, as before, let Φ = ∀ X ​ ∃ Y ​ F \Phi=\forall X\exists YF be
+a QBF selected uniformly at random from Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) . 
+
+ 
+ 
+ Clearly, if the formula F Y F^{Y} is satisfiable, then for every interpretation
+ I I of X X , the formula F | I F|_{I} is satisfiable or, equivalently, Φ \Phi is
+true. In our case, we have that A ≤ s ​ E 1 / h A\leq sE^{1/h} . Thus, A h ≤ s h ​ E A^{h}\leq s^{h}E .
+It follows that 2 h ​ ( A h ) ≤ 2 h ​ β h ​ s h ​ E 2^{h}\binom{A}{h}\leq 2^{h}\beta_{h}s^{h}E .
+Thus, 2 h ​ ( A h ) / E ≤ 2 h ​ β h ​ s h ρ l ​ ( k − h ) 2^{h}\binom{A}{h}/E\leq 2^{h}\beta_{h}s^{h} \rho_{l}(k-h) . It follows
+that the probability that F Y F^{Y} is satisfiable tends to 1 with E E and so,
+the probability that Φ \Phi is true tends to 1 1 with E E . In other words, 
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , ⌊ s ​ E 1 / h ⌋ , E ) = 1 . \lim_{E\rightarrow\infty}q^{\mathit{gctd}}(h,k-h,\lfloor sE^{1/h}\rfloor,E)=1. | 
+ | 
+ 
+
+ 
+ 
+ ∎ 
+
+ 
+ 
+ 
+ Figure 12 : Comparing Chen-Interian and Generalized Controlled model: hardness comparison. 
+ 
+ 
+
+#### Empirical Behavior.
+
+ 
+ We now discuss properties of the generalized controlled model presented above.
+In particular we compare the generalized controlled and the Chen-Interian
+models with respect to the hardness of formulas having the same number of
+variables, and comment on one possible extension of the generalized model.
+
+ 
+ 
+ We consider formulas from the Chen-Interian model Q ⁡ ( a , e , A , E , m ) Q(a,e;A,E;m) , where we set a = 2 a=2 , e = 3 e=3 , and E = 32 E=32 ,
+and vary the number A A of universal variables over the range [ 2..80 ] [2..80] 
+and the number m m of clauses over the range [ 10..1200 ] [10..1200] .
+As we did in Section  5.3 , we compare the hardness properties of the generalized controlled and the Chen-Interian models with the same number of existential variables.
+These results are shown in Figure  12 .
+For the controlled model, for each value of A A , the value on the corresponding hardness graph (the blue line) is obtained by averaging the solve times on formulas generated from the model Q 𝑔𝑐𝑡𝑑 ​ ( 2 , 3 , A , 32 ) Q^{\mathit{gctd}}(2,3,A,32) .
+The matrices of these formulas are 5-CNF formulas over A + 32 A+32 variables and with 4 ​ ( A 2 ) 4\binom{A}{2} clauses. The
+corresponding point on the hardness graph for the Chen-Interian model is
+obtained by averaging the solve times on formulas generated from the model
+ Q ⁡ ( 2 , 3 , A , 32 , m ​ a ​ x ) Q(2,3;A,32;max) , where for each A A and E = 32 E=32 , m ​ a ​ x max is selected to
+maximize the solve times (in particular, it falls in the phase transition
+region for the combination of the values A A and E = 32 E=32 ). The matrices of
+these formulas are 5-CNF formulas over A + 32 A+32 variables and m m clauses.
+The results show that the peak hardness regions for the two models are not
+aligned. Comparing this results with the one in
+Figure  4 we note that the generalized controlled
+model instances are much easier to solve than Chen-Interian ones, almost in
+every setting. The peak hardness from the generalized controlled model
+instances happens before the maximum hardness the peak hardness region for
+the Chen-Interian model. This is the opposite of what happens for (basic)
+controlled model instances as shown in Figure  4 .
+
+ 
+ 
+ One possible weakness of the generalized controlled model is that the number
+of clauses, m = 4 ​ ( A 2 ) m=4\binom{A}{2} , grows quadratically with the number A A of
+universal variables. Informally, this growth creates “long jumps” in terms
+of the number of clauses in a formula as we increment A A and so, also the
+corresponding jumps in the ratio of the number of clauses to the number of
+existential variables. That may cause the model to miss the “sweet spot”
+of maximum hardness. For example, already in our experiment with h = 2 h=2 ,
+formulas with A = 14 A=14 feature 364 clauses, and formulas with A = 15 A=15 feature
+420 clauses. We established experimentally that formulas with A = 14 A=14 are
+satisfied with the frequency 0.1 ~0.1 , whereas the frequency of a satisfiable
+instance for A = 15 A=15 is 1.
+
+ 
+ 
+ In order to verify whether the “jumps” contribute to the generation of
+easier formulas, we further extended the generalized controlled model to
+fill the gaps. Specifically, the smooth generalized controlled model,
+denoted by Q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , m ) Q^{\mathit{sgctd}}(h,k-h,E;m) , where we specify the number of existential
+variables and the number of clauses in the matrix, and where the number of
+universal variables is determined by the constraint 2 h ​ ( A − 1 h ) + 1 ≤ m ≤ 2 h ​ ( A h ) 2^{h}\binom{A-1}{h}+1\leq m\leq 2^{h}\binom{A}{h} . In particular, if m = 2 h ​ ( A h ) m=2^{h}\binom{A}{h} ,
+ Q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , m ) Q^{\mathit{sgctd}}(h,k-h,E;m) is defined to coincide with the generalized controlled
+model Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) . Formulas for m m satisfying 2 h ​ ( A − 1 h ) + 1 ≤ m 2 h ​ ( A h ) 2^{h}\binom{A-1}{h}+1\leq m 2^{h}\binom{A}{h} are obtained by generating an instance of
+ Q 𝑔𝑐𝑡𝑑 ​ ( h , k − h , A , E ) Q^{\mathit{gctd}}(h,k-h,A,E) and randomly choosing m m among its clauses.
+
+ 
+ 
+ A phase transition result holds also for the smooth generalized controlled
+model. Let q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , m ) q^{\mathit{sgctd}}(h,k-h,E;m) denote the probability that a random formula
+in Q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , m ) Q^{\mathit{sgctd}}(h,k-h,E;m) is true. We define μ l 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{sgctd}}_{l}(h,k-h) 
+to be the supremum over all positive real numbers ρ \rho such that
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , ⌊ ρ ​ E ⌋ ) = 1 , \lim_{E\rightarrow\infty}q^{\mathit{sgctd}}(h,k-h,E,\lfloor\rho E\rfloor)=1, | 
+ | 
+ 
+
+ and μ u 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{sgctd}}_{u}(h,k-h) to be the infimum over all positive real
+numbers ρ \rho such that
+
+ 
+
+ 
+ | 
+ lim E → ∞ q 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h , E , ⌊ ρ ​ m ⌋ ) = 0 . \lim_{E\rightarrow\infty}q^{\mathit{sgctd}}(h,k-h,E,\lfloor\rho m\rfloor)=0. | 
+ | 
+ 
+
+ Theorem 6.1 implies
+the following result.
+
+ 
+ 
+ Corollary 6.1 . 
+ 
+ For every integers k k and h h such that k ≥ 2 k\geq 2 and 1 ≤ h k 1\leq h k ,
+ μ l 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{sgctd}}_{l}(h,k-h) and μ u 𝑠𝑔𝑐𝑡𝑑 ​ ( h , k − h ) \mu^{\mathit{sgctd}}_{u}(h,k-h) are well defined. 
+
+ 
+ 
+ 
+ We experimented with the smooth generalized controlled model on the same
+setting as before but focusing on the phase transition region, that is, on
+values of A A that are close to 14. The results reported in
+Figure  13 were, thus, obtained varying A A from 10 to 18 (so
+ 150 ≤ m ≤ 612 150\leq m\leq 612 ). It can be noted that the smooth model allows us to
+generate formulas that are precisely in the phase transition zone, moreover
+we can obtain harder formulas. Nonetheless, the smooth generalized controlled
+model remains less hard than the Chen-Interian model, if we compare the
+hardest formulas that can be generated with the same number of existential
+variables, disregarding the number of universal variables. As we noted in
+the main part of the paper, alternative ways to compare the hardness of
+the models may exist and finding them is an important open research question.
+
+ 
+ 
+ Figure 13 : Comparing Generalized Controlled model with Smooth Generalized Controlled model. 
+ 
+ 
+ 
+ 
+
+### Additional notes on the generation of formulas
+
+ 
+ Let X X be a set consisting of N N elements. We will consider the
+following method to generate random elements of X t X^{t} (the set of all
+ t t -tuples over X X ):
+
+ 
+ for each position i i , 1 ≤ i ≤ t 1\leq i\leq t , select an element from X X 
+uniformly at random.
+
+ 
+ Clearly, every element of X t X^{t} is equally likely to appear as the result
+of this method. Thus, the method generates t t -tuples over X X uniformly
+at random.
+
+ 
+ 
+ Let S S be a property of t t -tuples over X X and let p N p_{N} be the probability
+that a t t -tuple generated by the method described above has the property S S .
+It follows that p N p_{N} is the probability that an t t -tuple selected from X t X^{t} 
+uniformly at random has the property S S .
+
+ 
+ 
+ Next, let us define
+
+ 
+
+ 
+ | 
+ D t ( X ) = { ⟨ x 1 , … , x t ⟩ ∈ X t : x i ≠ x j , for  i ≠ j } D^{t}(X)=\{\langle x_{1},\ldots,x_{t}\rangle\in X^{t}\colon x_{i}\neq x_{j},\ \mbox{for $i\neq j$}\} | 
+ | 
+ 
+
+ In other words, D t ​ ( X ) D^{t}(X) is the set of all tuples in X t X^{t} with
+no repeating elements.
+
+ 
+ 
+ Let S S be a property of tuples in X t X^{t} . We will denote by p N ′ p^{\prime}_{N} the
+probability that a tuple selected from D t ​ ( X ) D^{t}(X) uniformly at random
+has the property S S . Then, if t t is sufficiently smaller than N N , p N ′ p^{\prime}_{N} 
+can be closely estimated by p N p_{N} . To show that, let us define
+
+ 
+
+ 
+ | 
+ R t ​ ( X ) = X t ∖ D t ​ ( X ) . R^{t}(X)=X^{t}\setminus D^{t}(X). | 
+ | 
+ 
+
+ Clearly,
+
+ 
+
+ 
+ | 
+ p N = | S | | X t | and p N ′ = | D t ​ ( X ) ∩ S | | D t ​ ( X ) | . p_{N}=\frac{|S|}{|X^{t}|}\quad\mbox{and}\quad p^{\prime}_{N}=\frac{|D^{t}(X)\cap S|}{|D^{t}(X)|}. | 
+ | 
+ 
+
+ It follows that
+
+ 
+
+ 
+ | 
+ p N − | R t ​ ( X ) ∩ S | | X t | ≤ p N ′ ≤ p N + | R t ​ ( X ) ∖ S | | X t | p_{N}-\frac{|R^{t}(X)\cap S|}{|X^{t}|}\leq p^{\prime}_{N}\leq p_{N}+\frac{|R^{t}(X)\setminus S|}{|X^{t}|} | 
+ | 
+ 
+
+ and so,
+
+ 
+
+ 
+ | 
+ p N − | R t ​ ( X ) | | X t | ≤ p N ′ ≤ p N + | R t ​ ( X ) | | X t | p_{N}-\frac{|R^{t}(X)|}{|X^{t}|}\leq p^{\prime}_{N}\leq p_{N}+\frac{|R^{t}(X)|}{|X^{t}|} | 
+ | 
+ 
+
+ or, more explicitly,
+
+ 
+
+ 
+ | 
+ p N − ( 1 − ( N − t + 1 ) ⋯ ( N − 1 ) N N t ) ≤ p N ′ ≤ p N + ( 1 − ( N − t + 1 ) ⋯ ( N − 1 ) N N t ) . p_{N}-\big(1-\frac{(N-t+1)\cdots(N-1)N}{N^{t}}\big)\leq p^{\prime}_{N}\leq p_{N}+\big(1-\frac{(N-t+1)\cdots(N-1)N}{N^{t}}\big). | 
+ | 
+ 
+
+ 
+ 
+ Lemma 6.1 . 
+ 
+ If lim N → ∞ t 2 / N = 0 \lim_{N\rightarrow\infty}t^{2}/N=0 , then 
+
+ 
+
+ 
+ | 
+ lim N → ∞ ( N − t + 1 ) ⋯ ( N − 1 ) N N t = 1 \lim_{N\rightarrow\infty}\frac{(N-t+1)\cdots(N-1)N}{N^{t}}=1 | 
+ | 
+ 
+
+ 
+ 
+ 
+ Proof. 
+ 
+ : Clearly, 
+
+ 
+
+ 
+ | 
+ ( N − t N ) t ≤ ( N − t + 1 ) ⋯ ( N − 1 ) N N t ≤ 1 . \Bigl(\frac{N-t}{N}\Bigr)^{t}\leq\frac{(N-t+1)\cdots(N-1)N}{N^{t}}\leq 1. | 
+ | 
+ 
+
+ Moeover, 
+
+ 
+
+ 
+ | 
+ ( N − t N ) t = [ ( 1 − 1 N / t ) N / t ] t 2 / N \Bigl(\frac{N-t}{N}\Bigr)^{t}=\biggl[\Bigl(1-\frac{1}{N/t}\Bigr)^{N/t}\biggr]^{t^{2}/N} | 
+ | 
+ 
+
+ Since lim N → ∞ t 2 / N = 0 \lim_{N\rightarrow\infty}t^{2}/N=0 and t t is a positive integer,
+ lim N → ∞ N / t = ∞ \lim_{N\rightarrow\infty}N/t=\infty . Thus, 
+
+ 
+
+ 
+ | 
+ lim N → ∞ ( 1 − 1 N / t ) N / t = 1 / e \lim_{N\rightarrow\infty}\Bigl(1-\frac{1}{N/t}\Bigr)^{N/t}=1/e | 
+ | 
+ 
+
+ and, consequently, 
+
+ 
+
+ 
+ | 
+ lim N → ∞ [ ( 1 − 1 N / t ) N / t ] t 2 / N = 1 . \lim_{N\rightarrow\infty}\biggl[\Bigl(1-\frac{1}{N/t}\Bigr)^{N/t}\biggr]^{t^{2}/N}=1. | 
+ | 
+ 
+
+ ∎ 
+
+ 
+ 
+ 
+ Corollary 6.2 . 
+ 
+ If lim N → ∞ t 2 / N = 0 \lim_{N\rightarrow\infty}t^{2}/N=0 , then there is a sequence ε N \varepsilon_{N} such that lim N → ∞ ε N = 0 \lim_{N\rightarrow\infty}\varepsilon_{N}=0 
+and 
+
+ 
+
+ 
+ | 
+ p N − ε N ≤ p N ′ ≤ p N + ε N . p_{N}-\varepsilon_{N}\leq p^{\prime}_{N}\leq p_{N}+\varepsilon_{N}. | 
+ | 
+ 
+
+ 
+ 
+ 
+ Next, we observe that if the property S S does not depend on the
+order of the elements in a tuple in D t ​ ( X ) D^{t}(X) , that is, the probability
+that a tuple in D t ​ ( X ) D^{t}(X) has the property S S is the same for every
+permutation of the elements in the tuple), then the probability that a
+set of t t elements from X X has a property S S (its “set version”
+to be precise) is given by p N ′ p^{\prime}_{N} .
+
+ 
+ 
+ Our earlier discussion shows then that to estimate the probability that
+a t t -element subset of X X selected uniformly at random has a property
+ S S , it is sufficient to estimate the probability that a t t -tuple over X X 
+(an element of X t X^{t} ) selected uniformly at random has the property S S .
+
+ 
+ 
+ In this paper, we take advantage of this observation in the case when
+ X X consists of formulas and S S is the property that a set (tuple) of
+formulas is satisfiable ( 𝑆𝐴𝑇 \mathit{SAT} ), and unsatisfiable (UNSAT).
+
+ 
+ 
+ In particular, we consider in the paper the case when X X is the set of all
+non-tautological k-literal clauses over the set of n n 
+propositional variables. We note that | X | = 2 k ​ ( n k ) |X|=2^{k}{n\choose k} .
+It follows that when studying the probability that a k k -CNF formula
+with m m clauses is satisfiable, where m = O ⁡ ( n ) m=O(n) , the results above apply and
+the probabillity, in the limit, is the same no matter whether we vew formulas
+as sets or ordered tuples of clauses.
+
+ 
+ 
+ We also consider the case, when X X is the set of all k k -CNF formulas with m m 
+clauses over a set of n n variables, that is, the set C ⁡ ( k , n , m ) C(k,n,m) . Also here,
+it makes no difference whether a disjunction of such formulas is considered a set
+of those formulas or an ordered tuple of such formulas. Since we consider disjunctions
+of t t CNF formulas, where t t is fixed, the probability of such a disjunction being satisfiable
+is, in the limit, not affected by how we interpret the disjunction — as a set or an ordered tuple.

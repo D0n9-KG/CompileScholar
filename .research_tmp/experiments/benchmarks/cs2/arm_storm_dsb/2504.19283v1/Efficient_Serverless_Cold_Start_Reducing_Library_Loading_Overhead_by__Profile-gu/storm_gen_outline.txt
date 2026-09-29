@@ -1,0 +1,36 @@
+# Introduction
+# Background
+## Serverless Computing and Cold Start Latency
+## Library Initialization Overhead
+## Limitations of Static Analysis
+# Methodology
+## Profile-Guided Optimization Approach
+### Statistical Sampling
+### Call-Path Profiling
+## Identification of Inefficient Library Usage
+### Workload-Dependent Inefficiencies
+### Distinguishing Reachable from Frequently Used Code
+## Optimization Mechanism
+### Mitigation of Unused Library Initialization
+### Comparison with Standard Loading Methods
+# System Design
+## Runtime Instrumentation
+## Profile Data Utilization
+# Evaluation
+## Performance Improvements
+### Cold Start Latency Reduction
+## Overhead Analysis
+### Profiling Costs
+### Memory and Execution Time Impact
+# Discussion
+## Trade-offs and Risks
+### Impact on Service Level Agreements
+### Risks of Incorrect Optimization Decisions
+### Runtime Loader Complexity
+## Profile Maintenance and Bootstrapping
+### Initial Profile Generation
+### Handling Evolving Workloads
+## Comparison with Alternative Mitigation Strategies
+### Snapshotting and Pre-warming
+### Predictive Provisioning
+# Conclusion

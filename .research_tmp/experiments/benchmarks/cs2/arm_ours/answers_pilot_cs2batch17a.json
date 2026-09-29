@@ -1,0 +1,1681 @@
+[
+ {
+  "id": "46eecf06447c43657abf0420",
+  "type": "aggregation",
+  "question": "How does doping impact integrated circuit design?",
+  "gold_hint": "",
+  "answer": "Doping technology plays a pivotal role in determining the electrical and optical properties of semiconductor materials, which significantly affects overall device performance [coarse:c56081c26475]. Fundamentally, doping is defined as the intentional addition of impurities or atoms into intrinsic semiconductors to modulate their electrical, optical, and structural properties [coarse:0d997766e0b3] [coarse:c31f435a4932]. In the context of inorganic semiconductors, the controllably introduction of impurity atoms serves as the basic method to adjust conductivity and energy-level alignment [coarse:12f5e0644f71]. This process involves adding electron acceptors to p-type semiconductors or donors to n-type semiconductors [coarse:f8c6152]. The underlying semiconductor technology relies on the control of the migration and diffusion of quasi-particles of charge [coarse:899404fa32f0].\n\nIn specific integrated circuit architectures, doping parameters are critical for managing resistance and device characteristics [coarse:25a417858562]. In silicon CMOS technology, contact and spacer regions undergo heavy doping with concentrations ranging from 10^21 to 10^22 cm^-3 specifically to reduce access resistance [coarse:2ce92a068dd4]. For SOI inverters, retrograde doping engineering is recommended to reduce body resistance and maximize the threshold voltage shift (ΔVt) [coarse:95fc1a6b5753]. Furthermore, changes in doping caused by thickness variations will definitely change device performance, highlighting the sensitivity of design parameters to physical dimensions [coarse:25a417858562].\n\nIn the domain of emerging materials, doping aids in the design of field-effect transistors by helping to calibrate the electric features, such as electronic transport, of 2D materials using dilute dopant concentrations [coarse:0548a3efbd9e]. Additionally, doping significantly enhances the electrical conductivity of organic semiconductors [coarse:46a737f]. To address design challenges in 2D semiconductor devices, spacer design is incorporated to mitigate parasitic effects, including capacitance and resistance [coarse:a6212711f296].\n\nThe consulted records did not surface specific findings regarding how doping impacts detailed IC design decisions such as channel length scaling or specific threshold voltage tuning mechanisms beyond the SOI inverter context. Additionally, the records did not provide configuration data or comparative analysis on doping parameters across different IC design nodes.",
+  "arm": "main",
+  "steps": 8,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 1,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity:doping*] Question asks how doping impacts integrated circuit design. Two relevant entiti"
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "doping"
+    },
+    "intent": "Get cross-paper evidence dossier for doping entity",
+    "obs_chars": 1001,
+    "notes_chars": 379
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "integrated circuits"
+    },
+    "intent": "Get cross-paper evidence dossier for integrated circuits entity",
+    "obs_chars": 623,
+    "notes_chars": 379
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "doping",
+     "contains": "integrated circuit|IC design|transistor|semiconductor"
+    },
+    "intent": "Find finding records linking doping to IC design",
+    "obs_chars": 3109,
+    "notes_chars": 379
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t",
+     "contains": "doping|impact|design"
+    },
+    "intent": "Find findings in the 2D semiconductor IC paper about doping impact",
+    "obs_chars": 1163,
+    "notes_chars": 379
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t",
+     "contains": "doping|threshold|channel|scaling|resistance|concentration"
+    },
+    "intent": "Get all doping-related findings from the 2D semiconductor IC paper",
+    "obs_chars": 1163,
+    "notes_chars": 1629
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se",
+     "contains": "doping|device|performance|design|concentration"
+    },
+    "intent": "Get doping mechanism findings from the organic semiconductor doping paper",
+    "obs_chars": 1139,
+    "notes_chars": 1629
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "doping",
+     "claim_type": "mechanism",
+     "contains": "transistor|CMOS|device|threshold|channel|resistance"
+    },
+    "intent": "Find mechanism-type findings about doping in transistor/CMOS context",
+    "obs_chars": 2443,
+    "notes_chars": 1629
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "doping impact integrated circuit design threshold voltage channel length scaling",
+     "k": 8
+    },
+    "intent": "Search full texts for specific doping-IC design interactions",
+    "obs_chars": 2457,
+    "notes_chars": 1629
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t",
+     "contains": "doping|dopant|concentration|channel|threshold|scaling|design"
+    },
+    "intent": "Get all doping-related findings from the 2D semiconductor IC paper",
+    "obs_chars": 1163,
+    "notes_chars": 1964
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se",
+     "contains": "doping|dopant|concentration|device|performance|design|electrical"
+    },
+    "intent": "Get all doping-related findings from the organic semiconductor doping paper",
+    "obs_chars": 1139,
+    "notes_chars": 1964
+   },
+   {
+    "step": 4,
+    "tool": "config",
+    "args": {
+     "entity": "doping"
+    },
+    "intent": "Check for configuration records on doping parameters",
+    "obs_chars": 41,
+    "notes_chars": 1908
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2D semiconductor IC paper on how doping affects device design",
+    "obs_chars": 607,
+    "notes_chars": 1908
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the organic doping paper",
+    "obs_chars": 607,
+    "notes_chars": 1908
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "entity": "integrated circuits",
+     "contains": "doping|dopant|concentration|threshold|channel"
+    },
+    "intent": "Find findings linking doping to integrated circuits specifically",
+    "obs_chars": 609,
+    "notes_chars": 1908
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 8,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [coarse:c56081c26475] Doping technology has a key role in determining electrical and optical properties of semiconductor materials and significantly affects device performance | epistemic:stated\nN2. [coarse:0d997766e0b3] Doping = adding impurities into intrinsic semiconductors to modulate electrical, optical, structural properties | epistemic:stated\nN3. [coarse:c31f435a4932] Doping = intentional addition of atoms to intrinsic semiconductors to modulate electrical properties | epistemic:stated\nN4. [coarse:46a737f] Doping significantly enhances electrical conductivity of organic semiconductors | epistemic:stated\nN5. [coarse:0548a3efbd9e] Doping aids in design of field-effect transistors by helping calibrate 2D materials' electric features (electronic transport) with dilute dopant concentrations | epistemic:stated\nN6. [coarse:2ce92a068dd4] In silicon CMOS, contact and spacer regions undergo heavy doping with concentration 10^21 to 10^22 cm^-3 to reduce access resistance | epistemic:stated\nN7. [coarse:95fc1a6b5753] Retrograde doping engineering recommended to reduce body resistance and maximize ΔVt in SOI inverter | epistemic:stated\nN8. [coarse:25a417858562] Changes in doping caused by thickness changes will definitely change device performance | epistemic:stated\nN9. [coarse:a6212711f296] Spacer design incorporated into 2D semiconductor devices to mitigate parasitic effects (capacitance, resistance) | epistemic:stated\nN10. [coarse:899404fa32f0] Semiconductor technology depends on control of migration and diffusion of quasi-particles of charge | epistemic:stated\nN11. [coarse:f8c6152] Doping consists of adding electron acceptor to p-type semiconductor (donor to n-type) | epistemic:stated\nN12. [coarse:12f5e0644f71] Doping of inorganic semiconductors by controllably introducing impurity atoms is the basic method to adjust conductivity and energy-level alignment | epistemic:stated",
+  "gaps_final": "G1. Need more specific findings on how doping impacts IC design decisions (threshold voltage, channel length, scaling)\nG2. Need to check the 2D semiconductor IC paper for more design-specific doping findings\nG3. Need to check if there are config records or comparison data on doping parameters in IC design",
+  "queried": [
+   "card|{\"entity\": \"doping\"}",
+   "card|{\"entity\": \"integrated circuits\"}",
+   "findings|{\"contains\": \"integrated circuit|IC design|transistor|semiconductor\", \"entity\": \"doping\"}",
+   "findings|{\"contains\": \"doping|impact|design\", \"paper_id\": \"sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t\"}",
+   "findings|{\"contains\": \"doping|threshold|channel|scaling|resistance|concentration\", \"paper_id\": \"sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t\"}",
+   "findings|{\"contains\": \"doping|device|performance|design|concentration\", \"paper_id\": \"sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"transistor|CMOS|device|threshold|channel|resistance\", \"entity\": \"doping\"}",
+   "search_text|{\"k\": 8, \"query\": \"doping impact integrated circuit design threshold voltage channel length scaling\"}",
+   "findings|{\"contains\": \"doping|dopant|concentration|channel|threshold|scaling|design\", \"paper_id\": \"sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t\"}",
+   "findings|{\"contains\": \"doping|dopant|concentration|device|performance|design|electrical\", \"paper_id\": \"sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se\"}",
+   "config|{\"entity\": \"doping\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_two_dimensional_semiconductor_transistors_and_integrated_circuits_for_advanced_t\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_clarification_of_the_molecular_doping_mechanism_in_organic_single_crystalline_se\"}",
+   "findings|{\"contains\": \"doping|dopant|concentration|threshold|channel\", \"entity\": \"integrated circuits\"}"
+  ],
+  "gate": {
+   "note_rejects": 1,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 1
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 1,
+   "merge_total_lines": 1,
+   "relaxed_writes": 1,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 12,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "9b4f043c1561f830b2033f51",
+  "type": "aggregation",
+  "question": "How do external events influence software projects? Explain with a few recent examples.",
+  "gold_hint": "",
+  "answer": "External events are fundamentally defined as occurrences triggered from outside the component whose functionality is being examined . In specific simulation contexts, such as EventSeer, these are characterized as time events generated outside the simulation environment . The influence of such events on software projects is multifaceted, affecting design trajectories, team motivation, and long-term sustainability.\n\nA primary mechanism of influence is the alteration of product design and technology stacks, often driven by factors unrelated to the immediate process work in progress . The Sundance project provides a concrete example of this dynamic, where technology drove a significant change from Microsoft Windows to the web . Subsequently, technological limitations drove the transition back to Windows, illustrating how external technical constraints can reverse architectural decisions . These shifts demonstrate that external events can dictate the fundamental platform and design of a software product, independent of internal development workflows.\n\nBeyond architectural changes, external events significantly impact the human and organizational aspects of software development. The presence of external influences, such as consultant pressure or the features of packaged software, may lead to a decline in the motivation to resolve development issues . While these external influences may remedy short-term problems, such as a lack of involvement from firm members in the project, they may simultaneously harm the effectiveness of future systems projects . This duality suggests that while external forces can provide immediate relief or resources, they may undermine the long-term health and efficacy of the development team.\n\nFurthermore, external events pose challenges to quality improvement and accountability. Sustainable quality improvement (QI) is stated to require robustness against the influences of unanticipated external events . However, there is a noted temptation for some to use unanticipated external events as an excuse for failures, which can complicate the assessment of project outcomes . To properly gauge the impact of these events, it is necessary to know what was happening in the field, as this context enables the accurate assessment of external influences .\n\nIn the realm of software security, external events manifest as threats from third-party components. The \"Armor Within\" approach addresses this by ensuring that no unvalidated input crosses the channel between the main program and a third-party library, thereby preventing adversaries from tricking the main program into passing crafted input . These protections provide a strong guarantee that the overall application will not be exploited even if a third-party library is vulnerable, effectively isolating the core software from external security events .\n\nRegarding the analysis of these influences, snapshot metrics are considered insufficient for analyzing software repositories, with longitudinal metrics being necessary to capture the evolving impact of external events over time . The consulted records did not surface specific recent examples of external events such as CVEs, API changes, policy changes, or market shifts beyond the Sundance project and the general security context of third-party libraries. Additionally, the records did not provide specific details on the \"EventSeer\" tool beyond its definition of external events, nor did they offer further context on the \"sciverse_designing_as_the_world_turns\" paper beyond the Sundance case study.",
+  "arm": "main",
+  "steps": 10,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N1. [entity: eventseer*] Entity \"eventseer\" exists in corpus with records — likely a tool/method for",
+     "N2. [entity: external forces*] Entity \"external forces\" exists in corpus — likely a concept related "
+    ]
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "eventseer"
+    },
+    "intent": "Get full dossier on eventseer — what it is, what it finds about external events in software",
+    "obs_chars": 682,
+    "notes_chars": 835
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "external forces"
+    },
+    "intent": "Get full dossier on external forces concept in software context",
+    "obs_chars": 658,
+    "notes_chars": 835
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "eventseer",
+     "contains": "external event|influence|impact|software project"
+    },
+    "intent": "Find specific findings about how external events influence software projects",
+    "obs_chars": 3124,
+    "notes_chars": 835
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "external forces",
+     "contains": "external event|influence|impact|software|project"
+    },
+    "intent": "Find findings about external forces affecting software projects",
+    "obs_chars": 1555,
+    "notes_chars": 835
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_as_the_world_turns",
+     "contains": "external event|influence|change|impact|software"
+    },
+    "intent": "Get findings from the 'designing as the world turns' paper which discusses external events affecting software design",
+    "obs_chars": 1383,
+    "notes_chars": 2540
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_snapshot_metrics_are_not_enough_analyzing_software_repositories_with_longitudina",
+     "contains": "external|event|influence|change|impact|trend"
+    },
+    "intent": "Check longitudinal software repo paper for external event findings",
+    "obs_chars": 707,
+    "notes_chars": 2540
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "external events influence software projects recent examples",
+     "k": 12
+    },
+    "intent": "Find any corpus text discussing external events influencing software projects with concrete examples",
+    "obs_chars": 1758,
+    "notes_chars": 2540
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_armor_within_defending_against_vulnerabilities_in_third_party_libraries",
+     "contains": "external|vulnerability|third-party|dependency|event|impact"
+    },
+    "intent": "Check third-party library vulnerability paper for external event findings",
+    "obs_chars": 1067,
+    "notes_chars": 2540
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_as_the_world_turns",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation findings from the 'designing as the world turns' paper to understand what external events it discuss",
+    "obs_chars": 1383,
+    "notes_chars": 3162
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_as_the_world_turns",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 'designing as the world turns' paper",
+    "obs_chars": 187,
+    "notes_chars": 3162
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "external events software project impact CVE vulnerability API change policy",
+     "k": 12
+    },
+    "intent": "Search for specific examples of external events affecting software projects",
+    "obs_chars": 1752,
+    "notes_chars": 3162
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_designing_as_the_world_turns",
+     "contains": "Sundance|web|Windows|technology|change|design|external"
+    },
+    "intent": "Get all findings from the designing_as_the_world_turns paper to understand its full discussion of external events",
+    "obs_chars": 1383,
+    "notes_chars": 3162
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_snapshot_metrics_are_not_enough_analyzing_software_repositories_with_longitudina",
+     "contains": "external|event|change|impact|influence|trend|shift"
+    },
+    "intent": "Check longitudinal metrics paper for external event influence on software repos",
+    "obs_chars": 708,
+    "notes_chars": 3162
+   },
+   {
+    "f28_auto_retrieval": "sciverse_designing_as_the_world_turns",
+    "at_step": 6,
+    "obs_chars": 1383
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 10,
+    "f28_autos": 1
+   }
+  ],
+  "notes_final": "N1. [coarse:42aaa428fc01] External events defined as events triggered from outside the component whose functionality is being examined | anchor:\"events which are triggered from outside the component\" | epistemic:stated\nN2. [coarse:2e9abba64479] External events are time events generated outside the simulation (EventSeer context) | anchor:\"External events are time events that are generated outside the simulation\" | epistemic:stated\nN3. [coarse:7f003c55b560] Sundance project: changes affecting product design result from external events often not directly related to process work in progress | anchor:\"changes that affect product design resulting from external events often not directly related to the process work in progress\" | epistemic:stated\nN4. [coarse:f60715fb6db1] Technology drove the change from Microsoft Windows to the web in the Sundance project | anchor:\"technology drove the change from Microsoft Windows to the web\" | epistemic:stated\nN5. [coarse:988d5af4125d] Technological limitations drove the transition back to Windows in the Sundance project | anchor:\"technological limitatio\" | epistemic:stated\nN6. [coarse:9038a01218dd] Sustainable QI should be robust to influences of unanticipated external events | anchor:\"Sustainable QI should be robust to the influences of unanticipated external events\" | epistemic:stated\nN7. [coarse:fe920afcb571] Motivation to resolve development issues may decline with increased external influence (consultant pressure, packaged software features) | anchor:\"motivation to resolve development issues might decline with increased external influence\" | epistemic:stated\nN8. [coarse:65449a0383a7] External influences may remedy short-term problems (e.g., firm members less involved in project) | anchor:\"presence of external influences may thus remedy short-term problems\" | epistemic:stated\nN9. [coarse:e7e6aadaed9a] External forces may harm effectiveness of future systems projects | anchor:\"External forces may harm the effectiveness of future systems projects\" | epistemic:stated\nN10. [coarse:1d256ea] Temptation to use unanticipated external events as excuse for failures | anchor:\"temptation for some to use unanticipated external events to\" | epistemic:stated\nN11. [coarse:c6e3865] Knowing what was happening in the field enabled authors to gauge impact | anchor:\"Knowing what was happening in the field enabled us to gauge\" | epistemic:stated\nN12. [coarse:c83b33184d00] Armor Within: defense ensures no unvalidated input crosses channel between main program and third-party library | anchor:\"the adversary may try to trick the main program into passing the right crafted input to th\" | epistemic:stated\nN13. [coarse:b187d6eb9c7a] Armor Within: protections guarantee overall application not exploited even if third-party library vulnerable | anchor:\"These protections will provide a strong guarantee that even if a third-party library is vu\" | epistemic:stated\nN14. [coarse:47706d32f7a5] Snapshot metrics are not enough for analyzing software repositories (longitudinal metrics needed) | anchor:\"snapshot metrics are not enough: analyzing software repositories with longitudinal metrics\" | epistemic:stated",
+  "gaps_final": "G1. Need more context on \"sciverse_designing_as_the_world_turns\" paper — what external events does it discuss beyond Sundance?\nG2. Need recent examples of external events influencing software projects (CVEs, API changes, policy changes, market shifts)\nG3. What is \"eventseer\" specifically — a tool for detecting external events in software?\nG4. Are there findings about specific external events (CVEs, API changes, policy changes, market shifts) affecting software projects?",
+  "queried": [
+   "card|{\"entity\": \"eventseer\"}",
+   "card|{\"entity\": \"external forces\"}",
+   "findings|{\"contains\": \"external event|influence|impact|software project\", \"entity\": \"eventseer\"}",
+   "findings|{\"contains\": \"external event|influence|impact|software|project\", \"entity\": \"external forces\"}",
+   "findings|{\"contains\": \"external event|influence|change|impact|software\", \"paper_id\": \"sciverse_designing_as_the_world_turns\"}",
+   "findings|{\"contains\": \"external|event|influence|change|impact|trend\", \"paper_id\": \"sciverse_snapshot_metrics_are_not_enough_analyzing_software_repositories_with_longitudina\"}",
+   "search_text|{\"k\": 12, \"query\": \"external events influence software projects recent examples\"}",
+   "findings|{\"contains\": \"external|vulnerability|third-party|dependency|event|impact\", \"paper_id\": \"sciverse_armor_within_defending_against_vulnerabilities_in_third_party_libraries\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_designing_as_the_world_turns\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_designing_as_the_world_turns\"}",
+   "search_text|{\"k\": 12, \"query\": \"external events software project impact CVE vulnerability API change policy\"}",
+   "findings|{\"contains\": \"Sundance|web|Windows|technology|change|design|external\", \"paper_id\": \"sciverse_designing_as_the_world_turns\"}",
+   "findings|{\"contains\": \"external|event|change|impact|influence|trend|shift\", \"paper_id\": \"sciverse_snapshot_metrics_are_not_enough_analyzing_software_repositories_with_longitudina\"}",
+   "findings|{\"paper_id\": \"sciverse_designing_as_the_world_turns\"}"
+  ],
+  "gate": {
+   "note_rejects": 2,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "reject_reasons": {
+    "bad_backref": 2
+   },
+   "_consec_full_reject": 0,
+   "merge_downgraded_lines": 2,
+   "merge_total_lines": 5,
+   "relaxed_writes": 1,
+   "f28_autos": 1,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 13,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "ab3651c422a54f40aa4bac3f",
+  "type": "aggregation",
+  "question": "How do large language models like ChatGPT impact the diversity of published scientific ideas?",
+  "gold_hint": "",
+  "answer": "The widespread adoption of large language models (LLMs) and publicly available tools like ChatGPT has marked a significant turning point in the integration of artificial intelligence into science . While scientists have explored how these tools influence authors to write, edit, and publish papers , the specific impact on the diversity of published scientific ideas remains largely unaddressed in the available records. The consulted materials define LLMs as AI systems whose primary knowledge consists of statistical patterns, semantic relationships, and syntactical structures . Despite these limited forms of knowledge, the systems are adept at numerous complex tasks, including creative writing, storytelling, and translation .\n\nRegarding the specific mechanisms of impact on idea diversity, such as homogenization or diversification, the consulted records did not surface any direct evidence or theoretical proposals. Searches for terms related to the \"homogenization of research ideas,\" \"LLMs reduce novelty,\" and \"ChatGPT scientific writing homogenization convergence\" returned no relevant hits, suggesting that the corpus may lack direct content on the diversity of scientific ideas . Similarly, a search for \"diversity of scientific ideas homogenization\" found no direct hits, indicating that the topic may be phrased differently or present in papers not fully indexed . Consequently, there are no recorded empirical findings or quantitative metrics specifically measuring the diversity of scientific ideas in the context of LLM usage.\n\nThe available notes focus instead on the technical reliability and verification of LLM outputs rather than their ideational diversity. For instance, auto-regressive generation is identified as an important origin of hallucinations, with errors accumulating during the generation process . To mitigate these issues, self-verification is proposed to decompose generated content into fact checkpoints , and Chain-of-Verification utilizes separate LLM agents to verify these checkpoints individually . While \"response diversity\" is mentioned as a metric for conversational evaluation , this is distinct from the diversity of scientific ideas. Furthermore, attempts to find explicit criticism records regarding the impact of LLMs on scientific advancement yielded no results . A citation to \"BaHammam et al. 2023. Adapting to the Impact of AI in Scientific W...\" exists in the corpus , but the specific content regarding idea diversity from this source was not retrieved. In summary, while the integration of LLMs in scientific writing is acknowledged , the consulted records do not provide data on whether these tools increase or decrease the diversity of published scientific ideas.",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "large language model"
+    },
+    "intent": "Get cross-paper evidence dossier on LLMs for breadth",
+    "obs_chars": 4515,
+    "notes_chars": 883
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "contains": "diversity|novel|idea|homogeniz"
+    },
+    "intent": "Find findings on novelty/diversity of scientific ideas from LLMs",
+    "obs_chars": 244,
+    "notes_chars": 883
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science",
+     "contains": "diversity|homogeniz|novel|idea|impact"
+    },
+    "intent": "Find findings on LLM impact on science from friend-or-foe paper",
+    "obs_chars": 244,
+    "notes_chars": 883
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "contains": "diversity|bias|generaliz|homogeniz|narrow"
+    },
+    "intent": "Find findings on generalization bias affecting diversity",
+    "obs_chars": 244,
+    "notes_chars": 883
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "diversity of scientific ideas homogenization LLM ChatGPT impact on research novelty",
+     "k": 12
+    },
+    "intent": "Full-text hybrid search for raw passages about LLM impact on scientific idea diversity — the typed records missed this, ",
+    "obs_chars": 1753,
+    "notes_chars": 1218
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_"
+    },
+    "intent": "Get ALL findings from the most directly relevant paper without contains filter",
+    "obs_chars": 601,
+    "notes_chars": 1218
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science"
+    },
+    "intent": "Get ALL findings from the friend-or-foe implications paper",
+    "obs_chars": 63,
+    "notes_chars": 1218
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research"
+    },
+    "intent": "Get ALL findings from the generalization bias paper",
+    "obs_chars": 63,
+    "notes_chars": 1218
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "homogenization of research ideas LLMs reduce novelty scientific publications convergence"
+    },
+    "intent": "Find raw-text passages about homogenization/convergence of scientific ideas due to LLMs",
+    "obs_chars": 2057,
+    "notes_chars": 2414
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt"
+    },
+    "intent": "Get all findings from the ChatGPT readability paper — may discuss diversity/novelty changes",
+    "obs_chars": 595,
+    "notes_chars": 2414
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation"
+    },
+    "intent": "Get findings from the scientific synthesis paper — may discuss how LLMs affect idea generation diversity",
+    "obs_chars": 1126,
+    "notes_chars": 2414
+   },
+   {
+    "step": 3,
+    "tool": "gap_search",
+    "args": {
+     "query": "diversity of scientific ideas homogenization LLM impact on research novelty"
+    },
+    "intent": "Check if corpus records absences about LLM impact on idea diversity, and find external papers filling that gap",
+    "obs_chars": 212,
+    "notes_chars": 2414
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "ChatGPT scientific writing homogenization convergence ideas novelty reduction"
+    },
+    "intent": "Find raw-text passages about LLM/ChatGPT causing homogenization or convergence of scientific ideas",
+    "obs_chars": 1752,
+    "notes_chars": 2338
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_advancing_the_scientific_method_with_large_language_models_from_hypothesis_to_di",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting/critical statements from the 2025 paper on LLMs in scientific method",
+    "obs_chars": 2005,
+    "notes_chars": 2338
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc",
+     "claim_type": "criticism"
+    },
+    "intent": "Get critical statements from the paper on whether AI language models should be allowed in science",
+    "obs_chars": 187,
+    "notes_chars": 2338
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "LLM impact on research diversity homogenization of published papers scientific creativity"
+    },
+    "intent": "Broader search for diversity/homogenization impact of LLMs on published science",
+    "obs_chars": 1751,
+    "notes_chars": 2338
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "scientific novelty convergence homogenization LLM impact research output ideas"
+    },
+    "intent": "Try different phrasing for diversity/homogenization of scientific ideas",
+    "obs_chars": 1752,
+    "notes_chars": 3405
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "contains": "novel|diversity|idea|convergence|homogeniz|redundan|repetit"
+    },
+    "intent": "Find diversity/novelty-specific findings in the 'unlock novel ideas' paper",
+    "obs_chars": 244,
+    "notes_chars": 3405
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "contains": "generaliz|bias|diversity|narrow|converge|homogeniz|redundan"
+    },
+    "intent": "Find generalization bias findings that relate to idea diversity",
+    "obs_chars": 244,
+    "notes_chars": 3405
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the novel-ideas paper",
+    "obs_chars": 601,
+    "notes_chars": 3405
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from friend-or-foe paper",
+    "obs_chars": 187,
+    "notes_chars": 3405
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from generalization bias paper",
+    "obs_chars": 187,
+    "notes_chars": 3405
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "LLM homogenization scientific output convergence of ideas research diversity reduction"
+    },
+    "intent": "Broader search for diversity/homogenization content across all indexed papers",
+    "obs_chars": 286,
+    "notes_chars": 3405
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the most directly relevant paper on LLMs and novel scientific ideas",
+    "obs_chars": 187,
+    "notes_chars": 2695
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism records from the generalization bias paper — likely discusses how LLMs narrow/converge scientific content",
+    "obs_chars": 187,
+    "notes_chars": 2695
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records from the ChatGPT readability change paper — may contain empirical findings on how LLMs changed s",
+    "obs_chars": 595,
+    "notes_chars": 2695
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations from the novel-ideas paper — may discuss diversity implications",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations from friend-or-foe paper — may discuss diversity of scientific output",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations from generalization-bias paper — may discuss how bias reduces diversity",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting statements from the novelty paper",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting statements from the generalization bias paper",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting statements from the friend-or-foe paper",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt",
+     "claim_type": "criticism"
+    },
+    "intent": "Get self-limiting statements from the readability paper",
+    "obs_chars": 187,
+    "notes_chars": 2684
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [plan] Question: How do LLMs like ChatGPT impact diversity of published scientific ideas?\nN2. [plan] Key papers: sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_ (2024), sciverse_friend_or_foe (2023), sciverse_generalization_bias (2025), sciverse_exploring_the_change_in_scientific_readability (2025), sciverse_large_language_models_for_scientific_synthesis (2023), sciverse_advancing_the_scientific_method (2025)\nN3. [coarse:1d7df655b27d] \"widespread adoption of LLMs and publicly available ChatGPT have marked a significant turning point in the integration of AI in [science]\" | epistemic:stated\nN4. [coarse:c03e2cb83f48] \"Scientists have explored the impact of ChatGPT and subsequent LLM tools on scientific writing and how they influence authors to write, edit, and publish papers.\" | epistemic:stated\nN5. [coarse:ead369bf0286] LLMs defined as AI systems whose primary knowledge = statistical patterns, semantic relationships, syntactical structures | epistemic:stated\nN6. [coarse:7edfa89d16e5] \"Despite their limited forms of 'knowledge,' these systems are adept at numerous complex tasks including creative writing, storytelling, and translation.\" | epistemic:stated\nN7. [arxiv_2403.18105#54000] Citation to \"BaHammam et al. 2023. Adapting to the Impact of AI in Scientific W...\" — paper exists in corpus\nN8. [arxiv_2404.00579#47250] \"response diversity (Li et al., 2015)\" mentioned as metric for conversational evaluation\nN9. [plan] search_text found no direct hits on \"diversity of scientific ideas homogenization\" — topic may be phrased differently or in papers not fully indexed.\nN10. [plan] gap_search returned 8 candidates but budget-truncated (lists dropped). Need to narrow.\nN11. [plan] findings() with contains= returned zero for 3 papers. Dropping contains and using paper_id only also returned generic/definition records, not diversity-specific.\nN12. [coarse:9046c1454721] Self-verification mitigates hallucinations by decomposing generated content into fact checkpoints | epistemic:stated\nN13. [coarse:5fd7f6fcea14] Chain-of-Verification uses separate LLM agents to verify fact checkpoints individually | epistemic:stated\nN14. [coarse:a415ca911591] Auto-regressive generation is an important origin of hallucinations; errors accumulate during generation | epistemic:stated\nN15. [plan] findings(claim_type=criticism) returned 0 for both sciverse_advancing and sciverse_should papers — no explicit criticism records.\nN16. [plan] search_text for \"homogenization of research ideas LLMs reduce novelty\" and \"ChatGPT scientific writing homogenization convergence\" returned no relevant hits — corpus may lack direct diversity-of-ideas content.",
+  "gaps_final": "G1. What empirical evidence exists on LLM impact on scientific idea diversity?\nG2. What mechanisms are proposed (homogenization vs. diversification)?\nG3. What limitations/absences are recorded in the corpus?\nG4. Are there specific metrics or quantitative findings on diversity?",
+  "queried": [
+   "card|{\"entity\": \"large language model\"}",
+   "findings|{\"contains\": \"diversity|novel|idea|homogeniz\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"contains\": \"diversity|homogeniz|novel|idea|impact\", \"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"contains\": \"diversity|bias|generaliz|homogeniz|narrow\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "search_text|{\"k\": 12, \"query\": \"diversity of scientific ideas homogenization LLM ChatGPT impact on research novelty\"}",
+   "findings|{\"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "search_text|{\"k\": 12, \"query\": \"homogenization of research ideas LLMs reduce novelty scientific publications convergence\"}",
+   "findings|{\"paper_id\": \"sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt\"}",
+   "findings|{\"paper_id\": \"sciverse_large_language_models_for_scientific_synthesis_inference_and_explanation\"}",
+   "gap_search|{\"query\": \"diversity of scientific ideas homogenization LLM impact on research novelty\"}",
+   "search_text|{\"k\": 12, \"query\": \"ChatGPT scientific writing homogenization convergence ideas novelty reduction\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_advancing_the_scientific_method_with_large_language_models_from_hypothesis_to_di\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_should_artificial_intelligence_based_language_models_be_allowed_in_developing_sc\"}",
+   "search_text|{\"k\": 12, \"query\": \"LLM impact on research diversity homogenization of published papers scientific creativity\"}",
+   "search_text|{\"k\": 12, \"query\": \"scientific novelty convergence homogenization LLM impact research output ideas\"}",
+   "findings|{\"contains\": \"novel|diversity|idea|convergence|homogeniz|redundan|repetit\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"contains\": \"generaliz|bias|diversity|narrow|converge|homogeniz|redundan\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "search_text|{\"k\": 12, \"query\": \"LLM homogenization scientific output convergence of ideas research diversity reduction\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_can_large_language_models_unlock_novel_scientific_research_ideas_\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_generalization_bias_in_large_language_model_summarization_of_scientific_research\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_friend_or_foe_exploring_the_implications_of_large_language_models_on_the_science\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_exploring_the_change_in_scientific_readability_following_the_release_of_chatgpt\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 13,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "323e85c9052082358fc0c045",
+  "type": "aggregation",
+  "question": "How do different fairness metrics correlate with each other across various datasets and model architectures?",
+  "gold_hint": "",
+  "answer": "The correlation structure among fairness metrics is not static but is fundamentally contingent upon both the underlying data distribution and the specific model architecture employed, as stated in recent research on representative group fairness metrics [coarse:0b30fc4c3191] [coarse:a966f083fb8c]. Empirical evidence demonstrates that these correlations are explicitly model-type and data-dependent [a3872a7e28364e]. When the dataset is held constant, the correlations between metrics vary significantly depending on the classifier used, whereas fixing the model reveals that correlations shift across different datasets [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#45900]. This variability arises because different datasets possess distinct distributions that directly impact the resulting fairness values [coarse:d20bc683e818].\n\nIn terms of model architecture, the complexity of the decision boundary plays a critical role in determining the strength of metric correlations. Models with linear decision boundaries, such as Logistic Regression (Logit) and Support Vector Machines (SVM), exhibit higher correlations among fairness metrics compared to more complex models [1633ab4e9d44c5]. Consequently, linear models require fewer representative metrics to capture the fairness landscape; for instance, Logit required fewer representatives than Random Forest (RF) on the Credit dataset, and linear SVM required fewer representatives than RF on the COMPAS dataset [6a013bc9d18715] [04498e0da682d1]. In contrast, Neural Networks (NNs), which construct more complex boundaries, generate a wider range of fairness values, resulting in generally lower correlations between metrics compared to other model types [coarse:cbda05b7ac45] [coarse:b8fc75ef1799]. Specifically, NNs with hidden layers yield a higher number of cluster representatives than linear models, indicating a more fragmented correlation structure [a5bb5b914bee28]. It is noted that Pearson correlation may fail to capture these relationships if they are nonlinear or nonmonotonic, a limitation cited in the literature [72c3a0132b3cc0].\n\nRegarding specific dataset and metric interactions, the relationship between Demographic Independence (DI) and Statistical Parity Difference (SPD) is noted to be stable across datasets, with improvements in DI consistently reflected in SPD [coarse:cb17516e3b5e] [coarse:d411db00bd93]. Similarly, the relationship between Equalized Odds Difference (EOD) and False Positive Rate (FPR) remains stable across different datasets [coarse:cb17516e3b5e]. This consistency in specific metric pairs reinforces the conceptual overlap between these notions [coarse:92edf1a2f9b9]. However, not all metrics are correlated. On the Credit dataset, Positive Predictive Value (PP) and Equalized Odd Difference (odd-dif) were found to be uncorrelated, with a specific correlation value of 0.02 [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950] [9302c7b548991e]. This lack of correlation has practical implications: mitigating odd-dif on the Credit dataset adversely impacts PP [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950] [9302c7b548991e]. Conversely, on the same dataset, Statistical Parity (SP) and FNR-ratio were found to be highly correlated, while FNR-difference was strongly negatively correlated with another metric [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950].\n\nThe experimental setup for these findings involved sampling 1000 models over 30 rounds with an accuracy threshold of 0.5, utilizing classifiers including Logit, RF, KNN, SVM, and a single dense layer NN on datasets such as Bank (41188 observations, 20 attributes, with age as the sensitive attribute) and Credit [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200]. The metrics evaluated included FNR ratio, Average odd difference, SP, DI, SPD, EOD, FPR, PP, and Equal Opportunity (EO) [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#16200]. While previous work has shown correlations between fairness notions, it often considered only a subset of metrics without providing recommendations for representative groups [591aa19cdaca80] [5e29c61e0c326e]. The current understanding suggests that if correlations are specified, metrics can be grouped into representative sets, allowing unfairness reduction on a representative metric to approximate reduction on the metrics it represents [8a2631986dc921] [f7e03e800c95d8]. However, assuming bias exists in the data, it is not possible to fully mitigate all unfairnesses simultaneously [c0250074077fbf], and multi-metric unfairness reduction carries exponential time complexity [f91b0d8b8320c3].\n\nThe consulted records did not surface specific numeric correlation values for the majority of metric pairs beyond the specific case of PP and odd-dif on the Credit dataset. Additionally, the records did not provide detailed accounts of metric relationships from the \"biased rulers\" survey or the AI Fairness 360 toolkit documentation, nor did they list model architectures beyond those explicitly named in the primary experimental setup.",
+  "arm": "main",
+  "steps": 16,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "fairness metrics"
+    },
+    "intent": "Get cross-paper evidence dossier for fairness metrics entity",
+    "obs_chars": 1411,
+    "notes_chars": 663
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "fairness"
+    },
+    "intent": "Get cross-paper evidence dossier for fairness entity",
+    "obs_chars": 3822,
+    "notes_chars": 663
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "fairness metrics",
+     "contains": "correlation|correlate|correlated"
+    },
+    "intent": "Find finding records about correlations between fairness metrics",
+    "obs_chars": 1335,
+    "notes_chars": 663
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "contains": "correlation|correlate|metric"
+    },
+    "intent": "Get findings from the paper specifically about finding representative group fairness metrics using correlation estimatio",
+    "obs_chars": 1851,
+    "notes_chars": 663
+   },
+   {
+    "step": 2,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "sections": [
+      "experimental setup",
+      "results",
+      "discussion"
+     ]
+    },
+    "intent": "Get specific datasets, model architectures, and numeric correlation values from the core paper",
+    "obs_chars": 735,
+    "notes_chars": 2178
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "measuring fairness with biased rulers"
+    },
+    "intent": "Get evidence dossier for the biased-rulers survey paper",
+    "obs_chars": 583,
+    "notes_chars": 2178
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "ai fairness 360"
+    },
+    "intent": "Get evidence dossier for the AI Fairness 360 toolkit",
+    "obs_chars": 583,
+    "notes_chars": 2178
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers",
+     "contains": "correlation|correlate|metric|relationship"
+    },
+    "intent": "Find what the biased-rulers survey says about metric correlations",
+    "obs_chars": 244,
+    "notes_chars": 2178
+   },
+   {
+    "step": 3,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "sections": [
+      "4.1 Datasets"
+     ]
+    },
+    "intent": "Get the specific datasets and model architectures used in the correlation analysis",
+    "obs_chars": 210,
+    "notes_chars": 2178
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "claim_type": "observation"
+    },
+    "intent": "Get all observation-type findings from the core correlation paper to identify specific metrics, datasets, and architectu",
+    "obs_chars": 1335,
+    "notes_chars": 2178
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings explaining WHY correlations differ across models/datasets",
+    "obs_chars": 1065,
+    "notes_chars": 2178
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from the biased-rulers survey about metric relationships and correlations",
+    "obs_chars": 187,
+    "notes_chars": 2178
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_fairness_360",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from AI Fairness 360 about metric correlations and relationships",
+    "obs_chars": 187,
+    "notes_chars": 2178
+   },
+   {
+    "step": 6,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "sections": [
+      "introduction",
+      "methodology",
+      "conclusion"
+     ]
+    },
+    "intent": "Get the specific fairness metrics, datasets, and model architectures used in the correlation analysis, plus the paper's ",
+    "obs_chars": 1796,
+    "notes_chars": 2329
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "contains": "correlation|correlate|metric|relationship|overlap",
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers"
+    },
+    "intent": "Check what the biased-rulers survey says about relationships between fairness metrics",
+    "obs_chars": 244,
+    "notes_chars": 2329
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "contains": "correlation|correlate|metric|relationship|overlap",
+     "paper_id": "sciverse_ai_fairness_360"
+    },
+    "intent": "Check what AI Fairness 360 documents about metric correlations",
+    "obs_chars": 244,
+    "notes_chars": 2329
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "fairness metrics correlation Pearson Spearman dataset model architecture",
+     "k": 12
+    },
+    "intent": "Find full-text passages with specific correlation values, metric names, datasets, and model architectures from the core ",
+    "obs_chars": 2154,
+    "notes_chars": 3090
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "fairness metric overlap relationship equalized odds demographic parity disparate impact",
+     "k": 12
+    },
+    "intent": "Find passages discussing specific fairness metric names and their relationships/overlaps",
+    "obs_chars": 2164,
+    "notes_chars": 3090
+   },
+   {
+    "step": 7,
+    "tool": "search_text",
+    "args": {
+     "query": "correlation matrix fairness metrics neural network logistic regression decision tree",
+     "k": 12
+    },
+    "intent": "Find passages with model architecture details and correlation matrix results",
+    "obs_chars": 2155,
+    "notes_chars": 3090
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "logistic regression decision tree random forest neural network classifier model architecture fairness correlation experiment"
+    },
+    "intent": "Find the specific model architectures used in the correlation experiments",
+    "obs_chars": 1885,
+    "notes_chars": 4005
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "Pearson correlation coefficient Spearman fairness metric value 0.9 0.8 0.7 table results"
+    },
+    "intent": "Find specific numeric correlation values between fairness metrics",
+    "obs_chars": 2176,
+    "notes_chars": 4005
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the biased-rulers survey about how metrics relate",
+    "obs_chars": 187,
+    "notes_chars": 4005
+   },
+   {
+    "step": 8,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_fairness_360",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from AI Fairness 360 about metric relationships",
+    "obs_chars": 187,
+    "notes_chars": 4005
+   },
+   {
+    "step": 9,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "logistic regression decision tree random forest SVM kNN neural network classifier model architecture fairness correlation experiment"
+    },
+    "intent": "Find the specific model architectures tested in the correlation paper",
+    "obs_chars": 286,
+    "notes_chars": 4005
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "fairness metrics",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation-type findings about fairness metric correlations across papers",
+    "obs_chars": 2459,
+    "notes_chars": 4005
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "entity": "fairness",
+     "claim_type": "observation"
+    },
+    "intent": "Find observation-type findings about fairness correlations across papers",
+    "obs_chars": 2465,
+    "notes_chars": 4005
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200",
+     "window": 800
+    },
+    "intent": "Get full context around the dataset description to find the list of model architectures tested",
+    "obs_chars": 2000,
+    "notes_chars": 3903
+   },
+   {
+    "step": 11,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950",
+     "window": 800
+    },
+    "intent": "Get full context around the correlation discussion to find specific numeric values and model names",
+    "obs_chars": 1971,
+    "notes_chars": 3903
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "contains": "logistic|decision tree|random forest|SVM|kNN|classifier|architecture"
+    },
+    "intent": "Find which specific model architectures were tested in the correlation study",
+    "obs_chars": 2282,
+    "notes_chars": 3903
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations",
+     "contains": "0.9|0.8|0.7|0.6|0.5|Pearson|Spearman|correlation value|coefficient"
+    },
+    "intent": "Find specific numeric correlation values between fairness metrics",
+    "obs_chars": 1575,
+    "notes_chars": 3903
+   },
+   {
+    "step": 12,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200",
+     "window": 1500
+    },
+    "intent": "Get full list of classifiers and datasets from the experimental setup section",
+    "obs_chars": 3071,
+    "notes_chars": 4115
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers",
+     "claim_type": "observation",
+     "contains": "correlation|overlap|relationship|redundant|similar|equivalent"
+    },
+    "intent": "Find what the biased-rulers survey says about metric relationships/overlap",
+    "obs_chars": 244,
+    "notes_chars": 4115
+   },
+   {
+    "step": 12,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_fairness_360",
+     "claim_type": "observation",
+     "contains": "correlation|overlap|relationship|redundant|similar|equivalent|metric"
+    },
+    "intent": "Find what AI Fairness 360 documents about metric correlations",
+    "obs_chars": 244,
+    "notes_chars": 4115
+   },
+   {
+    "step": 12,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "correlation heatmap fairness metrics value 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 Pearson coefficient table"
+    },
+    "intent": "Find specific numeric correlation values between fairness metric pairs",
+    "obs_chars": 2176,
+    "notes_chars": 4115
+   },
+   {
+    "step": 13,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#45900",
+     "window": 1500
+    },
+    "intent": "Get the full text around Figure 3/4 discussion to extract specific correlation values and model-dependence details",
+    "obs_chars": 3053,
+    "notes_chars": 4443
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "correlation|overlap|relationship|redundant|similar|equivalent|metric",
+     "paper_id": "sciverse_measuring_fairness_with_biased_rulers"
+    },
+    "intent": "Get what the biased-rulers survey says about metric relationships/overlap",
+    "obs_chars": 244,
+    "notes_chars": 4443
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 16,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How do different fairness metrics correlate with each other across various datasets and model architectures?\nCore paper: sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations (2021)\n- [coarse:0b30fc4c3191] Correlations between fairness metrics are model-dependent | epistemic:stated\n- [coarse:a966f083fb8c] Correlations between fairness metrics are data-dependent | epistemic:stated\n- [coarse:b8fc75ef1799] Correlations for NN generally less than other models | epistemic:stated\n- [coarse:cbda05b7ac45] NN constructs more complex boundaries → wider range of fairness values | epistemic:stated\n- [coarse:cb17516e3b5e] DI/SPD and EOD/FPR relationship stable across datasets | epistemic:stated\n- [coarse:92edf1a2f9b9] Consistency of metric relationships reinforces conceptual overlap | epistemic:stated\n- [coarse:d411db00bd93] Improvements in DI consistently reflected in SPD | epistemic:stated\n- [coarse:d20bc683e818] Different datasets = different distributions impacting fairness values | epistemic:stated\n- [8a2631986dc921] If correlations specified, metrics can be grouped | epistemic:stated\n- [591aa19cdaca80] Correlation between fairness notions shown in [2] | epistemic:cited\n- [f91b0d8b8320c3] Multi-metric unfairness reduction has exponential time complexity | epistemic:stated\n- [5e29c61e0c326e] [2] only considers subset of metrics, no recommendation on representatives | epistemic:cited\n- [c0250074077fbf] Assuming bias in data, not possible to fully mitigate all unfairnesses | epistemic:stated\n- [f7e03e800c95d8] Unfairness reduction on representative metric ≈ reduces unfairness on represented metrics | epistemic:stated\n- [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200] Datasets: Bank (41188 obs, 20 attrs, age=sensitive), Credit; N=1000 sampled models, L=30 rounds, α=0.5 accuracy threshold; classifiers: Logit, RF, KNN, SVM, NN (one dense layer) | anchor:\"N = 1000... L = 30... α = 0.5... Logistic Regression (Logit), Random Forest (RF), K-nearest Neighbor (KNN), Support Vector\"\n- [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950] On Credit: SP/FNR-rat highly correlated; PP and odd-dif NOT correlated (r=0.02); FNR-dif and another metric strongly negatively correlated; mitigating odd-dif adversely impacts PP | anchor:\"PP and Equalized odd difference (odd-dif) are not correlated (correlation value of 0.02)... FNR-dif\"\n- [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#16200] Metrics: FNR ratio, Average odd difference, SP, DI, SPD, EOD, FPR, PP, EO | anchor:\"FNR ratio f14... Average odd difference f15\"\n- [04498e0da682d1] SVM (linear) → fewer representatives than RF on COMPAS | epistemic:demonstrated\n- [1633ab4e9d44c5] Fairness metrics of linear decision boundaries are more correlated | epistemic:stated\n- [6a013bc9d18715] Logit (linear) → fewer representatives than RF on Credit | epistemic:demonstrated\n- [a5bb5b914bee28] More complex models (NN with hidden layers) → higher number of cluster representatives vs linear | epistemic:demonstrated\n- [72c3a0132b3cc0] Pearson correlation fails for nonlinear/nonmonotonic relationships | epistemic:cited\n- [9302c7b548991e] Mitigating odd-dif adversely impacts PP (not correlated, r=0.02) on Credit | epistemic:demonstrated\n- [a3872a7e28364e] Correlation values between fairness metrics are model-type and data-dependent | epistemic:demonstrated\n- [sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#45900] Figure 3: fix dataset → correlations model-dependent; Figure 4: fix model → correlations data-dependent | anchor:\"correlations are model-dependent... fix the model to see if the correlations are data-dependent\"\nOther fairness papers:\n- sciverse_measuring_fairness_with_biased_rulers (2021) - survey\n- sciverse_ai_fairness_360 (2018) - toolkit\n- sciverse_a_seven_layer_model_for_standardising_ai_fairness_assessment (2022)\n- arxiv_2401.01262 (Fairness Certification NLP/LLMs, 2024)\n- sciverse_towards_fair_in_context_learning_with_tabular_foundation_models (2025)\n- [coarse:653a56638f42] Six fairness criteria for NLP devised\n- [coarse:2f44e135d253] Fairness metrics help identify bias and mathematically evaluate fairness\n- [coarse:f419a05056d2] Equal-opportunity is commonly used fairness metric\n- [coarse:58b9253b0a16] Distance metrics are commonly used fairness metrics",
+  "gaps_final": "G1. What specific model architectures (beyond NN) are tested? Need full list of classifiers.\nG2. What are the specific numeric correlation values (Pearson/Spearman) between metric pairs?\nG3. What does the biased-rulers survey say about metric relationships/overlap?\nG4. What does the AI Fairness 360 toolkit document about metric correlations?",
+  "queried": [
+   "card|{\"entity\": \"fairness metrics\"}",
+   "card|{\"entity\": \"fairness\"}",
+   "findings|{\"contains\": \"correlation|correlate|correlated\", \"entity\": \"fairness metrics\"}",
+   "findings|{\"contains\": \"correlation|correlate|metric\", \"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\"}",
+   "deep_read|{\"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\", \"sections\": [\"experimental setup\", \"results\", \"discussion\"]}",
+   "card|{\"entity\": \"measuring fairness with biased rulers\"}",
+   "card|{\"entity\": \"ai fairness 360\"}",
+   "findings|{\"contains\": \"correlation|correlate|metric|relationship\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}",
+   "deep_read|{\"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\", \"sections\": [\"4.1 Datasets\"]}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_ai_fairness_360\"}",
+   "deep_read|{\"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\", \"sections\": [\"introduction\", \"methodology\", \"conclusion\"]}",
+   "findings|{\"contains\": \"correlation|correlate|metric|relationship|overlap\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}",
+   "findings|{\"contains\": \"correlation|correlate|metric|relationship|overlap\", \"paper_id\": \"sciverse_ai_fairness_360\"}",
+   "search_text|{\"k\": 12, \"query\": \"fairness metrics correlation Pearson Spearman dataset model architecture\"}",
+   "search_text|{\"k\": 12, \"query\": \"fairness metric overlap relationship equalized odds demographic parity disparate impact\"}",
+   "search_text|{\"k\": 12, \"query\": \"correlation matrix fairness metrics neural network logistic regression decision tree\"}",
+   "search_text|{\"k\": 12, \"query\": \"logistic regression decision tree random forest neural network classifier model architecture fairness correlation experiment\"}",
+   "search_text|{\"k\": 12, \"query\": \"Pearson correlation coefficient Spearman fairness metric value 0.9 0.8 0.7 table results\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_ai_fairness_360\"}",
+   "search_text|{\"k\": 12, \"query\": \"logistic regression decision tree random forest SVM kNN neural network classifier model architecture fairness correlation experiment\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"fairness metrics\"}",
+   "findings|{\"claim_type\": \"observation\", \"entity\": \"fairness\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#49950\", \"window\": 800}",
+   "findings|{\"contains\": \"logistic|decision tree|random forest|SVM|kNN|classifier|architecture\", \"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\"}",
+   "findings|{\"contains\": \"0.9|0.8|0.7|0.6|0.5|Pearson|Spearman|correlation value|coefficient\", \"paper_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#43200\", \"window\": 1500}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"correlation|overlap|relationship|redundant|similar|equivalent\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"correlation|overlap|relationship|redundant|similar|equivalent|metric\", \"paper_id\": \"sciverse_ai_fairness_360\"}",
+   "search_text|{\"k\": 12, \"query\": \"correlation heatmap fairness metrics value 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 Pearson coefficient table\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_finding_representative_group_fairness_metrics_using_correlation_estimations#45900\", \"window\": 1500}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"correlation|overlap|relationship|redundant|similar|equivalent|metric\", \"paper_id\": \"sciverse_measuring_fairness_with_biased_rulers\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "360"
+    ],
+    "unsourced": 1
+   },
+   "compiled_numeric_residual": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "803bc7891917f823a52948eb",
+  "type": "aggregation",
+  "question": "How does in-context learning for LLMs differ from traditional machine learning model training?",
+  "gold_hint": "",
+  "answer": "In-context learning (ICL) for Large Language Models (LLMs) represents a distinct paradigm from traditional machine learning model training, primarily characterized by the absence of parameter updates during the task adaptation phase. While standard in-weights learning relies on gradient descent to modify model weights, ICL requires no parameter updates, allowing the model to adapt to new tasks purely through the context provided at inference time [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms]. This fundamental difference means that ICL is not a form of supervised or unsupervised learning in the traditional sense, as many researchers believe the mechanism is distinct from these conventional approaches . Instead of updating weights, LLMs infer a latent variable containing task information within a probabilistic model of reasoning, effectively viewing the process through a Bayesian lens .\n\nThe operational mechanics of ICL differ significantly from traditional training in terms of data utilization and computational cost. In traditional machine learning, models typically depend heavily on well-designed featurization and abundant labeled data for training, particularly in domains like tabular data where specific architectures cannot leverage the broad prior world knowledge and general-purpose multimodal perception acquired during LLM pretraining  . In contrast, ICL allows ML tasks to be solved purely without gradient descent, utilizing a small number of demonstration examples in the prompt context to learn from analogy  . The key idea is that the content in the context influences LLM behavior, with semantically closer examples having a more significant effect on the model's output than those that are less related  . This sensitivity to semantic closeness distinguishes ICL from conventional machine learning methods, which treat examples differently regarding this metric .\n\nFrom a computational perspective, the cost structures of ICL and traditional training are inverted. Pre-training an LM is the most expensive step in the ICL procedure, whereas the adaptation to a specific task is relatively cheap . Inference cost for ICL is estimated by the time to compute rolling log-likelihoods, and token throughput is calculated as total compute time divided by the number of tokens [d64093a5429989] [11b41100fe7b1b]. The number of training samples used in the context is typically limited, with records indicating up to 32 samples [c4789e0e290653]. This stands in contrast to test-time fine-tuning, which takes time linear in the number of tokens, making ICL with a trained model faster for adaptation [10a8147b4bcdd5]. However, while ICL is faster, its performance is not always superior; fine-tuning at test-time tends to outperform or perform on-par with ICL, and some studies, such as those by Hardt & Sun (2024), have found test-time fine-tuning to perform substantially better [13b34859e09194] [c62e59713b948c].\n\nDespite these differences, there are theoretical parallels between ICL and traditional optimization. GPT-based ICL behaves similarly to explicit fine-tuning from multiple perspectives, including a gradient descent view, suggesting that the model acts as a meta-optimizer by adapting internal mechanisms akin to meta-learning  . Furthermore, transformers can use ICL to approximate machine learning algorithms such as logistic regression, bridging the gap between the two paradigms . The effectiveness of ICL is heavily dependent on prompt engineering, which is considered the most impactful part affecting performance, as it involves presenting structured examples, explanations, and relevant background information to guide LLM behavior  .\n\nHowever, ICL has notable limitations compared to traditional training. It can suffer from high variance and may perform worse than manual prompting on some tasks [96c299a885aebb]. The consulted records did not surface specific quantitative performance comparisons between ICL and traditional ML models on standardized benchmarks, nor did they detail the specific mechanisms of the core ICL paper beyond the probabilistic and meta-learning perspectives described. Additionally, the relationship between ICL and continued pretraining, as explored in the ML-LM context, was not detailed in the available notes beyond the general statement that tabular-specific architectures lack the broad prior knowledge of LLMs . Thus, while ICL offers a flexible, parameter-free alternative to traditional training, it remains a distinct mechanism with its own set of strengths, particularly in leveraging pre-trained world knowledge, and weaknesses, such as sensitivity to prompt structure and potential performance gaps compared to fine-tuning.",
+  "arm": "main",
+  "steps": 18,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the core ICL paper",
+    "obs_chars": 1083,
+    "notes_chars": 1033
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation findings from the core ICL paper",
+    "obs_chars": 187,
+    "notes_chars": 1033
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+     "claim_type": "observation"
+    },
+    "intent": "Get findings on LLM performance in general ML tasks",
+    "obs_chars": 1512,
+    "notes_chars": 1033
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings on ICL vs continued pretraining",
+    "obs_chars": 1079,
+    "notes_chars": 1033
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions from core ICL paper about what ICL is and how it differs from training",
+    "obs_chars": 187,
+    "notes_chars": 1920
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "claim_type": "criticism"
+    },
+    "intent": "Get limitations/criticisms of ICL from core paper",
+    "obs_chars": 187,
+    "notes_chars": 1920
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from Mockingbird on how LLMs perform on ML tasks",
+    "obs_chars": 187,
+    "notes_chars": 1920
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+     "claim_type": "observation"
+    },
+    "intent": "Get observations from ML-LM on ICL vs pretraining relationship",
+    "obs_chars": 1581,
+    "notes_chars": 1920
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "contains": "weight update|gradient|training|fine-tun|parameter"
+    },
+    "intent": "Find how ICL differs from training in terms of weight updates vs prompt-based adaptation",
+    "obs_chars": 244,
+    "notes_chars": 2156
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+     "contains": "traditional|conventional|gradient|training|fine-tun|weight"
+    },
+    "intent": "Find Mockingbird's comparison of ICL vs traditional ML training",
+    "obs_chars": 560,
+    "notes_chars": 2156
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+     "contains": "pretrain|continued|gradient|training|weight|fine-tun"
+    },
+    "intent": "Find ML-LM's discussion of ICL vs continued pretraining relationship",
+    "obs_chars": 1581,
+    "notes_chars": 2156
+   },
+   {
+    "step": 4,
+    "tool": "card",
+    "args": {
+     "entity": "in-context learning"
+    },
+    "intent": "Get cross-paper dossier on in-context learning for broader comparison",
+    "obs_chars": 4642,
+    "notes_chars": 2156
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations/limitations from core ICL paper",
+    "obs_chars": 187,
+    "notes_chars": 4275
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+     "claim_type": "criticism"
+    },
+    "intent": "Get Mockingbird's critical findings on ICL vs traditional ML",
+    "obs_chars": 187,
+    "notes_chars": 4275
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+     "claim_type": "criticism"
+    },
+    "intent": "Get ML-LM's critical findings on ICL limitations",
+    "obs_chars": 1079,
+    "notes_chars": 4275
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "in-context learning no weight updates gradient descent traditional training difference",
+     "k": 8
+    },
+    "intent": "Find explicit statements about ICL not updating weights vs traditional ML training",
+    "obs_chars": 2416,
+    "notes_chars": 4275
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+     "contains": "no weight|parameter update|gradient|training|fine-tun|inference|test-time"
+    },
+    "intent": "Get core ICL paper's statements on the no-weight-update distinction from traditional training",
+    "obs_chars": 1314,
+    "notes_chars": 5008
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+     "contains": "in-context|ICL|prompt|demonstration|example|shot"
+    },
+    "intent": "Get Mockingbird's findings on ICL performance vs traditional ML",
+    "obs_chars": 1512,
+    "notes_chars": 5008
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+     "contains": "in-context|ICL|prompt|demonstration|shot|pretrain"
+    },
+    "intent": "Get ML-LM's findings on ICL vs continued pretraining",
+    "obs_chars": 1581,
+    "notes_chars": 5008
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "in-context learning vs traditional machine learning no parameter updates gradient descent weight updates difference"
+    },
+    "intent": "Find explicit comparisons between ICL and traditional ML training across papers",
+    "obs_chars": 2416,
+    "notes_chars": 5008
+   },
+   {
+    "f28_auto_retrieval": "sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im",
+    "at_step": 8,
+    "obs_chars": 1083
+   },
+   {
+    "f28_auto_retrieval": "sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_",
+    "at_step": 11,
+    "obs_chars": 1512
+   },
+   {
+    "f28_auto_retrieval": "sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin",
+    "at_step": 14,
+    "obs_chars": 1581
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 18,
+    "f28_autos": 3
+   }
+  ],
+  "notes_final": "N1. [sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im] Core ICL paper (2025).\nN2. [coarse:6c8ca64bc2a0] LLMs infer a latent variable containing task information in a probabilistic model of reasoning during ICL | anchor:\"Bayesian lens through which LLMs are viewed\" | epistemic:stated\nN3. [coarse:3fede275f63b] GPT acts as a meta-optimizer by adapting internal mechanisms through ICL, akin to meta-learning | anchor:\"GPT, act as meta-optimizers by adapting thei\" | epistemic:stated\nN4. [sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_] Mockingbird (2025).\nN5. [coarse:1598d2858cc6] Content in context influences LLM behavior; ICL is effective to some extent | anchor:\"content in context can influence the behavior of LLMs\" | epistemic:stated\nN6. [coarse:3e74705253d5] Semantically closer examples in context have more effect on LLMs | anchor:\"examples in the context that are semantically closer to the queries have more effect\" | epistemic:stated\nN7. [coarse:01fc5c22d8c2] ICL differs from conventional ML methods that treat examples differently regarding semantic closeness | anchor:\"this makes in-context learning different from conventional machine learning methods that t\" | epistemic:stated\nN8. [sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin] ML-LM (2025).\nN9. [coarse:b45a792d1b04] Tabular-specific architectures cannot leverage broad prior world knowledge and general-purpose multimodal perception that LLMs acquire during pretraining | anchor:\"these tabular-specific model architectures cannot leverage the broad prior world\" | epistemic:stated\nN10. [coarse:aeb40bf2438e] Tabular-specific architectures depend heavily on well-designed featurization and abundant labeled data for training | anchor:\"these tabular-specific model architectures cannot leverage the broad prior world\" | epistemic:stated\nN11. [coarse:8da06b5f5f36] Pioneering tabular models demonstrated ML tasks can be solved purely by ICL without gradient descent | anchor:\"ML tasks can be solved purely by in-context learning without gradient descent\" | epistemic:stated\nN12. [10a8147b4bcdd5] Test-time fine-tuning takes time linear in number of tokens whereas ICL with a trained model is faster | anchor:\"test-time fine-tuning takes time linear in the number of tokens whereas in-context learning with a t\" | epistemic:stated\nN13. [coarse:302cd5b2b1c1] Transformers can use ICL to approximate ML algorithms such as logistic regression | anchor:\"Transformers can use in-context learning to approximate machine learning algorithms such as logistic\" | epistemic:stated\nN14. [coarse:028e7d0ba502] Many believe ICL mechanism is different from supervised or unsupervised learning | anchor:\"Many believe that the in-context learning mechanism is different from supervised learning or unsuper\" | epistemic:stated\nN15. [coarse:714e4a9fc0e2] Pre-training an LM is the most expensive step in the ICL procedure | anchor:\"Pre-training an LM is the most expensive step in the in-context learning procedure\" | epistemic:stated\nN16. [13b34859e09194] Fine-tuning at test-time tends to outperform or perform on-par with ICL | anchor:\"Fine-tuning at test-time tends to outperform or perform on-par with in-context learning\" | epistemic:stated\nN17. [c62e59713b948c] Hardt & Sun (2024) found test-time fine-tuning performs substantially better than ICL | anchor:\"Hardt & Sun (2024) and other works have found (test-time) fine-tuning to perform substantially bette\" | epistemic:stated\nN18. [coarse:fd4928eb6a0f] By presenting structured examples, explanations, and relevant background info, ICL guides LLM behavior | anchor:\"By presenting structured examples, explanations, and relevant background information, in-context lea\" | epistemic:stated\nN19. [96c299a885aebb] ICL performs worse than manual prompt on some tasks and suffers from high variance | anchor:\"In-context learning performs even worse than manual prompt on some tasks and suffers from high varia\" | epistemic:stated\nN20. [coarse:fb25ee0ff0a3] Prompt engineering is the most impactful part affecting ICL performance | anchor:\"Prompt engineering has become the most impactful part that affects the performance of an in-context\" | epistemic:stated\nN21. [sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms] ICL requires no parameter updates, in contrast to standard in-weights learning | anchor:\"In contrast to standard in-weights learning, in-context learning requires no parameter updates\" | epistemic:stated\nN22. [arxiv_2301.00234] ICL key idea is to learn from analogy; requires few demonstration examples in prompt context | anchor:\"The key idea of in-context learning is to learn from analogy\" | epistemic:stated\nN23. [arxiv_2301.00234] GPT-based ICL behaves similarly to explicit fine-tuning from multiple perspectives (gradient descent view) | anchor:\"GPT-based ICL behaves similarly to explicit fine-tuning from multiple perspectives\" | epistemic:stated",
+  "gaps_final": "G1. Need more from core ICL paper: specific mechanisms, capabilities, limitations\nG2. Need Mockingbird findings on ICL vs traditional ML performance comparison\nG3. Need ML-LM findings on ICL vs continued pretraining relationship\nG4. Need conceptual distinction: ICL (no weight updates) vs traditional ML (weight updates, gradient descent)",
+  "queried": [
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}",
+   "findings|{\"contains\": \"weight update|gradient|training|fine-tun|parameter\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"contains\": \"traditional|conventional|gradient|training|fine-tun|weight\", \"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"contains\": \"pretrain|continued|gradient|training|weight|fine-tun\", \"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}",
+   "card|{\"entity\": \"in-context learning\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}",
+   "search_text|{\"k\": 8, \"query\": \"in-context learning no weight updates gradient descent traditional training difference\"}",
+   "findings|{\"contains\": \"no weight|parameter update|gradient|training|fine-tun|inference|test-time\", \"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"contains\": \"in-context|ICL|prompt|demonstration|example|shot\", \"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"contains\": \"in-context|ICL|prompt|demonstration|shot|pretrain\", \"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}",
+   "search_text|{\"k\": 8, \"query\": \"in-context learning vs traditional machine learning no parameter updates gradient descent weight updates difference\"}",
+   "findings|{\"paper_id\": \"sciverse_in_context_learning_in_large_language_models_llms_mechanisms_capabilities_and_im\"}",
+   "findings|{\"paper_id\": \"sciverse_mockingbird_how_does_llm_perform_in_general_machine_learning_tasks_\"}",
+   "findings|{\"paper_id\": \"sciverse_machinelearninglm_scaling_many_shot_in_context_learning_via_continued_pretrainin\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 3,
+   "a_chars": 303,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 18,
+   "_consec_full_reject": 0,
+   "f28_autos": 3,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 16,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [c4789e0e290653] in-context learning training samples=up to 32 | src:card@step3",
+   "A2. [d64093a5429989] in-context learning inference cost estim=time to compute rolling log-li | src:card@step3",
+   "A3. [11b41100fe7b1b] in-context learning token throughput cal=total compute time divided by | src:card@step3"
+  ],
+  "degenerate": false
+ }
+]

@@ -1,0 +1,1338 @@
+[
+ {
+  "qid": "00bdd80debc8549198001289",
+  "question": "How can I use an hybridization of ontology and machine learning for text summarization ?",
+  "sections": [
+   {
+    "title": "System Architecture",
+    "text": "The OATS cognitive system integrates ontology and machine learning into two distinct modules for automatic text summarization [1]. The first module performs ontology-based topic identification to select relevant documents aligned with user interests [1][1]. The second module generates user-focused summaries by exploiting answers extracted from a machine learning-based question-answering model [1][1]. This hybrid approach allows the system to leverage structured knowledge for document retrieval and statistical models for content extraction [1][1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that alig",
+       "it first utilizes an ontology-based approach to identify relevant documents to user's interest, and then takes advantage of the answers extracted from a question answering model using \"questions\" specified from users for the generation of text summarization",
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that aligns to the user's focus.",
+       "OATS consists of two modules: ontology-based topic identification and user-focused text summarization",
+       "we introduce a novel cognitive system, ontology-based and user-focused automatic text summarization (OATS), which consists of two modules: 1.) identification of relevant documents for a specific topic guided by an ontology with specified concepts and relations; 2.) generation of user-focused extractive text summarization from each relevant document utilizing \"questions\" specified from users.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "The same spirit is adapted in this work—we develop a COVID-19 risk factor ontology (see Subsection 3.1 for details) and identify the risk factor of COVID-19 from unstructured articles.",
+       "Since the extracted answers from the QA model may appear in multiple sentences in the text, a sentence scoring method is developed to improve the performance of the summarization generation.",
+       "With common words being filtered out, there is no need for IDF normalization.",
+       "if only \"COPD\" and its full name \"chronic obstructive pulmonary disease\" were used to find matching terms, the recall score would be low",
+       "if we separated COPD into four words and measured the distance from each word to the candidate term, the precision score would be low because the term \"chronic\" is commonplace",
+       "The system has a slightly poor performance with the risk factor COPD.",
+       "<tr><td>COPD</td><td>0.81</td><td>0.6</td></tr>",
+       "<tr><td>Obesity</td><td>1</td><td>0.71</td></tr>",
+       "<tr><td>Diabetes</td><td>0.92</td><td>0.76</td></tr>",
+       "<tr><td>Hypertension</td><td>0.93</td><td>0.84</td></tr>",
+       "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answer pairs from abstracts to form a text summarization.",
+       "The extracted answers pertaining to methodology information (Q1 through Q6) had over $50\\%$ accuracy",
+       "An additional limitation particular to Q7 and Q8 is that odds ratios are often presented in tables, which are not included in the text available to the QA model.",
+       "Furthermore, inaccessibility of the sections of the text that contain the optimal answers to questions remain can limit QA model performance.",
+       "A limitation is that the QA extraction accuracy can be sensitive to the wording of the question, especially for information that is presented slightly differently across documents.",
+       "A limitation is that the QA model approach requires a standardized set of questions to access information that may be presented in non-standardized ways across documents (e.g. risk from hypertension)."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Ontology and Graph Construction",
+    "text": "The system utilizes a simplified COVID-19 Risk Factor ontology, which is a reduced version of a Clinical Quality Measure (CQM) ontology that excludes the \"Change Concept\" component [3] [4][1]. This ontology is motivated by prior work by Schwemmer et al. (2019), who manually extracted \"gold standard\" concept graphs from approximately 2,000 CQM descriptions to guide concept selection [1]. In the current implementation, the igraph package in the R programming language is used to create graph concepts from extracted triples [2]. A matching algorithm then determines the relevancy of each document to specific risk factors using these graph representations [1][1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that alig",
+       "it first utilizes an ontology-based approach to identify relevant documents to user's interest, and then takes advantage of the answers extracted from a question answering model using \"questions\" specified from users for the generation of text summarization",
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that aligns to the user's focus.",
+       "OATS consists of two modules: ontology-based topic identification and user-focused text summarization",
+       "we introduce a novel cognitive system, ontology-based and user-focused automatic text summarization (OATS), which consists of two modules: 1.) identification of relevant documents for a specific topic guided by an ontology with specified concepts and relations; 2.) generation of user-focused extractive text summarization from each relevant document utilizing \"questions\" specified from users.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "The same spirit is adapted in this work—we develop a COVID-19 risk factor ontology (see Subsection 3.1 for details) and identify the risk factor of COVID-19 from unstructured articles.",
+       "Since the extracted answers from the QA model may appear in multiple sentences in the text, a sentence scoring method is developed to improve the performance of the summarization generation.",
+       "With common words being filtered out, there is no need for IDF normalization.",
+       "if only \"COPD\" and its full name \"chronic obstructive pulmonary disease\" were used to find matching terms, the recall score would be low",
+       "if we separated COPD into four words and measured the distance from each word to the candidate term, the precision score would be low because the term \"chronic\" is commonplace",
+       "The system has a slightly poor performance with the risk factor COPD.",
+       "<tr><td>COPD</td><td>0.81</td><td>0.6</td></tr>",
+       "<tr><td>Obesity</td><td>1</td><td>0.71</td></tr>",
+       "<tr><td>Diabetes</td><td>0.92</td><td>0.76</td></tr>",
+       "<tr><td>Hypertension</td><td>0.93</td><td>0.84</td></tr>",
+       "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answer pairs from abstracts to form a text summarization.",
+       "The extracted answers pertaining to methodology information (Q1 through Q6) had over $50\\%$ accuracy",
+       "An additional limitation particular to Q7 and Q8 is that odds ratios are often presented in tables, which are not included in the text available to the QA model.",
+       "Furthermore, inaccessibility of the sections of the text that contain the optimal answers to questions remain can limit QA model performance.",
+       "A limitation is that the QA extraction accuracy can be sensitive to the wording of the question, especially for information that is presented slightly differently across documents.",
+       "A limitation is that the QA model approach requires a standardized set of questions to access information that may be presented in non-standardized ways across documents (e.g. risk from hypertension)."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Next, we use the igraph package (Csardi & Nepsz, 2006) in the R programming language to create the graph concepts from extracted triples"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "The COVID-19 Risk Factor ontology is a simplified version of a novel CQM ontology developed, in part, by two authors of this paper (Schwemme"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "This complexity necessitates a simplified version of the ontology, which excludes \"Change Concept\" as a component and only includes a \"Popul"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Machine Learning Components",
+    "text": "Document relevancy scoring is performed using a word2vec model trained on ten years of data to assess the connection between documents and specific risk factors [5]. Because common words are filtered out during processing, there is no need for IDF normalization in the scoring process [1]. For the summarization phase, a sentence scoring method was developed to improve generation performance, particularly when extracted answers appear in multiple sentences [1]. This ML component complements the ontology-based retrieval by providing the specific content required for the final summary [1][1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that alig",
+       "it first utilizes an ontology-based approach to identify relevant documents to user's interest, and then takes advantage of the answers extracted from a question answering model using \"questions\" specified from users for the generation of text summarization",
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that aligns to the user's focus.",
+       "OATS consists of two modules: ontology-based topic identification and user-focused text summarization",
+       "we introduce a novel cognitive system, ontology-based and user-focused automatic text summarization (OATS), which consists of two modules: 1.) identification of relevant documents for a specific topic guided by an ontology with specified concepts and relations; 2.) generation of user-focused extractive text summarization from each relevant document utilizing \"questions\" specified from users.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "The same spirit is adapted in this work—we develop a COVID-19 risk factor ontology (see Subsection 3.1 for details) and identify the risk factor of COVID-19 from unstructured articles.",
+       "Since the extracted answers from the QA model may appear in multiple sentences in the text, a sentence scoring method is developed to improve the performance of the summarization generation.",
+       "With common words being filtered out, there is no need for IDF normalization.",
+       "if only \"COPD\" and its full name \"chronic obstructive pulmonary disease\" were used to find matching terms, the recall score would be low",
+       "if we separated COPD into four words and measured the distance from each word to the candidate term, the precision score would be low because the term \"chronic\" is commonplace",
+       "The system has a slightly poor performance with the risk factor COPD.",
+       "<tr><td>COPD</td><td>0.81</td><td>0.6</td></tr>",
+       "<tr><td>Obesity</td><td>1</td><td>0.71</td></tr>",
+       "<tr><td>Diabetes</td><td>0.92</td><td>0.76</td></tr>",
+       "<tr><td>Hypertension</td><td>0.93</td><td>0.84</td></tr>",
+       "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answer pairs from abstracts to form a text summarization.",
+       "The extracted answers pertaining to methodology information (Q1 through Q6) had over $50\\%$ accuracy",
+       "An additional limitation particular to Q7 and Q8 is that odds ratios are often presented in tables, which are not included in the text available to the QA model.",
+       "Furthermore, inaccessibility of the sections of the text that contain the optimal answers to questions remain can limit QA model performance.",
+       "A limitation is that the QA extraction accuracy can be sensitive to the wording of the question, especially for information that is presented slightly differently across documents.",
+       "A limitation is that the QA model approach requires a standardized set of questions to access information that may be presented in non-standardized ways across documents (e.g. risk from hypertension)."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "The relevancy of a document to a risk factor of COVID-19 (e.g., hypertension) is determined using a word2vec model that was trained on 10 ye"
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Matching Algorithm and Performance",
+    "text": "The matching algorithm demonstrates varying performance across different risk factors. Hypertension achieved a precision of 0.93 and a recall of 0.84, while Diabetes reached a precision of 0.92 and a recall of 0.76 [1][1]. Obesity showed perfect precision at 1.0 but a lower recall of 0.71 [1]. Performance was slightly poorer for COPD, with a precision of 0.81 and a recall of 0.60 [1][1]. To address the low recall associated with acronyms, the system separates \"COPD\" into its four constituent words and measures the distance from each word to candidate terms, although this can lower precision due to commonplace terms like \"chronic\" [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that alig",
+       "it first utilizes an ontology-based approach to identify relevant documents to user's interest, and then takes advantage of the answers extracted from a question answering model using \"questions\" specified from users for the generation of text summarization",
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that aligns to the user's focus.",
+       "OATS consists of two modules: ontology-based topic identification and user-focused text summarization",
+       "we introduce a novel cognitive system, ontology-based and user-focused automatic text summarization (OATS), which consists of two modules: 1.) identification of relevant documents for a specific topic guided by an ontology with specified concepts and relations; 2.) generation of user-focused extractive text summarization from each relevant document utilizing \"questions\" specified from users.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "The same spirit is adapted in this work—we develop a COVID-19 risk factor ontology (see Subsection 3.1 for details) and identify the risk factor of COVID-19 from unstructured articles.",
+       "Since the extracted answers from the QA model may appear in multiple sentences in the text, a sentence scoring method is developed to improve the performance of the summarization generation.",
+       "With common words being filtered out, there is no need for IDF normalization.",
+       "if only \"COPD\" and its full name \"chronic obstructive pulmonary disease\" were used to find matching terms, the recall score would be low",
+       "if we separated COPD into four words and measured the distance from each word to the candidate term, the precision score would be low because the term \"chronic\" is commonplace",
+       "The system has a slightly poor performance with the risk factor COPD.",
+       "<tr><td>COPD</td><td>0.81</td><td>0.6</td></tr>",
+       "<tr><td>Obesity</td><td>1</td><td>0.71</td></tr>",
+       "<tr><td>Diabetes</td><td>0.92</td><td>0.76</td></tr>",
+       "<tr><td>Hypertension</td><td>0.93</td><td>0.84</td></tr>",
+       "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answer pairs from abstracts to form a text summarization.",
+       "The extracted answers pertaining to methodology information (Q1 through Q6) had over $50\\%$ accuracy",
+       "An additional limitation particular to Q7 and Q8 is that odds ratios are often presented in tables, which are not included in the text available to the QA model.",
+       "Furthermore, inaccessibility of the sections of the text that contain the optimal answers to questions remain can limit QA model performance.",
+       "A limitation is that the QA extraction accuracy can be sensitive to the wording of the question, especially for information that is presented slightly differently across documents.",
+       "A limitation is that the QA model approach requires a standardized set of questions to access information that may be presented in non-standardized ways across documents (e.g. risk from hypertension)."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "QA Model Limitations and Context",
+    "text": "The question-answering model requires a standardized set of questions to access information that may be presented in non-standardized ways across documents [1]. Extraction accuracy is sensitive to question wording, especially when information is presented slightly differently in various sources [1]. Additionally, inaccessibility to text sections containing optimal answers limits model performance [1]. Specifically, odds ratios are often presented in tables, which are not included in the text available to the QA model, affecting questions Q7 and Q8 [1]. Despite these limitations, extracted answers pertaining to methodology information (Q1 through Q6) achieved over 50% accuracy [1]. This work builds upon prior research, including Arumae & Liu (2019), who developed a supervised deep learning framework using human-annotated question-answer pairs, and Muresan et al. (2001), who combined linguistic and machine learning techniques for email summarization [1][6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Muresan et al. (2001) \n \nSmaranda Muresan, Evelyne Tzoukermann, and Judith L Klavans. 2001.\n\n \n Combining linguistic and machine learning techniques for email\nsummarization.\n\n \n In Proceedings of the ACL 2001 Workshop on Computational\nNatural Language Learning (ConLL) .\n\n \n\n \n Murray et al. (2010) \n \nGabriel Murray, Giuseppe Carenini, and Raymond Ng. 2010.\n\n \n Generating and validating abs"
+      ],
+      "title": "Meeting Summarization: A Survey of the State of the Art",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2212.08206",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "chunk_id": "arxiv_2212.08206#49950",
+         "char_start": 49950
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that alig",
+       "it first utilizes an ontology-based approach to identify relevant documents to user's interest, and then takes advantage of the answers extracted from a question answering model using \"questions\" specified from users for the generation of text summarization",
+       "This paper proposes a novel automatic text summarization system, called OATS, which first utilizes an ontology-based approach using concept graphs to represent the knowledge from unstructured text and a matching algorithm to identify relevant documents, while also exploiting the answers from a question answering model based on \"questions\" specified by users to generate text summarization that aligns to the user's focus.",
+       "OATS consists of two modules: ontology-based topic identification and user-focused text summarization",
+       "we introduce a novel cognitive system, ontology-based and user-focused automatic text summarization (OATS), which consists of two modules: 1.) identification of relevant documents for a specific topic guided by an ontology with specified concepts and relations; 2.) generation of user-focused extractive text summarization from each relevant document utilizing \"questions\" specified from users.",
+       "Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs from around 2,000 clinical quality measure (CQM) descriptions to guide the selection of relevant measure concepts from biomedical literature.",
+       "They further developed a matching algorithm to determine the relevancy of each document to a CQM using \"gold standard graphs\" that were manually annotated from CQM descriptions according to the CQM ontology.",
+       "The same spirit is adapted in this work—we develop a COVID-19 risk factor ontology (see Subsection 3.1 for details) and identify the risk factor of COVID-19 from unstructured articles.",
+       "Since the extracted answers from the QA model may appear in multiple sentences in the text, a sentence scoring method is developed to improve the performance of the summarization generation.",
+       "With common words being filtered out, there is no need for IDF normalization.",
+       "if only \"COPD\" and its full name \"chronic obstructive pulmonary disease\" were used to find matching terms, the recall score would be low",
+       "if we separated COPD into four words and measured the distance from each word to the candidate term, the precision score would be low because the term \"chronic\" is commonplace",
+       "The system has a slightly poor performance with the risk factor COPD.",
+       "<tr><td>COPD</td><td>0.81</td><td>0.6</td></tr>",
+       "<tr><td>Obesity</td><td>1</td><td>0.71</td></tr>",
+       "<tr><td>Diabetes</td><td>0.92</td><td>0.76</td></tr>",
+       "<tr><td>Hypertension</td><td>0.93</td><td>0.84</td></tr>",
+       "Arumae & Liu (2019) developed a supervised deep learning framework utilizing human annotated question-answer pairs from abstracts to form a text summarization.",
+       "The extracted answers pertaining to methodology information (Q1 through Q6) had over $50\\%$ accuracy",
+       "An additional limitation particular to Q7 and Q8 is that odds ratios are often presented in tables, which are not included in the text available to the QA model.",
+       "Furthermore, inaccessibility of the sections of the text that contain the optimal answers to questions remain can limit QA model performance.",
+       "A limitation is that the QA extraction accuracy can be sensitive to the wording of the question, especially for information that is presented slightly differently across documents.",
+       "A limitation is that the QA model approach requires a standardized set of questions to access information that may be presented in non-standardized ways across documents (e.g. risk from hypertension)."
+      ],
+      "title": "ontology-based and user-focused automatic text summarization (oats): using covid-19 risk factors as an example",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.02028",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 23,
+   "n_claims_usable": 23,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 493,
+   "n_sections": 5,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "99fd4c1b54e1367bcd3cb3b2",
+  "question": "How can the integration of GIS spatial analysis techniques with economic modeling improve the accuracy and effectiveness of environmental policy ?",
+  "sections": [
+   {
+    "title": "Foundations of Spatial-Economic Integration",
+    "text": "The integration of spatial statistical analysis with Geographic Information Systems (GIS) offers a sophisticated framework for regional economic analysis [2]. Spatial statistics provides the theoretical basis for conducting exploratory analysis and making inferences on spatial data [3]. This approach allows researchers to move between different geographical scales, such as shifting from small units to larger regions, while capturing the impact of broader areas on specific components [2]. By connecting environmental and economic data through linked data structures, analysts can address the critical need to integrate environmental information with administrative, political, social, and economic datasets for development policy [1]. Numerous attempts have been made to reinforce the analysis of spatial-econ.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The need to integrate environmental information with administrative, political, social and economic data in developing development policy represents a powerful incentive for the application of GiS's in environmental and development modelling."
+      ],
+      "title": "implementing an integrated information system to support development planning",
+      "metadata": {
+       "year": 2003,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "GIS is well suited for the change of research area in level, like moving from small level geographical units to larger units, and it is convenient to capture the effect of a larger region on one of its components too.",
+       "Nowadays, the integration of spatial statistical analysis with GIS provides a more sophisticate"
+      ],
+      "title": "application of integration of spatial statistical analysis with gis to regional economic analysis",
+      "metadata": {
+       "year": 2004,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Spatial statistics [ 34 , 35 , 36 ] provides a theoretical framework to do exploratory analysis and make inference on spatial data.",
+       "The problem can be further categorized into spatial classification for categorical response and spatial regression for continuous response."
+      ],
+      "title": "A Survey on Spatial and Spatiotemporal Prediction Methods",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.13384",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "II Spatial Statistical Foundations",
+         "chunk_id": "arxiv_2012.13384#c9",
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Methodological Approaches and Prediction",
+    "text": "Environmental modeling activities can significantly benefit from GIS technology [4]. The integration of environmental models with GIS functionalities can be achieved through either loosely or tightly coupled approaches [4]. Spatial prediction methods are generally categorized into spatial classification for categorical responses and spatial regression for continuous responses [3]. To simplify these prediction methods, it is often assumed that spatial homogeneity exists, characterized by stationarity and isotropy. These statistical tools enhance the ability to model complex spatial relationships that traditional non-spatial models might overlook.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "Spatial statistics [ 34 , 35 , 36 ] provides a theoretical framework to do exploratory analysis and make inference on spatial data.",
+       "The problem can be further categorized into spatial classification for categorical response and spatial regression for continuous response."
+      ],
+      "title": "A Survey on Spatial and Spatiotemporal Prediction Methods",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": "2012.13384",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "II Spatial Statistical Foundations",
+         "chunk_id": "arxiv_2012.13384#c9",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Integrating environmental models with GIS functionalities is conceivable through either a loosely or tightly coupled approach.",
+       "Environmental modeling activities can tremendously benefit from geographic information system (GIS) technology."
+      ],
+      "title": "on tightly coupling models with visualizations: the package for analysis and visualization of environmental data",
+      "metadata": {
+       "year": 1997,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "System Dynamics and Policy Application",
+    "text": "System dynamics (SD) theory has long been used to model complex non-linear interrelationships [6]. However, the use of SD modeling to support the practical implementation of environmental sustainability policies has not been common [6]. A primary reason for this gap is that the challenge of incorporating spatial data into SD modeling has not yet been adequately addressed [6]. The potential for combining SD and GIS methods is exemplified in studies that integrate an economic model of climate change with a small structural model of the Greenland ice sheet (GIS) [6] [5]. This integration provides a methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses [5].",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "As such, it provides a methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses.",
+       "This study integrates an economic model of climate change with a small structural model of the Greenland ice sheet (GIS)."
+      ],
+      "title": "economics of the disintegration of the greenland ice sheet",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "Potential for adoption of SD and GIS methods in combination is exemplified with",
+       "This is largely because the challenge of including spatial data has not yet been well met.",
+       "so far it has not been common to do the kind of modeling in support of bringing environmental sustainability policies to practice",
+       "System dynamics (SD) theory has long been deployed in modeling complex non-linear interrelationships"
+      ],
+      "title": "interrelations between socio-economic development and environmental quality: a simulation integrating system dynamics models with gis",
+      "metadata": {
+       "year": 2005,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Enhancing Policy Effectiveness",
+    "text": "Policy analysis in the environmental field has improved in various ways by internalizing spatial-environmental externalities, for example, through Pigouvian taxation schemes [7]. By leveraging the spatial capabilities of GIS and the dynamic modeling of SD, policymakers can better understand the spatial distribution of economic impacts and environmental risks. This combined approach allows for more accurate assessments of how local actions affect larger regional systems, thereby improving the precision of cost-benefit analyses and the design of targeted regulatory interventions.",
+    "citations": [
+     {
+      "id": "[7]",
+      "snippets": [
+       "Finally, by internalizing spatial-environmental externalities, for example, through Pigouvian taxation schemes, policy analysis in the environmental field has improved in various ways."
+      ],
+      "title": "environmental change, adaptation, and security ||",
+      "metadata": {
+       "year": 1999,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 18,
+   "n_claims_usable": 18,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C13",
+     "sentence": "Numerous attempts have been made to reinforce the analysis of spatial-econ ."
+    },
+    {
+     "cid": "C18",
+     "sentence": "To simplify these prediction methods, it is often assumed that spatial homogeneity exists, characterized by stationarity and isotropy ."
+    }
+   ],
+   "word_count": 380,
+   "n_sections": 4,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "2bb40aa93ac3a6a673c839bd",
+  "question": "Have specialized approaches been developed for providing LLM assistance when people author SQL queries?",
+  "sections": [
+   {
+    "title": "Necessity of Specialized SQL Approaches",
+    "text": "Treating SQL as a standard programming language for existing LLM autocompletion systems is insufficient due to three main challenges that warrant special treatment [1]. A primary difficulty is that coexisting with traditional autocomplete systems remains a significant hurdle for many AI-assisted code authoring solutions [1]. Furthermore, the focus of specialized work is on autocompleting SQL queries as authors type them out, rather than general generation [1]. This iterative nature is critical because the biggest time savings and productivity boosts come from helping developers bootstrap and iterate on complex SQL queries without navigating clunky syntax, semantics, or documentation [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "As SQL development is iterative, the biggest time savings and productivity boost comes from the fact that SQLCompose helps developers bootstrap and iterate on complex SQL queries without needing to navigate clunky SQL syntax, semantics, and documentation.",
+       "whereas the focus of this work is on automixting SQL queries as authors type them out.",
+       "Coexisting with the traditional auto complete system is a challenge faced by many AI-assisted code authoring solutions [1].",
+       "While it can be tempting to cast SQL as just another programming language for existing LLM autocompletion systems, there are three main challenges that warrant special treatment for SQL.",
+       "LCM overcomes the limitations imposed by regular CM objective with respect to tokenization",
+       "(b) the latency constraints are much tighter for an automixtional tool compared to natural language querying,",
+       "SqlCompose has is used on a weekly basis by over 10k users including data scientists and software engineers",
+       "and.SqlComposeFIM is able to do this $75\\%$ of the time a major improvement over the other two models.",
+       "SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score.",
+       "The.SqlCompose models consistently outperform public and internal LLMs despite their smaller size (7 bn and 13 bn)"
+      ],
+      "title": "ai-assisted sql authoring at industry scale",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5.5 User sentiment and feedback",
+         "chunk_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale#c21",
+         "char_start": 38117
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Latency and Efficiency Constraints",
+    "text": "Latency constraints are much tighter for an autocompletion tool compared to natural language querying [1]. This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB) [2]. To address this, Consistency large language models (CLLMs) have been developed with an enhanced model architecture, providing a solution to reduce latency and speed up SQL query generation [2]. Additionally, LCM overcomes the limitations imposed by regular CM objective with respect to tokenization [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "As SQL development is iterative, the biggest time savings and productivity boost comes from the fact that SQLCompose helps developers bootstrap and iterate on complex SQL queries without needing to navigate clunky SQL syntax, semantics, and documentation.",
+       "whereas the focus of this work is on automixting SQL queries as authors type them out.",
+       "Coexisting with the traditional auto complete system is a challenge faced by many AI-assisted code authoring solutions [1].",
+       "While it can be tempting to cast SQL as just another programming language for existing LLM autocompletion systems, there are three main challenges that warrant special treatment for SQL.",
+       "LCM overcomes the limitations imposed by regular CM objective with respect to tokenization",
+       "(b) the latency constraints are much tighter for an automixtional tool compared to natural language querying,",
+       "SqlCompose has is used on a weekly basis by over 10k users including data scientists and software engineers",
+       "and.SqlComposeFIM is able to do this $75\\%$ of the time a major improvement over the other two models.",
+       "SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score.",
+       "The.SqlCompose models consistently outperform public and internal LLMs despite their smaller size (7 bn and 13 bn)"
+      ],
+      "title": "ai-assisted sql authoring at industry scale",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5.5 User sentiment and feedback",
+         "chunk_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale#c21",
+         "char_start": 38117
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "To address this, Consistency large language models (CLLMs) has been developed with an enhanced model architecture, providing a solution to reduce latency and speed up SQL query generation [79].",
+       "This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB).",
+       "RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation [31]."
+      ],
+      "title": "from natural language to sql: review of llm-based text-to-sql systems",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Schema Linking and Retrieval Strategies",
+    "text": "Prompting LLMs with entire schemas alongside the user's question fails on large databases [4]. To mitigate this, SchemaGraphSQL offers efficient schema linking using pathfinding graph algorithms for text-to-sql on large-scale databases [5]. Another approach involves scaling Text2SQL via LLM-efficient schema filtering using Functional Dependency Graph Rerankers [4]. RAG-based text-to-SQL systems also integrate dynamic retrieval abilities with generative models to improve SQL query generation [2]. While LLMs excel at row-level inference because they can reason over context and semantics [3], these retrieval and filtering methods are necessary to manage the complexity of large schemas.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "LLMs excel at row-level inference because they can reason over context and sem"
+      ],
+      "title": "research challenges in relational database management systems for llm queries",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "To address this, Consistency large language models (CLLMs) has been developed with an enhanced model architecture, providing a solution to reduce latency and speed up SQL query generation [79].",
+       "This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB).",
+       "RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation [31]."
+      ],
+      "title": "from natural language to sql: review of llm-based text-to-sql systems",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "Scaling Text2SQL via LLM-efficient Schema Filtering with Functional Dependency Graph Rerankers",
+       "While effective on small databases, this approach fails on"
+      ],
+      "title": "scaling text2sql via llm-efficient schema filtering with functional dependency graph rerankers",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases"
+      ],
+      "title": "schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql on large-scale databases",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Model Performance and Deployment",
+    "text": "The SqlCompose models consistently outperform public and internal LLMs despite their smaller size (7 bn and 13 bn) [1]. Specifically, SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score [1]. In terms of accuracy, SqlComposeFIM is able to get correct table names 75% of the time, a major improvement over the other two models [1]. These specialized approaches have seen significant adoption, with SqlCompose used on a weekly basis by over 10k users including data scientists and software engineers [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "As SQL development is iterative, the biggest time savings and productivity boost comes from the fact that SQLCompose helps developers bootstrap and iterate on complex SQL queries without needing to navigate clunky SQL syntax, semantics, and documentation.",
+       "whereas the focus of this work is on automixting SQL queries as authors type them out.",
+       "Coexisting with the traditional auto complete system is a challenge faced by many AI-assisted code authoring solutions [1].",
+       "While it can be tempting to cast SQL as just another programming language for existing LLM autocompletion systems, there are three main challenges that warrant special treatment for SQL.",
+       "LCM overcomes the limitations imposed by regular CM objective with respect to tokenization",
+       "(b) the latency constraints are much tighter for an automixtional tool compared to natural language querying,",
+       "SqlCompose has is used on a weekly basis by over 10k users including data scientists and software engineers",
+       "and.SqlComposeFIM is able to do this $75\\%$ of the time a major improvement over the other two models.",
+       "SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score.",
+       "The.SqlCompose models consistently outperform public and internal LLMs despite their smaller size (7 bn and 13 bn)"
+      ],
+      "title": "ai-assisted sql authoring at industry scale",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "5.5 User sentiment and feedback",
+         "chunk_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale#c21",
+         "char_start": 38117
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Reasoning and User Interaction",
+    "text": "Prompting techniques like Chain-of-Thought (Wei et al., 2022) and ReAct (Yao et al., 2023) have demonstrated improved performance on multi-step reasoning tasks in both general and biomedical settings [7]. However, a key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation [6]. While we have focused on single-shot query execution, irresolvable ambiguities should be handled through mixed-initiative specification, cooperatively engaging the user to resolve ambiguities rather than fail or guess [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "While we have focused on single-shot query execution, irresolvable ambiguities should be handled through mixed-initiative specification [11, 1], cooperatively engaging the user to resolve ambiguities rather than fail or guess.",
+       "A key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation."
+      ],
+      "title": "are we asking the right questions? on ambiguity in natural language queries for tabular data analysis",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "Prompting techniques like Chain-of-Thought (Wei et al., 2022) and ReAct (Yao et al., 2023) have demonstrated improved performance on multi-step reasoning tasks in both general and biomedical settings."
+      ],
+      "title": "biomedsql: text-to-sql for scientific reasoning on biomedical knowledge bases",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 20,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 443,
+   "n_sections": 5,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]",
+    "[2]",
+    "[3]",
+    "[6]",
+    "[7]"
+   ]
+  }
+ },
+ {
+  "qid": "fb607bc177d2efb926cb3dff",
+  "question": "How can question generation be used to mitigate hallucination in LLMs?",
+  "sections": [
+   {
+    "title": "Retrieval-Based Mitigation via Question-to-Question Matching",
+    "text": "A primary strategy for eliminating hallucination involves bypassing the generative step entirely by leveraging question-to-question (Q2Q) retrieval. Traditional methods suffer from low semantic similarity because questions are interrogative while source passages are declarative, a structural disparity that hinders high-precision retrieval [1]. To resolve this, the Q2Q approach employs an instruction-tuned LLM to generate a comprehensive set of questions for each logical content unit within a knowledge base, rather than embedding the document content directly [1]. For knowledge graphs like Wikidata, the system generates all possible questions to make entity relations accessible to a question-answering system [1]. This method achieves high cosine similarity (>0.9) for relevant question pairs, enabling precise retrieval [1]. By directly retrieving original content instead of relying on generated answers, the response is hallucination-free [1]. While this avoids the risk of the LLM creating plausible but incorrect answers, addressing the initial retrieval challenge may still require strategies such as question reformulation, passage summarization, or hybrid approaches combining semantic search with keyword matching [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Addressing this challenge requires strategies like question reformulation, passage summarization, or hybrid approaches that combine semantic search with keyword matching.",
+       "In this paper, we introduced a novel question-to-question retrieval approach for open-domain question answering over Wikipedia and Wikidata, which achieves high precision and eliminates the risk of hallucination by avoiding the traditional generation step.",
+       "The most important advantage is that the response is hallucination-free, since we directly retrieve the original content instead of relying on generated answers.",
+       "Furthermore, while LLMs excel at generating human-like text, the generation step itself introduces the risk of hallucination, where LLMs may create plausible but factually incorrect answers.",
+       "Our method achieves high cosine similarity \\( (>0.9\\) ) for relevant question pairs, enabling highly precise retrieval.",
+       "A similar approach is presented for wikidata where the content is in the form of entity relations, we generate all possible questions and then make the wikidata knowledge graph accessible to a question answer system.",
+       "Instead of embedding document content, we employ an instruction-tuned LLM to generate a comprehensive set of questions for each logical content unit within the knowledge base.",
+       "This disparity arises primarily from their distinct structural differences: questions are interrogative, while passages are predominantly declarative.",
+       "This \"question-to-passage\" comparison, exacerbated by lexical differences and the differing focus of questions and passages, hinders high-precision retrieval, particularly for queries seeking specific information."
+      ],
+      "title": "question-to-question retrieval for hallucination-free knowledge access: an approach for wikipedia and wikidata question answering",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Context-Driven Generation and Multi-Hop Decomposition",
+    "text": "Alternative approaches leverage the strong text generation capabilities of LLMs to create questions given a specific context and answer [4]. However, output variability and hallucinations pose significant threats to the reliability of these LLM-generated results [4]. In context-driven generation, hallucinations may lead to generated questions that introduce information not present in the source material. A promising direction for mitigating this is to fine-tune LLMs to better align with source constraints. For complex inquiries, decomposing a complex question into simpler questions based on identified topic entities allows each sub-question to address the relationship to the potential answer [3]. Nevertheless, eliminating hallucinations when prompting LLMs to generate these multi-hop questions remains an interesting and unresolved challenge [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Eliminating hallucinations when prompting LLMs to generate multi-hop questions will be an interesting challenge."
+      ],
+      "title": "multi-hop question generation via dual-perspective keyword guidance",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "First, the complex question \\( q \\) is decomposed into simpler questions based on the identified topic entities, each addressing their relationship to the potential answer. Addressing these simpler questions collectively guides the LLM to better answer the original query, thereby reducing hallucinations."
+      ],
+      "title": "paths-over-graph: knowledge graph empowered large language model reasoning",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "However, challenges such as output variability [16], [17] and hallucinations [18] pose significant threats to the reliability of LLM-generated results.",
+       "In this study, we leverage the strong text generation capabilities of LLMs to generate questions given a specific context and answer."
+      ],
+      "title": "testing question answering software with context-driven question generation",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Self-Estimation and Hallucination Testing Frameworks",
+    "text": "Another avenue for reducing hallucination involves optimizing API dependency through self-estimation. A proposed LLM is able to self-estimate if it is able to answer directly or needs to request an external tool [6]. This supervised approach introduces a hallucination masking mechanism where labels are generated using a close-book question-answering task [6]. The model directly provides answers for 78.2% of the known queries and opts to search for 77.2% of the unknown ones [6]. Consequently, the external API is utilized only 62% of the time, balancing accuracy with resource efficiency [6]. Furthermore, to evaluate the effectiveness of these models, researchers have presented a novel framework for generating invalid questions to test the frequency of hallucinations output by new LLMs [5]. This involves collecting an augmented version of the DBpedia dataset replaced with invalid questions to measure overfitting and hallucination rates.",
+    "citations": [
+     {
+      "id": "[5]",
+      "snippets": [
+       "Motivated by similar findings that language models are overfitting to QA datasets, Ramakrishna et al. (2023) present a novel framework for generating invalid questions to test the frequency of hallucinations output by new LLMs."
+      ],
+      "title": "Hallucination Detection in Foundation Models for Decision-Making: A Flexible Definition and Review of the State of the Art",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2403.16527",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "C.3.2. Adversarial Prompting",
+         "chunk_id": "arxiv_2403.16527#c38",
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[6]",
+      "snippets": [
+       "This results in the API being utilized only $62\\%$ of the time.",
+       "Our model directly provides answers for $78.2\\%$ of the known queries and opts to search for $77.2\\%$ of the unknown ones.",
+       "We investigate a supervised approach by introducing a hallucination masking mechanism in which labels are generated using a close book question-answering task.",
+       "In this paper, we propose a new LLM able to self-estimate if it is able to answer directly or needs to request an external tool."
+      ],
+      "title": "Navigating Uncertainty: Optimizing API Dependency for Hallucination Reduction in Closed-Book Question Answering",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": "2401.01780",
+       "authors": [
+        "Pierre Erbacher and Louis Falissar and Vincent Guigue and Laure\n  Soulier"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 22,
+   "n_claims_usable": 22,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_downgraded": [
+    {
+     "cid": "C8",
+     "sentence": "A promising direction for mitigating this is to fine-tune LLMs to better align with source constraints ."
+    },
+    {
+     "cid": "C7",
+     "sentence": "In context-driven generation, hallucinations may lead to generated questions that introduce information not present in the source material ."
+    },
+    {
+     "cid": "C15",
+     "sentence": "This involves collecting an augmented version of the DBpedia dataset replaced with invalid questions to measure overfitting and hallucination rates ."
+    }
+   ],
+   "word_count": 419,
+   "n_sections": 3,
+   "n_citations": 6,
+   "record_level": 6,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "3d1ff2a80239a37908a6f4c4",
+  "question": "How are user demonstrations represented in domain-specific-language programs and used for automation tasks?",
+  "sections": [
+   {
+    "title": "Representation of Demonstrations in DSLs",
+    "text": "Programming by Demonstration (PbD) is an approach for faster software development in domains where the user works interactively with a computer or some machinery [5]. This method has been adopted by many tools to reduce the expertise required, as users only have to interact with the target applications rather than write code [4]. To support programming for tasks in diverse domains, systems leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium, where procedural actions are represented as sequences of GUI operations [3]. Declarative concepts can be represented through references to GUI contents [3]. The system focuses on intuitive symbolic representations like a domain specific language (DSL) or a natural language interface [2]. A high-level domain-specific language is used that determines which the sets of rules are synthesized [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "A high-level domain-specific language is used that deter-mines which the sets of rules are synthesized."
+      ],
+      "title": "Analysis of Evolutionary Program Synthesis for Card Games",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": "2101.03172",
+       "authors": [
+        "Rohan Saha",
+        "Cassidy Pirlot"
+       ],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Therefore, we focus on intuitive symbolic representations like a domain specific language (DSL) or a natural language interface."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "To support programming for tasks in diverse domains, we leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium, where procedural actions are represented as sequences of GUI operations, and declarative concepts can be represented through references to GUI contents.",
+       "Moreover, even if a concept may seem clear to a human, an agent may still not understand it due to the limitations in its natural language understanding techniques and pre-defined ontology.",
+       "umice agent asks the user to verbally explain, or to demonstrate how to fulfill this resolve() function. If an unknown concept or procedure is resolved through verbal explanation, the parser can parse the new explanation into an expression of its original type in the target DSL (e.g., an explanation for a Boolean concept is parsed into a Boolean expression), and replace the original resolve() func",
+       "In this paper, we address the research challenge of enabling end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming and programming by demonstration (PBD).",
+       "Such restrictions are due to the limited capabilities of existing natural language understanding techniques – they do not yet support robust understanding of utterances across diverse domains without extensive training data and structured prior knowledge within each domain.",
+       "Other natural language programming approaches (e.g., [ \\citeauthoryearAzaria, Krishnamurthy, and Mitchell2016 , \\citeauthoryearFast et al.2018 , \\citeauthoryearKate, Wong, and Mooney2005 , \\citeauthoryearSrivastava, Labutov, and Mitchell2017 ] ) restricted the problem space to specific task domains, so that they could constrain the space and the complexity of target program statements in order to enable the understanding of flexible user utterances.",
+       "Some prior systems (e.g., [ \\citeauthoryearPrice et al.2000 ] ) directly translate user instructions in natural language into conventional programming languages like Java. This approach requires users to use unambiguous language with fixed structures similar to those in conventional programming languages."
+      ],
+      "title": "interactive task and concept learning from natural language instructions and gui demonstrations",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1909.00031",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[4]",
+      "snippets": [
+       "A programming by demonstration (PBD) approach has been adopted by many tools in order to further reduce the expertise required, since users only have to interact with the target applications rather than write code",
+       "it also goes beyond symbolic inferences and dynamically executes different UI actions based on the semantic understanding of the task input and web content.",
+       "By recording user demonstrations for each step, DiLogics generalizes the web macros to novel but semantically similar task requirements.",
+       "DiLogics first semantically segments input data to structured task steps.",
+       "To create a scalable automation program, DiLogics first semantically segments the input data to decompose the task into more tractable steps (Step 1, Fig. 1 )."
+      ],
+      "title": "dilogics: creating web automation programs with diverse logics",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2308.05828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2.3. Programming by Demonstration",
+         "chunk_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#c7",
+         "char_start": 19077
+        }
+       ]
+      }
+     },
+     {
+      "id": "[5]",
+      "snippets": [
+       "Programming by Demonstration (PbD) is an approach for faster software development in domains where the user works interactively with a computer or some machinery."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Semantic Segmentation and Execution",
+    "text": "To create a scalable automation program, DiLogics first semantically segments the input data to decompose the task into more tractable steps [4]. DiLogics first semantically segments input data to structured task steps [4]. By recording user demonstrations for each step, DiLogics generalizes the web macros to novel but semantically similar task requirements [4]. It also goes beyond symbolic inferences and dynamically executes different UI actions based on the semantic understanding of the task input and web content [4].",
+    "citations": [
+     {
+      "id": "[4]",
+      "snippets": [
+       "A programming by demonstration (PBD) approach has been adopted by many tools in order to further reduce the expertise required, since users only have to interact with the target applications rather than write code",
+       "it also goes beyond symbolic inferences and dynamically executes different UI actions based on the semantic understanding of the task input and web content.",
+       "By recording user demonstrations for each step, DiLogics generalizes the web macros to novel but semantically similar task requirements.",
+       "DiLogics first semantically segments input data to structured task steps.",
+       "To create a scalable automation program, DiLogics first semantically segments the input data to decompose the task into more tractable steps (Step 1, Fig. 1 )."
+      ],
+      "title": "dilogics: creating web automation programs with diverse logics",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": "2308.05828",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "2.3. Programming by Demonstration",
+         "chunk_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#c7",
+         "char_start": 19077
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Interactive Resolution and User Augmentation",
+    "text": "In this paper, we address the research challenge of enabling end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming [3]. If an unknown concept or procedure is resolved through verbal explanation, the parser can parse the new explanation into an expression of its original type in the target DSL (e.g., an explanation for a Boolean concept is parsed into a Boolean expression), and replace the original resolve() function with the new expression [3]. The agent asks the user to verbally explain, or to demonstrate how to fulfill this resolve() function [3]. Moreover, even if a concept may seem clear to a human, an agent may still not understand it due to the limitations in its natural language understanding techniques and pre-defined ontology [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "To support programming for tasks in diverse domains, we leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium, where procedural actions are represented as sequences of GUI operations, and declarative concepts can be represented through references to GUI contents.",
+       "Moreover, even if a concept may seem clear to a human, an agent may still not understand it due to the limitations in its natural language understanding techniques and pre-defined ontology.",
+       "umice agent asks the user to verbally explain, or to demonstrate how to fulfill this resolve() function. If an unknown concept or procedure is resolved through verbal explanation, the parser can parse the new explanation into an expression of its original type in the target DSL (e.g., an explanation for a Boolean concept is parsed into a Boolean expression), and replace the original resolve() func",
+       "In this paper, we address the research challenge of enabling end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming and programming by demonstration (PBD).",
+       "Such restrictions are due to the limited capabilities of existing natural language understanding techniques – they do not yet support robust understanding of utterances across diverse domains without extensive training data and structured prior knowledge within each domain.",
+       "Other natural language programming approaches (e.g., [ \\citeauthoryearAzaria, Krishnamurthy, and Mitchell2016 , \\citeauthoryearFast et al.2018 , \\citeauthoryearKate, Wong, and Mooney2005 , \\citeauthoryearSrivastava, Labutov, and Mitchell2017 ] ) restricted the problem space to specific task domains, so that they could constrain the space and the complexity of target program statements in order to enable the understanding of flexible user utterances.",
+       "Some prior systems (e.g., [ \\citeauthoryearPrice et al.2000 ] ) directly translate user instructions in natural language into conventional programming languages like Java. This approach requires users to use unambiguous language with fixed structures similar to those in conventional programming languages."
+      ],
+      "title": "interactive task and concept learning from natural language instructions and gui demonstrations",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1909.00031",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Limitations of Natural Language Approaches",
+    "text": "Some prior systems directly translate user instructions in natural language into conventional programming languages like Java [3]. This approach requires users to use unambiguous instructions [3]. Other natural language programming approaches restricted the problem scope [3]. Such restrictions are due to the limited capabilities of existing natural language understanding techniques – they do not yet support robust understanding of utterances across diverse domains without extensive training data [3].",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "To support programming for tasks in diverse domains, we leverage the graphical user interfaces (GUIs) of existing third-party mobile apps as a medium, where procedural actions are represented as sequences of GUI operations, and declarative concepts can be represented through references to GUI contents.",
+       "Moreover, even if a concept may seem clear to a human, an agent may still not understand it due to the limitations in its natural language understanding techniques and pre-defined ontology.",
+       "umice agent asks the user to verbally explain, or to demonstrate how to fulfill this resolve() function. If an unknown concept or procedure is resolved through verbal explanation, the parser can parse the new explanation into an expression of its original type in the target DSL (e.g., an explanation for a Boolean concept is parsed into a Boolean expression), and replace the original resolve() func",
+       "In this paper, we address the research challenge of enabling end users to augment domain-independent task automation scripts with conditional structures and new concepts through a combination of natural language programming and programming by demonstration (PBD).",
+       "Such restrictions are due to the limited capabilities of existing natural language understanding techniques – they do not yet support robust understanding of utterances across diverse domains without extensive training data and structured prior knowledge within each domain.",
+       "Other natural language programming approaches (e.g., [ \\citeauthoryearAzaria, Krishnamurthy, and Mitchell2016 , \\citeauthoryearFast et al.2018 , \\citeauthoryearKate, Wong, and Mooney2005 , \\citeauthoryearSrivastava, Labutov, and Mitchell2017 ] ) restricted the problem space to specific task domains, so that they could constrain the space and the complexity of target program statements in order to enable the understanding of flexible user utterances.",
+       "Some prior systems (e.g., [ \\citeauthoryearPrice et al.2000 ] ) directly translate user instructions in natural language into conventional programming languages like Java. This approach requires users to use unambiguous language with fixed structures similar to those in conventional programming languages."
+      ],
+      "title": "interactive task and concept learning from natural language instructions and gui demonstrations",
+      "metadata": {
+       "year": 2019,
+       "doi": null,
+       "arxiv": "1909.00031",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Demonstration Retention and Robotics Applications",
+    "text": "The method must have a means of retaining and reusing the user demonstrations similar in spirit to the way user modeling retains, reuses, and learns the user preferences [7]. Learning from demonstration (LfD) has been successfully used in many robotics applications to create policies based on a set of demonstrations provided by the user [6].",
+    "citations": [
+     {
+      "id": "[6]",
+      "snippets": [
+       "Learning from demonstration (LfD) has been successfully used in many robotics applications to create policies based on a set of demonstrations provided by the user [1]."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[7]",
+      "snippets": [
+       "It must have a means of retaining and reusing the user demonstrations similar in spirit to the way user modeling retains, reuses, and learns the user preferences."
+      ],
+      "title": null,
+      "metadata": {
+       "year": null,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 17,
+   "n_claims_usable": 17,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "word_count": 469,
+   "n_sections": 5,
+   "n_citations": 7,
+   "record_level": 7,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]",
+    "[3]",
+    "[4]",
+    "[5]",
+    "[6]"
+   ]
+  }
+ }
+]

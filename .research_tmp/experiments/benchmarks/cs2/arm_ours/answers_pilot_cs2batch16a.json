@@ -1,0 +1,2091 @@
+[
+ {
+  "id": "2bb40aa93ac3a6a673c839bd",
+  "type": "aggregation",
+  "question": "Have specialized approaches been developed for providing LLM assistance when people author SQL queries?",
+  "gold_hint": "",
+  "answer": "(The loop did not produce a standard answer; final notes and gaps follow, submitted by system fallback)\nNotes:\nQ: Have specialized approaches been developed for LLM assistance when people author SQL queries?\nRelevant papers: ai_assisted_sql_authoring_at_industry_scale, from_natural_language_to_sql_review, schemagraphsql, scaling_text2sql, biomedsql, ambiguity_in_nl_queries, research_challenges_in_rdbms_for_llm_queries\nN1. [cca91c66335f93] SQL presents three main challenges warranting special treatment vs casting as just another programming language for existing LLM autocompletion | anchor:\"While it can be tempting to cast SQL as just another programming language for existing LLM\" | epistemic:stated\nN2. [f88658f287ca9e] SQLCompose helps developers bootstrap/iterate on complex SQL without navigating clunky syntax/semantics/docs; biggest time savings from iterative dev | anchor:\"As SQL development is iterative, the biggest time savings and productivity boost comes fro\" | epistemic:stated\nN3. [coarse:9cc1ca15a50a] Latency constraints much tighter for an autocompletion tool compared to natural language querying | anchor:\"the latency constraints are much tighter for an automixtional tool compared to natural\" | epistemic:stated\nN4. [139b166d5b521e] LCM overcomes limitations of regular CM objective re: tokenization | anchor:\"LCM overcomes the limitations imposed by regular CM objective with respect to tokenization\" | epistemic:stated\nN5. [7aeb6c948a6dce] Coexisting with traditional autocomplete is a challenge for many AI-assisted code authoring solutions | anchor:\"Coexisting with the traditional auto complete system is a challenge faced by many AI-assis\" | epistemic:cited\nN6. [coarse:09bf646df861] Generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB) | anchor:\"This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is\" | epistemic:stated\nN7. [coarse:230cbf8ca7ef] RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation | anchor:\"RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models\" | epistemic:stated\nN8. [coarse:7b661c8de30a] SchemaGraphSQL: efficient schema linking using pathfinding graph algorithms for text-to-sql on large-scale databases | anchor:\"schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql\" | epistemic:stated\nN9. [coarse:167fcb547757] SchemaGraphSQL demonstrates superior schema linking performance compared to fine-tuned and specialized methods | anchor:\"ations, demonstrating superior schema linking performance compared to fine-tuned and speci\" | epistemic:stated\nN10. [coarse:9417457a1cc6] Scaling Text2SQL via LLM-efficient schema filtering with Functional Dependency Graph Rerankers | anchor:\"Scaling Text2SQL via LLM-efficient Schema Filtering with Functional Dependency Graph Reran\" | epistemic:stated\nN11. [coarse:47616bbd7296] Prompting LLMs with entire schemas alongside user's question fails on large databases | anchor:\"While effective on small databases, this approach fails on\" | epistemic:stated\nN12. [coarse:ea22955c570b] Focus on ambiguity in natural language queries for text-to-SQL | anchor:\"ambiguity in natural language queries for\" | epistemic:stated\nN13. [coarse:d13204d62f7d] Consistency LLMs (CLLMs) developed with enhanced architecture to reduce latency and speed up SQL query generation | anchor:\"To address this, Consistency large language models (CLLMs) has been developed with an enha\" | epistemic:stated\nN14. [1b4abf25c5ce0c] SqlComposeFIM gets correct table names 75% of the time, major improvement over other two models | epistemic:demonstrated\nN15. [bf58ba9a97b0a3] SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score | epistemic:demonstrated\nN16. [d0f353cd4d4ee8] SqlCompose models consistently outperform public and internal LLMs | epistemic:demonstrated\nN17. [dfe2f2cfa96078] SqlCompose used weekly by over 10k users including data engineers | epistemic:demonstrated\nN18. [43ec7bc548686b] Less than 1% of users have disabled SqlCompose | epistemic:demonstrated\nN19. [coarse:9ac5163dd8b8] Prompting techniques like Chain-of-Thought and ReAct demonstrated improved performance on multi-step reasoning in biomedical settings | epistemic:stated\nN20. [coarse:0b2d2d095f3d] Irresolvable ambiguities in single-shot query execution should be handled through mixed-initiative specification rather than failing or guessing | epistemic:stated\nN21. [coarse:96d6d9c14358] A key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation | epistemic:stated\nN22. [coarse:12d838800090] LLMs excel at row-level inference because they can reason over context and semantics | epistemic:stated\nN23. [coarse:67dc9aba6a45] Recent advances in AI have enabled LLMs to offer enhanced processing capabilities for structured (relational) data | epistemic:stated\n[AUTO-EVIDENCE — system-transcribed verbatim lines from tool observations you already received; they persist across steps. To reason over an A-line, copy it into an N-line keeping the same [anchor id].]\n[AUTO-EVIDENCE — system-transcribed verbatim lines from tool observations you already received; they persist across steps. To reason over an A-line, copy it into an N-line keeping the same [anchor id].]\nA1. [1b4abf25c5ce0c] to get the correct table names=75% | src:findings@step4 | epi:demonstrated\nA2. [43ec7bc548686b] Less than=1% | src:findings@step4\nGaps:\nG1. What specialized approaches/systems exist for LLM-assisted SQL authoring? (need findings from review + other papers)\nG2. Specific techniques: schema linking, schema filtering, ambiguity handling, industry-scale systems\nG3. Challenges/limitations of these approaches",
+  "arm": "main",
+  "steps": 13,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "specialized SQL agents"
+    },
+    "intent": "Get cross-paper evidence dossier on specialized SQL agents",
+    "obs_chars": 360,
+    "notes_chars": 815
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "llm-based text-to-sql systems"
+    },
+    "intent": "Get cross-paper evidence dossier on LLM-based text-to-SQL systems",
+    "obs_chars": 417,
+    "notes_chars": 815
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "specialized SQL agents",
+     "contains": "SQL authoring|SQL generation|text-to-SQL|natural language to SQL"
+    },
+    "intent": "Find specific findings about specialized SQL agent approaches",
+    "obs_chars": 244,
+    "notes_chars": 815
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale",
+     "contains": "approach|method|system|technique"
+    },
+    "intent": "Get findings from the industry-scale SQL authoring paper",
+    "obs_chars": 2574,
+    "notes_chars": 815
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems",
+     "contains": "approach|method|system|technique|pipeline"
+    },
+    "intent": "Get the taxonomy/approaches from the text-to-SQL review paper",
+    "obs_chars": 1051,
+    "notes_chars": 1751
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te",
+     "contains": "schema linking|pathfinding|graph|approach|method"
+    },
+    "intent": "Get details on SchemaGraphSQL specialized approach",
+    "obs_chars": 1064,
+    "notes_chars": 1751
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scaling_text2sql_via_llm_efficient_schema_filtering_with_functional_dependency_g",
+     "contains": "schema filtering|functional dependency|approach|method"
+    },
+    "intent": "Get details on schema filtering approach for text2sql",
+    "obs_chars": 996,
+    "notes_chars": 1751
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries",
+     "contains": "challenge|approach|method|limitation"
+    },
+    "intent": "Get challenges specific to LLM queries on RDBMS",
+    "obs_chars": 244,
+    "notes_chars": 1751
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism-level findings from the industry-scale SQL authoring paper",
+    "obs_chars": 2463,
+    "notes_chars": 3213
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases"
+    },
+    "intent": "Get findings from BioMedSQL paper on specialized text-to-SQL for biomedical domain",
+    "obs_chars": 2560,
+    "notes_chars": 3213
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t"
+    },
+    "intent": "Get findings from the ambiguity-in-NL-queries paper",
+    "obs_chars": 1070,
+    "notes_chars": 3213
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries",
+     "claim_type": "criticism"
+    },
+    "intent": "Get criticism/limitation findings from the RDBMS challenges paper",
+    "obs_chars": 187,
+    "notes_chars": 3213
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems",
+     "claim_type": "definition"
+    },
+    "intent": "Get definitions of specialized text-to-SQL approaches from the review paper",
+    "obs_chars": 1576,
+    "notes_chars": 2767
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details of SchemaGraphSQL approach",
+    "obs_chars": 582,
+    "notes_chars": 2767
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_scaling_text2sql_via_llm_efficient_schema_filtering_with_functional_dependency_g",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details of the schema filtering approach",
+    "obs_chars": 996,
+    "notes_chars": 2767
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get recommendations for specialized approaches from the challenges paper",
+    "obs_chars": 187,
+    "notes_chars": 2767
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems",
+     "contains": "approach|method|system|technique|pipeline|schema|ambiguity|retrieval|fine-tun"
+    },
+    "intent": "Get detailed findings from the review paper on specialized text-to-SQL approaches",
+    "obs_chars": 1601,
+    "notes_chars": 3374
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ai_assisted_sql_authoring_at_industry_scale",
+     "contains": "SQLCompose|approach|method|system|pipeline|autocomplete|schema|ambiguity|retrieval|fine-tun|latency"
+    },
+    "intent": "Get detailed findings from the industry-scale SQL authoring paper",
+    "obs_chars": 2434,
+    "notes_chars": 3374
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases",
+     "contains": "approach|method|system|pipeline|schema|ambiguity|retrieval|fine-tun|biomedical"
+    },
+    "intent": "Get findings from BioMedSQL paper on specialized text-to-SQL for biomedical domain",
+    "obs_chars": 2634,
+    "notes_chars": 3374
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the review paper to identify specific specialized approaches/systems for text-to-SQL",
+    "obs_chars": 1576,
+    "notes_chars": 4410
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the RDBMS challenges paper for specific challenges and approaches",
+    "obs_chars": 993,
+    "notes_chars": 4410
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the ambiguity paper for specific approaches to handling ambiguity in NL-to-SQL",
+    "obs_chars": 1070,
+    "notes_chars": 4410
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from BioMedSQL for specific specialized approaches for biomedical text-to-SQL",
+    "obs_chars": 2035,
+    "notes_chars": 4410
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "llm-based text-to-sql systems",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about how specialized text-to-SQL systems work",
+    "obs_chars": 187,
+    "notes_chars": 5186
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "specialized SQL agents",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about specialized SQL agents",
+    "obs_chars": 187,
+    "notes_chars": 5186
+   },
+   {
+    "step": 10,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems",
+     "contains": "approach|method|system|pipeline|schema|ambiguity|retrieval|fine-tun"
+    },
+    "intent": "Get findings from the review paper on text-to-SQL systems to identify specialized approaches",
+    "obs_chars": 1601,
+    "notes_chars": 5186
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 13,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: Have specialized approaches been developed for LLM assistance when people author SQL queries?\nRelevant papers: ai_assisted_sql_authoring_at_industry_scale, from_natural_language_to_sql_review, schemagraphsql, scaling_text2sql, biomedsql, ambiguity_in_nl_queries, research_challenges_in_rdbms_for_llm_queries\nN1. [cca91c66335f93] SQL presents three main challenges warranting special treatment vs casting as just another programming language for existing LLM autocompletion | anchor:\"While it can be tempting to cast SQL as just another programming language for existing LLM\" | epistemic:stated\nN2. [f88658f287ca9e] SQLCompose helps developers bootstrap/iterate on complex SQL without navigating clunky syntax/semantics/docs; biggest time savings from iterative dev | anchor:\"As SQL development is iterative, the biggest time savings and productivity boost comes fro\" | epistemic:stated\nN3. [coarse:9cc1ca15a50a] Latency constraints much tighter for an autocompletion tool compared to natural language querying | anchor:\"the latency constraints are much tighter for an automixtional tool compared to natural\" | epistemic:stated\nN4. [139b166d5b521e] LCM overcomes limitations of regular CM objective re: tokenization | anchor:\"LCM overcomes the limitations imposed by regular CM objective with respect to tokenization\" | epistemic:stated\nN5. [7aeb6c948a6dce] Coexisting with traditional autocomplete is a challenge for many AI-assisted code authoring solutions | anchor:\"Coexisting with the traditional auto complete system is a challenge faced by many AI-assis\" | epistemic:cited\nN6. [coarse:09bf646df861] Generating SQL queries is slower than traditional language modeling, posing a challenge for developing efficient, localized NL interfaces to databases (NLIDB) | anchor:\"This issue is pronounced in LLM-based text-to-SQL systems, where generating SQL queries is\" | epistemic:stated\nN7. [coarse:230cbf8ca7ef] RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models to improve SQL query generation | anchor:\"RAG-based text-to-SQL systems integrate dynamic retrieval abilities with generative models\" | epistemic:stated\nN8. [coarse:7b661c8de30a] SchemaGraphSQL: efficient schema linking using pathfinding graph algorithms for text-to-sql on large-scale databases | anchor:\"schemagraphsql: efficient schema linking with pathfinding graph algorithms for text-to-sql\" | epistemic:stated\nN9. [coarse:167fcb547757] SchemaGraphSQL demonstrates superior schema linking performance compared to fine-tuned and specialized methods | anchor:\"ations, demonstrating superior schema linking performance compared to fine-tuned and speci\" | epistemic:stated\nN10. [coarse:9417457a1cc6] Scaling Text2SQL via LLM-efficient schema filtering with Functional Dependency Graph Rerankers | anchor:\"Scaling Text2SQL via LLM-efficient Schema Filtering with Functional Dependency Graph Reran\" | epistemic:stated\nN11. [coarse:47616bbd7296] Prompting LLMs with entire schemas alongside user's question fails on large databases | anchor:\"While effective on small databases, this approach fails on\" | epistemic:stated\nN12. [coarse:ea22955c570b] Focus on ambiguity in natural language queries for text-to-SQL | anchor:\"ambiguity in natural language queries for\" | epistemic:stated\nN13. [coarse:d13204d62f7d] Consistency LLMs (CLLMs) developed with enhanced architecture to reduce latency and speed up SQL query generation | anchor:\"To address this, Consistency large language models (CLLMs) has been developed with an enha\" | epistemic:stated\nN14. [1b4abf25c5ce0c] SqlComposeFIM gets correct table names 75% of the time, major improvement over other two models | epistemic:demonstrated\nN15. [bf58ba9a97b0a3] SqlComposeSA substantially outperforms Llama by 16 percentage points on BLEU score | epistemic:demonstrated\nN16. [d0f353cd4d4ee8] SqlCompose models consistently outperform public and internal LLMs | epistemic:demonstrated\nN17. [dfe2f2cfa96078] SqlCompose used weekly by over 10k users including data engineers | epistemic:demonstrated\nN18. [43ec7bc548686b] Less than 1% of users have disabled SqlCompose | epistemic:demonstrated\nN19. [coarse:9ac5163dd8b8] Prompting techniques like Chain-of-Thought and ReAct demonstrated improved performance on multi-step reasoning in biomedical settings | epistemic:stated\nN20. [coarse:0b2d2d095f3d] Irresolvable ambiguities in single-shot query execution should be handled through mixed-initiative specification rather than failing or guessing | epistemic:stated\nN21. [coarse:96d6d9c14358] A key challenge lies in detecting and balancing when to automate grounding decisions and when to require explicit user consultation | epistemic:stated\nN22. [coarse:12d838800090] LLMs excel at row-level inference because they can reason over context and semantics | epistemic:stated\nN23. [coarse:67dc9aba6a45] Recent advances in AI have enabled LLMs to offer enhanced processing capabilities for structured (relational) data | epistemic:stated\n[AUTO-EVIDENCE — system-transcribed verbatim lines from tool observations you already received; they persist across steps. To reason over an A-line, copy it into an N-line keeping the same [anchor id].]",
+  "gaps_final": "G1. What specialized approaches/systems exist for LLM-assisted SQL authoring? (need findings from review + other papers)\nG2. Specific techniques: schema linking, schema filtering, ambiguity handling, industry-scale systems\nG3. Challenges/limitations of these approaches",
+  "queried": [
+   "card|{\"entity\": \"specialized SQL agents\"}",
+   "card|{\"entity\": \"llm-based text-to-sql systems\"}",
+   "findings|{\"contains\": \"SQL authoring|SQL generation|text-to-SQL|natural language to SQL\", \"entity\": \"specialized SQL agents\"}",
+   "findings|{\"contains\": \"approach|method|system|technique\", \"paper_id\": \"sciverse_ai_assisted_sql_authoring_at_industry_scale\"}",
+   "findings|{\"contains\": \"approach|method|system|technique|pipeline\", \"paper_id\": \"sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems\"}",
+   "findings|{\"contains\": \"schema linking|pathfinding|graph|approach|method\", \"paper_id\": \"sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te\"}",
+   "findings|{\"contains\": \"schema filtering|functional dependency|approach|method\", \"paper_id\": \"sciverse_scaling_text2sql_via_llm_efficient_schema_filtering_with_functional_dependency_g\"}",
+   "findings|{\"contains\": \"challenge|approach|method|limitation\", \"paper_id\": \"sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_ai_assisted_sql_authoring_at_industry_scale\"}",
+   "findings|{\"paper_id\": \"sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases\"}",
+   "findings|{\"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"criticism\", \"paper_id\": \"sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries\"}",
+   "findings|{\"claim_type\": \"definition\", \"paper_id\": \"sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_schemagraphsql_efficient_schema_linking_with_pathfinding_graph_algorithms_for_te\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_scaling_text2sql_via_llm_efficient_schema_filtering_with_functional_dependency_g\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries\"}",
+   "findings|{\"contains\": \"approach|method|system|technique|pipeline|schema|ambiguity|retrieval|fine-tun\", \"paper_id\": \"sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems\"}",
+   "findings|{\"contains\": \"SQLCompose|approach|method|system|pipeline|autocomplete|schema|ambiguity|retrieval|fine-tun|latency\", \"paper_id\": \"sciverse_ai_assisted_sql_authoring_at_industry_scale\"}",
+   "findings|{\"contains\": \"approach|method|system|pipeline|schema|ambiguity|retrieval|fine-tun|biomedical\", \"paper_id\": \"sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_research_challenges_in_relational_database_management_systems_for_llm_queries\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_are_we_asking_the_right_questions_on_ambiguity_in_natural_language_queries_for_t\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_biomedsql_text_to_sql_for_scientific_reasoning_on_biomedical_knowledge_bases\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"llm-based text-to-sql systems\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"specialized SQL agents\"}",
+   "findings|{\"contains\": \"approach|method|system|pipeline|schema|ambiguity|retrieval|fine-tun\", \"paper_id\": \"sciverse_from_natural_language_to_sql_review_of_llm_based_text_to_sql_systems\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 2,
+   "a_chars": 151,
+   "a_skipped_dup": 2,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 12,
+   "_consec_full_reject": 0,
+   "notes_truncated": 2830,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [1b4abf25c5ce0c] to get the correct table names=75% | src:findings@step4 | epi:demonstrated",
+   "A2. [43ec7bc548686b] Less than=1% | src:findings@step4"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "3d1ff2a80239a37908a6f4c4",
+  "type": "aggregation",
+  "question": "How are user demonstrations represented in domain-specific-language programs and used for automation tasks?",
+  "gold_hint": "",
+  "answer": "User demonstrations in domain-specific-language (DSL) programs are primarily represented as recorded mappings between natural language specifications or semantic task steps and specific user interface (UI) actions, serving as the foundational data for constructing automation logic. In the DiLogics framework, a web automation DSL, the representation process begins with the semantic segmentation of input data to decompose complex tasks into structured steps [8764569d5976be] [514b5ef7579b1c]. Users then engage in a \"Demonstrations and Mapping\" phase where they initiate web recording to demonstrate actions for each individual task step, allowing them to repair or refine task specifications as needed . These demonstrations are not merely static logs; DiLogics employs program synthesis techniques to record the user's actions and learns from these demonstrations using statistical learning methods [3336785ec7eede] [d14a44cd522550]. The system specifically learns action patterns and the association between logic and demonstration, enabling it to generalize the automation [1cb492997599ca] [687ed80671a915]. By recording mappings between diverse specifications and UI actions, DiLogics constructs automation programs with malleable programming logic . This representation allows the system to constantly search for the most semantically similar element, thereby executing macros on the correct UI regardless of the website's DOM structure, which goes beyond structural inferences and layout constraints . Consequently, DiLogics dynamically executes different UI actions based on semantic analysis, inserting proper UI actions for each step in real time [a403c0a5322e05] . While this approach leverages NLP models to scrape and process data [88bfd68deae3f5], a noted limitation is that it cannot perform logics requiring constant analysis of the website state .\n\nIn contrast, the Pumice system, which focuses on interactive task and concept learning from natural language instructions and GUIs, represents demonstrations through a more abstract, typed functional structure. In this environment, both Boolean and value concepts are represented as typed `resolve()` functions within the parsing result [0f2481771891fa]. This representation is necessary because end users often employ unclear, ambiguous, or vague concepts when naturally instructing tasks in natural language [9e7def1947b68f], and an agent may not understand a concept that seems clear to a human [523e19384218a7]. When the `resolve()` function is called at runtime, the Pumice agent asks the user to verbally explain or demonstrate how to fulfill the concept . If the user resolves the concept through a verbal explanation, the parser parses this new explanation into an expression of the original type in the target DSL (for example, converting a Boolean concept into a Boolean expression) and replaces the original `resolve()` function . For value concepts, once a target value is selected, Pumice stores the procedure of navigating to the screen where that target value appears [c0efda2d5403eb]. Furthermore, if the type of the target concept can be inferred, Pumice highlights possible items on the current app GUI to facilitate the demonstration [48aa600ed9d2f1]. In this system, procedural actions are represented as sequences of GUI operations, while declarative concepts are represented via references to GUI contents . This approach enables end users to augment domain-independent task automation scripts with conditional structures and new concepts via natural language programming and programming by demonstration .\n\nThe use of these representations for automation tasks relies on the retention and reuse of user demonstrations, which must be handled similarly to user preferences . Programming by Demonstration (PbD) is identified as an approach for faster software development in interactive domains , and Learning from Demonstration (LfD) is used in robotics to create policies from user demonstrations . In the context of natural language programming, prior systems have directly translated user instructions in natural language [bcb7fa72eefbb8], while other approaches restricted the problem space due to the limited capabilities of existing NLP [9fc4e884883cd6] [88c8e2d633eb21]. The DiLogics system, which has reported an ease of use score of 6.1/7 [e57142dc0f916c], utilizes data from sources such as StackOverflow, r/automate, and UiPath forums [b5a6a7996cebad]. Additionally, iterative prompting with environmental feedback, execution errors, and self-verification has been noted as a mechanism in related work [svy_f31eff065c81]. However, the consulted records did not surface specific details regarding the exact syntax or structural encoding of demonstrations within the DSL programs, nor did they provide deeper content on the compilation or generalization mechanisms beyond the semantic mapping and statistical learning described above.",
+  "arm": "main",
+  "steps": 20,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "search",
+    "args": {
+     "query": "user demonstrations domain-specific language programming automation"
+    },
+    "intent": "Find records about user demonstrations in DSL programs for automation",
+    "obs_chars": 1848,
+    "notes_chars": 653
+   },
+   {
+    "step": 1,
+    "tool": "search_text",
+    "args": {
+     "query": "user demonstration DSL program automation example-based",
+     "k": 12
+    },
+    "intent": "Full-text search for demonstration-based DSL programming",
+    "obs_chars": 2073,
+    "notes_chars": 653
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "contains": "demonstration|demonstrations|programming by example|example-based programming",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records about how demonstrations work in DSLs",
+    "obs_chars": 2484,
+    "notes_chars": 653
+   },
+   {
+    "step": 1,
+    "tool": "entities",
+    "args": {
+     "contains": "demonstration"
+    },
+    "intent": "Find entities related to demonstrations",
+    "obs_chars": 2673,
+    "notes_chars": 653
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "Programming by Demonstration"
+    },
+    "intent": "Get cross-paper evidence dossier on PbD to understand representation and use in automation",
+    "obs_chars": 448,
+    "notes_chars": 1476
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from DiLogics on how demonstrations are represented and used",
+    "obs_chars": 2387,
+    "notes_chars": 1476
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the interactive task learning paper on demonstration representation",
+    "obs_chars": 2694,
+    "notes_chars": 1476
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "demonstration representation DSL program structure encoding example-based",
+     "k": 12
+    },
+    "intent": "Find specific text about how demonstrations are represented in DSL programs",
+    "obs_chars": 1897,
+    "notes_chars": 1476
+   },
+   {
+    "step": 3,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "1cb492997599ca",
+     "window": 200
+    },
+    "intent": "Get full context around DiLogics' demonstration recording mechanism",
+    "obs_chars": 631,
+    "notes_chars": 2758
+   },
+   {
+    "step": 3,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "coarse:dfe5f42c6297",
+     "window": 200
+    },
+    "intent": "Get full context on how procedural actions and concepts are represented in the DSL",
+    "obs_chars": 741,
+    "notes_chars": 2758
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "k": 12,
+     "query": "demonstration recorded steps DSL program structure representation encoding automation"
+    },
+    "intent": "Find more specific text about how demonstrations are encoded in DSL programs",
+    "obs_chars": 2070,
+    "notes_chars": 2758
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get all mechanism findings from DiLogics about demonstration representation",
+    "obs_chars": 2473,
+    "notes_chars": 2758
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#41850",
+     "window": 300
+    },
+    "intent": "Get detailed text on how DiLogics records demonstrations and maps them to program steps",
+    "obs_chars": 1194,
+    "notes_chars": 3086
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550",
+     "window": 300
+    },
+    "intent": "Get detailed text on how DiLogics constructs automation programs with malleable programming logic from demonstrations",
+    "obs_chars": 1179,
+    "notes_chars": 3086
+   },
+   {
+    "step": 4,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200",
+     "window": 300
+    },
+    "intent": "Get detailed text on how demonstrations are parsed into DSL expressions in the interactive task learning system",
+    "obs_chars": 1233,
+    "notes_chars": 3086
+   },
+   {
+    "step": 5,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550",
+     "window": 500
+    },
+    "intent": "Get more context on how DiLogics represents demonstrations in the DSL program structure",
+    "obs_chars": 1485,
+    "notes_chars": 3692
+   },
+   {
+    "step": 5,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200",
+     "window": 500
+    },
+    "intent": "Get more context on how demonstrations are parsed into DSL expressions in the interactive task learning paper",
+    "obs_chars": 1533,
+    "notes_chars": 3692
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get definition records about how demonstrations are represented in DiLogics DSL",
+    "obs_chars": 2079,
+    "notes_chars": 3692
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "claim_type": "definition",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get definition records about how demonstrations are represented in the interactive task learning DSL",
+    "obs_chars": 2719,
+    "notes_chars": 3692
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "DiLogics"
+    },
+    "intent": "Get full evidence dossier for DiLogics including configs, results, and findings about demonstration representation",
+    "obs_chars": 368,
+    "notes_chars": 3692
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "pumice"
+    },
+    "intent": "Get full evidence dossier for Pumice including configs, results, and findings about demonstration representation",
+    "obs_chars": 360,
+    "notes_chars": 3692
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Find observation records about how demonstrations are represented in DiLogics DSL",
+    "obs_chars": 3595,
+    "notes_chars": 3692
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Find observation records about how demonstrations are represented in the interactive task learning system",
+    "obs_chars": 2312,
+    "notes_chars": 3692
+   },
+   {
+    "step": 8,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "sections": [
+      "system design",
+      "demonstration recording",
+      "program representation"
+     ]
+    },
+    "intent": "Get detailed mechanism of how demonstrations are encoded in DiLogics DSL and used for automation",
+    "obs_chars": 736,
+    "notes_chars": 3692
+   },
+   {
+    "step": 8,
+    "tool": "deep_read",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "sections": [
+      "system design",
+      "demonstration",
+      "DSL representation"
+     ]
+    },
+    "intent": "Get detailed mechanism of how demonstrations are represented in Pumice DSL and used for automation",
+    "obs_chars": 2292,
+    "notes_chars": 3692
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "claim_type": "mechanism",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure|resolve|concept"
+    },
+    "intent": "Get mechanism findings from the interactive task learning paper about how demonstrations are encoded in DSL",
+    "obs_chars": 2750,
+    "notes_chars": 4152
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "mechanism",
+     "contains": "mapping|recording|web recording|macro|UI action|step|demonstration|program"
+    },
+    "intent": "Get mechanism findings from DiLogics about how demonstrations are mapped to UI actions in the DSL program",
+    "obs_chars": 2493,
+    "notes_chars": 4152
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui",
+     "claim_type": "definition",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure|resolve|concept|procedure"
+    },
+    "intent": "Get definition findings from the interactive task learning paper about DSL representation of demonstrations",
+    "obs_chars": 2697,
+    "notes_chars": 4152
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics",
+     "claim_type": "definition",
+     "contains": "mapping|recording|web recording|macro|UI action|step|demonstration|program|DSL"
+    },
+    "intent": "Get definition findings from DiLogics about DSL program structure and demonstration encoding",
+    "obs_chars": 3041,
+    "notes_chars": 4152
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "query": "demonstration recorded as sequence of actions steps DSL program representation",
+     "k": 12
+    },
+    "intent": "Find verbatim passages about how demonstrations are encoded in DSL programs",
+    "obs_chars": 2069,
+    "notes_chars": 4152
+   },
+   {
+    "step": 11,
+    "tool": "search_text",
+    "args": {
+     "query": "user demonstration automation task execution generalization mapping UI actions",
+     "k": 12
+    },
+    "intent": "Find passages about how demonstrations are used for automation tasks",
+    "obs_chars": 2072,
+    "notes_chars": 4152
+   },
+   {
+    "step": 12,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#41850",
+     "window": 800
+    },
+    "intent": "Get full context of Step 2: Demonstrations and Mapping to understand how demonstrations are recorded and mapped to DSL s",
+    "obs_chars": 1949,
+    "notes_chars": 4152
+   },
+   {
+    "step": 12,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550",
+     "window": 800
+    },
+    "intent": "Get full context of how DiLogics uses recorded demonstrations for automation execution and generalization",
+    "obs_chars": 1939,
+    "notes_chars": 4152
+   },
+   {
+    "step": 12,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200",
+     "window": 800
+    },
+    "intent": "Get full context of how Pumice represents demonstrations as resolve() functions in DSL and how they are used at runtime",
+    "obs_chars": 1987,
+    "notes_chars": 4152
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure",
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get mechanism findings from the interactive task learning paper about how demonstrations are represented in DSL",
+    "obs_chars": 2744,
+    "notes_chars": 4152
+   },
+   {
+    "step": 16,
+    "tool": "card",
+    "args": {
+     "entity": "DiLogics"
+    },
+    "intent": "Get full evidence dossier for DiLogics including configs, results, and findings about demonstration representation",
+    "obs_chars": 368,
+    "notes_chars": 4152
+   },
+   {
+    "step": 16,
+    "tool": "card",
+    "args": {
+     "entity": "pumice"
+    },
+    "intent": "Get full evidence dossier for Pumice (interactive task/concept learning system) including configs and findings about DSL",
+    "obs_chars": 360,
+    "notes_chars": 4152
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "demonstration|record|GUI operation|step|DSL|program structure|resolve|concept|procedure",
+     "paper_id": "sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui"
+    },
+    "intent": "Get observation records from the interactive task learning paper about how demonstrations are represented in DSL program",
+    "obs_chars": 3169,
+    "notes_chars": 4152
+   },
+   {
+    "step": 17,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "mapping|recording|web recording|macro|UI action|step|demonstration|program|DSL",
+     "paper_id": "sciverse_dilogics_creating_web_automation_programs_with_diverse_logics"
+    },
+    "intent": "Get observation records from DiLogics about how demonstrations are encoded and used for automation",
+    "obs_chars": 2668,
+    "notes_chars": 4152
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 20,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How are user demonstrations represented in DSL programs and used for automation tasks?\nKey papers:\n- sciverse_dilogics_creating_web_automation_programs_with_diverse_logics: web automation DSL; records mappings between diverse specifications and UI actions; inserts proper UI actions for each step in real time; limitation: cannot perform logics requiring constant analysis of website state [sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550, #71550]\n- sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui: enables end users to augment domain-independent task automation scripts with conditional structures and new concepts via NL programming + PBD [coarse:81b4b8ba75cb]\n- Programming by Demonstration (PbD): approach for faster software development in interactive domains [coarse:67c3fbcbaf1a]\n- LfD: used in robotics to create policies from user demonstrations [coarse:7ef72098b930]\n- User demonstrations must be retained and reused similar to user preferences [coarse:c227f780bf40]\n- DiLogics: ease of use 6.1/7 [e57142dc0f916c]; data from StackOverflow, r/automate, UiPath forums [b5a6a7996cebad]\n- arxiv_2403.10249: iterative prompting with environmental feedback, execution errors, self-verification [svy_f31eff065c81]\nMechanism findings (DiLogics):\n- [8764569d5976be] DiLogics first semantically segments input data to structured task steps\n- [1cb492997599ca] By recording user demonstrations for each step, DiLogics generalizes the automation\n- [a403c0a5322e05] DiLogics dynamically executes different UI actions based on semantic analysis\n- [514b5ef7579b1c] DiLogics first semantically segments the input data to decompose the task\n- [88bfd68deae3f5] DiLogics leverages NLP models to scrape\n- [3336785ec7eede] DiLogics employs program synthesis techniques to record user's actions\n- [d14a44cd522550] DiLogics learns from user demonstration and uses statistical learning\n- [687ed80671a915] DiLogics learns action patterns and logic-to-demonstration association\nMechanism findings (interactive task/concept learning):\n- [bcb7fa72eefbb8] Some prior systems directly translate user instructions in NL\n- [9fc4e884883cd6] Other NL programming approaches restricted the problem space\n- [88c8e2d633eb21] Restrictions due to limited capabilities of existing NLP\n- [523e19384218a7] An agent may not understand a concept that seems clear to a human\n- [coarse:dfe5f42c6297] Procedural actions represented as sequences of GUI operations; declarative concepts via references to GUI contents\nfetch_chunk details:\n- [sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#41850] Step 2: Demonstrations and Mapping - users start web recording and demonstrate actions for each task step; users can repair/refine task specifications\n- [sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550] DiLogics constantly searches for most semantically similar element; automation executes macros on correct UI regardless of website DOM structure, going beyond structural inferences and layout constraints; by recording mappings between diverse specifications and UI actions, constructs automation programs with malleable programming logic by inserting proper UI actions for each step in real time\n- [sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200] When resolve() called at runtime, Pumice agent asks user to verbally explain or demonstrate how to fulfill it; if resolved through verbal explanation, parser parses new explanation into expression of original type in target DSL (e.g., Boolean concept → Boolean expression), replaces original resolve() function\n- [c0efda2d5403eb] Once target value selected, Pumice stores procedure of navigating to screen where target value appears\n- [48aa600ed9d2f1] Pumice highlights possible items on current app GUI if type of target concept can be inferred\n- [0f2481771891fa] Both Boolean and value concepts represented as typed resolve() functions in parsing result\n- [9e7def1947b68f] End users often use unclear, ambiguous or vague concepts when naturally instructing tasks in NL",
+  "gaps_final": "G1. How specifically are demonstrations encoded/represented in DSL programs (syntax, structure)?\nG2. How are demonstrations used for automation (compilation, execution, generalization)?\nG3. Need deeper content from DiLogics and the interactive task learning paper",
+  "queried": [
+   "search|{\"query\": \"user demonstrations domain-specific language programming automation\"}",
+   "search_text|{\"k\": 12, \"query\": \"user demonstration DSL program automation example-based\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"demonstration|demonstrations|programming by example|example-based programming\"}",
+   "entities|{\"contains\": \"demonstration\"}",
+   "card|{\"entity\": \"Programming by Demonstration\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\"}",
+   "search_text|{\"k\": 12, \"query\": \"demonstration representation DSL program structure encoding example-based\"}",
+   "fetch_chunk|{\"record_id\": \"1cb492997599ca\", \"window\": 200}",
+   "fetch_chunk|{\"record_id\": \"coarse:dfe5f42c6297\", \"window\": 200}",
+   "search_text|{\"k\": 12, \"query\": \"demonstration recorded steps DSL program structure representation encoding automation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#41850\", \"window\": 300}",
+   "fetch_chunk|{\"record_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550\", \"window\": 300}",
+   "fetch_chunk|{\"record_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200\", \"window\": 300}",
+   "fetch_chunk|{\"record_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550\", \"window\": 500}",
+   "fetch_chunk|{\"record_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200\", \"window\": 500}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions",
+   "card|{\"entity\": \"DiLogics\"}",
+   "card|{\"entity\": \"Pumice\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instruction",
+   "deep_read|{\"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics\", \"sections\": [\"system design\", \"demonstration recording\", \"program representation\"]}",
+   "deep_read|{\"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui\", \"sections\": [\"system design\", \"demonstration\", \"DSL representation\"]}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure|resolve|concept\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_langua",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"mapping|recording|web recording|macro|UI action|step|demonstration|program\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logic",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure|resolve|concept|procedure\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_nat",
+   "findings|{\"claim_type\": \"definition\", \"contains\": \"mapping|recording|web recording|macro|UI action|step|demonstration|program|DSL\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_",
+   "search_text|{\"k\": 12, \"query\": \"demonstration recorded as sequence of actions steps DSL program representation\"}",
+   "search_text|{\"k\": 12, \"query\": \"user demonstration automation task execution generalization mapping UI actions\"}",
+   "fetch_chunk|{\"record_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#41850\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse_logics#44550\", \"window\": 800}",
+   "fetch_chunk|{\"record_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_and_gui#43200\", \"window\": 800}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_natural_language_instructions_",
+   "card|{\"entity\": \"dilogics\"}",
+   "card|{\"entity\": \"pumice\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"demonstration|record|GUI operation|step|DSL|program structure|resolve|concept|procedure\", \"paper_id\": \"sciverse_interactive_task_and_concept_learning_from_na",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"mapping|recording|web recording|macro|UI action|step|demonstration|program|DSL\", \"paper_id\": \"sciverse_dilogics_creating_web_automation_programs_with_diverse"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 12,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "fb607bc177d2efb926cb3dff",
+  "type": "aggregation",
+  "question": "How can question generation be used to mitigate hallucination in LLMs?",
+  "gold_hint": "",
+  "answer": "Question generation serves as a critical mechanism for mitigating hallucination in Large Language Models (LLMs) by fundamentally altering the retrieval and verification processes, thereby reducing reliance on the model's internal parametric memory which is prone to generating plausible but factually incorrect answers [coarse:298443385630]. The core premise is that the generation step of LLMs inherently introduces hallucination risk, particularly when models are prompted to create content or answer complex queries without sufficient external grounding [coarse:298443385630]. By leveraging question generation, systems can bypass or constrain this risky generation phase, ensuring that outputs are anchored to verifiable sources rather than model inference [coarse:298443385630].\n\nOne primary strategy involves \"question-to-question\" retrieval, which addresses the limitations of conventional Retrieval-Augmented Generation (RAG) systems [coarse:69f1908]. In standard RAG, low semantic similarity between question embeddings and document passages arises from distinct structural properties, where questions and passages have different syntactic and semantic structures, hindering high-precision retrieval [6ca0d89e999cad]. To overcome this, the question-to-question approach employs an instruction-tuned model to generate questions for retrieval rather than embedding document content directly [b59842d95638ce]. For instance, in a Wikidata implementation, the method generates all possible questions for entity retrieval, allowing the system to match the user's query against a pre-generated set of questions [7130bd44e59fdd]. This mechanism achieves high precision and effectively eliminates hallucination risk by avoiding the open-ended generation step for the final answer, instead relying on a retrieval mechanism that precisely identifies relevant text [f34cc2fb2ae7ea]. Experimental results indicate that cosine similarity scores for relevant question pairs are consistently above 0.9, demonstrating the efficacy of this alignment [sciverse_question_to_question_retrieval#c9]. The implementation utilizes specific models, such as llama-3.1-8b-instruct-awq for question generation and baai/bge-small-en-v1.5 for 384-dimensional embeddings, indexed over a set of fewer than 1000 Wikipedia articles [sciverse_question_to_question_retrieval#22950]. However, this approach has limitations; it may fall short for questions requiring more than one paragraph or fact, and LLMs are efficient only in a small set of languages compared to the 300+ languages available in Wikipedia [sciverse_question_to_question_retrieval#24300].\n\nAnother application of question generation in hallucination mitigation is found in the context of testing and verifying QA software, specifically through the CQ²A framework [16]. This framework extracts entities and relationships from context as answers and then generates corresponding questions via an LLM [16]. The rationale is that hallucinations may lead to generated questions that introduce information not present in the source, thereby threatening the reliability of LLM-generated results [13]. To counter this, CQ²A employs consistency verification and constraint checking to enhance the reliability of the generated questions [sciverse_testing_qa_software#25650]. While rules provide coarse-grained constraints for question generation, they cannot ensure the correctness or alignment between the generated question and the answer on their own [sciverse_testing_qa_software#28350]. Therefore, consistency verification is used to ensure that the generated question aligns correctly with the extracted answer, mitigating the risk of hallucinated content [sciverse_testing_qa_software#28350].\n\nIn the domain of multi-hop question generation, the challenge of eliminating hallucinations is explicitly recognized as an interesting and significant problem [coarse:52eb88a6923c]. The DPKG (Dual-Perspective Keyword Generation) framework has been demonstrated to excel at local matching and capturing long-range semantic dependencies, which are crucial for generating accurate multi-hop questions [10]. DPKG outperforms the CQG method, showing a positive impact of dual-perspective keywords in guiding the generation process [11]. However, the number of keywords used is a critical factor; increasing the number of keywords has been demonstrated to hinder both keyword generation and question generation performance, suggesting that a balance is required to maintain accuracy and avoid hallucinations [12].\n\nFurthermore, question generation is utilized in self-verification processes to mitigate hallucinations by decomposing generated content into fact checkpoints [coarse:9046c1454721]. This approach allows the system to verify individual facts rather than the entire output, reducing the likelihood of undetected errors. Additionally, decomposing complex questions into simpler questions based on topic entities guides the LLM to better answer the original query, thereby reducing hallucinations [coarse:950ff2dee229]. This decomposition strategy helps manage the complexity of the task, ensuring that the model focuses on verifiable sub-questions.\n\nOther methods, such as Knowledge Injection and RAG, are also proposed to address hallucination by allowing LLMs to utilize trustworthy knowledge bases [coarse:551334316493]. RAG is specifically noted as a technique to address hallucination by grounding the model's responses in external data [coarse:0907c12de4d2]. In the context of news, quiz-style question generation is used, though the dataset size is limited because question creation is expensive [coarse:551334316493]. A novel framework has also been proposed for generating invalid questions to test the frequency of hallucinations output by new LLMs, providing a metric for evaluating model reliability [svy_b17ab084627f].\n\nThe consulted records did not surface detailed end-to-end implementation specifics for the question-to-question retrieval mechanism beyond the model names and similarity scores provided, nor did they identify other corpus papers connecting question generation to hallucination mitigation beyond those cited. Additionally, the specific contributions of the \"testing QA software with context-driven question generation\" paper are limited to the description of the CQ²A framework's use of consistency verification and constraint checking as noted above.",
+  "arm": "main",
+  "steps": 18,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "question generation"
+    },
+    "intent": "Get cross-paper evidence dossier on question generation to find papers linking it to hallucination mitigation",
+    "obs_chars": 905,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "hallucination"
+    },
+    "intent": "Get cross-paper evidence dossier on hallucination to find papers discussing mitigation via question generation",
+    "obs_chars": 2585,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "question generation",
+     "claim_type": "mechanism",
+     "contains": "hallucination|reducing|mitigat|prevent"
+    },
+    "intent": "Find mechanism records linking question generation to hallucination reduction",
+    "obs_chars": 410,
+    "notes_chars": 7
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "hallucination",
+     "claim_type": "mechanism",
+     "contains": "question generation|generating questions|self-question"
+    },
+    "intent": "Find mechanism records where hallucination is mitigated via question generation",
+    "obs_chars": 3945,
+    "notes_chars": 7
+   },
+   {
+    "step": 2,
+    "tool": "card",
+    "args": {
+     "entity": "question answering"
+    },
+    "intent": "Get cross-paper dossier on QA systems to find question-generation-based hallucination mitigation approaches",
+    "obs_chars": 2582,
+    "notes_chars": 1658
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "question generation|self-question|decompos|clarifying question|question-to-question",
+     "entity": "hallucination"
+    },
+    "intent": "Find mechanism records linking question generation to hallucination mitigation",
+    "obs_chars": 1662,
+    "notes_chars": 1658
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get detailed mechanism from the question-to-question retrieval paper",
+    "obs_chars": 2711,
+    "notes_chars": 1658
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_multi_hop_question_generation_via_dual_perspective_keyword_guidance",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism details from multi-hop question generation paper",
+    "obs_chars": 3055,
+    "notes_chars": 1658
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check if context-driven question generation paper has hallucination-related mechanisms",
+    "obs_chars": 2054,
+    "notes_chars": 2799
+   },
+   {
+    "step": 3,
+    "tool": "search_text",
+    "args": {
+     "query": "question generation mitigate hallucination LLM",
+     "k": 8
+    },
+    "intent": "Catch any additional papers connecting question generation to hallucination mitigation",
+    "obs_chars": 2842,
+    "notes_chars": 2799
+   },
+   {
+    "step": 3,
+    "tool": "card",
+    "args": {
+     "entity": "context-driven question generation"
+    },
+    "intent": "Get dossier on context-driven question generation entity",
+    "obs_chars": 482,
+    "notes_chars": 2799
+   },
+   {
+    "step": 4,
+    "type": "note_reject",
+    "n_bad": 2,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri"
+    ]
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question generation hallucination mitigation self-questioning verification LLM"
+    },
+    "intent": "Find additional corpus papers connecting question generation to hallucination mitigation",
+    "obs_chars": 2582,
+    "notes_chars": 3738
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "consistency verification|constraint checking|reliability",
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation"
+    },
+    "intent": "Get mechanism details on how CQ²A mitigates hallucination in generated questions",
+    "obs_chars": 1093,
+    "notes_chars": 3738
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question-to-question retrieval hallucination-free knowledge access mechanism"
+    },
+    "intent": "Get more detail on the question-to-question retrieval mechanism",
+    "obs_chars": 2891,
+    "notes_chars": 3738
+   },
+   {
+    "step": 5,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question generation self-verification fact-checking decompose answer into questions hallucination"
+    },
+    "intent": "Find additional corpus papers connecting question generation to hallucination mitigation",
+    "obs_chars": 2715,
+    "notes_chars": 4392
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "claim_type": "criticism",
+     "contains": "hallucination|limitation|weakness",
+     "entity": "question generation"
+    },
+    "intent": "Find limitations/criticisms of question generation approaches related to hallucination",
+    "obs_chars": 410,
+    "notes_chars": 4392
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question-to-question retrieval mechanism generate questions embed retrieve match answer"
+    },
+    "intent": "Get more detail on the end-to-end mechanism of question-to-question retrieval",
+    "obs_chars": 2563,
+    "notes_chars": 4392
+   },
+   {
+    "step": 6,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 7,
+    "type": "note_reject",
+    "n_bad": 4,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 7,
+    "tool": "fetch_chunk",
+    "args": {
+     "record_id": "f34cc2fb2ae7ea",
+     "window": 800
+    },
+    "intent": "Get full context around the main finding of question-to-question retrieval paper to understand the end-to-end mechanism",
+    "obs_chars": 1761,
+    "notes_chars": 4392
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "question generation|self-question|decompos|clarifying question|question-to-question",
+     "entity": "large language model"
+    },
+    "intent": "Find mechanism findings linking question generation to hallucination mitigation in LLMs more broadly",
+    "obs_chars": 3895,
+    "notes_chars": 4392
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "observation",
+     "contains": "hallucination|factuality|reliability|accuracy",
+     "entity": "question generation"
+    },
+    "intent": "Find observation records about hallucination/factuality in question generation context",
+    "obs_chars": 410,
+    "notes_chars": 4392
+   },
+   {
+    "step": 7,
+    "tool": "findings",
+    "args": {
+     "claim_type": "mechanism",
+     "contains": "question generation|self-question|decompos|clarifying question|question-to-question",
+     "entity": "retrieval augmented generation"
+    },
+    "intent": "Find mechanism findings linking question generation to hallucination mitigation in RAG context",
+    "obs_chars": 1273,
+    "notes_chars": 4392
+   },
+   {
+    "step": 8,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 8,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question generation reduce hallucination self-ask verify answer factuality LLM"
+    },
+    "intent": "Search for additional papers on using question generation to reduce hallucination",
+    "obs_chars": 286,
+    "notes_chars": 4838
+   },
+   {
+    "step": 9,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_multiple_choice_question_generation_using_large_language_models_methodology_and_",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check if multiple-choice QG paper has hallucination-related mechanisms",
+    "obs_chars": 1396,
+    "notes_chars": 4838
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_quiz_style_question_generation_for_news_stories",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check if quiz-style QG paper has hallucination-related mechanisms",
+    "obs_chars": 532,
+    "notes_chars": 4838
+   },
+   {
+    "step": 10,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 11,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 11,
+    "tool": "findings",
+    "args": {
+     "claim_type": "recommendation",
+     "contains": "question generation|self-question|decompos|clarifying question|question-to-question",
+     "entity": "hallucination"
+    },
+    "intent": "Find recommendation records linking question generation to hallucination",
+    "obs_chars": 2500,
+    "notes_chars": 5233
+   },
+   {
+    "step": 12,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 13,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 13,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_testing_question_answering_software_with_context_driven_question_generation",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation records for the context-driven QG paper",
+    "obs_chars": 2022,
+    "notes_chars": 5536
+   },
+   {
+    "step": 13,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "self-ask self-questioning decompose answer verify each sub-question hallucination reduction"
+    },
+    "intent": "Search for self-ask/self-questioning approaches to hallucination mitigation",
+    "obs_chars": 2446,
+    "notes_chars": 5536
+   },
+   {
+    "step": 14,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 15,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 15,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "question generation verify answer factuality self-ask decompose sub-question hallucination mitigation LLM"
+    },
+    "intent": "Search for additional papers connecting question generation to hallucination mitigation",
+    "obs_chars": 2702,
+    "notes_chars": 5536
+   },
+   {
+    "step": 16,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 17,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "step": 18,
+    "type": "note_reject",
+    "n_bad": 5,
+    "reasons": [
+     "bad_backref"
+    ],
+    "sample_lines": [
+     "N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking",
+     "N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency veri",
+     "N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for q"
+    ]
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 18,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "N1. [f34cc2fb2ae7ea] Question-to-question retrieval achieves high precision and eliminates hallucination risk by avoiding generation step (sciverse_question_to_question_retrieval) | epistemic:stated\nN2. [coarse:950ff2dee229] Decomposing complex questions into simpler questions based on topic entities guides LLM to better answer, reducing hallucinations (sciverse_paths_over_graph) | epistemic:stated\nN3. [coarse:9046c1454721] Self-verification mitigates hallucinations by decomposing generated content into fact checkpoints (sciverse_advancing_scientific_method) | epistemic:stated\nN4. [coarse:52eb88a6923c] Multi-hop question generation: \"Eliminating hallucinations when prompting LLMs to generate multi-hop questions is an interesting challenge\" (sciverse_multi_hop_qg) | epistemic:stated\nN5. [6ca0d89e999cad] Conventional RAG suffers from low semantic similarity between question embeddings and document passages due to structural differences (sciverse_question_to_question_retrieval) | epistemic:stated\nN6. [b59842d95638ce] Instead of embedding document content, the method employs an instruction-tuned model to generate questions for retrieval (sciverse_question_to_question_retrieval) | epistemic:stated\nN7. [7130bd44e59fdd] For Wikidata, the method generates all possible questions for entity retrieval (sciverse_question_to_question_retrieval) | epistemic:stated\nN8. [coarse:abebe36b553c] A retrieval mechanism that precisely identifies relevant text and removes the generation step mitigates hallucination in Wikipedia QA (sciverse_question_to_question_retrieval) | epistemic:stated\nN9. [coarse:298443385630] The generation step of LLMs introduces hallucination risk — plausible but factually incorrect answers (sciverse_question_to_question_retrieval) | epistemic:stated\nN10. [8e1271e4046378] DPKG framework excels at local matching and capturing long-range semantic dependencies for multi-hop question generation (sciverse_multi_hop_qg) | epistemic:demonstrated\nN11. [5936b8c2b9e94c] DPKG outperforms CQG, showing positive impact of dual-perspective keywords in guiding multi-hop question generation (sciverse_multi_hop_qg) | epistemic:demonstrated\nN12. [e7974dd2bb5f09] Increasing number of keywords hinders keyword generation and question generation performance (sciverse_multi_hop_qg) | epistemic:demonstrated\nN13. [coarse:63866fc] Hallucinations may lead to generated questions that introduce information not in source (sciverse_testing_qa_software) | epistemic:stated\nN14. [0c598bcff5bd28] The 'question-to-passage' comparison hinders high-precision retrieval (sciverse_question_to_question_retrieval) | epistemic:stated\nN15. [df699a849a983d] Low semantic similarity between questions and passages arises from distinct structural properties (sciverse_question_to_question_retrieval) | epistemic:stated\nN16. [52d2bbd09e7823] CQ²A extracts entities/relationships from context as answers, then generates corresponding questions via LLM (sciverse_testing_qa_software) | epistemic:stated\nN17. [coarse:714bebc1eefa] Output variability and hallucinations pose significant threats to reliability of LLM-generated results (sciverse_testing_qa_software) | epistemic:stated\n[unsourced] N18. [sciverse_testing_qa_software#25650] CQ²A uses consistency verification and constraint checking to enhance reliability of generated questions | anchor:\"Consistency Verification and Constraint Checking to Enhance Reliability\"\n[unsourced] N19. [sciverse_testing_qa_software#28350] Rules provide coarse-grained constraints; consistency verification ensures correctness/alignment between generated question and answer | anchor:\"The aforementioned rules provide only coarse-grained constraints for question generation and cannot ensure the correctness or alignment\"\n[unsourced] N20. [sciverse_question_to_question_retrieval#22950] Implementation: llama-3.1-8b-instruct-awq for question generation, baai/bge-small-en-v1.5 (384-dim) for embeddings, indexed <1000 Wikipedia articles | anchor:\"llama-3.1-8b-instruct-awq for question generation and baai/bge-small-en-v1.5 (384-dimensional vectors) for embeddings\"\n[unsourced] N21. [sciverse_question_to_question_retrieval#24300] Limitations: falls short for multi-paragraph questions; LLMs efficient only in small set of languages vs 300+ Wikipedia languages | anchor:\"For questions that need more than just one paragraph or fact, the system might fall short\"\nN22. [coarse:0907c12de4d2] RAG is a technique used to address hallucination by allowing LLMs to utilize trustworthy knowledge bases (sciverse_multiple_choice_qg) | epistemic:stated\n[unsourced] N23. [sciverse_question_to_question_retrieval#c9] Cosine similarity scores consistently above 0.9 for relevant question pairs; system offers fast, scalable retrieval | anchor:\"cosine similarity scores consistently above 0.9 for relevant question pairs\"\nN24. [coarse:cc118b053efc] LLMs could hallucinate (sciverse_multiple_choice_qg) | epistemic:stated\nN25. [coarse:551334316493] Knowledge Injection proposed as method to address hallucination in LLMs (sciverse_multiple_choice_qg) | epistemic:stated\nN26. [coarse:6e669f79cd7b] Quiz-style QG for news: dataset small because question creation is expensive (sciverse_quiz_style_qg) | epistemic:stated\nN27. [svy_b17ab084627f] Novel framework for generating invalid questions to test frequency of hallucinations output by new LLMs (arxiv_2403.16527) | epistemic:survey-claimed\nN28. [coarse:69f1908] LLMs still prone to hallucination, especially when generating content (arxiv_2401) | epistemic:stated",
+  "gaps_final": "G1. Need more detail on the question-to-question retrieval mechanism (how exactly it works end-to-end)\nG2. Are there other corpus papers connecting question generation to hallucination mitigation beyond the ones found?\nG3. What does the \"testing QA software with context-driven question generation\" paper contribute?",
+  "queried": [
+   "card|{\"entity\": \"question generation\"}",
+   "card|{\"entity\": \"hallucination\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"hallucination|reducing|mitigat|prevent\", \"entity\": \"question generation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"question generation|generating questions|self-question\", \"entity\": \"hallucination\"}",
+   "card|{\"entity\": \"question answering\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"question generation|self-question|decompos|clarifying question|question-to-question\", \"entity\": \"hallucination\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_question_to_question_retrieval_for_hallucination_free_knowledge_access_an_approa\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_multi_hop_question_generation_via_dual_perspective_keyword_guidance\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"question generation mitigate hallucination LLM\"}",
+   "card|{\"entity\": \"context-driven question generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"question generation hallucination mitigation self-questioning verification LLM\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"consistency verification|constraint checking|reliability\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"question-to-question retrieval hallucination-free knowledge access mechanism\"}",
+   "search_text|{\"k\": 8, \"query\": \"question generation self-verification fact-checking decompose answer into questions hallucination\"}",
+   "findings|{\"claim_type\": \"criticism\", \"contains\": \"hallucination|limitation|weakness\", \"entity\": \"question generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"question-to-question retrieval mechanism generate questions embed retrieve match answer\"}",
+   "fetch_chunk|{\"record_id\": \"f34cc2fb2ae7ea\", \"window\": 800}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"question generation|self-question|decompos|clarifying question|question-to-question\", \"entity\": \"large language model\"}",
+   "findings|{\"claim_type\": \"observation\", \"contains\": \"hallucination|factuality|reliability|accuracy\", \"entity\": \"question generation\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"contains\": \"question generation|self-question|decompos|clarifying question|question-to-question\", \"entity\": \"retrieval augmented generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"question generation reduce hallucination self-ask verify answer factuality LLM\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_multiple_choice_question_generation_using_large_language_models_methodology_and_\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_quiz_style_question_generation_for_news_stories\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"contains\": \"question generation|self-question|decompos|clarifying question|question-to-question\", \"entity\": \"hallucination\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_testing_question_answering_software_with_context_driven_question_generation\"}",
+   "search_text|{\"k\": 8, \"query\": \"self-ask self-questioning decompose answer verify each sub-question hallucination reduction\"}",
+   "search_text|{\"k\": 8, \"query\": \"question generation verify answer factuality self-ask decompose sub-question hallucination mitigation LLM\"}"
+  ],
+  "gate": {
+   "note_rejects": 69,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "reject_reasons": {
+    "bad_backref": 69
+   },
+   "merge_downgraded_lines": 69,
+   "merge_total_lines": 376,
+   "relaxed_writes": 15,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 26,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "0.9",
+     "3.1",
+     "300",
+     "384"
+    ],
+    "unsourced": 2
+   },
+   "compiled_numeric_residual": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ },
+ {
+  "id": "00bdd80debc8549198001289",
+  "type": "aggregation",
+  "question": "How can I use an hybridization of ontology and machine learning for text summarization ?",
+  "gold_hint": "",
+  "answer": "Hybridizing ontology and machine learning for text summarization involves integrating structured knowledge representation with data-driven algorithms to enhance the relevance and accuracy of generated summaries. A prominent example of this hybridization is the Ontology-based and User-focused Automatic Text Summarization (OATS) system, which combines ontology-based topic identification with user-focused text summarization [fe5ebc89f6eff5]. In this architecture, ontology concept graphs represent domain knowledge, and a matching algorithm identifies relevant documents, while a question-answering (QA) model answers user questions to generate the final summary [486ca3db669105]. The core mechanism relies on an ontology-based approach to identify documents relevant to user interests, followed by the generation of a summary from those selected texts [c7c574bac9eaff].\n\nThe pipeline flow begins with the determination of topics via the ontology module; if a document is deemed relevant, it proceeds to the summarization module [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#24300]. The system aims to generate extractive summaries for each relevant document separately [a46298263f9da5]. This approach is distinct from other summarization methods: extractive summarization selects the most important sentences from the source [coarse:96255c223b25], abstractive summarization generates new content that differs from the source [coarse:fb963f381d93], and hybrid approaches combine both [coarse:ad16d36ec21c]. OATS is unique in that it extracts summary sentences from unstructured text, a capability that makes it highly customizable as users can define their own questions and their order [4e608779e780f5] [d3892e78cf4734].\n\nMachine learning components are integral to the hybridization process. The relevancy model utilizes a word2vec model, which serves as the primary ML component for scoring [1438a3a31f0e85]. To improve summarization quality, a specific sentence scoring method was developed [6b6da91bbe3ef7]. Notably, this method does not require IDF normalization because common words are filtered out [0d8babfd3848fb]. The system also employs ML-based extraction of triples from unstructured text, although this is noted as an imperfect solution [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#22950]. To address challenges associated with small datasets, the use of pre-trained word embeddings is recommended [9a561db5b41640].\n\nThe ontology component in the OATS system was based on a simplified COVID-19 Risk Factor ontology, which excluded the \"Change Concept\" to maintain simplicity [9174465ed55530] [29faac570f43b1]. The graph creation was performed using the igraph package [590330480545cb]. The system was motivated by the CQM ontology [0e2c4645270639]. For the matching algorithm, which determines relevance, the system uses specific terms such as COPD and its full name [e82b4455e5d252] [e37170877b2c2c]. The acronym COPD is separated into four words, and distance is measured per word to assess similarity [1114f3fc4d5b40]. The \"gold standard\" concept graphs used for evaluation were manually extracted by Schwemmer et al. (2019) [3a39c1c857eace], who also developed the matching algorithm [e82b4455e5d252]. Related prior work includes a supervised deep learning framework developed by Arumae & Liu (2019) [35600fe722ff8e].\n\nExperimental results demonstrate the effectiveness of this hybrid approach across four risk factors. For Hypertension, the system achieved a Precision of 0.93 and a Recall of 0.84 [62160dfd98e19f] [7109014703324c]. For Diabetes, the Precision was 0.92 and the Recall was 0.76 [4dbb73de623b5a] [301623cfaf0864]. For Obesity, the Precision reached 1 and the Recall was 0.71 [3536dda02bf972] [ab94a7bdfd5cc3]. For COPD, the Precision was 0.81 and the Recall was 0.6 [6125c068ebbd5e] [4834e4154baf42]. Overall, the system demonstrated high precision and acceptable recall on all four risk factors [506d981f227c5b]. The methodology, evaluated through questions Q1-Q6, had over 50% accuracy [76eba18d0c6797]. The model is capable of distinguishing highly similar numerical details [307efa3daed8a3], and scores for questions Q7 and Q8 improved when the questions were made more specific [05b122695f2992].\n\nDespite these results, the system has limitations. The QA model requires a standardized question set to function effectively [b1a66b6dde7a45]. The inaccessibility of certain text sections limits the performance of the QA model [922cf97f8a22ed]. Performance was slightly poorer with COPD, likely due to the complexity of the acronym [e0b4f9387976fc]. A suggested improvement is to add an algorithm to extract the full name of acronyms [2efbbcb38bd1ac]. Additionally, while the QA model is correct, preprocessing discarded some data [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#41850].\n\nIn the broader context of ontology-based summarization, there is a need for more flexibility to allow users and applications to tune the model [coarse:0a2c94d96ab7]. Ontology partitioning is identified as a usable technique for ontology-based text summarization [coarse:451f2d8e1c3c]. The OATS system is applicable to summarizing scientific literature in gap areas [c58f123f4db0c6]. The consulted records did not surface detailed pipeline flow specifics beyond the general module interaction, nor did they provide extensive coverage of other papers on ontology summarization beyond the cited prior works and general methodological distinctions.",
+  "arm": "main",
+  "steps": 18,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "oats"
+    },
+    "intent": "Get full evidence dossier for OATS (ontology-based summarization)",
+    "obs_chars": 5719,
+    "notes_chars": 543
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19",
+     "claim_type": "mechanism"
+    },
+    "intent": "Mechanism of ontology+ML hybrid in OATS paper",
+    "obs_chars": 2579,
+    "notes_chars": 543
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "ontology summarization technique"
+    },
+    "intent": "Dossier for ontology summarization technique entity",
+    "obs_chars": 424,
+    "notes_chars": 543
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "entity": "oats",
+     "claim_type": "definition"
+    },
+    "intent": "Definition of OATS / ontology-ML hybrid",
+    "obs_chars": 3118,
+    "notes_chars": 543
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19",
+     "claim_type": "observation"
+    },
+    "intent": "Get additional observations about OATS pipeline details and performance characteristics",
+    "obs_chars": 2583,
+    "notes_chars": 3454
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "automatic text summarization methods",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find other papers in corpus on automatic text summarization mechanisms",
+    "obs_chars": 187,
+    "notes_chars": 3454
+   },
+   {
+    "step": 2,
+    "tool": "search_text",
+    "args": {
+     "query": "ontology machine learning hybrid text summarization pipeline word2vec concept graph matching",
+     "k": 8
+    },
+    "intent": "Search full texts for detailed pipeline description of ontology+ML hybrid summarization",
+    "obs_chars": 2894,
+    "notes_chars": 3454
+   },
+   {
+    "step": 2,
+    "tool": "lineage",
+    "args": {
+     "entity": "oats",
+     "direction": "both"
+    },
+    "intent": "Check lineage connections of OATS to related methods",
+    "obs_chars": 74,
+    "notes_chars": 3454
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19",
+     "claim_type": "recommendation"
+    },
+    "intent": "Get the paper's own recommendations for how to build/extend the ontology+ML hybrid pipeline",
+    "obs_chars": 3848,
+    "notes_chars": 3470
+   },
+   {
+    "step": 4,
+    "tool": "search_text",
+    "args": {
+     "query": "ontology knowledge graph word2vec sentence scoring extractive summarization pipeline steps",
+     "k": 8
+    },
+    "intent": "Find raw-text descriptions of the full pipeline flow in the OATS paper",
+    "obs_chars": 2895,
+    "notes_chars": 3470
+   },
+   {
+    "step": 4,
+    "tool": "lineage",
+    "args": {
+     "entity": "automatic text summarization methods",
+     "direction": "both"
+    },
+    "intent": "See what other summarization methods are connected in the corpus lineage",
+    "obs_chars": 74,
+    "notes_chars": 3470
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_title_automatic_summarization_of_russian_texts_comparison_of_extractive_and_abst",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check if the Russian text summarization paper has mechanism details for extractive vs abstractive comparison",
+    "obs_chars": 1418,
+    "notes_chars": 4458
+   },
+   {
+    "step": 5,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_unstructured_evidence_attribution_for_long_context_query_focused_summarization",
+     "claim_type": "mechanism"
+    },
+    "intent": "Check if the evidence attribution summarization paper has mechanism details relevant to ontology+ML hybrid",
+    "obs_chars": 187,
+    "notes_chars": 4458
+   },
+   {
+    "step": 5,
+    "tool": "search_text",
+    "args": {
+     "query": "ontology concept graph word2vec cosine distance sentence selection extractive summary pipeline architecture",
+     "k": 8
+    },
+    "intent": "Get more pipeline architecture details from the OATS paper full text",
+    "obs_chars": 2894,
+    "notes_chars": 4458
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19",
+     "contains": "pipeline|architecture|module|step|process|flow"
+    },
+    "intent": "Get detailed pipeline/architecture description from OATS paper",
+    "obs_chars": 2123,
+    "notes_chars": 4155
+   },
+   {
+    "step": 6,
+    "tool": "search_text",
+    "args": {
+     "k": 8,
+     "query": "ontology-based summarization word2vec cosine similarity sentence ranking extractive pipeline architecture steps"
+    },
+    "intent": "Find detailed pipeline description in full text",
+    "obs_chars": 2893,
+    "notes_chars": 4155
+   },
+   {
+    "step": 7,
+    "tool": "card",
+    "args": {
+     "entity": "automatic text summarization methods"
+    },
+    "intent": "Get dossier on automatic text summarization methods to find other ontology+ML hybrid approaches",
+    "obs_chars": 392,
+    "notes_chars": 4155
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "entity": "ontology summarization technique",
+     "claim_type": "mechanism"
+    },
+    "intent": "Find mechanism records for ontology summarization technique entity",
+    "obs_chars": 1009,
+    "notes_chars": 4155
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 18,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How to hybridize ontology + ML for text summarization?\nCentral paper: sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19 (2020) — OATS.\nOATS architecture (2 modules):\nN1. [fe5ebc89f6eff5] OATS = ontology-based topic identification + user-focused text summarization | epi:stated\nN2. [486ca3db669105] ontology concept graphs represent knowledge; matching algorithm identifies relevant docs; QA model answers user questions to generate summary | epi:stated\nN3. [c7c574bac9eaff] mechanism: ontology-based approach identifies relevant docs to user interest, then generates summary | epi:stated\nN4. [3a39c1c857eace] Schwemmer et al. (2019) manually extracted \"gold standard\" concept graphs | epi:stated\nN5. [35600fe722ff8e] Arumae & Liu (2019) developed supervised deep learning framework (related prior work) | epi:stated\nN6. [e82b4455e5d252] Schwemmer et al. (2019) developed matching algorithm to determine relevance | epi:stated\nConfigs:\nN7. [9174465ed55530] ontology = simplified COVID-19 Risk Factor ontology | epi:stated\nN8. [29faac570f43b1] ontology excludes \"Change Concept\" (simplified) | epi:stated\nN9. [590330480545cb] graph creation via igraph package | epi:stated\nN10. [1438a3a31f0e85] relevancy model = word2vec model trained (ML component) | epi:stated\nML components:\nN11. [6b6da91bbe3ef7] sentence scoring method developed to improve summarization | epi:stated\nN12. [0d8babfd3848fb] no IDF normalization needed (common words filtered) | epi:stated\nN13. [e37170877b2c2c] matching uses COPD + full name | epi:stated\nN14. [1114f3fc4d5b40] COPD separated into 4 words, distance measured per word | epi:stated\nResults:\nN15. [62160dfd98e19f] Hypertension P=0.93 | N16. [7109014703324c] R=0.84 | epi:demonstrated\nN17. [4dbb73de623b5a] Diabetes P=0.92 | N18. [301623cfaf0864] R=0.76 | epi:demonstrated\nN19. [3536dda02bf972] Obesity P=1 | N20. [ab94a7bdfd5cc3] R=0.71 | epi:demonstrated\nN21. [6125c068ebbd5e] COPD P=0.81 | N22. [4834e4154baf42] R=0.6 | epi:demonstrated\nN23. [506d981f227c5b] high precision + acceptable recall on all 4 risk factors | epi:stated\nN24. [76eba18d0c6797] methodology Q1-Q6 had over 50% accuracy | epi:stated\nLimitations:\nN25. [b1a66b6dde7a45] QA model requires standardized question set | epi:stated\nN26. [922cf97f8a22ed] inaccessibility of text sections limits QA performance | epi:stated\nN27. [e0b4f9387976fc] slightly poor performance with COPD | epi:stated\nN28. [2efbbcb38bd1ac] improvement: add algorithm to extract acronym full name | epi:stated\nLineage:\nN29. [0e2c4645270639] OATS motivated_by CQM ontology | epi:stated\nN30. [4e608779e780f5] OATS unique: extracts summary sentences from unstructured text | epi:stated\nN31. [d3892e78cf4734] highly customizable: users define questions + order | epi:stated\nN32. [c58f123f4db0c6] applicable to summarize scientific literature in gap areas | epi:stated\nN33. [05b122695f2992] Q7/Q8 scores improved by making questions more specific | epi:stated\nN34. [307efa3daed8a3] model distinguishes highly similar numerical details | epi:stated\nPipeline flow:\nN35. [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#24300] topic determined via ontology module; if relevant, doc goes to summarization module | epi:stated\nN36. [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#22950] ML-based extraction of triples from unstructured text (imperfect solution) | epi:stated\nN37. [sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19#41850] QA model correct but preprocessing discarded some data | epi:stated\nN38. [9a561db5b41640] pre-trained word embeddings recommended to minimize small-dataset challenges | epi:stated\nN39. [a46298263f9da5] goal: generate extractive summaries for each relevant document separately | epi:stated\nOther summarization papers:\nN40. [coarse:96255c223b25] extractive: summary from most important sentences | epi:stated\nN41. [coarse:fb963f381d93] abstractive: content generated, differs from source | epi:stated\nN42. [coarse:ad16d36ec21c] hybrid approach combines extractive + abstractive | epi:stated\nN43. [coarse:0a2c94d96ab7] ontology summarization needs more flexibility for users/apps to tune model | epi:stated\nN44. [coarse:451f2d8e1c3c] ontology partitioning usable for ontology-based text summarization | epi:stated",
+  "gaps_final": "G1. Confirm full pipeline flow details (ontology graph -> matching -> word2vec scoring -> QA -> summary)\nG2. Other papers on ontology summarization / automatic text summarization in corpus",
+  "queried": [
+   "card|{\"entity\": \"oats\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19\"}",
+   "card|{\"entity\": \"ontology summarization technique\"}",
+   "findings|{\"claim_type\": \"definition\", \"entity\": \"oats\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"automatic text summarization methods\"}",
+   "search_text|{\"k\": 8, \"query\": \"ontology machine learning hybrid text summarization pipeline word2vec concept graph matching\"}",
+   "lineage|{\"direction\": \"both\", \"entity\": \"oats\"}",
+   "findings|{\"claim_type\": \"recommendation\", \"paper_id\": \"sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19\"}",
+   "search_text|{\"k\": 8, \"query\": \"ontology knowledge graph word2vec sentence scoring extractive summarization pipeline steps\"}",
+   "lineage|{\"direction\": \"both\", \"entity\": \"automatic text summarization methods\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_title_automatic_summarization_of_russian_texts_comparison_of_extractive_and_abst\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_unstructured_evidence_attribution_for_long_context_query_focused_summarization\"}",
+   "search_text|{\"k\": 8, \"query\": \"ontology concept graph word2vec cosine distance sentence selection extractive summary pipeline architecture\"}",
+   "findings|{\"contains\": \"pipeline|architecture|module|step|process|flow\", \"paper_id\": \"sciverse_ontology_based_and_user_focused_automatic_text_summarization_oats_using_covid_19\"}",
+   "search_text|{\"k\": 8, \"query\": \"ontology-based summarization word2vec cosine similarity sentence ranking extractive pipeline architecture steps\"}",
+   "card|{\"entity\": \"automatic text summarization methods\"}",
+   "findings|{\"claim_type\": \"mechanism\", \"entity\": \"ontology summarization technique\"}"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 8,
+   "a_chars": 577,
+   "a_skipped_dup": 1,
+   "a_skipped_ungrounded": 3,
+   "a_overflow_dropped": 0,
+   "a_forged": 32,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 8,
+   "fallback_compiled": true,
+   "compiled_numeric_fail": {
+    "missing_nums": [
+     "1.0"
+    ],
+    "unsourced": 0
+   },
+   "compiled_numeric_residual": false
+  },
+  "backfills": [],
+  "auto_rows": [
+   "A1. [62160dfd98e19f] oats Precision=0.93 | src:card@step0 | epi:demonstrated",
+   "A2. [76eba18d0c6797] had over=50% | src:card@step0",
+   "A3. [7109014703324c] oats Recall=0.84 | src:card@step0 | epi:demonstrated",
+   "A4. [4dbb73de623b5a] oats Precision=0.92 | src:card@step0 | epi:demonstrated",
+   "A5. [301623cfaf0864] oats Recall=0.76 | src:card@step0 | epi:demonstrated",
+   "A6. [ab94a7bdfd5cc3] oats Recall=0.71 | src:card@step0 | epi:demonstrated",
+   "A7. [6125c068ebbd5e] oats Precision=0.81 | src:card@step0 | epi:demonstrated",
+   "A8. [4834e4154baf42] oats Recall=0.6 | src:card@step0 | epi:demonstrated"
+  ],
+  "degenerate": false
+ },
+ {
+  "id": "99fd4c1b54e1367bcd3cb3b2",
+  "type": "aggregation",
+  "question": "How can the integration of GIS spatial analysis techniques with economic modeling improve the accuracy and effectiveness of environmental policy ?",
+  "gold_hint": "",
+  "answer": "The integration of Geographic Information Systems (GIS) spatial analysis techniques with economic modeling enhances the accuracy and effectiveness of environmental policy by enabling more sophisticated regional economic analyses and facilitating the incorporation of complex spatial dynamics into standard economic frameworks. The paper states that the integration of spatial statistical analysis with GIS provides a more sophisticated approach for regional economic analysis . This methodological advancement is supported by the inherent flexibility of GIS, which is well suited for changing the level of the research area, such as moving from small to large units . Furthermore, GIS is convenient for capturing the effect of a larger region on one of its components, a capability that is critical for understanding hierarchical environmental and economic interactions .\n\nIn the context of environmental modeling, activities can tremendously benefit from GIS technology, as the integration of environmental models with GIS functionalities is conceivable through either loosely or tightly coupled approaches . While System Dynamics (SD) theory has long been deployed in modeling complex non-linear interrelationships, it has not been common to use SD modeling in support of bringing environmental sustainability policies to practice . The paper states that this limitation is largely because the challenge of including spatial data in SD modeling has not yet been well met . However, the potential for the adoption of SD and GIS methods in combination is exemplified in recent studies, suggesting a pathway to overcome these historical barriers .\n\nA specific application of this integration is demonstrated in a study that integrates an economic model of climate change with a small structural model of the Greenland ice sheet . This work provides a methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses . Regarding the quantitative impact of such spatial and physical integrations, the study finds that adding the Greenland ice sheet has only a small effect on the social cost of carbon (SCC) because melting is slow and damages are far in the future .\n\nThe consulted records did not surface specific details regarding the contributions of the 2004 paper on spatial statistics and GIS beyond the general findings on regional analysis, nor did they provide specific insights from the 1997 paper on tightly coupling models with visualizations. Additionally, the records lacked specific findings from the 2005 paper on socio-economic development and environmental quality, and did not detail further contributions from the 2019 paper on the economics of Greenland ice sheet disintegration beyond the methodology and SCC findings already noted.",
+  "arm": "main",
+  "steps": 11,
+  "cap": 30,
+  "trajectory": [
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "integration of spatial statistical analysis with GIS"
+    },
+    "intent": "Get cross-paper evidence dossier for the core GIS+spatial stats entity",
+    "obs_chars": 448,
+    "notes_chars": 900
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "gis-environmental-economic model linkage"
+    },
+    "intent": "Get cross-paper evidence dossier for the GIS-environmental-economic linkage entity",
+    "obs_chars": 390,
+    "notes_chars": 900
+   },
+   {
+    "step": 1,
+    "tool": "card",
+    "args": {
+     "entity": "Integration of environmental models with GIS functionalities"
+    },
+    "intent": "Get cross-paper evidence dossier for environmental models + GIS entity",
+    "obs_chars": 538,
+    "notes_chars": 900
+   },
+   {
+    "step": 1,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)"
+    },
+    "intent": "Get all finding records from the 2004 GIS+spatial stats paper",
+    "obs_chars": 1509,
+    "notes_chars": 900
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)"
+    },
+    "intent": "G2: what the 1997 tightly-coupling-models paper says about coupling environmental models with GIS/visualization",
+    "obs_chars": 1042,
+    "notes_chars": 1376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)"
+    },
+    "intent": "G3: what the 2005 socio-economic/environmental-quality paper says about the economic-environmental linkage",
+    "obs_chars": 1937,
+    "notes_chars": 1376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)"
+    },
+    "intent": "G4: what the 2019 Greenland ice sheet economics paper contributes to economic modeling of environmental policy",
+    "obs_chars": 1500,
+    "notes_chars": 1376
+   },
+   {
+    "step": 2,
+    "tool": "findings",
+    "args": {
+     "entity": "Combination of SD and GIS methods",
+     "contains": "GIS|spatial|environmental policy|economic"
+    },
+    "intent": "G5: findings on SD+GIS combination and environmental/economic policy linkage",
+    "obs_chars": 244,
+    "notes_chars": 1376
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)",
+     "claim_type": "mechanism|observation|recommendation"
+    },
+    "intent": "Get more detailed findings from the 2004 paper on spatial statistical analysis with GIS",
+    "obs_chars": 267,
+    "notes_chars": 3280
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)",
+     "claim_type": "mechanism|observation|recommendation"
+    },
+    "intent": "Get more detailed findings from the 1997 paper on tightly coupling models with visualizations",
+    "obs_chars": 267,
+    "notes_chars": 3280
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)",
+     "claim_type": "mechanism|observation|recommendation"
+    },
+    "intent": "Get more detailed findings from the 2005 paper on socio-economic development and environmental quality",
+    "obs_chars": 267,
+    "notes_chars": 3280
+   },
+   {
+    "step": 3,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)",
+     "claim_type": "mechanism|observation|recommendation"
+    },
+    "intent": "Get more detailed findings from the 2019 paper on economics of Greenland ice sheet disintegration",
+    "obs_chars": 267,
+    "notes_chars": 3280
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2004 spatial stat+GIS paper",
+    "obs_chars": 554,
+    "notes_chars": 3280
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 1997 tightly coupling models paper",
+    "obs_chars": 553,
+    "notes_chars": 3280
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2005 socio-economic/environmental quality paper",
+    "obs_chars": 1937,
+    "notes_chars": 3280
+   },
+   {
+    "step": 4,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)",
+     "claim_type": "mechanism"
+    },
+    "intent": "Get mechanism findings from the 2019 Greenland ice sheet economics paper",
+    "obs_chars": 1005,
+    "notes_chars": 3280
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2004 spatial stat+GIS paper",
+    "obs_chars": 1509,
+    "notes_chars": 3280
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 1997 tightly coupling paper",
+    "obs_chars": 553,
+    "notes_chars": 3280
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2005 socio-economic/environmental paper",
+    "obs_chars": 1937,
+    "notes_chars": 3280
+   },
+   {
+    "step": 6,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)",
+     "claim_type": "observation"
+    },
+    "intent": "Get observation-type findings from the 2019 Greenland ice sheet economics paper",
+    "obs_chars": 1500,
+    "notes_chars": 3280
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "Combination of SD and GIS methods"
+    },
+    "intent": "Get cross-paper evidence dossier for the SD+GIS combination entity",
+    "obs_chars": 575,
+    "notes_chars": 3280
+   },
+   {
+    "step": 8,
+    "tool": "card",
+    "args": {
+     "entity": "environmental and economic models"
+    },
+    "intent": "Get cross-paper evidence dossier for environmental-economic models entity",
+    "obs_chars": 609,
+    "notes_chars": 3280
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)",
+     "claim_type": "definition|recommendation|criticism"
+    },
+    "intent": "Get definition/recommendation/criticism findings from the 2004 spatial stat+GIS paper to understand its methodological c",
+    "obs_chars": 266,
+    "notes_chars": 3280
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)",
+     "claim_type": "definition|recommendation|criticism"
+    },
+    "intent": "Get definition/recommendation/criticism findings from the 1997 tightly coupling models paper to understand coupling appr",
+    "obs_chars": 266,
+    "notes_chars": 3280
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)",
+     "claim_type": "definition|recommendation|criticism"
+    },
+    "intent": "Get definition/recommendation/criticism findings from the 2005 socio-economic development & environmental quality paper ",
+    "obs_chars": 266,
+    "notes_chars": 3280
+   },
+   {
+    "step": 9,
+    "tool": "findings",
+    "args": {
+     "paper_id": "sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)",
+     "claim_type": "definition|recommendation|criticism"
+    },
+    "intent": "Get definition/recommendation/criticism findings from the 2019 Greenland ice sheet economics paper to understand its con",
+    "obs_chars": 266,
+    "notes_chars": 3280
+   },
+   {
+    "f28_hard_stop": true,
+    "at_step": 11,
+    "f28_autos": 0
+   }
+  ],
+  "notes_final": "Q: How can integration of GIS spatial analysis with economic modeling improve accuracy/effectiveness of environmental policy?\nN1. [coarse:3d8780d572d5] Integration of spatial statistical analysis with GIS provides a more sophisticated approach for regional economic analysis | anchor:\"the integration of spatial statistical analysis with GIS provides a more sophist\" | epistemic:stated\nN2. [coarse:abb9b5775561] GIS well suited for changing research area level (small→large units) | anchor:\"GIS is well suited for the change of research area in level, like moving from small level\" | epistemic:stated\nN3. [coarse:0bbda163309c] GIS convenient for capturing effect of larger region on one of its components | anchor:\"GIS is well suited for the change of research area in level, like moving from small level\" | epistemic:stated\nN4. [coarse:68afca6809fd] Environmental modeling activities can tremendously benefit from GIS technology | anchor:\"Environmental modeling activities can tremendously benefit from geographic information sys\" | epistemic:stated\nN5. [coarse:45f5a6294ed1] Integrating environmental models with GIS is conceivable through either loosely or tightly coupled approach | anchor:\"Integrating environmental models with GIS functionalities is conceivable through either a\" | epistemic:stated\nN6. [coarse:c965bb0f9c09] System dynamics (SD) theory long deployed in modeling complex non-linear interrelationships | anchor:\"System dynamics (SD) theory has long been deployed in modeling complex non-linear interrel\" | epistemic:stated\nN7. [coarse:b0ab7ba75693] Not common to use SD modeling in support of bringing environmental sustainability policies to practice | anchor:\"so far it has not been common to do the kind of modeling in support of bringing environmen\" | epistemic:stated\nN8. [coarse:a49674b691ab] Challenge of including spatial data in SD modeling has not yet been well met | anchor:\"This is largely because the challenge of including spatial data has not yet been well met.\" | epistemic:stated\nN9. [coarse:a3a208ee82fe] Potential for adoption of SD and GIS methods in combination is exemplified in the study | anchor:\"Potential for adoption of SD and GIS methods in combination is exemplified with\" | epistemic:stated\nN10. [coarse:d735ae93740c] Study integrates an economic model of climate change with a small structural model of the Greenland ice sheet | anchor:\"This study integrates an economic model of climate change with a small structural model of\" | epistemic:stated\nN11. [coarse:c55e03c4f91b] Provides methodology for incorporating large earth system changes into standard economic cost-benefit or damage-limiting analyses | anchor:\"As such, it provides a methodology for incorporating large earth system changes into stand\" | epistemic:stated\nN12. [coarse:c019fb5b3829] Adding the Greenland ice sheet has only a small effect on the social cost of carbon because melting is slow and damages are far in the future | anchor:\"It finds that adding the GIS has only a small effect on the social cost of carbon (SCC) be\" | epistemic:stated\nRelevant papers: 2004 (spatial stat+GIS regional), 1997 (tightly coupling models+visualizations), 2005 (socio-economic development & environmental quality), 2019 (economics of Greenland ice sheet disintegration).",
+  "gaps_final": "G1. What does the 2004 paper (spatial stat+GIS) contribute beyond the 3 findings already retrieved? (need more findings / full text)\nG2. What does the 1997 paper (tightly coupling models with visualizations) say about coupling environmental models with GIS?\nG3. What does the 2005 paper (socio-economic development & environmental quality) say about the economic-environmental linkage?\nG4. What does the 2019 paper (Greenland ice sheet economics) contribute to economic modeling of environmental policy?\nG5. Any findings on \"Combination of SD and GIS methods\" / \"environmental and economic models\" entities?",
+  "queried": [
+   "card|{\"entity\": \"integration of spatial statistical analysis with GIS\"}",
+   "card|{\"entity\": \"gis-environmental-economic model linkage\"}",
+   "card|{\"entity\": \"Integration of environmental models with GIS functionalities\"}",
+   "findings|{\"paper_id\": \"sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis to regional ; 2004)\"}",
+   "findings|{\"paper_id\": \"sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analysis and vis; 1997)\"}",
+   "findings|{\"paper_id\": \"sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental quality: a s; 2005)\"}",
+   "findings|{\"paper_id\": \"sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)\"}",
+   "findings|{\"contains\": \"GIS|spatial|environmental policy|economic\", \"entity\": \"Combination of SD and GIS methods\"}",
+   "findings|{\"claim_type\": \"mechanism|observation|recommendation\", \"paper_id\": \"sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial stat",
+   "findings|{\"claim_type\": \"mechanism|observation|recommendation\", \"paper_id\": \"sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizat",
+   "findings|{\"claim_type\": \"mechanism|observation|recommendation\", \"paper_id\": \"sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic deve",
+   "findings|{\"claim_type\": \"mechanism|observation|recommendation\", \"paper_id\": \"sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis t",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for analy",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental q",
+   "findings|{\"claim_type\": \"mechanism\", \"paper_id\": \"sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)\"}",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial statistical analysis with gis",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizations: the package for ana",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic development and environmental",
+   "findings|{\"claim_type\": \"observation\", \"paper_id\": \"sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)\"}",
+   "card|{\"entity\": \"Combination of SD and GIS methods\"}",
+   "card|{\"entity\": \"environmental and economic models\"}",
+   "findings|{\"claim_type\": \"definition|recommendation|criticism\", \"paper_id\": \"sciverse_application_of_integration_of_spatial_statistical_analysis_with_gis_to_regional_(application of integration of spatial stati",
+   "findings|{\"claim_type\": \"definition|recommendation|criticism\", \"paper_id\": \"sciverse_on_tightly_coupling_models_with_visualizations_the_package_for_analysis_and_visu(on tightly coupling models with visualizati",
+   "findings|{\"claim_type\": \"definition|recommendation|criticism\", \"paper_id\": \"sciverse_interrelations_between_socio_economic_development_and_environmental_quality_a_si(interrelations between socio-economic devel",
+   "findings|{\"claim_type\": \"definition|recommendation|criticism\", \"paper_id\": \"sciverse_economics_of_the_disintegration_of_the_greenland_ice_sheet(economics of the disintegration of the greenland ice sheet; 2019)"
+  ],
+  "gate": {
+   "note_rejects": 0,
+   "numeric_fail": null,
+   "repair": 0,
+   "gate_passed": null,
+   "a_rows": 0,
+   "a_chars": 0,
+   "a_skipped_dup": 0,
+   "a_skipped_ungrounded": 0,
+   "a_overflow_dropped": 0,
+   "a_forged": 0,
+   "_consec_full_reject": 0,
+   "f28_autos": 0,
+   "max_evidence_streak": 3,
+   "f28_hard_stop": true,
+   "forced_notes_submit": true,
+   "compile_citation_stripped": 10,
+   "fallback_compiled": true
+  },
+  "backfills": [],
+  "auto_rows": [],
+  "degenerate": false
+ }
+]

@@ -1,0 +1,1053 @@
+[
+ {
+  "qid": "e2d0eb391fbf674c070c74c3",
+  "question": "During pre-training, why is the transformer embedding layer initialized randomly, rather than with pre-trained embeddings from existing models?",
+  "sections": [
+   {
+    "title": "Rationale for Random Initialization in Continued Pre-training",
+    "text": "The decision to initialize the transformer embedding layer randomly during specific pre-training phases is driven by the need for efficient adaptation and the avoidance of redundant computational costs. In the DEPT framework, when models are initialized randomly for continued pre-training, the process begins with a maximum learning rate, denoted as η_max, which decays over N_CT learning steps [1]. This specific decay schedule is designed to facilitate rapid learning of the embedding matrix, thereby eliminating the necessity for another full training pass [1]. By starting from a random state and applying this aggressive initial learning rate, the model can quickly establish the necessary embedding representations without the overhead of re-training from scratch or relying on potentially mismatched pre-existing weights.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "During continued pre-training, for models initialized randomly, we begin with $\\eta_{\\mathrm{max}}$ and decay over $N_{\\mathrm{CT}}$ learning steps, allowing quick embedding matrix learning without requiring another full training pass, as is common in language rewiring (Artetxe et al., 2020).",
+       "When using pre-initialized models, we start from $\\eta_{\\mathrm{max}} / 2$ since both the model and embeddings are reasonably well-trained."
+      ],
+      "title": "dept: decoupled embeddings for pre-training language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Contrast with Pre-initialized Models",
+    "text": "The approach to random initialization stands in contrast to strategies that utilize pre-trained embeddings from existing models. When pre-initialized models are employed, the training process starts from a reduced learning rate of η_max / 2, a choice justified by the fact that both the model architecture and the embeddings are already reasonably well-trained [1]. This distinction highlights that random initialization is a specific tactical choice for scenarios where the embedding matrix needs to be learned from scratch or adapted significantly, whereas pre-initialized models benefit from a more conservative learning rate to preserve existing knowledge. The DEPT method specifically enables global, or shared, embedding through multi-phase adaptive pretraining, which involves a broad DEPT pre-training phase followed by continued pre-training on 15-19% of total steps. This continued phase utilizes a randomly initialized embedding matrix with a global vocabulary on a non-private dataset.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "During continued pre-training, for models initialized randomly, we begin with $\\eta_{\\mathrm{max}}$ and decay over $N_{\\mathrm{CT}}$ learning steps, allowing quick embedding matrix learning without requiring another full training pass, as is common in language rewiring (Artetxe et al., 2020).",
+       "When using pre-initialized models, we start from $\\eta_{\\mathrm{max}} / 2$ since both the model and embeddings are reasonably well-trained."
+      ],
+      "title": "dept: decoupled embeddings for pre-training language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance Implications and Multilingual Capabilities",
+    "text": "The use of random initialization in the continued pre-training phase is critical for maintaining broad model capabilities, particularly in multilingual contexts. Models that undergo continued pre-training from random initialization demonstrate superior performance across various comparisons. Conversely, without this specific continued pre-training phase, such models would have dominated only on their respective data sources while losing all other comparisons, with a notable decline in multilingual performance. This suggests that the random initialization strategy, combined with the specified training schedule, prevents the model from overfitting to a single data source and preserves its generalization abilities across different languages and tasks.",
+    "citations": []
+   },
+   {
+    "title": "Alternative Strategies Using Pre-trained Embeddings",
+    "text": "While the DEPT framework advocates for random initialization in its continued pre-training phase, other research areas frequently employ pre-trained embeddings to enhance model performance. In the domain of specialized language models, several architectures are obtained by initializing from existing pretrained models and then undergoing further pretraining [3]. This approach is exemplified by models such as BioBERT, ALeaseBERT, TOD-BERT, HateBERT, infoXLM, and XNLG, all of which utilize this initialization strategy [3]. The rationale for using pre-trained embeddings in these contexts is to facilitate the extraction of more comprehensive information, even when working with smaller datasets [2]. This indicates that the choice between random and pre-trained initialization is context-dependent, with pre-trained embeddings offering advantages in data-scarce or domain-specific scenarios, while random initialization may be preferred for broad, multi-phase pre-training processes aimed at global vocabulary integration.",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "At embedding layer, deep learning models make use of pre-trained word embeddings that facilitate them to extract more comprehensive information even from smaller datasets [51]."
+      ],
+      "title": "passion-net: a robust precise and explainable predictor for hate speech detection in roman urdu text",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Models like BioBERT [45], ALeaseBERT [32], TOD-BERT [40], HateBERT [81], infoXLM [90], and XNLG [106] are obtained by initializing from existing pretrained models and then further pretrain"
+      ],
+      "title": "title:ammus : a survey of transformer-based pretrained models in natural language processing",
+      "metadata": {
+       "year": 2021,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 8,
+   "n_claims_usable": 8,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 4,
+   "word_count": 489,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "e2491bb6e4147c18762e7fb2",
+  "question": "Global Navigation Satellite Systems (GNSS) receivers can provide a reference clock signal known as Pulse-per-Second (PPS or 1-PPS). Is the PPS physically generated through a digitally-controlled oscillator (or line driver) whose offset is periodically re-initialized by the estimated clock bias (retrieved by means of PVT algorithms)?",
+  "sections": [
+   {
+    "title": "Signal Generation and Hardware Implementation",
+    "text": "The Pulse-per-Second (PPS) signal serves as a fundamental time reference in Global Navigation Satellite Systems (GNSS) infrastructure, typically provided by receivers to ensure synchronization between transmitting and receiving entities [1]. On the transmitting side, high-precision PPS signals are generated by disciplined oscillators, such as the Quartzlock E80-GPS disciplined rubidium oscillator, which synchronizes the signal with the beginning of the UTC second [3]. Conversely, on the receiving side, the PPS is generated by specific GNSS RTK receivers, such as the GINTEC M1G2 [3]. In simulation environments, an atomic clock provides the reference clock for both the simulator and the receiver, with the simulator sending PPS and RF signals to the GNSS receiver for initial self-calibration [2]. The physical generation of these signals involves maintaining coherence between different output types; for instance, the 10 MHz frequency signal output from a GNSS receiver follows the 1PPS coherently, ensuring that the derivative of the 1PPS phase in time remains consistent with the output frequency [1]. While the exact phase relationship between the PPS and 10 MHz signals may be unknown, this offset is strictly bounded within ±1 ns, rendering it irrelevant for many applications [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "The unknown phase relationship between the PPS and $10\\mathrm{MHz}$ signals from GNSS becomes irrelevant; this offset may be a constant one, and it is strictly bounded within $\\pm 1(ns)$ .",
+       "The output $10\\mathrm{MHz}$ frequency signal from GNSS follows the 1PPS coherently.",
+       "The derivative of the 1PPS phase in time is consistent with the output frequency.",
+       "A typical GNSS receiver provides the time reference through its output 1PPS signals.",
+       "This device can achieve less than 80 ns and 356 ns in 1PPS signal drift in the indoor environment test and the outdoor environment test, respectively, after 24 h of working without a GPS signal.",
+       "The second factor is the frequency nonlinear drift of the crystal oscillators because of the aging and the temperature [11].",
+       "The first is the random errors and outlines contained in one pulse per second (PPS), which is the broadcast output of the GPSs [10].",
+       "IIRF1 attenuates the GPS receiver noise.",
+       "IIRF2 attenuates the temperature component of the correction signal, but passes the aging component.",
+       "This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging.",
+       "Conventional GPSDOs require long time constants of integration to inherit the GPS signal's long-term accuracy [14,15]."
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "An atomic clock provides the simulator and receiver with the reference clock, and through sending PPS and RF signal to GNSS receiver, the simulator should be self-calibrated at first.",
+       "A time interval counter measures the bias of PPS output between the receiver PPS(r) and simulator PPS(s) .",
+       "If the receiver does not have PPS input, RecT will keep synchronous to global navigation satellite systems time (GNSST) such as GPS time (GPST), otherwise PPS input instead.",
+       "However, under on-off operation, the receiver delay represents periodic variation",
+       "Under continuous operation, the receiver delay shows a monotone reduction of 10 ns as Ttp increased by 10 ns",
+       "Nevertheless, the phase difference between external $10\\mathrm{MHz}$ and PPS named time-to-phase (TtP) also affected the calibration result [15].",
+       "the combined uncertainty of absolute calibration is calculated with 1.36 ns"
+      ],
+      "title": "research on absolute calibration of gnss receiver delay through clock-steering characterization",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "while on the receiving side, the PPS signal was generated by the GNSS RTK Receiver GINTEC M1G2.",
+       "To ensure full synchronization of transmitting and receiving, a reference PPS (Pulse Per Second) signal was used, generated on the transmitting side by the Quartzlock E80-GPS disciplined rubidium oscillator (whose starting point is synchronized with the beginning of the UTC second)"
+      ],
+      "title": "radio channel modelling for vhf system operating in the offshore wind farms propagation environment",
+      "metadata": {
+       "year": 2023,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Receiver Synchronization and Time Bias",
+    "text": "The synchronization behavior of the receiver's PPS output depends on the presence of external inputs and specific model parameters. If a receiver does not have a PPS input, its internal time (RecT) remains synchronous to the Global Navigation Satellite System Time (GNSST), such as GPS Time (GPST); however, if a PPS input is present, the receiver synchronizes to that input instead [2]. The PPS output may not be totally synchronized with GNSS Time due to model or parameter settings, which is why a 10 MHz signal from an atomic clock is often used as an external reference for the receiver. Different receiver brands exhibit distinct synchronization behaviors; for example, the PPS output of a Septentrio receiver synchronizes with the simulator PPS, whereas the PPS output of a Novatel receiver synchronizes with the 10 MHz reference clock, meaning the Novatel PPS is maintained by the reference clock. In the case of the Novatel SR620, the PPS bias is negative, indicating that the receiver time leads the GPS Time relatively. To quantify these discrepancies, a time interval counter is employed to measure the bias between the receiver PPS and the simulator PPS [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "An atomic clock provides the simulator and receiver with the reference clock, and through sending PPS and RF signal to GNSS receiver, the simulator should be self-calibrated at first.",
+       "A time interval counter measures the bias of PPS output between the receiver PPS(r) and simulator PPS(s) .",
+       "If the receiver does not have PPS input, RecT will keep synchronous to global navigation satellite systems time (GNSST) such as GPS time (GPST), otherwise PPS input instead.",
+       "However, under on-off operation, the receiver delay represents periodic variation",
+       "Under continuous operation, the receiver delay shows a monotone reduction of 10 ns as Ttp increased by 10 ns",
+       "Nevertheless, the phase difference between external $10\\mathrm{MHz}$ and PPS named time-to-phase (TtP) also affected the calibration result [15].",
+       "the combined uncertainty of absolute calibration is calculated with 1.36 ns"
+      ],
+      "title": "research on absolute calibration of gnss receiver delay through clock-steering characterization",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Drift Characteristics and Environmental Factors",
+    "text": "The accuracy of the PPS signal is influenced by various environmental and hardware factors. Random errors and outliers contained in the broadcast PPS output of GPS satellites affect the accuracy of frequency correction [1]. Additionally, the nonlinear frequency drift of crystal oscillators, caused by component aging and temperature variations, further impacts correction accuracy [1]. When operating without a GPS signal, the drift of the PPS signal in FPGA-based GPS-disciplined oscillators varies by environment; after 24 hours of working, the drift is less than 80 ns in indoor environment tests and 356 ns in outdoor environment tests [1]. The phase difference between the external 10 MHz signal and the PPS, referred to as time-to-phase (TtP), also affects the calibration result [2]. Under continuous operation, the receiver delay shows a monotone reduction of 10 ns as the TtP is increased by 10 ns [2]. In contrast, under on-off operation, the receiver delay represents a periodic variation rather than a monotone trend [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "An atomic clock provides the simulator and receiver with the reference clock, and through sending PPS and RF signal to GNSS receiver, the simulator should be self-calibrated at first.",
+       "A time interval counter measures the bias of PPS output between the receiver PPS(r) and simulator PPS(s) .",
+       "If the receiver does not have PPS input, RecT will keep synchronous to global navigation satellite systems time (GNSST) such as GPS time (GPST), otherwise PPS input instead.",
+       "However, under on-off operation, the receiver delay represents periodic variation",
+       "Under continuous operation, the receiver delay shows a monotone reduction of 10 ns as Ttp increased by 10 ns",
+       "Nevertheless, the phase difference between external $10\\mathrm{MHz}$ and PPS named time-to-phase (TtP) also affected the calibration result [15].",
+       "the combined uncertainty of absolute calibration is calculated with 1.36 ns"
+      ],
+      "title": "research on absolute calibration of gnss receiver delay through clock-steering characterization",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "The unknown phase relationship between the PPS and $10\\mathrm{MHz}$ signals from GNSS becomes irrelevant; this offset may be a constant one, and it is strictly bounded within $\\pm 1(ns)$ .",
+       "The output $10\\mathrm{MHz}$ frequency signal from GNSS follows the 1PPS coherently.",
+       "The derivative of the 1PPS phase in time is consistent with the output frequency.",
+       "A typical GNSS receiver provides the time reference through its output 1PPS signals.",
+       "This device can achieve less than 80 ns and 356 ns in 1PPS signal drift in the indoor environment test and the outdoor environment test, respectively, after 24 h of working without a GPS signal.",
+       "The second factor is the frequency nonlinear drift of the crystal oscillators because of the aging and the temperature [11].",
+       "The first is the random errors and outlines contained in one pulse per second (PPS), which is the broadcast output of the GPSs [10].",
+       "IIRF1 attenuates the GPS receiver noise.",
+       "IIRF2 attenuates the temperature component of the correction signal, but passes the aging component.",
+       "This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging.",
+       "Conventional GPSDOs require long time constants of integration to inherit the GPS signal's long-term accuracy [14,15]."
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Disciplining Algorithms and Calibration Uncertainty",
+    "text": "Conventional GPS-disciplined oscillators (GPSDOs) require long integration time constants to inherit the long-term accuracy of the GPS signal [1]. To address this, advanced algorithms such as the Adaptive Oscillator Model (AOM) are used, which are composed of two Kalman filters to adaptively model the frequency drift of the Temperature-Compensated Crystal Oscillator (TCXO) due to temperature and component aging [1]. This model utilizes specific Infinite Impulse Response filters to manage different noise components: IIRF1 attenuates GPS receiver noise, while IIRF2 attenuates the temperature component of the correction signal but allows the aging component to pass [1]. Despite these sophisticated control mechanisms, the absolute calibration of the system carries a combined uncertainty of 1.36 ns [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "An atomic clock provides the simulator and receiver with the reference clock, and through sending PPS and RF signal to GNSS receiver, the simulator should be self-calibrated at first.",
+       "A time interval counter measures the bias of PPS output between the receiver PPS(r) and simulator PPS(s) .",
+       "If the receiver does not have PPS input, RecT will keep synchronous to global navigation satellite systems time (GNSST) such as GPS time (GPST), otherwise PPS input instead.",
+       "However, under on-off operation, the receiver delay represents periodic variation",
+       "Under continuous operation, the receiver delay shows a monotone reduction of 10 ns as Ttp increased by 10 ns",
+       "Nevertheless, the phase difference between external $10\\mathrm{MHz}$ and PPS named time-to-phase (TtP) also affected the calibration result [15].",
+       "the combined uncertainty of absolute calibration is calculated with 1.36 ns"
+      ],
+      "title": "research on absolute calibration of gnss receiver delay through clock-steering characterization",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "The unknown phase relationship between the PPS and $10\\mathrm{MHz}$ signals from GNSS becomes irrelevant; this offset may be a constant one, and it is strictly bounded within $\\pm 1(ns)$ .",
+       "The output $10\\mathrm{MHz}$ frequency signal from GNSS follows the 1PPS coherently.",
+       "The derivative of the 1PPS phase in time is consistent with the output frequency.",
+       "A typical GNSS receiver provides the time reference through its output 1PPS signals.",
+       "This device can achieve less than 80 ns and 356 ns in 1PPS signal drift in the indoor environment test and the outdoor environment test, respectively, after 24 h of working without a GPS signal.",
+       "The second factor is the frequency nonlinear drift of the crystal oscillators because of the aging and the temperature [11].",
+       "The first is the random errors and outlines contained in one pulse per second (PPS), which is the broadcast output of the GPSs [10].",
+       "IIRF1 attenuates the GPS receiver noise.",
+       "IIRF2 attenuates the temperature component of the correction signal, but passes the aging component.",
+       "This algorithm is composed of two Kalman filters to adaptively model the frequency drift of the TCXO due to temperature and component aging.",
+       "Conventional GPSDOs require long time constants of integration to inherit the GPS signal's long-term accuracy [14,15]."
+      ],
+      "title": "fpga-based autonomous gps-disciplined oscillatorsfor wireless sensor network nodes",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 24,
+   "n_claims_usable": 24,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 3,
+   "word_count": 656,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "983e73defc06e6794a856330",
+  "question": "Does active learning work well when fine-tuning large language models?",
+  "sections": [
+   {
+    "title": "The Necessity and Challenges of Active Learning for LLMs",
+    "text": "Active learning is considered crucial for fine-tuning large pre-trained foundation models, which typically require substantial amounts of labeled data. However, the application of active learning to large language models (LLMs) faces significant practical hurdles. Most active learning approaches yield too few samples, often on the order of hundreds, to feasibly fine-tune large deep-language models [2]. Consequently, prior work mostly did not use pre-trained language models (PLMs) in active learning setups [2]. This gap exists because standard fine-ting techniques have inherent limitations when applied to skewed data; a random sample drawn from such data mirrors existing biases, and the fine-tuned model may fail for underrepresented groups [1]. LLMs have been under scrutiny for exhibiting bias toward under-represented groups, further complicating the fine-tuning process [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Despite advancements, Large Language Models (LLMs) have been under scrutiny for exhibiting bias toward under-represented groups (Nozza et al., 2022; Baffour et al., 2023).",
+       "Standard fine-tuning may not mitigate this (Zhou et al., 2023) as a random sample drawn from skewed data would mirror biases and the fine-tuned model may fail for underrepresented groups.",
+       "Further, our results show that the data acquired via our approach improves the performance of secondary models not involved in the learning loop, showcasing practical utility of the framework."
+      ],
+      "title": "an active learning framework for inclusive generation by large language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Hence, prior work mostly did not use PLMs in this setup[5, 40].",
+       "However, most active learning approaches usually yield too few samples (on the order of hundreds) to feasibly fine-tune large deep-language models [34, 13].",
+       "with transfer from SBIC “Lewd” offering a small mean gain of 4.67%",
+       "while transfer from SBIC “Group” results in a small mean loss of -1.30%.",
+       "We can see that annotating small number of target domain samples via active learning can benefit transfer, but the relative gain diminishes as more target samples are annotated.",
+       "we can also see that the initial baseline performance of the models is consistently higher for the negative transfer scenario (mean AUC of 58.9) than for the positive one (mean AUC of 55.6).",
+       "In terms of transfer, fine-tuning on out-of-domain data can lead to detrimental domain shift [16].",
+       "Furthermore, fine-tuning can also lead to over-fitting, especially in the case of smaller train sets, and to catastrophic forgetting of knowledge present in the pre-trained model [6]."
+      ],
+      "title": "can you label less by using out-of-domain data? active & transfer learning with few-shot instructions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2211.11798",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Risks of Standard Fine-Tuning and Transfer",
+    "text": "Beyond bias, standard fine-tuning presents risks of over-fitting, especially in the case of smaller train sets, and can lead to catastrophic forgetting of knowledge present in the pre-trained model [2][2]. Additionally, fine-tuning on out-of-domain data can lead to detrimental domain shift [2]. In the context of transfer learning, the initial baseline performance of models is consistently higher for the negative transfer scenario, with a mean AUC of 58.9, than for the positive one, which has a mean AUC of 55.6 [2]. Annotating a small number of target domain samples via active learning can benefit transfer, but the relative gain diminishes as more target samples are annotated [2]. For example, in the negative transfer scenario for the #MeToo \"Toxicity\" task using the smallest model (Meg1.3b), transfer from SBIC \"Group\" results in a small mean loss of -1.30% [2]. In contrast, transfer from SBIC \"Lewd\" offers a small mean gain of 4.67% in the same scenario [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Hence, prior work mostly did not use PLMs in this setup[5, 40].",
+       "However, most active learning approaches usually yield too few samples (on the order of hundreds) to feasibly fine-tune large deep-language models [34, 13].",
+       "with transfer from SBIC “Lewd” offering a small mean gain of 4.67%",
+       "while transfer from SBIC “Group” results in a small mean loss of -1.30%.",
+       "We can see that annotating small number of target domain samples via active learning can benefit transfer, but the relative gain diminishes as more target samples are annotated.",
+       "we can also see that the initial baseline performance of the models is consistently higher for the negative transfer scenario (mean AUC of 58.9) than for the positive one (mean AUC of 55.6).",
+       "In terms of transfer, fine-tuning on out-of-domain data can lead to detrimental domain shift [16].",
+       "Furthermore, fine-tuning can also lead to over-fitting, especially in the case of smaller train sets, and to catastrophic forgetting of knowledge present in the pre-trained model [6]."
+      ],
+      "title": "can you label less by using out-of-domain data? active & transfer learning with few-shot instructions",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2211.11798",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "SIFT: A Data Selection Algorithm for Uncertainty Reduction",
+    "text": "To address the limitations of standard selection methods, SIFT was introduced as a data selection algorithm designed to reduce uncertainty about the model's response given a prompt [3]. Nearest Neighbors retrieval for data selection tends to select redundant data, which limits its effectiveness or even hurts performance [3]. In contrast, SIFT minimizes the uncertainty in the model's response to the prompt x*, leading to a \"denser\" cover close to x* and a \"coarser\" cover further away [3]. The SIFT configuration includes specific hyperparameters such as the number of samples (N), the learning rate, the use of LoRA, and a lambda' value set to 0.01 [3]. This approach aims to optimize the data selection process to better support the fine-tuning of large models.",
+    "citations": [
+     {
+      "id": "[3]",
+      "snippets": [
+       "<tr><td>\\( \\lambda^{\\prime} \\)</td><td>0.01</td><td>0.01</td><td>0.01</td></tr>",
+       "In contrast, SIFT minimizes the uncertainty in the model's response to the prompt $\\boldsymbol{x}^\\star$ , leading to a \"denser\" cover close to $\\boldsymbol{x}^\\star$ and a \"coarser\" cover further away from $\\boldsymbol{x}^\\star$ .",
+       "However, we theoretically show that this approach tends to select redundant data, limiting its effectiveness or even hurting performance.",
+       "To address this, we introduce SIFT, a data selection algorithm designed to reduce uncertainty about the model's response given a prompt, which unifies"
+      ],
+      "title": "efficiently learning at test-time: active fine-tuning of llms",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I EXPERIMENT DETAILS",
+         "chunk_id": "sciverse_efficiently_learning_at_test_time_active_fine_tuning_of_llms#c43",
+         "char_start": 114644
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Utility of Active Learning Frameworks for Secondary Models",
+    "text": "While active learning faces challenges in directly fine-tuning large models due to sample size constraints, specific frameworks demonstrate practical utility. Inclusive generation active learning frameworks show that data acquired via these approaches improves the performance of secondary models not involved in the learning loop [1]. This suggests that even if the primary fine-tuning process is constrained by the number of samples, the data selection strategies employed in active learning can yield benefits for related models or downstream tasks, highlighting the broader value of these methodologies in the LLM ecosystem.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Despite advancements, Large Language Models (LLMs) have been under scrutiny for exhibiting bias toward under-represented groups (Nozza et al., 2022; Baffour et al., 2023).",
+       "Standard fine-tuning may not mitigate this (Zhou et al., 2023) as a random sample drawn from skewed data would mirror biases and the fine-tuned model may fail for underrepresented groups.",
+       "Further, our results show that the data acquired via our approach improves the performance of secondary models not involved in the learning loop, showcasing practical utility of the framework."
+      ],
+      "title": "an active learning framework for inclusive generation by large language models",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 20,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 4,
+   "word_count": 489,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ },
+ {
+  "qid": "dc761baf0fc9fead9889d9eb",
+  "question": "For different modulation types like MPSK, QPSK, and MQAM, I'm measuring the error rate but want to understand and measure the Error Vector Magnitude (EVM) more accurately. I'm using a general equation for all modulation types. Is this the right approach, and what should I expect from the EVM vs. Eb/No curve?",
+  "sections": [
+   {
+    "title": "Fundamental Definition and Normalization",
+    "text": "Error Vector Magnitude (EVM) is the most widely used metric for expressing modulation quality in wireless communication systems [3]. It is fundamentally defined as the root-mean-square (RMS) value of the difference between a collection of measured symbols and their corresponding ideal symbols [1]. This metric expresses the difference between the expected complex voltage of a demodulated symbol and the value of the actual received symbol [1]. Consequently, EVM is essentially the normalized error magnitude between the measured constellation and the ideal constellation [1]. The calculation involves comparing two signals: a reference signal and a test signal containing the information-carrying complex symbol values [2]. A specific formulation defines RMS EVM as the square root of the ratio of the average power of the error signal to the average power of the reference signal [2]. This standard definition is codified in Equation 2.8, which serves as the standard EVM definition in IEEE 802.11a-1999 [1]. The formula for EVM_RMS is given by (1/N sum).",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This is the definition which is now being used as the standard definition of the EVM in IEEE 802.11a- $1999^{TM}[6,5]$",
+       "From Equation 2.8, it is evident that EVM is essentially the normalized error magnitude between the measured constellation and the ideal constellation.",
+       "EVM expresses the difference between the expected complex voltage of a demodulated symbol and the value of the actual received symbol.",
+       "Thus, EVM is defined as the root-mean-square (RMS) value of the difference between a collection of measured symbols and ideal symbols.",
+       "The normalization is derived such that the mean square amplitude of all possible symbols in the constellation of any modulation scheme is one.",
+       "Since different modulation systems viz. BPSK, 4-QAM, 16-QAM etc. have different amplitude levels, to calculated and compare EVM measurements effectively some normalization is typically carried out [7].",
+       "Finally, in order to also establish the fact that the normalized EVM is same for all modulation schemes, we have also carried out another simulation as shown in Fig. 3.",
+       "It is interesting to note that due to the relationship set up between BER and EVMin Equation 2.12, the BER versus EVM curve shown in Fig. 2 show the inverse relationship that exists between BER and EVM.",
+       "Compared to the bit error rate (BER), which gives a simple one-to-one binary decision as to whether a bit is erroneous or not, EVM is more of a measure of errors between the measured symbols and expected symbols.",
+       "These days EVM calculations can be effectively carried out in VSAs and are quite fast, as well and it can thus save the DSP operation greatly as compared to that of the slicing and demodulation needed to perform a BER calculation for every packet [2]."
+      ],
+      "title": "on the error vector magnitude as a performance metric and comparative analysis",
+      "metadata": {
+       "year": 2006,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "B. Error vector Magnitude",
+         "chunk_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#c3",
+         "char_start": 5891
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "A root mean square (RMS) EVM is then equal to square root of the ratio of average power of the error signal to the average power of the reference signal.",
+       "EVM is computed via a comparison of two signals — a reference and a test signal containing the information carrying complex symbol values.",
+       "Examples also show that the error vector magnitude may be significantly different when comparing local minima and the global minima.",
+       "Also the behavior of the objective function is often such that many local minima exist with a very deep and narrow global minimum.",
+       "In WLAN it is required to compensate for time offset, magnitude and phase offsets, and frequency offset."
+      ],
+      "title": "robust computation of error vector magnitude for wireless standards",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I. INTRODUCTION AND STATE-OF-THE-ART",
+         "chunk_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards#c1",
+         "char_start": 1403
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "Error vector magnitude (EVM) is the most widely used metric to express the modulation quality in wireless communication systems."
+      ],
+      "title": "evm measurement of rf zigbee transceivers using standard digital ate",
+      "metadata": {
+       "year": 2020,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": null,
+         "chunk_id": null,
+         "char_start": null
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Modulation-Specific Normalization",
+    "text": "A critical aspect of accurate EVM measurement is the application of normalization, as different modulation systems such as BPSK, 4-QAM, and 16-QAM possess different amplitude levels [1]. To calculate and compare EVM measurements effectively across these schemes, normalization is typically carried out [1]. The normalization is derived such that the mean square amplitude of all possible symbols in the constellation of any modulation scheme is one [1]. This approach ensures that the normalized EVM is the same for all modulation schemes, a fact established through simulation [1]. Therefore, using a general equation that incorporates this specific normalization is the correct approach for comparing different modulation types like MPSK, QPSK, and MQAM, as it accounts for the inherent amplitude differences between them [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This is the definition which is now being used as the standard definition of the EVM in IEEE 802.11a- $1999^{TM}[6,5]$",
+       "From Equation 2.8, it is evident that EVM is essentially the normalized error magnitude between the measured constellation and the ideal constellation.",
+       "EVM expresses the difference between the expected complex voltage of a demodulated symbol and the value of the actual received symbol.",
+       "Thus, EVM is defined as the root-mean-square (RMS) value of the difference between a collection of measured symbols and ideal symbols.",
+       "The normalization is derived such that the mean square amplitude of all possible symbols in the constellation of any modulation scheme is one.",
+       "Since different modulation systems viz. BPSK, 4-QAM, 16-QAM etc. have different amplitude levels, to calculated and compare EVM measurements effectively some normalization is typically carried out [7].",
+       "Finally, in order to also establish the fact that the normalized EVM is same for all modulation schemes, we have also carried out another simulation as shown in Fig. 3.",
+       "It is interesting to note that due to the relationship set up between BER and EVMin Equation 2.12, the BER versus EVM curve shown in Fig. 2 show the inverse relationship that exists between BER and EVM.",
+       "Compared to the bit error rate (BER), which gives a simple one-to-one binary decision as to whether a bit is erroneous or not, EVM is more of a measure of errors between the measured symbols and expected symbols.",
+       "These days EVM calculations can be effectively carried out in VSAs and are quite fast, as well and it can thus save the DSP operation greatly as compared to that of the slicing and demodulation needed to perform a BER calculation for every packet [2]."
+      ],
+      "title": "on the error vector magnitude as a performance metric and comparative analysis",
+      "metadata": {
+       "year": 2006,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "B. Error vector Magnitude",
+         "chunk_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#c3",
+         "char_start": 5891
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Relationship Between EVM and BER",
+    "text": "While Bit Error Rate (BER) provides a simple one-to-one binary decision regarding whether a bit is erroneous, EVM offers a more granular measure of the errors between measured and expected symbols [1]. There is a direct mathematical relationship between these two metrics. For M-ary modulation, the BER is expressed by the equation sqrt([3 log2 L/(L^2-1)] * [2 Es/(N0 log2 M)]). Furthermore, Equation 2.12 relates BER to EVM_RMS via the formula BER = Q(sqrt(2 EVM_RMS^2 log2 M)). These simulations typically utilize gray-coded M-ary modulation, Gaussian noise, and assume no fading. Due to the relationship established in Equation 2.12, the BER versus EVM curve demonstrates an inverse relationship between BER and EVM [1]. As EVM decreases, the BER also decreases, reflecting the improved fidelity of the received symbols relative to the ideal constellation.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "This is the definition which is now being used as the standard definition of the EVM in IEEE 802.11a- $1999^{TM}[6,5]$",
+       "From Equation 2.8, it is evident that EVM is essentially the normalized error magnitude between the measured constellation and the ideal constellation.",
+       "EVM expresses the difference between the expected complex voltage of a demodulated symbol and the value of the actual received symbol.",
+       "Thus, EVM is defined as the root-mean-square (RMS) value of the difference between a collection of measured symbols and ideal symbols.",
+       "The normalization is derived such that the mean square amplitude of all possible symbols in the constellation of any modulation scheme is one.",
+       "Since different modulation systems viz. BPSK, 4-QAM, 16-QAM etc. have different amplitude levels, to calculated and compare EVM measurements effectively some normalization is typically carried out [7].",
+       "Finally, in order to also establish the fact that the normalized EVM is same for all modulation schemes, we have also carried out another simulation as shown in Fig. 3.",
+       "It is interesting to note that due to the relationship set up between BER and EVMin Equation 2.12, the BER versus EVM curve shown in Fig. 2 show the inverse relationship that exists between BER and EVM.",
+       "Compared to the bit error rate (BER), which gives a simple one-to-one binary decision as to whether a bit is erroneous or not, EVM is more of a measure of errors between the measured symbols and expected symbols.",
+       "These days EVM calculations can be effectively carried out in VSAs and are quite fast, as well and it can thus save the DSP operation greatly as compared to that of the slicing and demodulation needed to perform a BER calculation for every packet [2]."
+      ],
+      "title": "on the error vector magnitude as a performance metric and comparative analysis",
+      "metadata": {
+       "year": 2006,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "B. Error vector Magnitude",
+         "chunk_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#c3",
+         "char_start": 5891
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Measurement Challenges and Optimization",
+    "text": "In Wireless Local Area Network (WLAN) environments, accurate EVM measurement requires compensation for time offset, magnitude and phase offsets, and frequency offset [2]. The optimization of EVM can be complex, as the behavior of the objective function often involves many local minima with a very deep and narrow global minimum [2]. This complexity means that the error vector magnitude may be significantly different when comparing local minima and the global minima [2]. Despite these challenges, EVM calculations can be effectively carried out in Vector Signal Analyzers (VSAs) and are quite fast [1]. This speed saves significant DSP operations compared to the slicing and demodulation processes required to perform a BER calculation [1]. Recent research, such as a 2013 paper, has focused on robust EVM computation for wireless standards, further refining these measurement techniques [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "A root mean square (RMS) EVM is then equal to square root of the ratio of average power of the error signal to the average power of the reference signal.",
+       "EVM is computed via a comparison of two signals — a reference and a test signal containing the information carrying complex symbol values.",
+       "Examples also show that the error vector magnitude may be significantly different when comparing local minima and the global minima.",
+       "Also the behavior of the objective function is often such that many local minima exist with a very deep and narrow global minimum.",
+       "In WLAN it is required to compensate for time offset, magnitude and phase offsets, and frequency offset."
+      ],
+      "title": "robust computation of error vector magnitude for wireless standards",
+      "metadata": {
+       "year": 2013,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "I. INTRODUCTION AND STATE-OF-THE-ART",
+         "chunk_id": "sciverse_robust_computation_of_error_vector_magnitude_for_wireless_standards#c1",
+         "char_start": 1403
+        }
+       ]
+      }
+     },
+     {
+      "id": "[1]",
+      "snippets": [
+       "This is the definition which is now being used as the standard definition of the EVM in IEEE 802.11a- $1999^{TM}[6,5]$",
+       "From Equation 2.8, it is evident that EVM is essentially the normalized error magnitude between the measured constellation and the ideal constellation.",
+       "EVM expresses the difference between the expected complex voltage of a demodulated symbol and the value of the actual received symbol.",
+       "Thus, EVM is defined as the root-mean-square (RMS) value of the difference between a collection of measured symbols and ideal symbols.",
+       "The normalization is derived such that the mean square amplitude of all possible symbols in the constellation of any modulation scheme is one.",
+       "Since different modulation systems viz. BPSK, 4-QAM, 16-QAM etc. have different amplitude levels, to calculated and compare EVM measurements effectively some normalization is typically carried out [7].",
+       "Finally, in order to also establish the fact that the normalized EVM is same for all modulation schemes, we have also carried out another simulation as shown in Fig. 3.",
+       "It is interesting to note that due to the relationship set up between BER and EVMin Equation 2.12, the BER versus EVM curve shown in Fig. 2 show the inverse relationship that exists between BER and EVM.",
+       "Compared to the bit error rate (BER), which gives a simple one-to-one binary decision as to whether a bit is erroneous or not, EVM is more of a measure of errors between the measured symbols and expected symbols.",
+       "These days EVM calculations can be effectively carried out in VSAs and are quite fast, as well and it can thus save the DSP operation greatly as compared to that of the slicing and demodulation needed to perform a BER calculation for every packet [2]."
+      ],
+      "title": "on the error vector magnitude as a performance metric and comparative analysis",
+      "metadata": {
+       "year": 2006,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "B. Error vector Magnitude",
+         "chunk_id": "sciverse_on_the_error_vector_magnitude_as_a_performance_metric_and_comparative_analysis#c3",
+         "char_start": 5891
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 20,
+   "n_claims_usable": 20,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 4,
+   "word_count": 548,
+   "n_sections": 4,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": [
+    "[1]"
+   ]
+  }
+ },
+ {
+  "qid": "0919a8528cd20166163de3fd",
+  "question": "Have large langauge models been applied to the schema matching problem in databases and are they effective?",
+  "sections": [
+   {
+    "title": "The Challenge of Schema Matching in Biomedical Data",
+    "text": "Current data integration workflows in the biomedical sector rely heavily on manual processes and dataset-specific scripts to handle schema matching [2]. This reliance on manual labor persists because many existing schema matching solutions struggle to handle the complexity and syntactic variability inherent in biomedical datasets [2]. Traditional deep learning approaches, such as those using Generative Adversarial Networks (GANs) or Adversarial Graph Embeddings (AGE), have not directly addressed all use cases for schema-matched datasets, nor do they fully exploit the relationships between features across different databases [1]. Furthermore, prior methods are often confounded by columns that represent simple but nonlinear re-parameterizations of other variables, such as calculating body surface area from height and weight [1]. These limitations highlight the need for more robust and automated approaches to aligning database schemas.",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Finally, some columns may be simple but nonlinear re-parameterizations of others; for example, body surface area of height and weight. This final problem confounds many prior approaches to matching the distribution of features from multiple databases.",
+       "Even though the above methods have the potential to generate augmenting data, they do not directly address all the use cases of a schema-matched dataset and do not exploit the relationships between features across databases.",
+       "We propose a novel summary statistic (fingerprint) method that solves the schema matching problem with moderate accuracy and high efficiency.",
+       "If the primary dataset is small, the results on combined data quickly converge to simply using the external data.",
+       "For KMF and chimeric encoder methods, performance stabilizes around 5000 5000 samples, suggesting the variation that we observe in other experiments (using 10000 samples) is the large sample behavior."
+      ],
+      "title": "deep learning to jointly schema match, impute, and transform databases",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.03536",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases#c2",
+         "char_start": 2683
+        }
+       ]
+      }
+     },
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets.",
+       "Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.",
+       "In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.",
+       "By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy.",
+       "while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints.",
+       "Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task.",
+       "We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.",
+       "In contrast, Magneto demonstrates superior accuracy and generally faster runtimes.",
+       "we show that Magneto is scalable and attains high accuracy for datasets from different domains.",
+       "Intuitively, it measures how well the matcher can place all correct matches of a table $\\mathbf{S}$ at the top of the global ranked list."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "PVLDB Reference Format:",
+         "chunk_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#c2",
+         "char_start": 1682
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Magneto: A Two-Phase Pipeline for Scalable Matching",
+    "text": "To address these challenges, the Magneto framework introduces a two-phase schema matching pipeline consisting of retrieval and reranking [2]. This architecture allows the system to use computationally efficient Small Language Models (SLMs) to derive candidate matches, which are then refined by Large Language Models (LLMs) for final reranking [2]. This design is motivated by the distinct constraints of different model sizes; while SLMs require costly and difficult-to-obtain training data, LLMs demand significant computational resources and face strict context window limitations [2]. By structuring the process in two phases, Magneto makes it possible to balance these trade-offs effectively [2]. The system offers four specific variants based on combinations of retriever and reranker types: zero-shot base prompt (zs-bp), fine-tuned base prompt (ft-bp), zero-shot LLM (zs-llm), and fine-tuned LLM (ft-llm). Unlike traditional methods that require extensive training data, Magneto variants strike a balance between runtime and accuracy without the need for such data [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets.",
+       "Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.",
+       "In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.",
+       "By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy.",
+       "while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints.",
+       "Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task.",
+       "We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.",
+       "In contrast, Magneto demonstrates superior accuracy and generally faster runtimes.",
+       "we show that Magneto is scalable and attains high accuracy for datasets from different domains.",
+       "Intuitively, it measures how well the matcher can place all correct matches of a table $\\mathbf{S}$ at the top of the global ranked list."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "PVLDB Reference Format:",
+         "chunk_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#c2",
+         "char_start": 1682
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Performance and Accuracy of Magneto Variants",
+    "text": "Experimental results demonstrate that Magneto is scalable and attains high accuracy across datasets from various domains [2]. Specifically, the Magneto-ft-llm variant achieves the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for complex matching tasks [2]. In contrast to other methods, Magneto demonstrates superior accuracy and generally faster runtimes [2]. The zero-shot variations of Magneto also outperform recent state-of-the-art methods. Evaluation on the Valentine benchmark, which covers a variety of domains, shows that Magneto performs well in these diverse settings [2]. The effectiveness of the pipeline is further supported by the observation that the combination of fine-tuned SLMs and LLMs is particularly effective for complex matching tasks [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets.",
+       "Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.",
+       "In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.",
+       "By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy.",
+       "while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints.",
+       "Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task.",
+       "We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.",
+       "In contrast, Magneto demonstrates superior accuracy and generally faster runtimes.",
+       "we show that Magneto is scalable and attains high accuracy for datasets from different domains.",
+       "Intuitively, it measures how well the matcher can place all correct matches of a table $\\mathbf{S}$ at the top of the global ranked list."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "PVLDB Reference Format:",
+         "chunk_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#c2",
+         "char_start": 1682
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Limitations of Traditional Deep Learning Baselines",
+    "text": "In comparison to Magneto, traditional deep learning approaches exhibit significant limitations. On the MIMIC dataset, a baseline method referred to as Kang achieved an F1 score of 0.40. Other methods, such as Kernel Mean Field (KMF) and chimeric encoders, showed lower performance, matching only 22 out of 49 and 20 out of 49 cases respectively. The optimization of chimeric encoders is particularly difficult, with loss functions remaining far from the optimum and performance being sensitive to batch size and hyperparameters. For KMF and chimeric encoder methods, performance stabilizes around 5000 samples, suggesting that variations observed in experiments using 10000 samples represent large sample behavior [1]. Additionally, if the primary dataset is small, results on combined data quickly converge to simply using the external data, limiting the utility of these approaches in data-scarce scenarios [1]. A novel summary statistic or fingerprint method has been proposed to solve schema matching with moderate accuracy and high efficiency, but it does not match the superior accuracy and speed of Magneto [1].",
+    "citations": [
+     {
+      "id": "[1]",
+      "snippets": [
+       "Finally, some columns may be simple but nonlinear re-parameterizations of others; for example, body surface area of height and weight. This final problem confounds many prior approaches to matching the distribution of features from multiple databases.",
+       "Even though the above methods have the potential to generate augmenting data, they do not directly address all the use cases of a schema-matched dataset and do not exploit the relationships between features across databases.",
+       "We propose a novel summary statistic (fingerprint) method that solves the schema matching problem with moderate accuracy and high efficiency.",
+       "If the primary dataset is small, the results on combined data quickly converge to simply using the external data.",
+       "For KMF and chimeric encoder methods, performance stabilizes around 5000 5000 samples, suggesting the variation that we observe in other experiments (using 10000 samples) is the large sample behavior."
+      ],
+      "title": "deep learning to jointly schema match, impute, and transform databases",
+      "metadata": {
+       "year": 2022,
+       "doi": null,
+       "arxiv": "2207.03536",
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "1 Introduction",
+         "chunk_id": "sciverse_deep_learning_to_jointly_schema_match_impute_and_transform_databases#c2",
+         "char_start": 2683
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Implications for Text-to-SQL and Schema Linking",
+    "text": "The application of LLMs to database tasks extends beyond schema matching to text-to-SQL generation, where schema linking is a critical component. Fine-tuning approaches have been employed to enhance the performance of open-source LLMs in SQL generation [3]. However, while fine-tuning helps keep data on-premises, these approaches often exhibit sub-optimal performance [3]. Many existing LLM-based models perform well on benchmarks like the Spider dataset but tend to struggle on others, such as BIRD or robustness-focused datasets [3]. In the context of schema linking, some research suggests that this step may be unnecessary when the entire database schema fits within the LLM's context window [3]. This observation aligns with the constraints faced by LLMs in schema matching, where context window limitations are a primary challenge [2]. The ability of LLMs to handle large contexts may reduce the need for complex retrieval mechanisms in certain scenarios, although the two-phase approach of Magneto remains effective for balancing computational efficiency and accuracy [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets.",
+       "Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.",
+       "In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.",
+       "By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy.",
+       "while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints.",
+       "Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task.",
+       "We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.",
+       "In contrast, Magneto demonstrates superior accuracy and generally faster runtimes.",
+       "we show that Magneto is scalable and attains high accuracy for datasets from different domains.",
+       "Intuitively, it measures how well the matcher can place all correct matches of a table $\\mathbf{S}$ at the top of the global ranked list."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "PVLDB Reference Format:",
+         "chunk_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#c2",
+         "char_start": 1682
+        }
+       ]
+      }
+     },
+     {
+      "id": "[3]",
+      "snippets": [
+       "In particular, [75] suggested that schema linking may be unnecessary when the entire database schema fits within the LLM's context window.",
+       "For instance, many existing LLM-based models perform well on benchmarks like the Spider dataset but tend to struggle on others, such as BIRD or some robustness-focused datasets.",
+       "Although FT-based approaches help alleviate this issue by keeping data on-premises, they often exhibit sub-optimal performance [63, 90].",
+       "Simultaneously, fine-tuning approaches have been employed to enhance the performance of open-source LLMs in SQL generation [63]."
+      ],
+      "title": "exploring the landscape of text-to-sql with large language models: progresses, challenges and opportunities",
+      "metadata": {
+       "year": 2025,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "7.2 RQ4.2: What are potential future directions for advancing LLM-based text-to-SQL systems?",
+         "chunk_id": "sciverse_exploring_the_landscape_of_text_to_sql_with_large_language_models_progresses_cha#c26",
+         "char_start": 74396
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "title": "Evaluation Metrics and Methodological Considerations",
+    "text": "The evaluation of schema matching systems requires specific metrics to assess performance accurately. One such metric is Recall@GT, which intuitively measures how well a matcher can place all correct matches of a table at the top of the global ranked list [2]. This metric is crucial for determining the effectiveness of retrieval and reranking pipelines like Magneto. The use of such metrics allows for a clear comparison between different methods, highlighting the superior accuracy of Magneto over traditional deep learning baselines [2]. The findings from these evaluations underscore the importance of selecting appropriate metrics that reflect the practical requirements of schema matching in diverse domains [2].",
+    "citations": [
+     {
+      "id": "[2]",
+      "snippets": [
+       "Our experiments show that many existing schema matching solutions struggle with this benchmark, particularly given the complexity and syntactic variability present in its datasets.",
+       "Our interviews with biomedical experts revealed that current data integration practices rely heavily on manual processes and dataset-specific scripts for schema matching [12, 52, 57]. As illustrated in Example 1.1, this approach is both error-prone and difficult to reproduce, creating significant barriers to biomedical research.",
+       "In contrast, Magneto variants strike a balance across both dimensions and have the advantage of requiring no training data.",
+       "By structuring the SM pipeline in two phases, retrieval and reranking, Magneto can use computationally efficient SLM-based strategies to derive candidate matches which can then be reranked by LLMs, thus making it possible to reduce runtime while improving matching accuracy.",
+       "while small LMs (SLMs) require costly, difficult-to-obtain training data, large LMs (LLMs) demand significant computational resources and face context window constraints.",
+       "Magneto-ft-11m has the highest overall accuracy, confirming that the combination of a fine-tuned SLM and an LLM is effective for this complex matching task.",
+       "We also evaluate Magneto on the Valentine benchmark [48] and observe that it also performs well for the Valentine datasets which cover a variety of domains.",
+       "In contrast, Magneto demonstrates superior accuracy and generally faster runtimes.",
+       "we show that Magneto is scalable and attains high accuracy for datasets from different domains.",
+       "Intuitively, it measures how well the matcher can place all correct matches of a table $\\mathbf{S}$ at the top of the global ranked list."
+      ],
+      "title": "magneto: combining small and large language models for schema matching",
+      "metadata": {
+       "year": 2024,
+       "doi": null,
+       "arxiv": null,
+       "authors": [],
+       "evidence_loc": [
+        {
+         "section": "PVLDB Reference Format:",
+         "chunk_id": "sciverse_magneto_combining_small_and_large_language_models_for_schema_matching#c2",
+         "char_start": 1682
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "diag": {
+   "n_claims_input": 23,
+   "n_claims_usable": 23,
+   "claims_dropped_noref": 0,
+   "claims_invalidated": 0,
+   "orphan_markers": 5,
+   "word_count": 827,
+   "n_sections": 6,
+   "n_citations": 3,
+   "record_level": 3,
+   "id_in_text_not_declared": 0,
+   "id_declared_not_in_text": 0,
+   "snippet_in_text_violations": []
+  }
+ }
+]

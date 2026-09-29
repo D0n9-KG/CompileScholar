@@ -1,0 +1,29 @@
+# Introduction
+## Background on Semi-supervised Learning
+## The Open-set Problem in Semi-supervised Learning
+### Violation of Identical Class Distribution Assumption
+### Impact of Outliers on Model Performance
+## Limitations of Existing Open-set SSL Methods
+### Reliance on Single-Model Prediction Discrepancies
+### Failure in Low-Label Regimes
+## Motivation for the Diversify and Conquer Framework
+# Methodology
+## Overview of the Diversify and Conquer Framework
+## The Diversify Component
+### Exploiting Prediction Disagreement
+### Contrast with Single-Model Approaches
+### Role of Multiple Sources in Generating Disagreement
+## The Conquer Component
+### Utilizing Disagreement for Robustness
+### Distinguishing Inliers from Outliers
+# Experimental Evaluation
+## Evaluation Datasets
+## Comparison with State-of-the-Art Methods
+### Contextual Comparison with FixMatch
+### Contextual Comparison with FlexMatch
+## Performance in Open-set Scenarios
+# Discussion
+## Robustness in Noisy Label Scenarios
+## Computational Considerations
+## Limitations and Future Directions
+# Conclusion
