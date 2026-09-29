@@ -1596,7 +1596,11 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             break
         prev_obs_nums = set()   # N10: F25 tracking is STEP-scoped (reset here)
         notes_step_start = notes   # F28d: productivity baseline for this step
-        if not cov_audit_done and steps_left == 8:   # F22 injection point
+        # 触发点修正（批21b 实锤）：原 steps_left==8 的注入点对早收束题
+        # （17 步即答完 gap 清空）永远不会到达——V3/V4 全部空转。改为
+        # steps_left<=8 and steps>=5：覆盖晚收束（原语义）+早收束题的
+        # 第一次满足时刻（cov_audit_done 一次性 flag 不变）
+        if not cov_audit_done and steps_left <= 8 and steps >= 5:   # F22 injection point
             cov_audit_done = True
             _nmt = 0
             try:
