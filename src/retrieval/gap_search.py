@@ -211,12 +211,23 @@ def build_gap_docs(views: dict) -> list[dict]:
     cov = (views or {}).get("coverage", {}) or {}
     docs = []
     for a in cov.get("absences_extracted") or []:
-        docs.append({
+        # P0-2（FIX-PLAN v2）：缺口生灭链——resolved_by（LLM 核验过的
+        # in-corpus 解决者）随 gap doc 暴露：消费方（gap_search 调用者/
+        # agent）能先查库内解决者的记录再决定外部检索。未核验候选链
+        # （resolution_candidates）不进 doc——结构候选不是语义断言。
+        rb = a.get("resolved_by") or []
+        doc = {
             "doc": f"{a.get('subject')} lacks {a.get('missing')}",
             "subject": a.get("subject"), "missing": a.get("missing"),
             "kind": "empirical_absence", "paper_id": a.get("paper_id"),
             "quote": a.get("quote", "")[:200],
-        })
+        }
+        if rb:
+            doc["resolved_by"] = [
+                {"entity": r.get("entity"), "paper_id": r.get("paper_id"),
+                 "year": r.get("year"), "relation": r.get("relation")}
+                for r in rb[:3]]
+        docs.append(doc)
     for a in cov.get("absences_derived") or []:
         docs.append({
             "doc": f"no corpus results for {a.get('entity')} on "

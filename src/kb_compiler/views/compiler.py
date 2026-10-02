@@ -198,7 +198,7 @@ def build_genealogy(recs, registry, manifest):
         if not rel or not f or not t:
             continue
         fid, tid = _ref_id(f), _ref_id(t)
-        edges.append({
+        edge = {
             "from": fid or _norm(_ref_name(f)), "to": tid or _norm(_ref_name(t)),
             "from_name": _ref_name(f), "to_name": _ref_name(t),
             "relation": rel, "scope": r.get("scope") or {},
@@ -206,7 +206,17 @@ def build_genealogy(recs, registry, manifest):
             "year": _year_of(r.get("paper_id"), manifest),
             "paper_id": r.get("paper_id"), "record_id": r.get("id"),
             "quote": (r.get("quote") or "")[:160], "provenance": "extracted",
-        })
+        }
+        # 组件2(引用桥,2026-10-01):ref 的 paper_id 透传为边端点论文
+        # 指针——跨论文边从"内容有链接无"变可导航(P 说 Q 的 X 扩展了
+        # R 的 Y)。引用桥解析见 resolve_citations.py。
+        fp = f.get("paper_id") if isinstance(f, dict) else None
+        tp = t.get("paper_id") if isinstance(t, dict) else None
+        if fp:
+            edge["from_paper"] = fp
+        if tp:
+            edge["to_paper"] = tp
+        edges.append(edge)
     # transitive chains over extends/improves/generalizes (ancestor closure)
     fwd = defaultdict(set)
     for e in edges:
@@ -293,12 +303,20 @@ def build_coverage(recs, registry, vocab, manifest):
     for r in recs:
         if r.get("kind") != "absence":
             continue
-        extracted.append({
+        _row = {
             "subject": _use(r, "subject"), "missing": _use(r, "missing"),
             "absence_type": _use(r, "absence_type"), "evidence": r.get("evidence"),
             "paper_id": r.get("paper_id"), "record_id": r.get("id"),
             "quote": (r.get("quote") or "")[:160], "provenance": "extracted",
-        })
+        }
+        # resolved_by 透传（2026-10-02 易失根治第三例：缺口生灭链曾只写
+        # views 被重编译冲掉 3 次——现在 lives in records（absence 记录
+        # 本体），编译天然携带。missing_zh 同理已在 records 层。
+        if r.get("resolved_by"):
+            _row["resolved_by"] = r["resolved_by"]
+        if r.get("missing_zh"):
+            _row["missing_zh"] = r["missing_zh"]
+        extracted.append(_row)
     # derived absences: entity evaluated in family F but sibling families with
     # >=3 evaluating entities stay empty for it -> "not evaluated" (derived)
     fam_counts = defaultdict(int)

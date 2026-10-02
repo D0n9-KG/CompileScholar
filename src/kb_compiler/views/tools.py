@@ -20,7 +20,9 @@ dim 4096) — mixed-dim cosine silently corrupts (measured failure).
 """
 from __future__ import annotations
 
+import os
 import re
+from collections import defaultdict
 
 from .compiler import (_norm, _num, _ref_name, as_of as genealogy_as_of,
                        round_robin_by_paper as _round_robin_by_paper)
@@ -48,6 +50,61 @@ class KBTools:
         eid = self.surface_index.get(_norm(name))
         return self.byid.get(eid) if eid else None
 
+    # ---------- P1-8 PPR（FIX-PLAN v2，HippoRAG 2405.14831 式）----------
+
+    _ppr_cache = None   # class-level: (adj, ) 只算一次
+
+    def _ppr_adjacency(self):
+        """genealogy 边 → 实体邻接表（缓存；2406 边图很小）。"""
+        if KBTools._ppr_cache is not None:
+            return KBTools._ppr_cache
+        adj = defaultdict(set)
+        g = (self.views or {}).get("genealogy") or {}
+        for e in g.get("edges") or []:
+            f, t = str(e.get("from")), str(e.get("to"))
+            if f and t:
+                adj[f].add(t)
+                adj[t].add(f)
+        # backflow 挂载的外部论文边也在 views.genealogy 里（load_backflow
+        # 就地扩展）——天然含生长成果
+        KBTools._ppr_cache = adj
+        return adj
+
+    def ppr_entity_scores(self, seed_names, restart=0.8, max_iter=12):
+        """查询实体作种子 → Personalized PageRank 分数（实体 id -> score）。
+        HippoRAG 式单次 PPR 捕获多跳关联：沿 extends/improves/replaces
+        边扩散（P1-8 主张：预编译图结构指挥检索排序，词法降为召回）。
+        种子=entity 参数解析出的 registry 实体 + contains 各词的实体
+        解析（命不中 registry 的词当噪声丢弃——PPR 需要图节点种子）。
+        无种子返回空 dict（调用方退回原排序，行为不变）。"""
+        adj = self._ppr_adjacency()
+        seeds = set()
+        for nm in ([seed_names] if isinstance(seed_names, str) else
+                   list(seed_names or [])):
+            if not nm:
+                continue
+            e = self.resolve(nm)
+            if e:
+                seeds.add(e["entity_id"])
+        if not seeds:
+            return {}
+        # 迭代 PPR：score = restart*seed + (1-restart)*邻居传播
+        scores = {s: 1.0 / len(seeds) for s in seeds}
+        for _ in range(max_iter):
+            nxt = defaultdict(float)
+            for node, sc in scores.items():
+                nbrs = adj.get(node) or ()
+                if nbrs:
+                    share = sc * (1 - restart) / len(nbrs)
+                    for nb in nbrs:
+                        nxt[nb] += share
+                else:
+                    nxt[node] += sc * (1 - restart)
+            for s in seeds:
+                nxt[s] += restart / len(seeds)
+            scores = dict(nxt)
+        return scores
+
     def _alias_set(self, entity_name: str) -> set:
         e = self.resolve(entity_name)
         names = {_norm(entity_name)}
@@ -55,6 +112,75 @@ class KBTools:
             names.add(_norm(e["canonical"]))
             names.update(_norm(a) for a in e.get("aliases", []))
         return names
+
+    # ---------- 组件4:共享实体论文群(实体→论文索引) ----------
+
+    _ent_papers_cache = None   # class-level,惰性一次;external_tools
+    # 深读落新记录时置 None 失效(见 external_tools._persist_deep_records)
+
+    _ENT_PAPERS_MAX = 100      # 实体挂>100篇=泛化hub('large language
+                               # model'@164),不作论文群信号;真实方法
+                               # 全低于此(bert 49/transformer 81/RL 46)
+
+    def _entity_papers(self):
+        """entity_id -> {paper_id: 记录数},全载体(refs/entity_refs)。
+        组件1归一后 96.4% 记录带载体——这是共享实体论文群的地基
+        (实测 2,588 个桥实体、~18万论文对)。"""
+        if KBTools._ent_papers_cache is not None:
+            return KBTools._ent_papers_cache
+        idx = defaultdict(lambda: defaultdict(int))
+        REFF = ("method_ref", "from_method_ref", "to_method_ref",
+                "scope_ref_ref", "target_ref_ref")
+        for pid, payload in self.records.items():
+            recs = (payload.get("records", payload)
+                    if isinstance(payload, dict) else payload)
+            if not isinstance(recs, list):
+                continue
+            for r in recs:
+                if not isinstance(r, dict):
+                    continue
+                for f in REFF:
+                    ref = r.get(f)
+                    if isinstance(ref, dict) and ref.get("entity_id"):
+                        idx[ref["entity_id"]][pid] += 1
+                for a in r.get("entity_refs") or []:
+                    if isinstance(a, dict) and a.get("entity_id"):
+                        idx[a["entity_id"]][pid] += 1
+        KBTools._ent_papers_cache = idx
+        return idx
+
+    def _papers_sharing_entities(self, eids, exclude_pid=None, k=5):
+        """实体集合 → 共享论文群(top-k,按这些实体在论文里的记录数)。
+        泛化hub实体(挂>_ENT_PAPERS_MAX 篇)不产生信号(谁都在讨论
+        =无区分度)。"""
+        idx = self._entity_papers()
+        pcount = defaultdict(int)
+        for eid in eids:
+            papers = idx.get(eid) or {}
+            if len(papers) > KBTools._ENT_PAPERS_MAX:
+                continue
+            for pid, nrec in papers.items():
+                if pid != exclude_pid:
+                    pcount[pid] += nrec
+        if not pcount:
+            return None
+        ranked = sorted(pcount.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
+        return [{"paper_id": pid, "records_on_entity": n} for pid, n in ranked]
+
+    def _shared_entity_papers(self, entity_name, exclude_pid=None, k=5):
+        """查询实体 → 共享论文群。组件4:直击批31a 轨迹实锤的'磨5篇'
+        病根——agent 拿 paper_id 查 findings 时给出'该实体还有谁在
+        讨论'信号。"""
+        if not entity_name:
+            return None
+        names = self._alias_set(entity_name)
+        # 别名集合解析出的全部实体(surface_index 直查,别名都在索引里)
+        eids = set()
+        for nm in names:
+            eid = self.surface_index.get(nm)
+            if eid and eid in self.byid:
+                eids.add(eid)
+        return self._papers_sharing_entities(eids, exclude_pid, k)
 
     # ---------- typed tool 1: compare ----------
 
@@ -270,8 +396,16 @@ class KBTools:
         flags = {e: f for e, f in cov["flags"].items()
                  if not entity or _norm(e) in names} if entity else cov["flags"]
         grid = {e: f for e, f in cov["grid"].items() if not entity or _norm(e) in names}
-        return {"tool": "find_gap", "absences_extracted": extracted,
-                "absences_derived": derived, "flags": flags, "grid": grid}
+        res = {"tool": "find_gap", "absences_extracted": extracted,
+               "absences_derived": derived, "flags": flags, "grid": grid}
+        # 组件4(缺口→供给线索):查询实体的共享论文群=可能补缺的论文
+        # (不保证解决——供给验证是 gap docs 的 resolved_by 层;这里是
+        # 探索起点,"知缺→世界补缺"的运行时入口)。
+        if entity:
+            supply = self._shared_entity_papers(entity, k=5)
+            if supply:
+                res["papers_discussing_entity"] = supply
+        return res
 
     # ---------- typed tool 4: config ----------
 
@@ -447,10 +581,39 @@ class KBTools:
                             "scope": scope, "target": target,
                             "record_id": r.get("id"),
                             "quote": (r.get("quote") or "")[:120]})
+                # 组件1(粗抽实体归一):记录绑定的实体(PPR 分桶用,
+                # 返回前剥离——hex id 不进模型视野)
+                if r.get("entity_refs"):
+                    _eids = [a.get("entity_id") for a in r["entity_refs"]
+                             if a.get("entity_id")][:6]
+                    if _eids:
+                        out[-1]["_eids"] = _eids
+                # 组件2(引用桥):survey_claim 的被评论文指向——归因措辞
+                # ("论文 P 转述了 Q 的 X")与进一步 findings(paper_id=Q)
+                # 的锚点。库外被引论文无此字段(诚实缺失)。
+                if r.get("about_paper_id"):
+                    out[-1]["about_paper_id"] = r["about_paper_id"]
+                    if r.get("about_paper_title"):
+                        out[-1]["about_paper_title"] = \
+                            str(r["about_paper_title"])[:80]
+                # 组件3(转述四分类):中性关系标签——restate/extend/
+                # qualify/dispute,不裁决对错(转述者站未来视角)
+                if r.get("paraphrase_rel"):
+                    out[-1]["paraphrase_rel"] = r["paraphrase_rel"]["label"]
         # IL-B4: collect all matches; entity-naming claims first (dossier
         # centrality), each group paper-round-robin (cross-paper breadth),
         # then the k cap — file order alone cut decisive cross-paper evidence
         total = len(out)
+        # P1-8 PPR 重排（CS2_PPR=1 开关，缺省关=findings 行为不变）：
+        # 词法命中的候选里，图邻域（查询实体沿谱系边 PPR 扩散）的记录
+        # 优先。用户裁定：升级 findings 排序而非新工具——agent 零学习
+        # 成本，谱系边数据已就绪（P0-3 年份回填后 2406 边可用）。
+        # 排序保留 round-robin 的跨论文广度（先按 PPR 分数分桶，桶内
+        # round-robin）——纯分数排序会把单一中心论文顶到前面，重新
+        # 引入 IL-B4 治过的 file-order 单调性。
+        _ppr_on = os.environ.get("CS2_PPR", "0") == "1"
+        _ppr_scores = (self.ppr_entity_scores([entity] + list(raw_cns or []))
+                       if _ppr_on and total > 0 else {})
         if names:
             direct, rest = [], []
             for o in out:
@@ -459,9 +622,56 @@ class KBTools:
             out = _round_robin_by_paper(direct) + _round_robin_by_paper(rest)
         else:
             out = _round_robin_by_paper(out)
+        if _ppr_scores:
+            def _rec_ppr(o):
+                # 记录分数 = scope/target 实体 + entity_refs 绑定实体的
+                # PPR 分数（claim 文本命中已由词法层保证，这里只加图结构
+                # 信号）。entity_refs 是组件1(粗抽实体归一)回填的——粗抽
+                # 记录从此进入 PPR 射程（修复前仅 hub 深记录的 scope/
+                # target 参与，89% 记录在图谱之外）
+                s = 0.0
+                for key in (o.get("scope"), o.get("target")):
+                    e = self.resolve(key) if key else None
+                    if e:
+                        s += _ppr_scores.get(e["entity_id"], 0.0)
+                for eid in o.get("_eids") or ():
+                    s += _ppr_scores.get(eid, 0.0)
+                return s
+            # 三桶：图邻域命中（>0）/未命中（=0）——桶间有序桶内 round-robin
+            hi = [o for o in out if _rec_ppr(o) > 0]
+            lo = [o for o in out if _rec_ppr(o) == 0]
+            out = hi + lo
+        # 组件4(共享实体论文群):带 paper_id 查询时给出"这些实体还有谁
+        # 在讨论"——直击批31a 轨迹实锤的窄锚定病根(34 次 findings 全磨
+        # 同 5 篇论文,外部探索拖到最后 4 步)。实体来源=查询实体(若有)
+        # + 命中记录的 entity_refs 高频 top10(兼容 paper_id+contains
+        # 调用形态——病例轨迹实测该形态占绝对多数)。信号不是命令,
+        # agent 自己决定是否扩面。计数在 _eids 剥离前做。
+        _ent_counts = None
+        if paper_id:
+            from collections import Counter as _C
+            _ent_counts = _C()
+            for o in out:
+                for eid in o.get("_eids") or ():
+                    _ent_counts[eid] += 1
+        for o in out:
+            o.pop("_eids", None)
         out = out[:k]
         res = {"tool": "findings", "n": total, "returned": len(out),
-               "truncated": total > len(out), "entries": out}
+               "truncated": total > len(out), "entries": out,
+               "ppr_reranked": bool(_ppr_scores) or None}
+        if _ent_counts is not None:
+            _eids_q = set()
+            if entity:
+                for nm in self._alias_set(entity):
+                    eid = self.surface_index.get(nm)
+                    if eid and eid in self.byid:
+                        _eids_q.add(eid)
+            also = self._papers_sharing_entities(
+                list(_eids_q) + [e for e, _ in _ent_counts.most_common(10)],
+                exclude_pid=paper_id, k=5)
+            if also:
+                res["related_papers_via_entities"] = also
         if total < 3 and cns:
             # P0-3 语义兜底：词法零/低命中（<3）≠库内无相关内容（同义词
             # 盲赌的代价不对称——批13 实证 1 hit 起步整题弃答）。零命中
@@ -479,18 +689,35 @@ class KBTools:
                     res["entries"] = merged[:k]
                     res["returned"] = len(res["entries"])
                 res["semantic_match"] = True
-                res["note"] = ("lexical contains had few/no hits; entries "
-                               "marked with semantic_score are SEMANTIC "
-                               "matches (embedding) — the records' wording "
-                               "differs from your query. They are still "
-                               "verbatim-anchored evidence.")
+                # 2026-10-02 诚实信号改版(PaperQA2 score-cutoff/CRAG
+                # 检索评估器先例):词法零命中本身=「KB 可能不覆盖此主题」
+                # 的重要信号——必须让 agent 看见,而不是把"最相似的"
+                # 包装成"找到了"。三件套:①头部诚实声明 ②条目按分数
+                # 分档(强/弱) ③弱档明示可能跑题。
+                res["note"] = ("NO LEXICAL MATCH — the KB likely does not "
+                               "cover this topic well. Entries below are "
+                               "the NEAREST records by embedding similarity; "
+                               "those without [strong] may be only loosely "
+                               "related (same domain, not this question). "
+                               "If they do not actually answer the aspect "
+                               "you are filling, the KB has nothing for it "
+                               "— use search_papers for this aspect.")
+                for e in sem:
+                    sc = e.get("semantic_score") or 0
+                    e["relevance"] = ("strong" if sc >= 0.75 else
+                                      "weak — may be off-topic")
                 return res
             if total == 0:
                 res["note"] = ("contains 零命中——记录用词可能与查询用词不同，"
                                "换措辞或用 | 分隔多组候选词重试")
         return res
 
-    _SEM_CONTAINS_TH = 0.50   # 与 deep_read 节匹配同一定标（同义对
+    _SEM_CONTAINS_TH = 0.65   # 2026-10-02 调研修正(PaperQA2 cutoff+
+    # CRAG 三路分叉先例):实测真相关下界 0.707(地震内容)/伪相关
+    # 上界 0.669(LLM 化学论文冒充量子化学)——0.65 分得开两者。
+    # 旧值 0.50 过低:任何两句学术文本都 0.5+,零命中永远不空手
+    # →agent 从得不到'库里没有'的信号(34 系列域外题病根)。
+    # 旧注释: 与 deep_read 节匹配同一定标（同义对
     # 0.50-0.57 / 无关对 0.38-0.48 实测带）
 
     def _semantic_contains_fallback(self, raw_cns, entity, claim_type,

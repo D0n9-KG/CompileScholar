@@ -133,6 +133,12 @@ def build_backflow(coarse_payload: dict, paper_meta: dict,
                 for e in (registry or {}).get("entities", [])
                 if e.get("entity_id")}
     surface_index = (registry or {}).get("surface_index") or {}
+    # 关系升级用:ref surface 的 norm 直查(深读 ref 的 entity_id 23% 绑定,
+    # 其余靠 surface 现场解析——与 _build_norm_surface 的 multi-form 不同,
+    # 这里只需精确 norm 匹配,模糊匹配交给 mention 那一路)
+    _si_norm = {}
+    for _s, _e in surface_index.items():
+        _si_norm.setdefault(_norm(_s), _e)
 
     # collect mentions per record so each edge carries its evidence quote
     per_record: list[tuple[dict, list[dict]]] = []
@@ -169,17 +175,74 @@ def build_backflow(coarse_payload: dict, paper_meta: dict,
             if key in seen_pairs:
                 continue
             seen_pairs.add(key)
+            # 关系升级（2026-10-02，审计修复：backflow.py 文档宣称
+            # "深读产出真实谱系边替换弱 external_mention"——实态深读回流
+            # 104 边全是弱边，升级 0 兑现。深读记录里的 lineage kind 带
+            # 真实 relation + from/to 方法 surface。升级条件（实测校准：
+            # 深读 ref surface 23% 能被 registry 解析，其余是库外新方法/
+            # 编号形态——只升级可解析端）：mention 命中的实体 == from 端
+            # surface 解析结果（外部论文做了 relation 动作作用于该实体）
+            # 或 == to 端（外部论文是被作用方）。库外端=外部论文自身。
+            rel = "external_mention"
+            prov = "coarse"
+            if r.get("kind") == "lineage" and r.get("relation"):
+                _from_ref = r.get("from_method_ref") or {}
+                _to_ref = r.get("to_method_ref") or {}
+                _f_eid = (_from_ref.get("entity_id") if isinstance(_from_ref, dict) else None) \
+                    or _si_norm.get(_norm(_from_ref.get("surface") if isinstance(_from_ref, dict) else ""))
+                _t_eid = (_to_ref.get("entity_id") if isinstance(_to_ref, dict) else None) \
+                    or _si_norm.get(_norm(_to_ref.get("surface") if isinstance(_to_ref, dict) else ""))
+                # 方向语义（2026-10-02 校准）：深读 lineage 记录的
+                # from/to 是"这篇论文的记录声称的演化关系"——记录语境里
+                # from/to 都指涉方法，其中一端被外部论文实现/讨论。
+                # 深读记录语义: 记录所属论文(P)声称 from --relation--> to
+                # （P 是证据来源不是边端点）。因此正确形态=保留记录的
+                # from→to 方向,把可解析的一端接库内实体,另一端(库外/
+                # 未解析)指向外部论文节点 P(该端方法由 P 贡献):
+                #   from 可解析: from实体 --relation--> P
+                #   to 可解析:   P --relation--> to实体
+                #   (记录原方向 from→to 保持)
+                if m["entity_id"] == _f_eid:
+                    edges.append({
+                        "from": m["entity_id"], "to": node["id"],
+                        "from_name": eid2name.get(m["entity_id"], m["entity_id"]),
+                        "to_name": node["canonical"],
+                        "relation": r["relation"],
+                        "scope": r.get("scope") or {},
+                        "evidence_basis": "deep_record",
+                        "year": paper_meta.get("year"),
+                        "paper_id": paper_key,
+                        "record_id": r["id"],
+                        "quote": (r.get("quote") or "")[:250],
+                        "provenance": "deep",
+                    })
+                    continue
+                if m["entity_id"] == _t_eid:
+                    edges.append({
+                        "from": node["id"], "to": m["entity_id"],
+                        "from_name": node["canonical"],
+                        "to_name": eid2name.get(m["entity_id"], m["entity_id"]),
+                        "relation": r["relation"],
+                        "scope": r.get("scope") or {},
+                        "evidence_basis": "deep_record",
+                        "year": paper_meta.get("year"),
+                        "paper_id": paper_key,
+                        "record_id": r["id"],
+                        "quote": (r.get("quote") or "")[:250],
+                        "provenance": "deep",
+                    })
+                    continue
             edges.append({
                 "from": m["entity_id"], "to": node["id"],
                 "from_name": eid2name.get(m["entity_id"], m["entity_id"]),
                 "to_name": node["canonical"],
-                "relation": "external_mention",
+                "relation": rel,
                 "scope": {}, "evidence_basis": "explicit_mention",
                 "year": paper_meta.get("year"),
                 "paper_id": paper_key,
                 "record_id": r["id"],
                 "quote": (r.get("quote") or "")[:250],
-                "provenance": "coarse",
+                "provenance": prov,
             })
     return {"node": node, "edges": edges, "matches": list(all_matches.values())}
 
