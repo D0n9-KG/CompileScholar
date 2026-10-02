@@ -393,7 +393,9 @@ Remaining steps are shown at the end of each observation; plan accordingly."""
 
 
 def build_step_prompt(system, q, notes, gaps, queried, obs, steps_left, glist=None,
-                      notes_spec=None):
+                      notes_spec=None, budget_brief=None):
+    # 2026-10-01 重构：budget_brief 参数现在承载证据计划的每步缺口
+    # 盘点（render_evidence_plan 产出）；None=无计划（分解失败或关闭）。
     # F31 v2: notes_spec override carries RULE7 for the main arm when the
     # device is ON; None -> NOTES_SPEC verbatim (off-state byte-identical,
     # control arm never receives the A-line contract).
@@ -413,6 +415,9 @@ def build_step_prompt(system, q, notes, gaps, queried, obs, steps_left, glist=No
     tail = (" (FINAL WINDOW: if the notes already contain the key points, output <answer> now; disclose remaining gaps honestly inside it)"
             if steps_left <= 2 else " (once exhausted you must answer from notes)")
     parts.append(f"\n\nSteps remaining: {steps_left}{tail}")
+    # 证据计划区块（render_evidence_plan 每步渲染）
+    if budget_brief:
+        parts.append(f"\n{budget_brief}")
     parts.append(f"\n\nCurrent notes:\n{notes if notes else '(empty)'}")
     parts.append(f"\n\nOpen gaps:\n{gaps if gaps else '(to be established on first step)'}")
     return "\n".join(parts)
@@ -1409,6 +1414,209 @@ _RE_DEMAND_PER_ENTITY = 2  # steps per additional entity
 _RE_DEMAND_MAX_BONUS = 16
 
 
+# ---- 轨道1 阶段1：问题信息需求分解层（FIX-PLAN v2 §3.1，09-30） ----
+# 机制：harness 级预调用（循环外，不占步数预算）让 27B 把题面分解为
+# 信息槽位清单；槽位由 KB 结构确定性认领（这是与 generic decomposition
+# 的差异点——认领映射走我们自己的 typed tool 通道）；首步注入。
+# 阶段1=分解+认领+首步注入；槽位记账/差集外检=阶段2（数据说话后定）。
+# 开关 CS2_DECOMP=1（缺省 0=字节等价旧行为，A/B 干净）。
+_SLOT_CLAIMS = {
+    # slot type -> (KB tool channel, guidance)  认领映射=确定性
+    "method": ("lineage_walk_ext(entity)",
+               "typed genealogy walk — extends/improves/replaces chain"),
+    "metric": ("compare(entity)/card(entity)",
+               "cross-paper matrix + method cards (numbers, setups)"),
+    "limitation": ("findings(claim_type=criticism)",
+                   "criticism records + recorded absences"),
+    "application": ("findings(kind=method)",
+                    "method records with application context"),
+    "comparison": ("compare(entity)",
+                   "head-to-head matrix tables"),
+    "definition": ("findings(claim_type=definition)",
+                    "definition records"),
+    "dataset": ("findings(contains=...)",
+                "dataset mentions in claims/quotes"),
+}
+
+
+def decompose_question(question: str) -> list[dict] | None:
+    """27B 预调用：题面 -> 信息槽位清单。失败返回 None（降级=无注入，
+    行为回到现状——分解是增益不是依赖）。"""
+    slots_doc = "\n".join(f"- {k}: {v[1]}" for k, v in _SLOT_CLAIMS.items())
+    prompt = f"""Decompose this research question into the INFORMATION SLOTS a complete answer needs (a reader of a survey would expect each filled). Classify each slot with exactly one type from:
+{slots_doc}
+
+Question: {question}
+
+Output STRICT JSON only: {{"slots": [{{"type": "<type>","need": "<one short phrase: what specifically must be found"}}]}} — 3-6 slots, most-important first. No other text."""
+    try:
+        raw = _chat(prompt, max_tokens=600, temperature=0.0,
+                    enable_thinking=False)
+        if not raw:
+            return None
+        obj = parse_json_response(raw)
+        slots = (obj or {}).get("slots") if isinstance(obj, dict) else None
+        if not isinstance(slots, list):
+            return None
+        out = []
+        for s in slots[:6]:
+            if isinstance(s, dict) and s.get("type") in _SLOT_CLAIMS \
+                    and s.get("need"):
+                out.append({"type": s["type"],
+                            "need": str(s["need"])[:120]})
+        return out or None
+    except Exception:
+        return None
+
+
+def render_slot_brief(slots: list[dict]) -> str:
+    """槽位清单 -> 首步注入文本（槽位+KB 认领通道——agent 按通道检索，
+    不是自由文字建议）。
+    反锚定条款（批29双样本实锤）：29b 的 fb60/2bb4 两题下降模式=agent
+    把清单当边界——槽位字面填满即 16 步收束，检索面比基线还窄。清单
+    是起点不是边界：填满后仍要扩面（survey 题的覆盖广度在清单之外）。
+    2026-10-01 证据计划重构：首步静态清单保留（方向锚），循环中的
+    动态盘点走 render_evidence_plan（每步渲染缺口状态）。"""
+    lines = ["[INFORMATION NEEDS] A complete answer needs these slots "
+             "filled — each is served by a specific KB tool channel:"]
+    for i, s in enumerate(slots, 1):
+        tool, _desc = _SLOT_CLAIMS[s["type"]]
+        lines.append(f"{i}. [{s['type']}] {s['need']}  -> {tool}")
+    lines.append("Plan your retrieval to cover every slot; a slot with no "
+                 "KB evidence after genuine attempts is a gap to fill via "
+                 "search_papers or to disclose honestly in the answer.")
+    lines.append("IMPORTANT: this list is the FLOOR of coverage, not its "
+                 "ceiling — once slots are filled, keep widening: additional "
+                 "distinct sources, related methods, and cross-cutting "
+                 "evidence make a survey answer stronger. Do not stop early "
+                 "just because every slot has some evidence.")
+    return "\n".join(lines)
+
+
+# ── 证据计划（2026-10-01 重构：取代 24 个条件触发 SYSTEM 注入）──
+# 设计变更：旧机制看 agent 行为历史（"你磨了 6 步"）打补丁；计划看
+# 问题的需求结构（"槽位 3 还没有任何证据"）给方向。agent 每步对照
+# 缺口自己决策——不需要行为统计守卫。
+
+_SLOT_STOP = {"the", "a", "an", "of", "for", "and", "or", "in", "on", "to",
+              "not", "was", "is", "are", "with", "by", "et", "al", "what",
+              "how", "which", "does", "do", "their", "its"}
+
+
+def _slot_tokens(need: str) -> set:
+    return {t for t in re.findall(r"[a-z]{4,}", str(need or "").lower())
+            if t not in _SLOT_STOP}
+
+
+def _slot_record_hits(need: str, notes: str, rec_index: dict) -> int:
+    """槽位的记录级命中数（2026-10-02 判定升级）：笔记行首的 [record_id]
+    指向的记录 subject/claim 与槽位 need 词法重合=硬证据信号。比纯词法
+    （笔记任意位置出现同词）严格：要求"引用的证据本身讲这个方面"，
+    而不是"笔记某处碰巧有这个词"。
+    rec_index=REC_INDEX（record_id→记录）——调用方传入，无全局依赖。"""
+    hits = 0
+    toks = _slot_tokens(need)
+    if not toks:
+        return 0
+    for rid in re.findall(r"\[([0-9a-f]{12,16})\]", str(notes or "")):
+        r = rec_index.get(rid)
+        if not isinstance(r, dict):
+            continue
+        blob = _slot_tokens(str(r.get("subject") or "") + " "
+                            + str(r.get("claim") or ""))
+        if toks & blob:
+            hits += 1
+    return hits
+
+
+def _slot_status(s: dict, notes_toks: set) -> str:
+    toks = _slot_tokens(s["need"])
+    hit = sum(1 for t in toks if t in notes_toks)
+    if not toks or hit >= max(2, len(toks) // 2):
+        return "COVERED"
+    return "PARTIAL" if hit > 0 else "OPEN"
+
+
+def _slot_status2(s: dict, notes: str, rec_index: dict) -> str:
+    """判定 v2（2026-10-02）：双信号——record 级硬命中（笔记引用的证据
+    讲这个方面）优先；词法命中（笔记任意位置同词）做宽兜底但只给到
+    PARTIAL（宽信号不足以判 COVERED——'diversity' 一词出现在无关句里
+    不构成覆盖）。COVERED 必须有 ≥1 条记录级命中或全词命中。"""
+    toks = _slot_tokens(s["need"])
+    if not toks:
+        return "COVERED"
+    n_rec = _slot_record_hits(s["need"], notes, rec_index)
+    if n_rec >= 1:
+        return "COVERED"
+    notes_toks = set(re.findall(r"[a-z]{4,}", str(notes or "").lower()))
+    hit = sum(1 for t in toks if t in notes_toks)
+    if hit >= max(2, len(toks) // 2):
+        return "PARTIAL"
+    return "PARTIAL" if hit > 0 else "OPEN"
+
+
+def render_evidence_plan(slots: list[dict], notes: str,
+                         steps_left: int, rec_index: dict = None,
+                         open_dwell: dict = None) -> str:
+    """证据计划 + 缺口盘点 -> 每步注入的一个区块。
+
+    覆盖判定=确定性词法（槽位 need 的内容词 vs 笔记文本）。粗但方向
+    正确：它只回答"这个方面有没有证据落在笔记里"，不评判证据好坏。
+    agent 看到：各槽位状态（COVERED/PARTIAL/OPEN）+ 剩余步数事实 +
+    OPEN 槽位的工具通道。没有指令、没有阈值、没有"你应该"——决策
+    留给 agent。
+
+    验收闭环（2026-10-02，Anthropic 验证器模式）：全 COVERED 时渲染
+    EVIDENCE COMPLETE 状态——内容驱动的收束信号。
+
+    驻留标注（2026-10-02 晚，34c 实锤的边际覆盖题病灶）：e7bef53d/
+    d28ae3b3/a2a5c807 三题 46-86 步零外部检索——KB 边缘域有零星命中
+    →停机计数不断清零→"连续3步全零"的转向信号结构性不触发。修法=
+    计划状态的如实呈现：一个槽位连续 open_dwell 步仍 OPEN 时标注
+    "OPEN for N steps — KB coverage for it may be exhausted; external
+    search is the way to fill it"。驻留步数是状态事实非阈值守卫——
+    边际覆盖题的 OPEN 槽位一直在（不管零星命中），标注天然可达。
+    """
+    if not slots:
+        return ""
+    notes_l = str(notes or "").lower()
+    notes_toks = set(re.findall(r"[a-z]{4,}", notes_l))
+    _stat = (lambda s: _slot_status2(s, notes, rec_index)) if rec_index \
+        else (lambda s: _slot_status(s, notes_toks))
+    rows = []
+    n_open = 0
+    complete = True
+    for i, s in enumerate(slots, 1):
+        status = _stat(s)
+        if status != "COVERED":
+            n_open += 1
+            complete = False
+        tool, _ = _SLOT_CLAIMS[s["type"]]
+        line = f"{i}. [{s['type']}] {s['need']} — {status}"
+        if status == "OPEN":
+            line += f" (KB: {tool} / external: search_papers)"
+            dwell = (open_dwell or {}).get(i, 0)
+            if dwell >= 5:
+                line += (f" [OPEN for {dwell} steps — KB coverage for "
+                         "this aspect may be exhausted; search_papers "
+                         "is the way to fill it]")
+        rows.append(line)
+    if complete:
+        head = (f"[EVIDENCE PLAN] steps left: {steps_left} | "
+                "EVIDENCE COMPLETE — every aspect has evidence in your "
+                "notes. Retrieval is done: transcribe remaining "
+                "observations into notes and write the <answer> next.")
+        return "\n".join([head] + rows)
+    head = (f"[EVIDENCE PLAN] steps left: {steps_left} | "
+            f"{n_open} of {len(slots)} aspects still lack evidence "
+            "(COVERED=notes carry evidence, PARTIAL=some wording matched, "
+            "OPEN=nothing yet):")
+    tail = ("Fill OPEN aspects first; PARTIAL ones may need one more "
+            "targeted query. When every aspect is COVERED — or genuinely "
+            "absent from the KB after real attempts — write the answer.")
+    return "\n".join([head] + rows + [tail])
+
+
 def run_question(q, arm, kb, tkb, grounding, glog):
     qtype = q["type"]
     cap = STEP_CAP["broad" if qtype in BROAD_TYPES else "precise"]
@@ -1435,9 +1643,10 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         # CS2 批1实测（09-28）：3/5 题磨满 48 步（笔记不收敛+同主题重复
         # 检索），20 步时材料已齐。天花板降 30（CS2_CAP_MAX 可调/回滚）。
         cap = min(cap, int(os.environ.get('CS2_CAP_MAX', '30')))
-    # FULLCHAIN-AUDIT B5：per-question 饱和状态（局部 list，循环里通过
-    # q['_search_family'] 传递——不再用模块级全局）
-    q["_search_family"] = []
+    # 2026-10-01 证据计划重构:cap 放宽绑定 CS2_DECOMP(计划在=36 步,
+    # 计划要步数兑现——OPEN 槽位的检索/深读需要余量;无计划=30 步不变)。
+    if arm == "main" and os.environ.get("CS2_DECOMP", "0") == "1":
+        cap = min(int(os.environ.get('CS2_CAP_MAX', '36')), max(cap, 36))
     # deep_read L1 定向模式（2026-09-28）：把当前题目注入 broker——
     # Agent 未显式传 sections 时的默认选择依据（题目 token 重叠前 3 节）
     # FULLCHAIN-AUDIT B5：_current_question 类级共享在并发下被最后写入
@@ -1448,12 +1657,40 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         _ext._current_question = q["question"]
         _ext._q_deep_read = q.setdefault("_deep_read", set())
     glist = ground_lists(kb, grounding, q["question"]) if arm == "main" else None
+    # 轨道1 阶段1（FIX-PLAN v2 §3.1）：harness 级预调用分解（循环外，
+    # 不占步数）。CS2_DECOMP=1 且 main 臂才启用；失败/关闭=零注入。
+    # 2026-10-01 证据计划重构：分解结果不再只做首步静态清单——保留
+    # _slots 供每步 render_evidence_plan 动态渲染缺口状态。
+    slot_brief = None
+    _slots = None
+    if arm == "main" and os.environ.get("CS2_DECOMP", "0") == "1":
+        _slots = decompose_question(q["question"])
+        if _slots:
+            slot_brief = render_slot_brief(_slots)
+            glog is not None and glog.append(
+                {"qid": q.get("qid"), "slots": _slots})
+        else:
+            glog is not None and glog.append(
+                {"qid": q.get("qid"), "slots": None, "decomp_failed": True})
     system = MAIN_SYSTEM if arm == "main" else CONTROL_SYSTEM
+    # 阶段1 注入位：分解槽位清单作为第 1 步的 obs 前缀（一次性，后续
+    # 步骤不重复——首步即建立检索计划骨架）。
     notes, gaps, queried, obs = "", "", [], ""
+    if slot_brief:
+        obs = slot_brief
     cov_suggest = _family_suggest(q.get("question"), kb) if kb is not None else None  # R2-B
     q_titles = [str(m.get("title") or "") for m in (kb.manifest.values() if kb is not None else [])]  # F26
     q_pids = set(kb.manifest.keys()) if kb is not None else set()  # PSV3-IL-2
     valid_ids = set(REC_INDEX) | {p for p in (kb.manifest if kb else {})}
+    # 批30 实证修复（ab3651c4 双样本 0 外部引用）：search_papers 候选的
+    # ext:xxx cite_id 是合法笔记回指（external_tools 生成并登记进运行时
+    # manifest）——不在 valid_ids 里=agent 引外部论文被笔记门拒 →
+    # 编造 id（99fd4c1b 33 次 bad_backref）或干脆不用外部结果
+    # （ab3651c4 双样本 0 篇外部引用的"最后一公里"断点）。
+    # 随检索动态增长：每次笔记门检查时从运行时 manifest 取 ext: 键。
+    if kb is not None and _ext is not None:
+        _cand_m = (getattr(_ext, "_kb_manifest", None) or {})
+        valid_ids |= {p for p in _cand_m if p.startswith("ext:")}
     if kb is not None:  # IL-C1: registry canonicals+aliases are legitimate
         for e in kb.registry.get("entities", []):   # 回指 for catalog observations
             valid_ids.add(e["canonical"])           # (entities/list_papers give
@@ -1469,25 +1706,14 @@ def run_question(q, arm, kb, tkb, grounding, glog):
     prev_notes = None
     last_progress_notes = None   # N13: last notes that actually CHANGED (rollback target)
     forced_answer = False
-    cov_audit_done = False   # F22: one-shot mid-budget breadth audit
     prev_obs_nums = set()    # F25: numbers carried by the latest observation
-    transcribe_nudges = 0    # F25: transcription-nudge budget (max 3/question)
     pending_sys = None   # IL-C6: reject-merge system message rides the next obs
     evidence_streak = 0      # F28: consecutive steps with no executed-tool evidence
     max_evidence_streak = 0  # F28: observability (loop-health metric)
     error_streak = 0         # F28e: consecutive errored/coached tool calls
-    # A7 timing (2026-09-20, REPAIR-LOG GOLDCOV queue item 5): terminal-run
-    # telemetry showed the escape hatch was systematically UNUSED where it
-    # was designed for — "KB has nothing but the answer needs content" fired
-    # in only 6 cases; number-dense questions never systematically fell back
-    # to the raw texts. Fix: count consecutive zero-hit TYPED-tool calls; at
-    # 3, nudge ONCE per question toward search_text. Deterministic, no gold
-    # or question-type awareness; a typed hit resets the streak.
-    typed_empty_streak = 0
-    a7_nudged = False
-    error_interventions = 0 # F28e: coaching interventions fired (max 2/question)
     f28_autos = 0            # F28: auto-retrievals fired (max 3/question)
     f28_terminate = False    # F28c: hard-stop flag (checked at loop top)
+    _f28_external_hinted = False   # F28 计划化:域外题转向信号(一次性)
     gate_info = {"note_rejects": 0, "numeric_fail": None, "repair": 0, "gate_passed": None}
     # ---- F31 v2 state (main arm + G2_F31=on only; off-state inert) ----
     auto_rows = []
@@ -1523,6 +1749,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
         exists without any benchmark. Control arm stays inert (no kb)."""
         nonlocal evidence_streak, max_evidence_streak, f28_autos, error_streak
         nonlocal forced_answer, prev_obs_nums, valid_ids, f28_terminate
+        nonlocal _f28_external_hinted
         # F28d (PSV5, 2026-09-13): productive-notes-step exemption — a step
         # that materially REWROTE the notes did transcription work (the exact
         # behavior F25 asks for); counting it as idle made F25 and F28 pull in
@@ -1536,11 +1763,46 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             evidence_streak = 0
             error_streak = 0     # F28e: transcription work also clears the error streak
             return obs_cur
+        # ── F28 计划状态化重构（2026-10-02，34a held-out 实锤）──
+        # 旧判据"3 步零证据一刀切"的两个合法反例（都是实测）：
+        # ① 收尾期（33b：COMPLETE 后转写步被杀 → 9/15 fallback，CT 塌）
+        # ② 域外题（34a a2a5c807：KB 零覆盖，agent 卡在库内零命中，
+        #    正确出路是转外部检索，但 3 步就被杀没机会走到）
+        # 计划驱动的停机语义：
+        # - 全 COVERED → 转写期豁免（收尾交给步数上限）
+        # - 有 OPEN 槽 + 零证据 → 不是空转，是"KB 可能没有"——第一次
+        #   停机触发时给一次外部转向信号（search_papers 提示 + streak
+        #   重置）；第二次才停机（真给了机会也没动=诚实收束）
+        # - 无计划（分解失败）→ 维持旧语义（3 步停）
+        _plan_state = None
+        if _slots and notes is not None:
+            _stats = [_slot_status2(s, notes, REC_INDEX) for s in _slots]
+            if all(x == "COVERED" for x in _stats):
+                _plan_state = "complete"
+            elif any(x == "OPEN" for x in _stats):
+                _plan_state = "open"
+        if _plan_state == "complete":
+            return obs_cur   # 转写期豁免（33b 修复保留）
         evidence_streak += 1
         if evidence_streak > max_evidence_streak:
             max_evidence_streak = evidence_streak
         if evidence_streak < 3 or arm != "main" or kb is None:
             return obs_cur
+        # 域外题分支：OPEN 槽位在 + 从未做过外部检索 + 第一次触发 →
+        # 转向信号而非停机（34a 实测：a2a5c807 五步被杀零外部尝试）
+        if _plan_state == "open" and not _f28_external_hinted:
+            _has_ext = any(s.startswith(("search_papers|", "gap_search|"))
+                           for s in queried)
+            if not _has_ext:
+                _f28_external_hinted = True
+                evidence_streak = 0
+                traj.append({"f28_external_hint": True, "at_step": steps})
+                return (obs_cur
+                        + "\n[SYSTEM] The knowledge base has returned nothing "
+                        "for the open aspects of this question (3 consecutive "
+                        "empty steps). This topic may live OUTSIDE the KB — "
+                        "use search_papers(query=...) now to search the open "
+                        "literature; cite results with [ext:<cite_id>].")
         tgts = f28_targets(gaps, queried, q_pids, notes) if f28_autos < 3 else []
         if tgts:
             p = tgts[0]
@@ -1596,89 +1858,33 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             break
         prev_obs_nums = set()   # N10: F25 tracking is STEP-scoped (reset here)
         notes_step_start = notes   # F28d: productivity baseline for this step
-        # 触发点修正（批21b 实锤）：原 steps_left==8 的注入点对早收束题
-        # （17 步即答完 gap 清空）永远不会到达——V3/V4 全部空转。改为
-        # steps_left<=8 and steps>=5：覆盖晚收束（原语义）+早收束题的
-        # 第一次满足时刻（cov_audit_done 一次性 flag 不变）
-        if not cov_audit_done and steps_left <= 8 and steps >= 5:   # F22 injection point
-            cov_audit_done = True
-            _nmt = 0
-            try:
-                _nmt = len(((kb.views or {}).get("matrix") or {}).get("tables") or {})
-            except Exception:
-                pass
-            _audit = coverage_audit(notes, queried, REC_INDEX, steps_left, cov_suggest, q_pids, n_matrix_tables=_nmt)
-            if _audit:
-                obs = (_audit + "\n\n" + obs) if obs else _audit
-            # FULLCHAIN 第二轮 V3（窄面题广度引导）：批15 方差解剖实锤
-            # DSL/ontology 类窄面题（笔记覆盖论文 2-4 篇）一篇命中差异=
-            # 30-50% 证据面差→双样本极差 0.24。半程时覆盖论文 <3 且
-            # gap 未清 → 一次性广度引导（扩源查询建议），与 F22 同点位
-            # 注入（不新开提示位——27B 对多系统消息敏感）。
-            if arm == "main" and steps_left == 8:
-                _npapers = len({m for m in re.findall(
-                    r"\[([0-9A-Za-z_:\-#\.]{8,})\]", notes or "")})
-                if _npapers < 3 and (gaps or "").strip().upper() != "NONE":
-                    obs = ("[SYSTEM] BREADTH CHECK: your notes cite evidence "
-                           "from fewer than 3 distinct sources. For a survey "
-                           "question this is thin coverage — run 2-3 "
-                           "search_papers / findings(contains=...) calls with "
-                           "DIFFERENT phrasings to surface additional papers "
-                           "before answering.\n\n" + obs) if obs else (
-                        "[SYSTEM] BREADTH CHECK: your notes cite evidence "
-                        "from fewer than 3 distinct sources. For a survey "
-                        "question this is thin coverage — run 2-3 "
-                        "search_papers / findings(contains=...) calls with "
-                        "DIFFERENT phrasings to surface additional papers "
-                        "before answering.")
-            # FULLCHAIN 第二轮 V4（KB 空转→开放检索引导）：批17/18 实锤
-            # 3 题 KB 缺口（时事/社会主题 KB 零覆盖），双样本一致 0.15-0.30
-            # ——agent 全程只用 KB 工具 0 次开放检索（有答案但跑题）。
-            # 半程时笔记证据源仍稀薄（<4 唯一 id）且已做过 findings 尝试
-            # → 注入"KB 可能没有此主题，去开放文献检索"引导（一次性，
-            # 与 V3 同点位——KB 空转与窄面在半程点信号重叠，合并触发面）。
-            if arm == "main" and steps_left <= 8 and steps >= 5:
-                _n_findings = sum(1 for s in queried
-                                  if s.startswith("findings|"))
-                _n_ext = sum(1 for s in queried
-                             if s.startswith(("search_papers|",
-                                              "gap_search|")))
-                # 触发校准（批17/18 缺口题实测：一题 14 低相关 id、一题 0 id
-                # ——唯一 id 数不可靠；共同信号=findings>=4 且 0 开放检索）
-                if (_n_findings >= 4 and _n_ext == 0
-                        and (gaps or "").strip().upper() != "NONE"):
-                    obs = ("[SYSTEM] KB COVERAGE CHECK: your findings() calls "
-                           "return little usable evidence — this topic may "
-                           "not be in the compiled knowledge base. Use "
-                           "search_papers(query=...) NOW to search the open "
-                           "literature directly (recent events, social "
-                           "impacts, and cross-domain topics often live "
-                           "only there). From the results: cite "
-                           "concept-level claims with [title] backrefs "
-                           "and verbatim sentences from the abstract "
-                           "as anchors; emit MULTIPLE search_papers "
-                           "calls in one step (they are free in step "
-                           "budget); admit_paper + deep_read only the "
-                           "1-2 papers whose SPECIFIC numbers or "
-                           "mechanisms you need.\n\n" + obs) if obs else (
-                        "[SYSTEM] KB COVERAGE CHECK: your findings() calls "
-                        "return little usable evidence — this topic may "
-                        "not be in the compiled knowledge base. Use "
-                        "search_papers(query=...) NOW to search the open "
-                        "literature directly (recent events, social "
-                        "impacts, and cross-domain topics often live "
-                        "only there). From the results: cite "
-                        "concept-level claims with [title] backrefs "
-                        "and verbatim sentences from the abstract "
-                        "as anchors; emit MULTIPLE search_papers "
-                        "calls in one step (they are free in step "
-                        "budget); admit_paper + deep_read only the "
-                        "1-2 papers whose SPECIFIC numbers or "
-                        "mechanisms you need.")
-                traj.append({"coverage_audit": True, "at_step": steps,
-                             "unique_queries": len(queried)})
+        # 2026-10-01 清理: F22 半程 coverage audit 及其挂载的 V3/V4
+        # 广度引导整体删除——职责由证据计划的每步缺口盘点接管。
+        # ── 证据计划注入（2026-10-01 重构，取代 P1-6 预算播报与全部
+        # 行为统计守卫）：每步渲染"问题需求 vs 笔记覆盖"的缺口盘点。
+        # 剩余步数作为事实信息附带（不再有 CRITICAL 指令——收束时机
+        # 由 agent 对照缺口自己判断）。CS2_DECOMP=1 时生效（计划原料
+        # 来自分解）；分解失败=零注入。
+        budget_brief = None
+        if arm == "main" and _slots:
+            # 驻留跟踪（2026-10-02 晚）：每步更新各槽位 OPEN 驻留计数
+            # （COVERED 时清零）——边际覆盖题的转向信号数据源
+            _dw = q.setdefault("_slot_open_dwell", {})
+            _notes_toks_d = set(re.findall(r"[a-z]{4,}",
+                                           str(notes_full() or "").lower()))
+            for _si, _s in enumerate(_slots, 1):
+                _st = _slot_status2(_s, notes_full(), REC_INDEX)
+                if _st == "OPEN":
+                    _dw[_si] = _dw.get(_si, 0) + 1
+                else:
+                    _dw[_si] = 0
+            _plan = render_evidence_plan(_slots, notes_full(), steps_left,
+                                         REC_INDEX, open_dwell=_dw)
+            if _plan:
+                budget_brief = _plan
         p = build_step_prompt(system, q, notes_full(), gaps, queried, obs,
-                              max(0, steps_left), glist, notes_spec=f31_spec)
+                              max(0, steps_left), glist, notes_spec=f31_spec,
+                              budget_brief=budget_brief)
         if book(f"{arm}_step", len(p)):
             traj.append({"budget_abort": True, "at_step": steps})
             break  # prereg total token ceiling hit — honest stop
@@ -1729,6 +1935,12 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                                 "transcriptions and plan). Re-copying "
                                 "A-lines wastes your step; continue with an "
                                 "<action> instead.")
+            # 批30 修复动态面：search_papers 每步都可能新增 ext: 候选
+            # id——笔记门检查时从运行时 manifest 增量并入（valid_ids
+            # 本体在题首构建时是不动的）。
+            if _ext is not None:
+                _cand_m = (getattr(_ext, "_kb_manifest", None) or {})
+                valid_ids |= {p for p in _cand_m if p.startswith("ext:")}
             kept, bad = note_gate(st["notes"], valid_ids)
             # FULLCHAIN 第二轮 V2（笔记形态前置约束）：自由散文行占比高
             # 时提示按 NOTES_SPEC 重写（15b 实测 38 行全散文——下游 LLM
@@ -1737,10 +1949,13 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             _n_form = sum(1 for l in _lines
                           if re.match(r"(N\d+\.|X\d+\.|\[unsourced\])", l))
             if _lines and _n_form / len(_lines) < 0.5 and steps >= 1:
+                # 2026-10-01 清理:格式教学的行为指令删去,保留事实告知
+                # (prose 行失去证据链接=系统行为后果;格式规范在系统提示常驻,
+                # 改不改是 agent 的决策)。
                 obs += ("\n[SYSTEM] FORMAT: most of your notes are free-form "
-                        "prose lines. Rewrite them as N<i>. [record_id] "
-                        "<claim> lines per the notes spec — prose lines lose "
-                        "their evidence linkage at answer time.")
+                        "prose lines — these lose their evidence linkage "
+                        "at answer time. (The notes spec is in the system "
+                        "prompt.)")
             if bad:
                 gate_info["note_rejects"] += len(bad)
                 # F28-era instrumentation (2026-09-19 batch 2): reject-reason
@@ -1933,6 +2148,42 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 continue
             answer = st["answer"]
             answer = _clean_answer_artifacts(answer)   # R-D
+            # ── 答案预检（验收闭环第 2 件，2026-10-02）：提交前对照证据
+            # 计划逐槽位核验答案覆盖——Anthropic CitationAgent 角色（提交
+            # 前的独立核验，但我们用确定性词法而非第二个 LLM：27B 自
+            # 反思不可靠）。计划里 COVERED 的槽位（笔记有证据）在答案
+            # 里一个词都没出现=证据没被用上，提示一次；第二次提交放行
+            # （答案组织是 agent 的决策）。纯状态对照，不评好坏。
+            if _slots and not forced_answer \
+                    and gate_info.get("plan_precheck", 0) < 1:
+                _ans_l = str(answer or "").lower()
+                _ans_toks = set(re.findall(r"[a-z]{4,}", _ans_l))
+                _notes_toks = set(re.findall(
+                    r"[a-z]{4,}", str(notes_full() or "").lower()))
+                _missed = []
+                for s in _slots:
+                    if _slot_status2(s, notes_full(), REC_INDEX) == "COVERED":
+                        toks = _slot_tokens(s["need"])
+                        # 槽位内容词在答案里零命中(容忍1个词)
+                        if toks and sum(1 for t in toks if t in _ans_toks) <= 1:
+                            _missed.append(s["need"][:60])
+                if _missed:
+                    gate_info["plan_precheck"] = \
+                        gate_info.get("plan_precheck", 0) + 1
+                    traj.append({"step": steps + 1,
+                                 "type": "plan_precheck",
+                                 "uncovered_slots": _missed})
+                    obs = ("Your answer leaves these evidence-backed aspects "
+                           "unmentioned (the notes carry evidence for them): "
+                           + "; ".join(_missed[:4])
+                           + ". The answer should draw on every aspect the "
+                           "notes support — fold them in and re-emit "
+                           "<answer>, or re-emit unchanged if omitting them "
+                           "is deliberate. This check will not fire again.")
+                    st["answer"] = None
+                    answer = None
+                    steps += 1
+                    continue
             miss, uns, btit = answer_gates(answer, notes_full(), q_titles)
             if (miss or uns or btit) and gate_info["repair"] < 1 and not forced_answer:
                 gate_info["numeric_fail"] = {"missing_nums": miss[:10], "unsourced": uns,
@@ -1976,56 +2227,10 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             # 26% point coverage at 6-11 of 48 steps used). Coach, do not
             # block — the model may re-emit <answer> next step and this
             # never fires twice.
-            if (_RE_PREANSWER_AUDIT and not forced_answer
-                    and not gate_info.get("preanswer_audit_fired")
-                    and steps < cap * 0.4):
-                gate_info["preanswer_audit_fired"] = True
-                papers = set()
-                for rid in re.findall(r"\b[0-9a-f]{12,16}\b", notes_full()):
-                    r = REC_INDEX.get(rid)
-                    if isinstance(r, dict) and r.get("paper_id"):
-                        papers.add(r["paper_id"])
-                if q_pids:
-                    for pid in q_pids:
-                        if pid and pid in (notes_full() or ""):
-                            papers.add(pid)
-                obs = (
-                    "[SYSTEM] PRE-ANSWER EXHAUSTIVENESS CHECK (automatic, fires once): "
-                    f"you are submitting after {steps} of {cap} steps — most of the "
-                    "retrieval budget is still unused. Before finalizing, verify the notes "
-                    f"cover EVERY aspect the question asks about (notes currently anchor "
-                    f"{len(papers)} distinct papers via {len(set(queried))} unique queries). "
-                    "Commonly missed: per-dataset/per-metric results for each asked method, "
-                    "ablations, implementation details (backbone, hyperparameters), and each "
-                    "paper's own limitations. If any asked-for item is absent from the notes, "
-                    "spend a few remaining steps retrieving it (findings(paper_id=X, "
-                    "claim_type=...), compare(subject=...), card(entity)) and re-emit "
-                    "<answer>. If the notes genuinely cover every asked aspect, re-emit "
-                    "<answer> unchanged — this check will not fire again.")
-                steps += 1
-                continue
             gate_info["gate_passed"] = not miss and not uns
             break
-        # F25 transcription audit (PSV3-IL-2, 2026-09-12): mode-A pathology —
-        # the previous observation carried >=5 numeric values and THIS step's
-        # notes captured none of them. Observations are Markovian (only the
-        # latest is shown), so uncaptured material is lost forever. Nudge via
-        # the pending_sys channel (consumed at every obs assembly point),
-        # max 3 per question. Deterministic, observable-state-only, generic.
-        if prev_obs_nums and len(prev_obs_nums) >= 5 and transcribe_nudges < 3 \
-                and st["notes"] and not any(n in st["notes"] for n in prev_obs_nums) \
-                and not (f31_active and any(
-                    n in r["line"] for n in prev_obs_nums for r in auto_rows)):
-            # F31 v2: numbers already carried by the A-block count as
-            # transcribed — the nudge's purpose is mechanically fulfilled
-            transcribe_nudges += 1
-            _tmsg = (f"[SYSTEM] Note-capture check: the last observation carried "
-                     f"{len(prev_obs_nums)} numeric values and your current notes "
-                     "contain NONE of them — observations scroll out of context. "
-                     "This step, transcribe the key values into the notes "
-                     "(metric + value + [record_id] per line), then continue.")
-            pending_sys = (pending_sys + "\n" + _tmsg) if pending_sys else _tmsg
-            prev_obs_nums = set()
+        # 2026-10-01 清理: F25 数值转写检查删除——转写时机由 agent
+        # 对照证据计划与笔记自己判断(行为统计守卫)。
         # action branch — A1 (2026-09-19 batch 2): the model may emit several
         # INDEPENDENT <action> blocks; all execute within this one step.
         # steps counts MODEL steps only — a step carrying 3 calls costs 1
@@ -2042,12 +2247,7 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             # is still thin, every no-action obs carries the audit state.
             # Deterministic, bounded, generic (no question/gold awareness);
             # auto-silent once coverage is healthy (coverage_audit -> None).
-            if cov_audit_done:
-                _a2 = coverage_audit(notes, queried, REC_INDEX, max(0, cap - steps),
-                                     cov_suggest, q_pids)
-                if _a2:
-                    obs += ("\n[SYSTEM] Coverage is still thin — a note-only "
-                            "step adds no evidence. " + _a2)
+            # 2026-10-01 清理: Coverage-thin 行为检查删除(职责归证据计划)。
             if pending_sys:
                 obs = pending_sys + "\n" + obs
                 pending_sys = None
@@ -2075,38 +2275,14 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                                         k=int(args.get("k", 8) or 8))
                     res = compact("search", res)
                 elif tool == "search_text":
-                    # 批1实测（09-28）：同主题查询重复 39 次（模型换措辞
-                    # 反复搜）。查询族饱和反馈：主题 token 集合已搜过多次
-                    # →返回饱和提示而非新结果，强迫转向笔记整理。
-                    # P1-8（REPAIR-WAVE-0928）：3→5 次且新实体词豁免——
-                    # 批12 实测误杀一半合法查询（ontology 题 6 条不同
-                    # 措辞全被拦；换措辞含新实体词=实质新角度，不该拦）。
+                    # 2026-10-01 清理：查询族饱和阀拆除。它和刚删的磨查
+                    # 检测器同族（token 计数→拦截结果+教学文案）——同主题
+                    # 重复查询是否该继续是 agent 对照证据计划的决策,不是
+                    # 词法统计的决策;完全相同的查询本来就被 sig 去重拦截,
+                    # 这里多拦的"换措辞同主题"曾实测误杀一半合法查询
+                    # (批12 ontology 题)。搜索照常执行。
                     _q = str(args.get("query", q["question"]))[:300]
-                    _qtoks = frozenset(t for t in re.findall(
-                        r"[a-z]{4,}", _q.lower()))
-                    _FAM = q.setdefault("_search_family", [])
-                    _prev_all = set().union(*_FAM) if _FAM else set()
-                    _new_toks = _qtoks - _prev_all
-                    if _qtoks:
-                        _fam_hits = sum(1 for _prev in _FAM
-                                        if len(_qtoks & _prev) >=
-                                        max(2, len(_qtoks) // 3))
-                        if _fam_hits >= 5 or (_fam_hits >= 3
-                                               and not _new_toks):
-                            res = {"tool": "search_text", "n": 0,
-                                   "saturation": True,
-                                   "note": ("this topic has already been "
-                                            "searched 3+ times — the results "
-                                            "are in your notes; STOP searching "
-                                            "this theme and either search a "
-                                            "DIFFERENT aspect, use typed tools "
-                                            "(card/findings/compare), or write "
-                                            "the answer from your notes now")}
-                        else:
-                            _FAM.append(_qtoks)
-                            res = _text_search(_q, args.get("k", 8))
-                    else:
-                        res = _text_search(_q, args.get("k", 8))
+                    res = _text_search(_q, args.get("k", 8))
                 elif tool in TOOL_WHITELIST or tool == "entities" or tool == "fetch_chunk" or tool == "describe_kb":
                     glog_ = []
                     cands = gate_entity_args(kb, args, glog_) if tool in (
@@ -2189,18 +2365,6 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 res = {"tool": tool, "error": f"{_label}: {str(e)[:80]}",
                        "valid_signature": TOOL_SIGS.get(tool, "(query,k<=12)")}
             res = shrink_obs(res)
-            # A7 timing: streak over typed-tool zero-hits (compare/findings/
-            # card/config/find_gap/lineage). Errors don't count (they get
-            # their own F28e coaching) — only clean-but-empty angles do.
-            if tool in ("compare", "findings", "card", "config", "find_gap",
-                        "lineage") and isinstance(res, dict) and not res.get("error"):
-                _hits = res.get("n") or len(res.get("rows") or res.get("entries")
-                                           or res.get("items") or ()) or \
-                    (1 if res.get("canonical") else 0)
-                if _hits:
-                    typed_empty_streak = 0
-                else:
-                    typed_empty_streak += 1
             new_ids = set()
             obs_record_ids(res, new_ids)
             valid_ids |= new_ids
@@ -2235,6 +2399,12 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 else (prev_obs_nums | _step_obs_nums)
             if isinstance(res, dict) and res.get("error"):
                 step_error = True
+            elif isinstance(res, dict) and res.get("n") == 0:
+                # 2026-10-02 F28 计划化收尾:零命中的成功调用不算新证据
+                # (34b 实测 a2a5c807: 32 步全零命中但每步都清零 streak
+                # → hint/停机双盲——域外题磨满预算自然 fallback。
+                # 零命中=KB 没有此内容,正是需要转向信号的信号)
+                pass
             else:
                 step_evidence = True
             if f31_active and isinstance(res, dict) and not res.get("error"):
@@ -2247,34 +2417,13 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                          "intent": str(act.get("intent", ""))[:120],
                          "obs_chars": len(obs_text), "notes_chars": len(notes)})
         obs = "\n---\n".join(obs_parts)
-        # P2-9（REPAIR-WAVE-0928）：首步脆弱性护栏——前 3 步全部零命中
-        # 时定向教学（审计实证：首步词面赌错穿透所有放弃护栏，批13 DSL
-        # 题 3 步弃答）。词面零命中≠库内无内容，教正确的恢复路径。
-        if steps < 3 and obs_parts and not step_error:
-            _any_hit = any(
-                isinstance(json.loads(p) if p.startswith("{") else {}, dict)
-                and (json.loads(p).get("n") or 0) > 0
-                for p in obs_parts if p.startswith("{"))
-            if not _any_hit:
-                obs += ("\n[SYSTEM] Early zero-hit guidance: your first "
-                        "queries returned nothing. This is usually WORDING, "
-                        "not absence — records rarely echo the question's "
-                        "words. Recovery: (1) findings with 2-3 SYNONYM "
-                        "phrasings joined by | , (2) entities(contains=...) "
-                        "to find the actual entity names in this domain, "
-                        "(3) search_text for raw-text phrasing. Do NOT "
-                        "conclude the corpus lacks the answer yet.")
-        if typed_empty_streak >= 3 and not a7_nudged:
-            a7_nudged = True
-            obs += ("\n[SYSTEM] Structured records return nothing for this "
-                    "angle (3 consecutive empty typed queries). When the "
-                    "question needs content that may live in prose, appendices, "
-                    "captions or table notes rather than typed records — number-"
-                    "dense details, protocol specifics, novel phrasings — call "
-                    "search_text(query): full-text hybrid retrieval over the raw "
-                    "corpus papers; passages carry [paper_id#char_start] anchors "
-                    "usable as note backrefs.")
-            typed_empty_streak = 0
+        # 2026-10-01 清理：磨查检测器 v1/v2、深读触发提示删除（CS2_EXPLORE
+        # 开关随之失效）——行为统计守卫的职责由证据计划接管：OPEN 槽位
+        # 每步可见（含 search_papers/deep_read 通道），agent 对着缺口
+        # 决策而不是对着"你磨了 6 步"的反应。
+        # 2026-10-01 清理: 首步零命中教学删除——恢复路径在证据计划的
+        # OPEN 槽位提示里(工具通道常驻),不需要行为触发教学。
+        # 2026-10-01 清理: A7 连续空命中守卫删除(职责归证据计划)。
         if pending_sys:      # IL-C6: merged-reject message + tool results together
             obs = pending_sys + "\n" + obs
             pending_sys = None
@@ -2287,17 +2436,8 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             # idleness — separate streak + targeted coaching (max 2), never the
             # kill ladder. Measured: 6 questions killed at steps 4-6 in D53r.
             error_streak += 1
-            if error_streak >= 3 and error_interventions < 2:
-                error_streak = 0
-                error_interventions += 1
-                traj.append({"f28_error_coach": True, "at_step": steps,
-                             "n_interventions": error_interventions})
-                obs += ("\n[SYSTEM] Your last 3 tool calls all failed to "
-                        "resolve their arguments. Stop guessing names: call "
-                        "describe_kb() for the KB inventory, or "
-                        "entities(contains=<name-fragment>) to find valid "
-                        "canonical names, or search_text() for free-text "
-                        "retrieval over the corpus papers.")
+        # 2026-10-01 清理: F28e 错误教学删除——工具错误已在 obs 的
+        # error 字段(含 valid_signature),不需要行为统计层二次教练。
         else:
             obs = _f28_step(obs, notes_step_start)   # all-repeats step = no-evidence step
         if redundant >= 2:  # local rollback (H5, N13-fixed: real restore)
@@ -2305,15 +2445,12 @@ def run_question(q, arm, kb, tkb, grounding, glog):
                 notes = last_progress_notes   # discard the circling rewrites
             else:
                 notes = prev_notes or notes
-            obs += "\n[SYSTEM] Two consecutive steps with zero note delta = circling signal: change angle (different tool/entity/keywords), or answer directly if the gaps are closed."
+            # 2026-10-01 清理: circling 教学删除(回滚机制保留——防环结构)。
             redundant = 0
         if none_streak >= 3:
+            # 2026-10-01 清理: gap-closed 教学文本删除,forced_answer 保留
+            # (连续无 gap=结构性收束信号,强制转答案是防环结构)。
             forced_answer = True
-            obs += ("\n[SYSTEM] Gap list closed consecutively: no more retrieval; next step "
-                    "you must output <answer> (answer from the notes, disclose minor gaps honestly).")
-        elif none_streak == 2:
-            obs += ("\n[SYSTEM] All gaps closed: if the notes already contain the key points, "
-                    "output <answer> directly next step; further retrieval wastes budget.")
         steps += 1
         if steps >= cap and not forced_answer:
             forced_answer = True
@@ -2336,7 +2473,10 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             "retrieval loop that exhausted its step budget. Write the final answer: "
             "exhaustive, well-structured prose IN THE LANGUAGE OF THE QUESTION, covering "
             "every aspect asked, using ONLY information present in the notes (numbers "
-            "verbatim). CITATIONS: each claim sentence must carry the bracketed id "
+            "verbatim). CLAIM COVERAGE: draw on EVERY note line that answers the "
+            "question — a note claim omitted from the answer is evidence lost "
+            "(33b 实测: fallback 编译 12 claims 只用 4 条引用=CT 损失主源). "
+            "CITATIONS: each claim sentence must carry the bracketed id "
             "copied VERBATIM from its note line (e.g. [93d961829e1f2c] — the exact hex "
             "id in the note's leading brackets). "
             "VALID citation forms (copy the note's bracket EXACTLY): "
@@ -2358,6 +2498,10 @@ def run_question(q, arm, kb, tkb, grounding, glog):
             "paper's own findings; epistemic:stated claims go as the paper's own words "
             "('the paper states/claims'), not as established fact. Never repeat the same "
             "citation parenthetical twice in a row. "
+            "SENTENCE DISCIPLINE (aligned with the main compiler): every factual "
+            "sentence stays within what its cited note lines state — no interpretive "
+            "framing of your own ('this suggests', 'interestingly'); such sentences "
+            "cannot be verified and weaken the answer. "
             "Absence wording (strict): the loop gathered these notes WITHOUT any guarantee "
             "that absence channels were queried. Where the notes lack something the question "
             "asks for, write that the consulted records did not surface it — NEVER that the "

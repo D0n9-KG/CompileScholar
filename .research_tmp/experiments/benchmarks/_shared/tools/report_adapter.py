@@ -61,8 +61,12 @@ _NOTE_LINE = re.compile(
 _NOTE_LINE_DASH = re.compile(r"^\s*-\s*(\[[^\]]+\].*)$")
 # 批14 实证形态（2026-09-28）：'- claim text [ref]'——ref 在行尾而非
 # 紧随破折号（批14 ontology 题 34 条证据行全丢=适配失败根因之一）。
+# 批30a 实证补丁（2026-09-30，15dec998：34 行笔记只解析出 5 条）：
+# 行尾 [ref] 后还挂属性尾巴（' epi:stated' / ' paraphrase of N5'）——
+# 原 $ 锚定直接失配。允许 [ref] 簇后跟简短尾注（≤40 字符、无新 ref）。
 _NOTE_LINE_DASH_TAIL = re.compile(
-    r"^\s*-\s*(.+?)\s*((?:\[[A-Za-z0-9_:\-#\.]{8,}\]\s*)+)$")
+    r"^\s*-\s*(.+?)\s*((?:\[[A-Za-z0-9_:\-#\.]{8,}\]\s*)+)"
+    r"(?:\s*(?:epi:[A-Za-z]+|paraphrase[^\[\]]{0,30}|[A-Za-z =:,]{0,20}))?\s*$")
 _BACKREF = re.compile(r"\[([A-Za-z0-9_:\-#\.]+)\]")  # 含冒号：粗抽 record_id 是 coarse:xxx 形态（CS2 批1实测）
 
 
@@ -208,6 +212,9 @@ class EvidenceStore:
                  views_path: str | None = None):
         self.by_record: dict[str, dict] = {}
         self.by_paper: dict[str, dict] = {}
+        # 批30a 修复（pid 引用降档）：paper_id → 该论文记录清单，
+        # paper 级回指时挑代表记录升 full 档
+        self.by_paper_records: dict[str, list[dict]] = {}
         self._texts_dir = texts_dir
         self._text_cache: dict[str, str] = {}
         for pid, payload in records_checked.items():
@@ -215,6 +222,9 @@ class EvidenceStore:
                 rid = rec.get("id")
                 if rid:
                     self.by_record[rid] = rec
+                # 批30a 修复索引：论文级回指升级用的记录清单
+                if pid:
+                    self.by_paper_records.setdefault(pid, []).append(rec)
         # FULLCHAIN-AUDIT C1：views_cs2.json 内嵌记录（33 个笔记回指的
         # 真实 id 在适配器加载空间外）——views 里带 quote 的记录行并入
         # by_record，同 id 不覆盖记录库（记录库为准）。
@@ -286,6 +296,41 @@ class EvidenceStore:
                 },
             }
         if ref_id in self.by_paper:
+            # 批30a 实证（1f384c4d：9/9 引用全 title 档 CT=0.36）：agent
+            # 用整条 paper_id 做笔记回指时只能落到 title 档（半信用）。
+            # 升级：该论文的记录里挑一条 claim 文本最长的作 quote 代理
+            # （record 级 1.0 档——笔记既然引了整篇，其代表性记录就是
+            # 证据载荷）。
+            best = None
+            for rec in self.by_paper_records.get(ref_id) or []:
+                q = (rec.get("quote") or rec.get("claim") or "").strip()
+                if q and (best is None or len(q) > len(best)):
+                    best = q
+            if best:
+                return {
+                    "tier": "full",
+                    "paper_id": ref_id,
+                    "quote": best[:400],
+                    "meta": self.paper_meta(ref_id),
+                    "loc": {"section": "paper-level ref",
+                            "chunk_id": None, "char_start": None},
+                }
+            # 引用策略修复（2026-10-01 诊断）：无记录论文的 paper 级回指
+            # 降 title 档=判分时 JUST_HAS_A_TITLE 半信用+只过"标题相关"
+            # 宽门槛；但外部候选登记时 manifest 里就存了 abstract
+            # （search_papers 落盘 203 候选 180 条带摘要）——真实证据
+            # 白白没用。升 abstract 档：snippet=摘要原文，过严格蕴含
+            # 判定（agent 引外部论文的 claim 本就提炼自摘要，通常可蕴含）。
+            ab = str(self.by_paper.get(ref_id, {}).get("abstract") or "").strip()
+            if ab:
+                return {
+                    "tier": "full",
+                    "paper_id": ref_id,
+                    "quote": ab[:1600],
+                    "meta": self.paper_meta(ref_id),
+                    "loc": {"section": "abstract",
+                            "chunk_id": None, "char_start": None},
+                }
             return {
                 "tier": "title",
                 "paper_id": ref_id,
@@ -323,6 +368,21 @@ STRICT RULES:
 4. {word_budget} words total. Direct, factual, survey-style prose. No filler.
 5. If the claims conflict, present both and attribute each to its marker.
 6. NUMBERS: every specific value, quantity, model name, or dataset name that appears in a claim MUST appear in the report — claims are dense transcriptions, and dropping their numbers loses the evidence. A report that omits the numeric details of its claims is a failed report, not a concise one.
+7. CLAIM SELECTION (quality over volume): you will often get more claims than
+   the question needs. Select — compile ONLY claims that directly answer the
+   question's aspects; drop marginal/tangential ones (background trivia,
+   loosely related methods, claims the question never asks about). A report
+   stuffed with weakly-relevant sentences scores WORSE than a tighter one
+   that answers exactly what was asked. As a guide: aim for 15-35 claims for
+   a survey-style question, fewer for a narrow one.
+8. EVIDENCE-GROUNDED SENTENCES ONLY (citation discipline): every factual
+   sentence must stay within what its cited claims' evidence quotes state.
+   Do NOT write interpretive framing or significance commentary of your own
+   ("this marks a significant shift", "this suggests", "this widespread
+   adoption indicates", "interestingly"). Such sentences cannot be verified
+   against any evidence and weaken the report. If a synthesis spans several
+   claims, state it as the conjunction of what those claims say and cite ALL
+   of their markers on that sentence.
 
 QUESTION: {question}
 

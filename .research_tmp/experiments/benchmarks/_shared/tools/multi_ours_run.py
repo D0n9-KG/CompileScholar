@@ -287,9 +287,15 @@ def wrap_f21(kb):
         start = (rec.get("chunk_char_start") if rec else None) or _anchor_start or 0
         lo = max(0, start - window // 2)
         hi = min(len(txt), start + window)
+        # P1-7 Self-Route 兜底（2407.16833）：片段窗口不够时 agent 可
+        # 传 window=3000 升大窗口（全文是 fallback 不是默认——默认
+        # 1500ch 片段符合 context cliff 纪律；不足才显式升）
         return {"tool": "fetch_chunk", "record_id": record_id, "paper_id": pid,
                 "quote": rec.get("quote") if rec else txt[start:start + 400],
                 "chunk_id": rec.get("chunk_id") if rec else record_id,
+                "window_used": window,
+                "note": "pass window=3000 for a wider context if this "
+                        "window is insufficient",
                 "text_window": txt[lo:hi]}
 
     kb.findings, kb.card, kb.compare = findings_cx, card_cx, compare_cx

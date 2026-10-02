@@ -30,6 +30,15 @@ sys.path.insert(0, SHARED)
 
 MODEL = os.environ.get("OURS_MODEL", "local:Qwen3.8-27B")
 TAG = os.environ.get("OURS_TAG", "cs2dev")
+# --tag 命令行参数优先(2026-10-01:PowerShell run_in_background 的 env
+# 块传递三次失效——31b/32a/32b 的 OURS_TAG/OURS_ANSWERS 都没到子进程,
+# 32b 因此被 resume 判定已答而整批空转。命令行参数是可靠通道)
+for _i, _a in enumerate(sys.argv):
+    if _a == "--tag" and _i + 1 < len(sys.argv):
+        TAG = sys.argv[_i + 1]
+        os.environ["OURS_TAG"] = TAG
+        del sys.argv[_i:_i + 2]
+        break
 
 os.environ.setdefault("LLM_CALL_LOG", os.path.join(ARM, f"ledger_ours_{TAG}.jsonl"))
 os.environ.setdefault("LLM_RUN_ID", f"ours-{TAG}")
@@ -132,20 +141,29 @@ def build_tools_cs2():
                  emb_cache_path=os.path.join(ARM, "emb_cache_records.bin"))
     if os.environ.get("KB_OPEN_SET", "1") == "1":
         from external_tools import attach_external_tools
-        attach_external_tools(kb, views, manifest, model=MODEL,
+        # KB_SNAPSHOT（FIX-PLAN v2 ②B 裁定：答题模式关生长）：=1 时全部
+        # 可写产物重定向到 ARM 下的影子目录——答题期深读只进本题
+        # EvidenceStore/影子层，库文件（deep_read_records/backflow_edges/
+        # manifest_all/deep_cache/growth_library）只读不漂移。100 题全量
+        # 看到同一个库（"单一版本"宣称），KB size 论文里是个固定数。
+        # 缺省 0 = 开发期旧行为（深读累积进库，批间漂移）。
+        if os.environ.get("KB_SNAPSHOT", "0") == "1":
+            _snap = os.path.join(ARM, "kb_snapshot_writes")
+            os.makedirs(_snap, exist_ok=True)
+            _w = lambda name: os.path.join(_snap, name)  # noqa: E731
+            print(f"[cs2] KB_SNAPSHOT=1: growth writes -> {_snap}", flush=True)
+        else:
+            _w = lambda name: os.path.join(BASE_KB, name)  # noqa: E731
+        _ext = attach_external_tools(kb, views, manifest, model=MODEL,
                               registry=registry, blocklist=None,
-                              backflow_path=os.path.join(
+                              backflow_path=_w("backflow_edges.jsonl"),
+                              replay_from=os.path.join(
                                   BASE_KB, "backflow_edges.jsonl"),
-                              tier_db=os.path.join(BASE_KB,
-                                                   "growth_library.db"),
-                              manifest_path=os.path.join(
-                                  BASE_KB, "manifest_all.json"),
-                              deep_cache_path=os.path.join(
-                                  BASE_KB, "deep_read_cache.jsonl"),
-                              deep_text_dir=os.path.join(
-                                  BASE_KB, "deep_read_texts"),
-                              deep_records_path=os.path.join(
-                                  BASE_KB, "deep_read_records.json"))
+                              tier_db=_w("growth_library.db"),
+                              manifest_path=_w("manifest_all.json"),
+                              deep_cache_path=_w("deep_read_cache.jsonl"),
+                              deep_text_dir=_w("deep_read_texts"),
+                              deep_records_path=_w("deep_read_records.json"))
     return kb, records, views, manifest
 
 

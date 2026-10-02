@@ -29,8 +29,10 @@ Design decisions:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import re as _re
 import sys
 
 _SRC = r"C:\Users\D0n9\Desktop\CompileScholar\src"
@@ -104,6 +106,41 @@ def _truncate_obs(rows: list[dict], cap: int = 6500) -> list[dict]:
             used += len(json.dumps(r, ensure_ascii=False))
         break
     return out
+
+
+def _record_mentions(r: dict) -> list[str]:
+    """一条记录 → mentions 候选清单（backflow 匹配 registry 用）。
+    两套字段契约并存：
+    - 粗抽契约（extract_paper）：method/from_method/to_method/subject/
+      scope_ref/target_ref —— 字符串
+    - 深读契约（L1/L2 finalize）：scope_ref_ref/method_ref/target_ref_ref
+      —— {surface, canonical, entity_id} 字典，取 surface
+    P0-1（FIX-PLAN v2 2026-09-30）：旧提取只认粗抽字段，66 篇深读
+    7,395 条记录几乎全部 miss（仅 subject 288 + target_ref 3,665 可命中
+    ——后者实际是深读字典字段但 str() 整个字典序列化后不可能精确命中
+    surface_index）。"会生长"机制自 09-26 起静默断裂即此。
+    2026-10-02 第三契约补齐：from_method_ref/to_method_ref（深读 lineage
+    记录的方法引用）——此前 lineage 264 条记录 mention 提取为空=连弱边
+    都没挂过（审计实锤），关系升级（backflow provenance=deep）也依赖
+    这两个字段进入 mentions。
+    """
+    ms = [str(r.get(f))[:60]
+          for f in ("method", "from_method", "to_method",
+                    "subject", "scope_ref", "target_ref")
+          if r.get(f)]
+    for f in ("scope_ref_ref", "method_ref", "target_ref_ref",
+              "from_method_ref", "to_method_ref"):
+        ref = r.get(f)
+        s = ((ref.get("surface") or ref.get("canonical"))
+             if isinstance(ref, dict) else ref)
+        if s:
+            ms.append(str(s)[:60])
+    out, seen = [], set()
+    for x in ms:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out[:8]
 
 
 class ExternalTools:
@@ -304,23 +341,127 @@ class ExternalTools:
 
     # ---- tool surfaces (harness contract: plain dicts) --------------------
 
+    def _expand_query_aliases(self, query: str) -> str:
+        """组件5(实体别名扩展检索,TaxoIndex 路线):查询里的实体缩写/
+        简称 → registry 全称并进查询(确定性零 LLM)。词法变体(POMDP
+        vs partially observable markov decision process)在语义检索
+        可桥接,但关键词回退通道吃不到——扩展让两条通道都命中。
+        防御(实测 registry 别名表污染:'dr'/'ope'/'pae-pomdp models'/
+        'approaches vanilla'):每实体只取最长全称(≥3 token 且全
+        >2字符);最多 2 个实体;全称的词全在查询里=跳过;无合格
+        命中=原样返回。"""
+        reg = getattr(self, "_registry", None)
+        if not reg or not query:
+            return query
+        si = reg.get("surface_index") or {}
+        byid = {e["entity_id"]: e for e in reg.get("entities") or []}
+        raw_toks = query.strip().split()
+        toks = _re.sub(r"\s+", " ", query.lower()).strip().split()
+        qset = set(toks)
+        acronyms = {t.lower() for t in raw_toks
+                    if t.isupper() and len(t) >= 2}
+        extra = []
+        for n in range(min(4, len(toks)), 0, -1):
+            for i in range(len(toks) - n + 1):
+                cand = " ".join(toks[i:i + n])
+                # 单 token 只对缩写作实体匹配(POMDP/VGG 类;小写普通词
+                # 'vision'/'agents' 单查=垃圾别名重灾区)
+                if n == 1 and cand not in acronyms:
+                    continue
+                eid = si.get(cand)
+                if not eid or eid not in byid:
+                    continue
+                # 该实体最长全称形式
+                best = None
+                for alias in byid[eid].get("aliases") or []:
+                    a = " ".join(str(alias).strip().lower().split())
+                    atoks = a.split()
+                    if (len(atoks) >= 3 and all(len(t) > 2 for t in atoks)
+                            and (best is None or len(a) > len(best))):
+                        best = a
+                if not best:
+                    continue
+                new_toks = [t for t in best.split() if t not in qset]
+                # 全称至少贡献2个新词——只添1个泛词('approaches')的
+                # 伪全称不是扩展
+                if len(new_toks) < 2:
+                    continue
+                add = " ".join(new_toks)
+                if add not in extra:
+                    extra.append(add)
+                if len(extra) >= 2:
+                    return query + " " + " ".join(extra[:2])
+        return query + " " + " ".join(extra) if extra else query
+
     def search_papers(self, query: str, k: int = 8) -> dict:
         """Blind external search through the shared tiered engine
         (Sciverse semantic leads, keyword fallbacks). Returns title+abstract
         rows usable as evidence. 外部论文不再是断头路：对想深读的论文先
-        admit_paper(title=...) 入库，再 deep_read。"""
+        admit_paper(title=...) 入库，再 deep_read。
+        批30a 实锤（99fd4c1b）：返回行没有可引用 id——agent 想引外部
+        论文时无从落笔，编造 'external:xxx' 假 id 被笔记门连拒 33 次。
+        现在每行带稳定 cite_id（ext:+md5(title)，同题同论文稳定），
+        且候选元数据登记进 EvidenceStore 可解析空间（适配器消费）。"""
         try:
             # agent mode (P14): the loop's query is already refined keyword
             # vocabulary — skip the A3 decomposition, semantic-first single
             # pass with keyword fallback
-            r = self._service().search(query, mode="agent", limit=k)
+            # 组件5:实体别名扩展(见 _expand_query_aliases)
+            q_exp = self._expand_query_aliases(query)
+            r = self._service().search(q_exp, mode="agent", limit=k)
             rows = [_cand_row(c) for c in r.candidates[:k]]
+            for row in rows:
+                t = row.get("title") or ""
+                if t:
+                    cid = "ext:" + hashlib.md5(
+                        _re.sub(r"[^a-z0-9 ]", " ", t.lower())
+                        .encode("utf-8")).hexdigest()[:12]
+                    row["cite_id"] = cid
+                    # 候选登记：适配器 EvidenceStore 的 by_paper 空间
+                    # （tier=title 摘要级引用可解析）。内存登记 + 落盘
+                    # 到 _manifest_path（快照模式=影子目录 manifest_all，
+                    # 适配器叠加读取；不落盘=独立进程的适配器解析不了
+                    # [ext:xxx] 回指）。
+                    m = (self._kb_manifest or {})
+                    if cid not in m:
+                        m[cid] = {"paper_id": cid, "title": t,
+                                  "doi": row.get("doi"),
+                                  "year": row.get("year"),
+                                  "abstract": (row.get("abstract") or "")[:2000],
+                                  "admitted_from": "search_candidate"}
+                        # 批30 修复（断点 B）：候选落盘无条件化——快照模式
+                        # 落影子 manifest_all（适配器已叠加读取）；非快照
+                        # 模式落题级 sidecar（ext_candidates.jsonl 追加，
+                        # 适配器按 run 目录叠加）。原"仅 KB_SNAPSHOT=1 落盘"
+                        # 使非快照运行的外部引用事后永远解析不了。
+                        # 引用策略修复（2026-10-01 held-out 暴露）：影子
+                        # manifest 是整写覆写文件——后续批重跑会冲掉先前批
+                        # 的候选（31a 候选被 31b 覆写 → 重适配 14 个 orphan）。
+                        # sidecar 追加是无损通道：两种模式都追加，影子
+                        # manifest 保留作运行时快照（adapt 叠加两者）。
+                        _mp = getattr(self, "_manifest_path", None)
+                        if _mp and os.environ.get("KB_SNAPSHOT") == "1":
+                            try:
+                                json.dump(list(m.values()),
+                                          open(_mp, "w", encoding="utf-8"),
+                                          ensure_ascii=False, indent=1)
+                            except Exception:
+                                pass
+                        _sp = getattr(self, "_ext_candidates_path", None)
+                        if _sp:
+                            try:
+                                with open(_sp, "a", encoding="utf-8") as f:
+                                    f.write(json.dumps(
+                                        m[cid], ensure_ascii=False) + "\n")
+                            except Exception:
+                                pass
             return {"tool": "search_papers", "n": len(rows), "papers": _truncate_obs(rows),
                     "latency_ms": {k2: v for k2, v in r.latency.items()},
                     "note": "external papers; to READ one in full: "
                             "admit_paper(title=...) then "
-                            "deep_read(paper_id=...) — or cite by [title] "
-                            "as abstract-level evidence"}
+                            "deep_read(paper_id=...). To CITE one in notes, "
+                            "use its cite_id from each row, e.g. "
+                            "[ext:0bb74cfc40eb] — abstract-level evidence"}
         except Exception as e:
             return {"tool": "search_papers", "n": 0,
                     "error": f"external search failed: {str(e)[:120]}"}
@@ -534,12 +675,15 @@ class ExternalTools:
             from kb_compiler.records.backflow import (build_backflow,
                                                       apply_backflow)
             m = (self._kb_manifest or {}).get(paper_id) or {}
+            # P0-1 连带修复：build_backflow 对命中记录取 r["id"]/quote
+            # （边证据 + node.records 裁剪）——旧 payload 只传 kind+mentions，
+            # 一旦匹配成功即 KeyError 被吞。运行时深回流实际 0 篇成功。
             payload = {"records": [
-                {"kind": r.get("kind"),
-                 "mentions": [str((r.get(f or "method") or ""))[:60]
-                              for f in ("method", "from_method", "to_method",
-                                        "subject", "scope_ref", "target_ref")
-                              if r.get(f)][:6]}
+                {"id": r.get("id"), "kind": r.get("kind"),
+                 "subject": r.get("subject"),
+                 "claim": r.get("claim"),
+                 "quote": r.get("quote"),
+                 "mentions": _record_mentions(r)}
                 for r in recs if isinstance(r, dict)]}
             bf = build_backflow(payload,
                                 {"title": m.get("title") or paper_id,
@@ -557,14 +701,84 @@ class ExternalTools:
                   flush=True)
         return None
 
+    def _bind_entity_refs(self, recs: list) -> int:
+        """组件1运行时侧：深读新记录的 *_ref surface → registry 绑定。
+        确定性词法匹配（registry.surface_index），零 LLM。幂等：已绑定的
+        ref 跳过。返回绑定数。
+        运行时实体注册（2026-10-02，审计修复：registry 自 09-26 一次性
+        构建后零更新——74 篇运行时深读的新实体从未进过 registry，"实体
+        治理层随使用生长"的宣称与实态矛盾）。策略=append-only：精确命中
+        →绑定；库外新 surface →注册为新实体（entity_type='runtime_grown'，
+        provenance 标记区分于构建期治理实体——合并/治理升级留给离线
+        registry_growth，运行时不做 LLM 合并防拖延）。注册进内存+随
+        deep_records 落盘路径写 registry_runtime_growth.jsonl（重放可
+        重建，幂等）。"""
+        reg = getattr(self, "_registry", None)
+        if not reg:
+            return 0
+        si = reg.setdefault("surface_index", {})
+        byid = {e["entity_id"]: e for e in reg.get("entities") or []}
+        n = 0
+        new_ents = []
+        for r in recs:
+            if not isinstance(r, dict):
+                continue
+            for f in ("method_ref", "from_method_ref", "to_method_ref",
+                      "scope_ref_ref", "target_ref_ref"):
+                ref = r.get(f)
+                if not isinstance(ref, dict) or ref.get("entity_id"):
+                    continue
+                surf = str(ref.get("surface") or "").strip().lower()
+                surf = " ".join(surf.split())
+                if not surf or len(surf) < 3:
+                    continue
+                eid = si.get(surf)
+                if eid and eid in byid:
+                    ref["canonical"] = byid[eid]["canonical"]
+                    ref["entity_id"] = eid
+                    n += 1
+                elif len(surf) >= 4 and not _re.match(r"^\[.*\]$", surf):
+                    # 库外新方法/实体 surface → append-only 注册
+                    _eid = hashlib.md5(surf.encode("utf-8")).hexdigest()[:12]
+                    if _eid not in byid:
+                        ent = {"entity_id": _eid, "canonical": surf,
+                               "aliases": [surf], "entity_type": "runtime_grown"}
+                        reg["entities"].append(ent)
+                        byid[_eid] = ent
+                        new_ents.append(ent)
+                    si.setdefault(surf, _eid)
+                    ref["canonical"] = surf
+                    ref["entity_id"] = _eid
+                    n += 1
+        if new_ents and getattr(self, "_registry_path", None):
+            try:
+                import json as _json
+                _rp = self._registry_path
+                with open(_rp, "a", encoding="utf-8") as f:
+                    for ent in new_ents:
+                        f.write(_json.dumps(ent, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+        return n
+
     def _persist_deep_records(self, paper_id: str, recs: list, replace: bool):
         """终化记录持久化（批10 第三断口修复）：deep_read/L2 的记录若只
         活在答题进程内存，report_adapter 的 EvidenceStore（独立进程）解析
         不了深记录回指→空壳报告。落 deep_read_records.json（合并非替换，
-        粗抽记录的回指仍有效）。"""
+        粗抽记录的回指仍有效）。
+        组件1(粗抽实体归一,2026-10-01)：落盘前把 *_ref 的 surface 绑定到
+        registry（entity_id null → 绑定；normalize_entities.py 的 pass A
+        语义）——运行时新长的记录不再是图谱外孤儿（PPR/共享实体桥射程）。"""
         p = getattr(self, "_deep_records_path", None)
         if not p or not recs:
             return
+        self._bind_entity_refs(recs)
+        # 组件4:新记录入账 → 共享实体索引(类级缓存)失效,下次查询重建
+        try:
+            from kb_compiler.views.tools import KBTools as _KBT
+            _KBT._ent_papers_cache = None
+        except Exception:
+            pass
         with ExternalTools._CACHE_LOCK:
             try:
                 cur = {}
@@ -1150,7 +1364,12 @@ class ExternalTools:
                 # FULLCHAIN-AUDIT B4：键名 record_id（与 findings 行/笔记
                 # 规范一致）——旧 "id" 键收割器不认，agent 忠实抄深读 id
                 # 被 note_gate 判 bad_backref（b14 实测 10 连拒）
+                # P1-7 chunk 自包含（Dense X 2312.06648/LongRAG 2410.18050）：
+                # 记录脱离原文后 section 语境丢失（"accuracy 74.7"不知道
+                # 是哪个 setup 的）——带 section 语境头。sample 总量
+                # 6×~150ch≈900ch 远低于 2.5k context cliff（2601.14123）
                 sample.append({"record_id": r.get("id"), "kind": r.get("kind"),
+                               "section": r.get("section"),
                                "content": body[:130]})
             obs = {"tool": "deep_read", "paper_id": paper_id,
                    "mode": f"L1/{mode}", "n_records": len(recs),
@@ -1179,6 +1398,7 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
                           model: str = "local:Qwen3.8-27B",
                           registry: dict = None, blocklist: list = None,
                           backflow_path: str = None,
+                          replay_from: str = None,
                           tier_db: str = None,
                           manifest_path: str = None,
                           deep_cache_path: str = None,
@@ -1203,11 +1423,28 @@ def attach_external_tools(kb, views: dict, kb_manifest: dict,
     ext._deep_cache_path = deep_cache_path
     ext._deep_text_dir = deep_text_dir
     ext._deep_records_path = deep_records_path
+    # 运行时实体注册的落盘位（2026-10-02）：与 deep_records 同目录，
+    # 重放可重建（registry_runtime_growth.jsonl append-only）
+    ext._registry_path = (
+        os.path.join(os.path.dirname(deep_records_path),
+                     "registry_runtime_growth.jsonl")
+        if deep_records_path else None)
+    # 批30 修复（断点 B）：非快照模式的候选落盘位（题级 sidecar，
+    # 附在 deep_records 同目录——run 目录下天然隔离）
+    ext._ext_candidates_path = (
+        os.path.join(os.path.dirname(deep_records_path),
+                     "ext_candidates.jsonl")
+        if deep_records_path else None)
     ext._records_target = kb.records   # deep_read 记录直落入账
-    if backflow_path:
+    ext._kb_ref = kb   # 组件4:深读落新记录后失效共享实体索引缓存
+    # KB_SNAPSHOT（FIX-PLAN v2 ②B）：重放读库内正本（快照模式下
+    # backflow_path 指向影子目录——空的）；写入走 backflow_path。
+    # replay_from 参数显式传入正本路径（cs2_runner 快照分支）。
+    _replay_path = replay_from or backflow_path
+    if _replay_path:
         try:
             from kb_compiler.records.backflow import load_backflow
-            n = load_backflow(views, backflow_path)
+            n = load_backflow(views, _replay_path)
             if n:
                 print(f"[backflow] replayed {n} external papers into "
                       f"genealogy", flush=True)

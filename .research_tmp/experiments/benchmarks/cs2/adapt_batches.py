@@ -22,8 +22,15 @@ def _load_records_with_deep():
     记录若不进 EvidenceStore，笔记里的深记录回指解析不了→空壳报告）。
     合并非替换：粗抽记录的回指仍然有效（deep payload 不含 coarse id）。"""
     records = json.load(open(BASE / "records_merged.json", encoding="utf-8"))
-    dp = BASE / "deep_read_records.json"
-    if dp.exists():
+    # KB_SNAPSHOT（FIX-PLAN v2 ②B）：答题在快照模式下跑时，本题深读
+    # 落在影子目录（arm_ours/kb_snapshot_writes）——适配器叠加影子层
+    # 保证笔记回指可解析（证据只服务本题，不进库）。缺省读库正本。
+    _cands = [BASE / "deep_read_records.json",
+              BASE.parent / "arm_ours" / "kb_snapshot_writes"
+              / "deep_read_records.json"]
+    for dp in _cands:
+        if not dp.exists():
+            continue
         deep = json.load(open(dp, encoding="utf-8"))
         for pid, payload in deep.items():
             if not (isinstance(payload, dict) and payload.get("records")):
@@ -42,6 +49,35 @@ def adapt_batch(b: int) -> str:
                                 normalize_notes, parse_notes)
     records = _load_records_with_deep()
     manifest = json.load(open(BASE / "manifest_all.json", encoding="utf-8"))
+    # 批30a 修复（99fd4c1b 编造 id）：search_papers 候选现带 ext:xxx
+    # cite_id 且答题进程把候选登记进运行时 manifest——快照模式下该
+    # manifest 落在影子目录（kb_snapshot_writes），适配器叠加之，
+    # [ext:xxx] 回指才可解析（tier=title 摘要级引用）。
+    _snap_man = (ARM_OURS / "kb_snapshot_writes" / "manifest_all.json")
+    if _snap_man.exists():
+        try:
+            snap = json.load(open(_snap_man, encoding="utf-8"))
+            have = {r.get("paper_id") for r in manifest}
+            manifest = manifest + [r for r in snap
+                                   if r.get("paper_id") not in have]
+        except Exception:
+            pass
+    # 批30 修复（断点 B 适配器侧）：非快照模式候选落 ext_candidates
+    # .jsonl（题级 sidecar，随 deep_records 目录）——叠加进 manifest。
+    _side = (BASE / "ext_candidates.jsonl")
+    if _side.exists():
+        try:
+            have = {r.get("paper_id") for r in manifest}
+            for line in open(_side, encoding="utf-8"):
+                line = line.strip()
+                if not line:
+                    continue
+                cand = json.loads(line)
+                if cand.get("paper_id") not in have:
+                    manifest = manifest + [cand]
+                    have.add(cand.get("paper_id"))
+        except Exception:
+            pass
     # FULLCHAIN-AUDIT C1：texts_dir 接线（批11 chunk 锚修复是死代码——
     # 三个调用方都没传）+ views_cs2 内嵌记录加载（33 个真实 id 断链源）
     store = EvidenceStore(records, manifest,
@@ -79,6 +115,16 @@ def adapt_batch(b: int) -> str:
         try:
             draft = narrative_compile(row["question"], claims, store)
             report, diag = assemble(draft, claims, store)
+            # 批30a 实锤（ab3651c4）：narrative_compile 是 temp=0.3 的随机
+            # 调用，偶发整稿零 [Ck] 标记 → citation 全零（重放 3 次全正常
+            # 5-6 条——坏抽签非输入问题）。有可用主张但装配出 0 引用时
+            # 重抽一次；再零则如实提交（真无引用）。
+            usable_n = sum(1 for c in claims if c.get("text") and c.get("refs"))
+            if usable_n >= 3 and diag.get("n_citations", 0) == 0:
+                print(f"[b{b}] {row['id'][:14]}: 0 citations with "
+                      f"{usable_n} usable claims — recompile once", flush=True)
+                draft = narrative_compile(row["question"], claims, store)
+                report, diag = assemble(draft, claims, store)
             out.append({"qid": row["id"], "question": row["question"],
                         "sections": report["sections"], "diag": diag})
         except Exception as e:
