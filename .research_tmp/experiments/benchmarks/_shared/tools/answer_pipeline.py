@@ -254,34 +254,42 @@ def _s2(path: str, params: dict, tries: int = 4, deadline: float | None = None):
 
 def cite_expand(seed_titles: list[str], k: int = 10, max_seeds: int = 8, budget_s: float = 90.0) -> list[dict]:
     """种子论文的参考文献，按被几篇种子共同引用排序（p8：同候选池召回约为语义检索 2 倍）。
-    budget_s：本次扩展的墙钟上限（S2 无 key 限流时宁可少扩，不卡住整题）；命中缓存不耗时。"""
+
+    10-03 改为多来源参考文献图（refgraph：arXiv HTML 主 + Crossref 兜底），不再依赖 S2——无 key 的 S2 / OpenAlex
+    按出口 IP 共享免费额度，实测并行即被封（S2 20/20 次 429；OpenAlex 当日额度耗尽）。共引排序逻辑不变；
+    参考文献条目只有题录，排序后前 k 条再用 arXiv 精确标题查摘要（查不到摘要的不收：证据必须有可引用原文）。
+    budget_s：本次扩展的墙钟上限；命中缓存不耗时。"""
+    import refgraph
     from collections import Counter
     freq, info = Counter(), {}
     deadline = time.time() + budget_s
     for t in seed_titles[:max_seeds]:
-        m = _s2("/paper/search/match", {"query": t[:300], "fields": "paperId,title"}, deadline=deadline)
-        pid = ((m.get("data") or [{}])[0] or {}).get("paperId")
-        if not pid:
-            continue
-        refs = _s2(f"/paper/{pid}/references", {"fields": "title,year,abstract,publicationDate", "limit": 200},
-                   deadline=deadline)
-        for row in refs.get("data") or []:
-            c = row.get("citedPaper") or {}
-            if not c.get("title") or not c.get("abstract"):
+        if time.time() > deadline:
+            break
+        refs, _src = refgraph.references(t)
+        seen = set()
+        for r in refs:
+            key = refgraph.norm(r["title"])
+            if len(key.split()) < 2 or key in seen:
                 continue
-            if not _cut_allowed(c.get("year"), c.get("publicationDate")):
+            seen.add(key)
+            if r.get("year") and not _cut_allowed(r["year"]):
                 continue
-            key = c["title"].lower().strip()
             freq[key] += 1
-            info[key] = c
+            info.setdefault(key, r)
     out = []
     for key, n in freq.most_common():
-        if n < 2 or len(out) >= k:
+        if n < 2 or len(out) >= k or time.time() > deadline:
             break
-        c = info[key]
-        out.append({"src": "cite", "paper_key": "ext:" + hashlib.md5(key.encode()).hexdigest()[:12],
-                    "title": c["title"], "year": c.get("year"), "snippet": c["abstract"][:1200],
-                    "co_cited_by": n})
+        a = refgraph.resolve_abstract(info[key]["title"])
+        if not a:
+            continue
+        date = f"{a['year']}-{a['month']:02d}" if a.get("year") and a.get("month") else None
+        if not _cut_allowed(a.get("year"), date):
+            continue
+        out.append({"src": "cite", "paper_key": "ext:" + hashlib.md5(a["title"].lower().encode()).hexdigest()[:12],
+                    "title": a["title"], "year": a.get("year"), "arxiv": a.get("arxiv"),
+                    "snippet": a["abstract"][:1200], "co_cited_by": n})
     return out
 
 

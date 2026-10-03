@@ -30,6 +30,8 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--no-kb", action="store_true")
+    # 10-03 用户裁定：拿不到 S2 key → 只用 Sciverse；Sciverse 无引用图接口（实测），引文扩展默认关闭
+    ap.add_argument("--cite", action="store_true", help="开启 S2 引文扩展（需 S2 配额；默认关）")
     a = ap.parse_args()
     rows = json.load(open(os.path.join(P6, "oracle_inputs.json"), encoding="utf-8"))
     if a.limit:
@@ -48,7 +50,7 @@ def main():
         # 每题截止=目标论文发表年月；线程局部（cutoff.set_thread_cutoff），并发题互不干扰。
         # 注意 answer_pipeline 内部的检索线程池是新线程，需要在其中重设——由 AP.answer(cutoff=...) 传入。
         # DSB 任务给定目标论文摘要（官方 query 模板即含摘要）——作为任务材料证据（本文自述，不算外部引用）
-        res = AP.answer(r["query"], kb, use_ext=True, use_cite=True, cutoff=cut,
+        res = AP.answer(r["query"], kb, use_ext=True, use_cite=a.cite, cutoff=cut,
                         task_context={"title": r.get("title"), "text": r.get("abstract") or ""})
         tnorm = re.sub(r"\W+", " ", (r.get("title") or "").lower()).strip()
         body = []
