@@ -92,39 +92,47 @@ LightRAG 0.567 / 0.508, PaperQA2 0.495 / 0.475 (pre-registered / strict).
 ### 6.5 Field-layer evaluation
 
 20 held-out surveys (4 each from cs.AI/CL/CV/IR/LG), gold = the surveys' own taxonomy nodes, node properties and stated
-limitations/gaps extracted verbatim. Each survey is removed from the knowledge base; only its cited papers are given
-(title + abstract; 18/20 surveys had a resolvable reference list; cited papers with an abstract, median 88 per survey). All systems use the same 27B and
+limitations/gaps extracted verbatim. Systems see only each survey's cited papers, never the knowledge base (the 20 surveys
+are in the answer KB, so any future variant that compiles over the KB must exclude them and their records). Inputs are
+title + abstract ( 18/20 surveys had a resolvable reference list; cited papers with an abstract, median 88 per survey). All systems use the same 27B and
 the same inputs; a different model (DeepSeek-V4.1-Flash) judges whether each gold statement is expressed by some system
 statement. Systems: **state** (compiled field state: per-paper records → family induction → family-level facts with
-verbatim support), **state_v2** (same records, families + cross-paper aggregated open problems), **direct** (one call:
-all papers → write the taxonomy, family properties and open problems), **flat** (per-paper extraction only, no
-cross-paper organization), **memory** (survey title only; measures what the 27B already knows). Gold items were tagged
-self-contained or not by the judge model before any system output was inspected ("clean": 316/460 limitations, 380/528
-properties). Recall@K takes each system's first K items, K = number of gold items.
+verbatim support → cross-paper aggregated open problems), **direct** (one call: all papers → write the taxonomy, family
+properties and open problems), **flat** (per-paper extraction only, no cross-paper organization), **memory** (survey
+title only; measures what the 27B already knows). Gold items were tagged self-contained or not by the judge model before
+any system output was inspected ("clean": 316/460 limitations, 380/528 properties). Recall@K takes each system's first K
+items, K = number of gold items.
 
-| System | Families recall / @K | Properties recall (clean) | Limitations recall (clean) | Items (fam / prop / lim) |
+**Run-to-run variance (must be read before the table).** The compiler was run twice per survey (run 1 / run 2: same
+per-paper records, re-induced families and facts; on 4 surveys run 1 predates the open-problem stage, so run 1 has no
+open problems there). The two runs differ by +0.088 [+0.027, +0.157] on family recall and −0.080 [−0.240, +0.071] on
+limitations — as large as the effects below. We therefore report the mean of the two runs as "state" and never pick the
+better run per column. [TBD: a third run; seeds/temperature logged.]
+
+| System | Families recall | Properties recall (clean) | Limitations recall (clean) | Items (fam / prop / lim) |
 |---|---|---|---|---|
-| state | **0.630** / **0.621** | **0.109** | 0.273 | 10 / 69 / 63 |
-| state_v2 | 0.542 / 0.538 | 0.089 | **0.353** | 10 / 70 / 66 |
-| direct | 0.465 / 0.429 | 0.064 | 0.263 | 8 / 32 / 31 |
-| flat | 0.596 / 0.163 | 0.033 | 0.346 | 188 / 471 / 70 |
-| memory | 0.317 / 0.262 | 0.050 | 0.153 | 5 / 20 / 25 |
+| state (mean of 2 runs) | 0.586 (run 1 .630 / run 2 .542) | 0.099 (.109 / .089) | 0.313 (.273 / .353) | 10 / 70 / 65 |
+| direct | 0.465 | 0.064 | 0.263 | 8 / 32 / 31 |
+| flat | 0.596 | 0.033 | 0.346 | 188 / 471 / 70 |
+| memory | 0.317 | 0.050 | 0.153 | 5 / 20 / 25 |
 
-Paired bootstrap over surveys (n = 18; properties n = 17):
-- Families: state − direct +0.165 [+0.050, +0.290]; state − memory +0.313 [+0.141, +0.468]; state − flat +0.034 n.s. on
-  recall, but flat needs 19× more items; at matched size (recall@K) state − flat +0.458 [+0.319, +0.592].
-- Family properties: state − direct +0.045 [+0.015, +0.084]; state − flat +0.077 [+0.029, +0.132]; state − memory
-  +0.060 [−0.007, +0.125].
-- Limitations: state_v2 − direct +0.090 [+0.007, +0.175]; state_v2 − memory +0.200 [+0.063, +0.349]; state_v2 − flat
-  +0.007 n.s.
+Paired bootstrap over surveys (state = 2-run mean; n = 18, properties n = 17):
+- Families: state − direct +0.121 [+0.007, +0.239]; state − memory +0.268 [+0.110, +0.414]; state − flat −0.011 n.s.
+  (flat lists 19× more items).
+- Family properties: state − direct +0.035 [+0.007, +0.073]; state − flat +0.067 [+0.018, +0.123]; state − memory +0.050
+  [−0.012, +0.110] n.s.
+- Limitations: state − direct +0.050 n.s.; state − flat −0.034 n.s.; state − memory +0.160 [+0.046, +0.271].
 
-Reading. Cross-paper compilation recovers the surveys' own families and family-level properties better than writing the
-skeleton in one call from the same papers, and the gain is not recall of memorized surveys (memory is lowest on every
-part). For limitations, the compiled open-problem list ties the unorganized per-paper limitations at similar size: the
-organization layer does not add limitations that individual papers do not already state. Absolute property recall is low
-(≈0.1) for every system: survey authors' family-level statements often go beyond what the cited abstracts say. Two
-caveats: flat's recall@K depends on record order (no ranking), and the judge is an LLM; [TBD: human spot-check of 50
-matched / 50 unmatched judgments].
+Reading. Compiling across papers recovers the surveys' families and family-level properties somewhat better than writing
+the skeleton in one call from the same papers; the margins are small and the property gain over memory-only is not
+significant. For limitations, organization adds nothing over the unorganized per-paper limitations. Absolute property
+recall is ≈0.1 for every system.
+
+Known protocol issues to fix before this section is final: (i) the judge sees only the first 250 candidates, which
+truncates flat on 14/18 surveys for properties (3/18 for families) and biases flat downward; (ii) direct's input
+truncates abstracts to 600 characters while the compiler reads the full abstract; (iii) recall@K is not reported because
+flat's items have no ranking; (iv) single LLM judge; [TBD: human spot-check of 50 matched / 50 unmatched judgments, second
+judge].
 
 ## 7 Analysis
 
