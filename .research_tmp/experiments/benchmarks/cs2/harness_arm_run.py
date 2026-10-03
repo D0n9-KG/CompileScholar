@@ -153,7 +153,9 @@ def main():
     def one(q):
         qid = q["case_id"][:24]
         t0 = time.time()
-        r = run_q(q["question"])
+        # 10-03：多臂并行时 Sciverse 共享配额排队，harness 每次检索都可能等配额 → 1800s 墙钟会把"排队"误判成失败
+        # （test 首轮 17 题 5 题超时）；默认放宽到 3600s（HARNESS_TIMEOUT_S 可改），不改 max-turns。
+        r = run_q(q["question"], timeout_s=int(os.environ.get("HARNESS_TIMEOUT_S", "3600")))
         r["qid"] = qid
         r["question"] = q["question"]
         r["elapsed_s"] = round(time.time() - t0, 1)
