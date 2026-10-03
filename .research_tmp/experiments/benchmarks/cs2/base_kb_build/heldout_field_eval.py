@@ -63,6 +63,31 @@ def run_direct(papers):
     return {"families": fams}
 
 
+MEMORY = """Write the field state of the research area covered by a survey titled "{title}" ({year}), as that survey's
+taxonomy would: the method families (each with a short name and a one-sentence definition), and for each family its
+properties (how the methods work, what distinguishes them, strengths, conditions where they apply) and its limitations
+(weaknesses, failure conditions, open problems). Also list open problems of the area as a whole. One sentence per fact.
+
+Return JSON only: {{"families": [{{"name": "...", "definition": "...", "properties": ["..."], "limitations": ["..."]}}],
+"open_problems": ["..."]}}"""
+
+
+def run_memory(g):
+    """记忆对照：不给任何论文，只给综述标题——测 27B 参数记忆能恢复多少（留出综述 2020-2024，模型多半见过）。
+    direct 与 memory 接近 = 该检验在这批综述上主要测记忆，而非从论文编译的能力。"""
+    obj = FS._chat(MEMORY.format(title=g["title"], year=g.get("year")), max_tokens=8000) or {}
+    fams = []
+    for f in obj.get("families") or []:
+        if isinstance(f, dict) and f.get("name"):
+            fams.append({"name": str(f["name"]), "definition": str(f.get("definition") or ""),
+                         "properties": [{"text": str(x)} for x in f.get("properties") or [] if str(x).strip()],
+                         "limitations": [{"text": str(x)} for x in f.get("limitations") or [] if str(x).strip()]})
+    op = [{"text": str(x)} for x in obj.get("open_problems") or [] if str(x).strip()]
+    if op:
+        fams.append({"name": "Open problems of the area", "definition": "", "properties": [], "limitations": op})
+    return {"families": fams}
+
+
 def run_flat(records):
     fams = {}
     for k, recs in records.items():
@@ -80,8 +105,16 @@ def run_flat(records):
 # ---------------------------------------------------------------- judge
 MATCH = """Gold statements were written by the expert authors of a survey. Candidate statements were produced by a system
 that read only the papers the survey cites. For each gold statement, list the ids of candidates that express the same
-point — the same {what}. A candidate that is more specific but clearly makes the gold point counts; a candidate that is
-merely on the same topic, or makes a different point about it, does not.
+point — the same {what}.
+
+A candidate matches only if a reader of the candidate alone would learn the gold point: it must be about the same
+method or object AND state the same property, weakness or problem. Examples of NON-matches:
+- gold "k-means is sensitive to initialization" vs candidate "k-means is slow on large datasets" (same method,
+  different weakness);
+- gold "beam search produces repetitive outputs" vs candidate "random forests overfit noisy labels" (both are
+  limitations, different objects);
+- any generic statement ("robustness remains an open challenge") for a specific gold point.
+Most gold statements will have no matching candidate; return an empty list for them.
 
 Gold:
 {gold}
@@ -118,6 +151,8 @@ def score(gold: dict, sys_state: dict) -> dict:
     cand_f = [f"{f['name']} — {f.get('definition', '')}" for f in fams]
     cand_p = [p["text"] for f in sys_state["families"] for p in f.get("properties") or []]
     cand_l = [l["text"] for f in sys_state["families"] for l in f.get("limitations") or []]
+    # 领域级开放问题（field_state v2）：按跨论文支持数排序在前，与族级局限一起作为"局限"候选
+    cand_l = [p["text"] for p in sys_state.get("problems") or []] + cand_l
     g_f = gold["families"]
     g_p = [p["text"] for p in gold["properties"]]
     g_l = [l["text"] for l in gold["limitations"]]
@@ -140,7 +175,7 @@ def score(gold: dict, sys_state: dict) -> dict:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--surveys", type=int, default=0)
-    ap.add_argument("--systems", default="state,direct,flat")
+    ap.add_argument("--systems", default="state,state_v2,direct,flat,memory")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     gold = json.load(open(os.path.join(V2, "survey_gold.json"), encoding="utf-8"))
@@ -165,6 +200,13 @@ def main():
             st = FS.compile_field_state(papers)
             json.dump(st, open(sp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         outs = {"state": st}
+        if "state_v2" in systems:
+            # 同一批逐篇记录（与 state/flat 完全相同的抽取结果），只换组织层——隔离"组织"本身的效果
+            p2 = os.path.join(OUT, f"{pid}.state_v2.json")
+            if not os.path.exists(p2):
+                json.dump(FS.compile_field_state(papers, records=st["records"]), open(p2, "w", encoding="utf-8"),
+                          ensure_ascii=False, indent=1)
+            outs["state_v2"] = json.load(open(p2, encoding="utf-8"))
         if "direct" in systems:
             dp = os.path.join(OUT, f"{pid}.direct.json")
             if not os.path.exists(dp):
@@ -172,6 +214,11 @@ def main():
             outs["direct"] = json.load(open(dp, encoding="utf-8"))
         if "flat" in systems:
             outs["flat"] = run_flat(st["records"])
+        if "memory" in systems:
+            mp = os.path.join(OUT, f"{pid}.memory.json")
+            if not os.path.exists(mp):
+                json.dump(run_memory(g), open(mp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+            outs["memory"] = json.load(open(mp, encoding="utf-8"))
         scp = os.path.join(OUT, f"{pid}.scores.json")
         prev = json.load(open(scp, encoding="utf-8")) if os.path.exists(scp) else {}
         with cf.ThreadPoolExecutor(3) as ex:

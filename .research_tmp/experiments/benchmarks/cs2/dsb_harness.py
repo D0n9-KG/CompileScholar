@@ -1,153 +1,117 @@
 # -*- coding: utf-8 -*-
-"""DeepScholar-Bench harness 臂（Claude Code+27B+检索 MCP）——DSB 三臂对照
-的通用 agent 臂。
+"""DeepScholar-Bench harness 臂（Claude Code+27B+检索 MCP），与新管线 run_vnext_dsb.py 同题同截止同判分。
 
-任务形态：给定论文 abstract → 生成 Related Works 综述段（含引用）。
-与 CS2 harness 臂同配置（Claude Code CLI+27B+开放检索 MCP），仅题目源
-和 prompt 换成 DSB 的 Related Works 任务。
-
-产物落 DSB 官方 parser 期望的形态（每题目录 search_ai 风格?——harness
-没有官方 parser，产物直接是 markdown 文章 → 落 storm 同款
-storm_gen_article.md 文件名，复用 StormParser 的通用 markdown+引用解析）。
-
-用法：python dsb_harness.py --limit 5 / python dsb_harness.py
+10-03 重写（旧版问题见 review-1002-full-audit #21：≥11/63 题自述"WebSearch 不可用"后闭卷作答；
+无每题截止；用户级 settings 注入；GPUStack 响应不合规 1 轮即失败）：
+- 题集 = p6/oracle_inputs.json 的 48 个唯一题（与 run_vnext_dsb / judge_nuggets 同口径），题面 = 官方 query 模板
+  （含目标论文摘要与"只引用 <发表日> 之前的 arXiv 文献"）。
+- 每题知识截止 = 目标论文发表年月：为每题写一份 MCP 配置（KNOWLEDGE_CUTOFF 注入 MCP 进程环境，服务端强制）。
+- 与 CS2 harness 同隔离：--setting-sources project --strict-mcp-config、中性 cwd、经 cc_compat_proxy（127.0.0.1:8765）。
+- 产物：p6/gen/<SYS>/<gt_dir>.md（正文，judge_nuggets.py 直接判）+ arm_harness_dsb/<SYS>.json（信封/轮数/耗时）。
+  API 层失败（is_error / "API Error"）不算完成，续跑会重做；最终仍失败的题在判分时按空文本计 0。
+用法：python dsb_harness.py --sys harness_v2 [--limit N] [--fanout 2]
 """
 import argparse
-import csv
 import json
 import os
+import re
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
-CS2 = Path(_HERE)
-DSB = CS2.parent / "deepscholar" / "dsb"
+CS2 = Path(__file__).resolve().parent
+P6 = CS2.parents[2] / "review_1002" / "p6"
 ARM = CS2 / "arm_harness_dsb"
-CLAUDE_EXE = (Path(os.environ.get("APPDATA", "")) / "npm" /
-              "node_modules" / "@anthropic-ai" / "claude-code" / "bin" /
-              "claude.exe")
-MCP_CONFIG = CS2.parent / "_shared" / "mcp" / "mcp_config_open.json"
-
-PROMPT_TMPL = """Write a Related Works section for an academic paper, given the paper's abstract below. Cite the most relevant prior literature with inline citations. Use markdown format with sections where appropriate.
-
-{abstract}
-
-Requirements:
-- Cover the main research threads the paper builds on (cite specific prior work)
-- Inline citations in the form [Author et al., Year] or [1] with a references list at the end
-- Survey-style prose, well organized into thematic subsections"""
+MCP_BASE = CS2.parent / "_shared" / "mcp" / "mcp_config_open.json"
+CLAUDE_EXE = (Path(os.environ.get("APPDATA", "")) / "npm" / "node_modules" / "@anthropic-ai" / "claude-code" /
+              "bin" / "claude.exe")
+sys.path.insert(0, str(CS2))
+from harness_arm_run import _ensure_proxy, _local_key  # noqa: E402
 
 
-def _local_key():
-    for line in open(CS2.parents[3] / ".env", encoding="utf-8"):
-        m = __import__("re").match(r"^LOCAL_API_KEY\s*=\s*(.+)$", line.strip())
-        if m:
-            return m.group(1).strip()
-    return ""
+def _mcp_config(cut: str) -> Path:
+    cfg = json.load(open(MCP_BASE, encoding="utf-8"))
+    for s in cfg["mcpServers"].values():
+        s.setdefault("env", {})["KNOWLEDGE_CUTOFF"] = cut
+    p = ARM / "mcp_cfg" / f"mcp_{cut}.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    json.dump(cfg, open(p, "w", encoding="utf-8"), indent=1)
+    return p
 
 
-def run_q(abstract: str, timeout_s: int = 1800) -> dict:
+def run_q(prompt: str, cut: str, timeout_s: int = 1800) -> dict:
+    _ensure_proxy()
     env = {**os.environ.copy(),
-           "ANTHROPIC_BASE_URL": "http://192.168.199.73",
+           "ANTHROPIC_BASE_URL": os.environ.get("HARNESS_ANTHROPIC_BASE_URL", "http://127.0.0.1:8765"),
+           "NO_PROXY": "127.0.0.1,localhost,192.168.199.73",
            "ANTHROPIC_AUTH_TOKEN": _local_key(),
            "ANTHROPIC_MODEL": "Qwen3.8-27B"}
-    cmd = [str(CLAUDE_EXE), "-p",
-           PROMPT_TMPL.format(abstract=abstract),
-           "--model", "Qwen3.8-27B",
-           "--output-format", "json",
-           "--max-turns", "40",
-           "--mcp-config", str(MCP_CONFIG),
-           "--allowedTools",
-           "mcp__retrieval__search_papers,mcp__retrieval__fetch_chunk"]
+    cmd = [str(CLAUDE_EXE), "-p", prompt, "--model", "Qwen3.8-27B", "--output-format", "json",
+           "--max-turns", "40", "--mcp-config", str(_mcp_config(cut)),
+           "--setting-sources", "project", "--strict-mcp-config",
+           "--allowedTools", "mcp__retrieval__search_papers,mcp__retrieval__fetch_chunk"]
+    cwd = Path(os.environ.get("HARNESS_CWD", r"C:\cs2_harness_cwd"))
+    cwd.mkdir(exist_ok=True)
     try:
-        p = subprocess.run(cmd, env=env, capture_output=True, text=True,
-                           encoding="utf-8", errors="replace",
-                           timeout=timeout_s, cwd=str(ARM))
-        out = p.stdout or ""
+        p = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=timeout_s, cwd=str(cwd))
         try:
-            envelope = json.loads(out.strip().splitlines()[-1])
-            return {"ok": True, "result": envelope.get("result", ""),
-                    "num_turns": envelope.get("num_turns"),
+            envelope = json.loads((p.stdout or "").strip().splitlines()[-1])
+            return {"ok": True, "result": envelope.get("result", ""), "num_turns": envelope.get("num_turns"),
                     "is_error": envelope.get("is_error")}
         except Exception:
-            return {"ok": False, "err": "envelope parse", "raw": out[:500]}
+            return {"ok": False, "err": "envelope parse", "raw": (p.stdout or "")[:500]}
     except subprocess.TimeoutExpired:
         return {"ok": False, "err": "timeout"}
     except Exception as e:
         return {"ok": False, "err": str(e)[:150]}
 
 
+def _good(r):
+    return r.get("ok") and not r.get("is_error") and not str(r.get("result", "")).startswith("API Error")
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser()
-    ap.add_argument("--limit", type=int, default=5)
-    args = ap.parse_args()
-
+    ap.add_argument("--sys", default="harness_v2")
+    ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--fanout", type=int, default=2)
+    a = ap.parse_args()
+    rows = json.load(open(P6 / "oracle_inputs.json", encoding="utf-8"))
+    if a.limit:
+        rows = rows[:a.limit]
+    gen = P6 / "gen" / a.sys
+    gen.mkdir(parents=True, exist_ok=True)
     ARM.mkdir(exist_ok=True)
-    rows = list(csv.DictReader(open(
-        DSB / "dataset" / "papers_with_related_works.csv", encoding="utf-8")))
-    rows = rows[:args.limit]
-
-    # gt 映射（arxiv qid → 数字 index——与 StormParser 的 file_id 对齐）
-    gt_map = {}
-    for idx in os.listdir(DSB / "dataset" / "gt_nuggets_outputs"):
-        p = DSB / "dataset" / "gt_nuggets_outputs" / idx / "res.json"
-        if p.exists():
-            gt_map[json.load(open(p, encoding="utf-8")).get("qid", "")] = idx
-
-    done_path = ARM / "answers_harness_dsb.json"
-    done = {}
-    if done_path.exists():
-        done = {r["qid"]: r for r in
-                json.load(open(done_path, encoding="utf-8"))}
-    todo = [r for r in rows if r["arxiv_id"] not in done]
-    print(f"[harness-dsb] {len(done)} done, {len(todo)} todo", flush=True)
-
-    fanout = int(os.environ.get("HARNESS_DSB_FANOUT", "1"))
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    done_p = ARM / f"{a.sys}.json"
+    done = {r["gt_dir"]: r for r in json.load(open(done_p, encoding="utf-8"))} if done_p.exists() else {}
+    todo = [r for r in rows if not _good(done.get(r["gt_dir"], {}))]
+    print(f"[harness-dsb] {len(rows) - len(todo)} done, {len(todo)} todo, fanout={a.fanout}", flush=True)
 
     def one(r):
-        qid = r["arxiv_id"]
+        cut = (r.get("published_date") or "")[:7]
         t0 = time.time()
-        res = run_q(r["abstract"])
-        res["qid"] = qid
-        res["title"] = r["title"]
-        res["elapsed_s"] = round(time.time() - t0, 1)
-        # 产物落 StormParser 形态（index 目录 + storm_gen_article.md）
-        idx = gt_map.get(qid)
-        if idx and res.get("ok"):
-            out_dir = ARM / "indexed" / idx
-            out_dir.mkdir(parents=True, exist_ok=True)
-            # 产物清洗：Claude Code 常在正文前加说明行（"下面是..."）——
-            # 剥到第一个 markdown 标题；引用格式混合式（[Author, Year]）保留
-            # （StormParser 的 citation 正则认 [text](url)，无 url 的标记
-            # 按 nugget/organization 判分仍进正文——不丢内容）
-            text = res.get("result", "")
-            import re as _re
-            m = _re.search(r"^#{1,3} ", text, _re.M)
+        res = run_q(r["query"], cut)
+        res.update({"gt_dir": r["gt_dir"], "qid": r["qid"], "cutoff": cut, "elapsed_s": round(time.time() - t0, 1)})
+        if _good(res):
+            text = res.get("result") or ""
+            m = re.search(r"^#{1,3} ", text, re.M)  # 剥掉正文前的说明行（"Here is ..."）
             if m and m.start() > 0:
                 text = text[m.start():]
-            with open(out_dir / "storm_gen_article.md", "w",
-                      encoding="utf-8") as f:
-                f.write(text)
+            open(gen / f"{r['gt_dir']}.md", "w", encoding="utf-8").write(text)
         return res
 
-    lock = __import__("threading").Lock()
-    with ThreadPoolExecutor(max_workers=fanout) as ex:
-        futs = [ex.submit(one, r) for r in todo]
-        for fut in as_completed(futs):
-            r = fut.result()
-            with lock:
-                done[r["qid"]] = r
-                json.dump(list(done.values()),
-                          open(done_path, "w", encoding="utf-8"),
-                          ensure_ascii=False, indent=1)
-            print(f"[harness-dsb] {r['qid'][:12]} ok={r.get('ok')} "
-                  f"{len(r.get('result') or '')}ch {r.get('elapsed_s')}s "
-                  f"{r.get('err', '')[:60]}", flush=True)
-    print(f"[harness-dsb] answers saved: {done_path}", flush=True)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    with ThreadPoolExecutor(a.fanout) as ex:
+        for f in as_completed([ex.submit(one, r) for r in todo]):
+            r = f.result()
+            done[r["gt_dir"]] = r
+            json.dump(list(done.values()), open(done_p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+            print(f"[harness-dsb] gt={r['gt_dir']} good={_good(r)} turns={r.get('num_turns')} "
+                  f"{len(r.get('result') or '')}ch {r['elapsed_s']}s {r.get('err', '')}", flush=True)
+    print(f"[harness-dsb] good {sum(1 for r in done.values() if _good(r))}/{len(rows)}", flush=True)
 
 
 if __name__ == "__main__":
