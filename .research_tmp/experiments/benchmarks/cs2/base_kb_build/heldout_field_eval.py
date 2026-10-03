@@ -231,6 +231,26 @@ def main():
                           f"L {prev[s]['limitations']['recall'] or 0:.2f}@{prev[s]['limitations']['n_cand']}"
                           for s in systems)
         print(f"{pid} papers={len(papers)} state={st['stats']} || {line}", flush=True)
+    summarize(rows, systems, gold)
+
+
+def summarize(rows, systems, gold):
+    """宏平均。另报 clean 金标口径（clean_survey_gold.py 在看结果前标注；复用已有匹配，不重判）。"""
+    for s in systems:
+        agg = {}
+        for part in ("properties", "limitations"):
+            v = []
+            for pid, r in rows.items():
+                if not r.get(s):
+                    continue
+                items = gold[pid][part]
+                idx = [i for i, x in enumerate(items) if x.get("clean")]
+                if not idx:
+                    continue
+                m = r[s][part]["matches"]
+                v.append(sum(1 for i in idx if m.get(f"G{i + 1}")) / len(idx))
+            agg[f"{part}.recall_clean"] = round(sum(v) / len(v), 3) if v else None
+        print(s, "clean", json.dumps(agg))
     # 汇总（宏平均，跳过金标为空的项）
     for s in systems:
         agg = {}

@@ -36,6 +36,10 @@ def main():
     ap.add_argument("--no-screen", action="store_true")
     ap.add_argument("--no-state", action="store_true")
     ap.add_argument("--no-probe", action="store_true")
+    # 10-03 用户裁定（方案 A）：CS2 默认整篇 ~1,000 词。依据：同 15 题长度对照，限 1,000 词 0.842 vs 无上限 0.812
+    # （+0.031 [+0.006,+0.050]；官方 simplified_eval 无长度项但 AP 逐段计离题），且与 harness（843 词）长度对齐后
+    # 优势仍 +0.099 [+0.049,+0.149]、全部来自 CR/CP。无上限（--word-budget 0）作为消融报告。
+    ap.add_argument("--word-budget", type=int, default=1000, help="整篇总词数上限（默认 1000；0=无上限，消融用）")
     ap.add_argument("--workers", type=int, default=3)
     a = ap.parse_args()
     qs = json.load(open(os.path.join(HERE, "..", "scholarqa_multi", RUB[a.split]), encoding="utf-8"))
@@ -46,7 +50,7 @@ def main():
     done = {r["qid"]: r for r in json.load(open(ans_p, encoding="utf-8"))} if os.path.exists(ans_p) else {}
     kb = None if a.no_kb else AP.KB(os.path.join(HERE, "base_kb_v2"))
     cfg = {"split": a.split, "offset": a.offset, "limit": a.limit, "kb": not a.no_kb, "ext": not a.no_ext,
-           "cite": not a.no_cite, "screen": not a.no_screen, "state": not a.no_state, "probe": not a.no_probe, "model": AP.MODEL, "cutoff": os.environ.get("KNOWLEDGE_CUTOFF")}
+           "cite": not a.no_cite, "screen": not a.no_screen, "state": not a.no_state, "probe": not a.no_probe, "word_budget": a.word_budget or None, "model": AP.MODEL, "cutoff": os.environ.get("KNOWLEDGE_CUTOFF")}
     json.dump(cfg, open(os.path.join(out_dir, f"config_{a.tag}.json"), "w"), indent=1)
     print("[vnext]", cfg, f"todo {sum(1 for q in qs if q['case_id'][:24] not in done)}", flush=True)
 
@@ -55,7 +59,7 @@ def main():
         t = time.time()
         try:
             r = AP.answer(q["question"], kb, use_ext=not a.no_ext, use_cite=not a.no_cite, use_screen=not a.no_screen, use_state=not a.no_state,
-                          use_probe=not a.no_probe)
+                          use_probe=not a.no_probe, word_budget=a.word_budget or None)
             r.update({"qid": qid, "question": q["question"]})
         except Exception as e:
             r = {"qid": qid, "question": q["question"], "sections": [], "error": f"{type(e).__name__}: {str(e)[:300]}"}

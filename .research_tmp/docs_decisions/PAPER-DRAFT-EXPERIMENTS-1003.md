@@ -32,6 +32,19 @@ Multi-108: citation F1 (pre-registered) and a strict variant (§6.4).
 | STORM + 27B | — | [TBD] | — |
 | LightRAG / PaperQA2 (closed corpus) | — | — | 0.515 / 0.461 ; 0.449 / 0.431 |
 
+### 6.2b Answer length (dev, 15 questions; reported because the official CS2 configuration has no length term)
+
+| Arm | words (median) | G | IR | AP | CR | CP |
+|---|---|---|---|---|---|---|
+| Ours, ~1,000-word budget (default) | 1,024 | 0.842 | .744 | .883 | .822 | .921 |
+| Ours, no length limit | 2,832 | 0.812 | .802 | .715 | .795 | .936 |
+| Claude Code + 27B harness | 843 | 0.743 | .764 | .979 | .419 | .810 |
+
+Removing the budget raises ingredient recall (−0.059 with the budget, CI [−0.105, −0.010]) but lowers answer precision more
+(+0.169 with the budget, [+0.120, +0.208]); net +0.031 [+0.006, +0.050] for the budgeted arm. At matched length the gap to the
+harness is +0.099 [+0.049, +0.149] and comes entirely from citation recall (+0.40) and precision (+0.11); ingredient recall
+ties (−0.02, n.s.). We use the ~1,000-word budget for all CS2 runs.
+
 ### 6.3 Ablations [TBD]
 
 | Arm | CS2 dev Δ | DSB Δ |
