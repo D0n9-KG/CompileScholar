@@ -1,0 +1,267 @@
+{
+ "families": [
+  {
+   "name": "Graph Neural Network (GNN) Architectures",
+   "definition": "Methods that utilize graph neural networks, such as GCNs and GATs, to learn user and item embeddings by modeling the graph structure of user-item interactions and social relations.",
+   "properties": [
+    {
+     "text": "GNNs integrate node information and topological structure to learn latent factors for users and items."
+    },
+    {
+     "text": "Graph Convolutional Networks (GCNs) model information diffusion processes in graphs to refine user embedding learning."
+    },
+    {
+     "text": "Graph Attention Networks (GATs) use masked self-attentional layers to assign different weights to neighbors without costly matrix operations."
+    },
+    {
+     "text": "Simplified GCNs like LightGCN and UltraGCN omit feature transformations and nonlinear activations to accelerate convergence and improve performance."
+    },
+    {
+     "text": "Dual-channel or multi-channel architectures are used to capture both sequential session information and social influence simultaneously."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Standard GCNs suffer from over-smoothing problems as diffusion depth increases."
+    },
+    {
+     "text": "Message passing mechanisms in GCNs can slow down training convergence, especially in large-scale systems."
+    },
+    {
+     "text": "Existing GNN-based methods often fail to consider bias offsets of users or items, such as rating tendencies of fastidious users."
+    },
+    {
+     "text": "Many models focus primarily on modeling users while neglecting the dynamic changes in item attraction over time."
+    }
+   ]
+  },
+  {
+   "name": "High-Order and Hypergraph Models",
+   "definition": "Approaches that extend beyond pairwise relations to model high-order social connections and complex group interactions using hypergraphs or multi-order networks.",
+   "properties": [
+    {
+     "text": "Hypergraphs provide a natural way to model high-order relations where multiple users interact simultaneously."
+    },
+    {
+     "text": "Multi-order hypergraph convolutional networks capture implicit social relations and dynamic interest changes over time."
+    },
+    {
+     "text": "These methods address the limitation of standard social recommenders that only leverage first-order direct neighbors."
+    },
+    {
+     "text": "High-order social relations, such as friends of friends, are utilized to reveal deeper user preferences."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The potential of hypergraphs for improving social recommendation has been under-explored until recently."
+    },
+    {
+     "text": "Existing high-order methods often ignore the implicit social relations among users."
+    },
+    {
+     "text": "Modeling high-order complexity can be computationally expensive if not properly optimized."
+    }
+   ]
+  },
+  {
+   "name": "Self-Supervised and Contrastive Learning",
+   "definition": "Techniques that generate supervision signals from the data itself, such as through data augmentation or contrastive tasks, to enhance representation learning in sparse social recommendation scenarios.",
+   "properties": [
+    {
+     "text": "Self-supervised learning (SSL) helps address data sparsity by learning from unlabeled data."
+    },
+    {
+     "text": "Contrastive learning identifies properties that distinguish positive from negative samples to resolve popularity bias."
+    },
+    {
+     "text": "Disentangled contrastive learning frameworks learn distinct representations for collaborative and social domains to model heterogeneous behavior patterns."
+    },
+    {
+     "text": "Data augmentation methods, such as node or edge dropout, create new data views for self-discrimination based contrastive learning."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Most existing SSL methods build only a bijective mapping between nodes in different views, neglecting self-supervision signals from other nodes."
+    },
+    {
+     "text": "Directly constructing contrastive learning tasks on different channels may not fully utilize the relationships between channels while maintaining their uniqueness."
+    },
+    {
+     "text": "Uniform node or edge dropout may not effectively capture the specific structural nuances of social graphs."
+    }
+   ]
+  },
+  {
+   "name": "Disentangled and Preference-Aware Models",
+   "definition": "Models that separate user representations into distinct facets, such as collaborative versus social preferences or long-term versus short-term interests, to handle heterogeneous user behaviors.",
+   "properties": [
+    {
+     "text": "Disentangled models address the limitation of unifying user representations for both user-item interactions and social relations."
+    },
+    {
+     "text": "Preference-aware networks design specific modules for item aggregation, friend-preference aggregation, and user aggregation."
+    },
+    {
+     "text": "These methods recognize that socially related users may share preferences only for specific items, not universally."
+    },
+    {
+     "text": "Multi-facet social relations, such as classmates or colleagues, are explicitly disentangled to encode influence under each facet."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Unifying user representations can impair expressiveness by failing to model heterogeneous behavior patterns in different domains."
+    },
+    {
+     "text": "Traditional social aggregation models often use highly entangled and complex node representations, which is unreasonable when only part of preferences determines connectivity."
+    },
+    {
+     "text": "Existing methods often assume social relations are homogeneously applied to all items, which is impractical for diverse user preferences."
+    }
+   ]
+  },
+  {
+   "name": "Session-Based Social Recommendation",
+   "definition": "Methods tailored for session-based scenarios that capture short-term, dynamic user preferences by combining sequential session data with social network influences.",
+   "properties": [
+    {
+     "text": "These models aim to predict the next item in an ongoing session by leveraging both item transition patterns and social influences."
+    },
+    {
+     "text": "Dual-channel attentive networks are used to combine sequential information and social features to prevent information loss."
+    },
+    {
+     "text": "Dynamic graph attention networks model context-dependent influencers, where different friends are relied upon for different items."
+    },
+    {
+     "text": "Efficiency is improved by avoiding the need to process many additional sessions of friends for every prediction."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing methods often ignore sequential information, focusing only on graph networks for item transitions."
+    },
+    {
+     "text": "Modeling entire sessions with invalid or repeatedly clicked items can interfere with recommendation results."
+    },
+    {
+     "text": "Processing additional sessions of friends to capture social influence can be computationally inefficient."
+    }
+   ]
+  },
+  {
+   "name": "Trust and Influence Diffusion Models",
+   "definition": "Frameworks that explicitly model the propagation of social influence and trust, distinguishing between explicit and implicit influences to refine user preference modeling.",
+   "properties": [
+    {
+     "text": "Neural influence diffusion networks model the social influence diffusion process from the global social network structure."
+    },
+    {
+     "text": "Models distinguish between local implicit influence on unobserved interpersonal relations and global implicit influence of items."
+    },
+    {
+     "text": "Adversarial approaches are used to disentangle homophily and influence, which cannot be separated from observational data alone."
+    },
+    {
+     "text": "Trust-aware variational methods estimate diverse levels of influence among entities rather than assuming equal influence."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Most existing methods focus only on explicit influence on observed social links, ignoring implicit influence."
+    },
+    {
+     "text": "Social relations are often noisy and indiscriminately used, leading to failure in practice for users with limited neighbors."
+    },
+    {
+     "text": "It is fundamentally difficult to disentangle homophily and influence from observational data to determine the effect of social inference."
+    }
+   ]
+  },
+  {
+   "name": "Heterogeneous and Multi-Relational Graph Models",
+   "definition": "Approaches that handle the complexity of real-world social networks by modeling multiple types of relationships, heterogeneous trust, and diverse interaction patterns.",
+   "properties": [
+    {
+     "text": "Heterogeneous information diffusion models address the loss of heterogeneity in separate social and interaction graphs."
+    },
+    {
+     "text": "Multi-relational attention networks use similarity-based mechanisms to solve data sparsity by supplementing with item homogeneous relations."
+    },
+    {
+     "text": "These models capture heterogeneous trust relations among customers and heterogeneous interactions between customers and products."
+    },
+    {
+     "text": "Bilateral filtering GCNs address the power-law property of degree distributions to better learn representations for long-tail nodes."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Most existing methods assume only single social relations, ignoring the impact of multifaceted social relations."
+    },
+    {
+     "text": "Vanilla GCNs with static normalized adjacency matrices have limitations in learning node representations for long-tail nodes due to power-law properties."
+    },
+    {
+     "text": "Representing social data as two separate graphs (user-user and user-item) leads to a loss of heterogeneity."
+    }
+   ]
+  },
+  {
+   "name": "Hyperbolic and Geometric Embedding Methods",
+   "definition": "Techniques that learn user and item representations in non-Euclidean spaces, such as hyperbolic space, to better capture hierarchical structures in social data.",
+   "properties": [
+    {
+     "text": "Hyperbolic social recommendation aims to learn compact but strong representations that exploit the latent hierarchical property of data."
+    },
+    {
+     "text": "Hyperbolic geometry naturally reflects heterogeneous degree distributions and strong clustering in complex networks."
+    },
+    {
+     "text": "These methods overcome the limitations of Euclidean space in exploring latent hierarchical properties."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing methods usually learn representations in Euclidean space, which has large limitations for exploring latent hierarchical properties."
+    },
+    {
+     "text": "The application of hyperbolic geometry in social recommendation is a novel problem with limited prior work."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Social recommender systems consistently fail in practice for users with a very limited number of neighbors in social networks."
+    },
+    {
+     "text": "There is a lack of in-depth analysis of implicit assumptions in existing GNN-based social recommendation methods."
+    },
+    {
+     "text": "It remains challenging to simultaneously model the static and dynamic features of users and items while integrating time information and social relations."
+    },
+    {
+     "text": "The problem of disentangling homophily and influence from observational data to determine the effect of social inference is inherently adversarial and unresolved."
+    },
+    {
+     "text": "Most existing methods do not fully exploit the multi-type user-item interactive behavior and the underlying cross-relational inter-dependencies."
+    },
+    {
+     "text": "There is a need for more efficient methods for session-based social recommendation that do not require processing many additional sessions of friends."
+    },
+    {
+     "text": "The potential of hypergraph structures for modeling high-order social relations in recommendation is still under-explored."
+    },
+    {
+     "text": "Existing self-supervised learning methods neglect self-supervision signals from nodes other than the bijective mapping pairs."
+    }
+   ]
+  }
+ ]
+}

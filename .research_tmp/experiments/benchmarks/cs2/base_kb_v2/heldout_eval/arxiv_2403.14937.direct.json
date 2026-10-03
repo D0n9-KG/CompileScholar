@@ -1,0 +1,242 @@
+{
+ "families": [
+  {
+   "name": "Procedural and Generative Synthesis",
+   "definition": "Methods that synthesize new 3D articulated objects or enhance static models into interactive ones using generative models, procedural tools, or diffusion priors.",
+   "properties": [
+    {
+     "text": "These methods use hierarchical transformers, diffusion models, or procedural toolboxes to generate geometry and kinematic structures simultaneously."
+    },
+    {
+     "text": "They can convert static 3D objects into openable or articulated versions by detecting parts and predicting motion."
+    },
+    {
+     "text": "Generative approaches often parameterize objects as trees of tokens or graphs to model part connectivity and articulation."
+    },
+    {
+     "text": "Some methods leverage 2D diffusion priors to provide virtual supervision for 3D shape and articulation learning."
+    },
+    {
+     "text": "They aim to create large-scale datasets with rich annotations to overcome data scarcity in articulated object understanding."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Generated objects may lack physical plausibility or detailed interior geometry if not explicitly constrained."
+    },
+    {
+     "text": "Flexibility-quality tradeoffs exist, where high flexibility often leads to lower geometric quality."
+    },
+    {
+     "text": "Many methods rely on predefined structures or retrieve shapes from static datasets, limiting diversity."
+    },
+    {
+     "text": "Physical validity of generated samples is a challenge, particularly in few-shot settings."
+    }
+   ]
+  },
+  {
+   "name": "Reconstruction from Visual Observations",
+   "definition": "Techniques that recover 3D shape, part segmentation, and articulation parameters from 2D images, videos, or point clouds.",
+   "properties": [
+    {
+     "text": "These methods use implicit representations like Neural Radiance Fields (NeRFs) or Signed Distance Functions (SDFs) to model geometry and appearance."
+    },
+    {
+     "text": "They often employ analysis-by-synthesis frameworks to optimize for part-level motion and shape from monocular or multi-view inputs."
+    },
+    {
+     "text": "Some approaches use skeleton-based or part-based models to handle non-rigid deformations and articulations."
+    },
+    {
+     "text": "Methods can reconstruct articulated objects from sparse image ensembles, single videos, or even single images."
+    },
+    {
+     "text": "They frequently utilize differentiable rendering to align 3D predictions with 2D observations."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Reconstruction from monocular inputs is inherently under-constrained and prone to ambiguities in pose and shape."
+    },
+    {
+     "text": "Many methods rely on pre-built deformable models or templates, limiting generalization to novel categories."
+    },
+    {
+     "text": "Heavy occlusion and complex dynamics in human-object interactions make accurate reconstruction difficult."
+    },
+    {
+     "text": "Real-time performance is often sacrificed for high-fidelity reconstruction, or vice versa."
+    }
+   ]
+  },
+  {
+   "name": "Articulation and Kinematics Estimation",
+   "definition": "Algorithms that identify movable parts, infer joint types, and estimate kinematic parameters from static or dynamic data.",
+   "properties": [
+    {
+     "text": "These methods detect openable parts and predict their motion parameters, such as joint axes and limits."
+    },
+    {
+     "text": "They can infer kinematic hierarchies and part connectivity from point cloud sequences or interaction data."
+    },
+    {
+     "text": "Some approaches use screw theory or equivariant networks to model part mobility and transformations."
+    },
+    {
+     "text": "They often operate in a self-supervised or semi-supervised manner to reduce the need for labeled motion data."
+    },
+    {
+     "text": "Methods can estimate articulation models from pairs of static states or from video sequences of moving objects."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Estimating articulation for unseen object categories remains challenging due to geometric and semantic variations."
+    },
+    {
+     "text": "Many methods assume a fixed kinematic structure or category-level priors, which limits generalizability."
+    },
+    {
+     "text": "Noisy point clouds in real-world settings degrade the performance of models trained on clean simulation data."
+    },
+    {
+     "text": "Inferring complete kinematic hierarchies for novel instances without templates is an open challenge."
+    }
+   ]
+  },
+  {
+   "name": "Robot Manipulation and Interaction",
+   "definition": "Systems that enable robots to perceive, plan, and execute actions to manipulate articulated objects in physical or simulated environments.",
+   "properties": [
+    {
+     "text": "These methods learn manipulation policies that generalize across different object categories and articulation structures."
+    },
+    {
+     "text": "They often use affordance prediction to identify actionable points on objects for pushing, pulling, or opening."
+    },
+    {
+     "text": "Some systems use imitation learning from human demonstrations or self-guided exploration to learn manipulation skills."
+    },
+    {
+     "text": "They integrate perception of object state with motion planning to execute complex tasks like opening cabinets or doors."
+    },
+    {
+     "text": "Benchmarks and simulators provide environments for training and evaluating these manipulation policies."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Generalization to novel object categories and unseen instances is a significant hurdle."
+    },
+    {
+     "text": "Sim-to-real transfer is difficult due to differences in physics, sensing, and actuation."
+    },
+    {
+     "text": "Many methods require extensive interaction data or human demonstrations, which are costly to collect."
+    },
+    {
+     "text": "Handling dynamic obstacles and complex scene interactions in real-world environments remains challenging."
+    }
+   ]
+  },
+  {
+   "name": "Human-Object Interaction (HOI) Modeling",
+   "definition": "Approaches that model the interaction between humans and articulated objects, including pose estimation, motion synthesis, and dataset creation.",
+   "properties": [
+    {
+     "text": "These methods capture full-body human motion and object articulation during interactions, such as grasping or opening."
+    },
+    {
+     "text": "They often use motion capture data or video-based reconstruction to create datasets of human-object interactions."
+    },
+    {
+     "text": "Some approaches synthesize human motions conditioned on textual instructions or object states."
+    },
+    {
+     "text": "They aim to understand the spatial arrangements and contact points between humans and objects."
+    },
+    {
+     "text": "Methods can reconstruct 3D human and object poses from monocular videos or single images."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Heavy occlusion between humans and objects makes accurate 3D reconstruction difficult."
+    },
+    {
+     "text": "Capturing diverse and realistic interactions in natural settings is challenging and expensive."
+    },
+    {
+     "text": "Many datasets are limited in scale or diversity, restricting the generalization of learned models."
+    },
+    {
+     "text": "Modeling the complex dynamics of full-body interactions with articulated objects is computationally intensive."
+    }
+   ]
+  },
+  {
+   "name": "Simulation and Benchmarking",
+   "definition": "Platforms and datasets that provide realistic environments, objects, and tasks for training and evaluating embodied AI and robotics.",
+   "properties": [
+    {
+     "text": "These simulators support physics-based interaction with articulated objects, including rigid and deformable bodies."
+    },
+    {
+     "text": "They provide large-scale datasets with rich annotations for parts, kinematics, and semantics."
+    },
+    {
+     "text": "Benchmarks define specific tasks like navigation, manipulation, and human-robot collaboration."
+    },
+    {
+     "text": "Some platforms enable human-in-the-loop interaction via VR or other interfaces."
+    },
+    {
+     "text": "They aim to bridge the gap between synthetic training data and real-world applications."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Creating high-fidelity, large-scale datasets of articulated objects is expensive and time-consuming."
+    },
+    {
+     "text": "Simulations may not perfectly capture the complexities of real-world physics and sensing."
+    },
+    {
+     "text": "Generalization from synthetic to real-world environments remains a key challenge."
+    },
+    {
+     "text": "Many simulators lack the diversity of object categories and interaction types found in real homes."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Scarcity of large-scale, high-quality 3D articulated object data with detailed annotations remains a major obstacle."
+    },
+    {
+     "text": "Generalizing manipulation and perception models to unseen object categories and novel instances is difficult."
+    },
+    {
+     "text": "Achieving physically plausible and high-fidelity generation of articulated objects is challenging."
+    },
+    {
+     "text": "Real-time reconstruction and manipulation of articulated objects in dynamic, unstructured environments is an open problem."
+    },
+    {
+     "text": "Bridging the sim-to-real gap for robot manipulation of articulated objects requires better transferability."
+    },
+    {
+     "text": "Understanding and modeling complex, full-body human-object interactions with articulated objects is under-explored."
+    },
+    {
+     "text": "Inferring complete kinematic hierarchies and part connectivity for arbitrary objects without prior templates is unsolved."
+    }
+   ]
+  }
+ ]
+}

@@ -45,14 +45,25 @@ Removing the budget raises ingredient recall (−0.059 with the budget, CI [−0
 harness is +0.099 [+0.049, +0.149] and comes entirely from citation recall (+0.40) and precision (+0.11); ingredient recall
 ties (−0.02, n.s.). We use the ~1,000-word budget for all CS2 runs.
 
-### 6.3 Ablations [TBD]
+### 6.3 Ablations (CS2 dev, same 15 questions, paired bootstrap; DSB [TBD])
 
-| Arm | CS2 dev Δ | DSB Δ |
-|---|---|---|
-| − state retrieval | [TBD] | [TBD] |
-| − knowledge base | [TBD] | [TBD] |
-| − citation expansion | [TBD] | [TBD] |
-| − screening | [TBD] | [TBD] |
+Each row changes one component against the configuration it was developed on (the pipeline evolved during development, so
+the reference arm differs by row; all deltas are paired on the same 15 questions).
+
+| Change | Reference arm (G) | Δ G [95% CI] | Facet that moved |
+|---|---|---|---|
+| − state retrieval | no-limit, pre-probe (0.803) | +0.000 [−0.037, +0.034] | AP −0.05, CR +0.03, CP +0.03 (cancel) |
+| − probe (retrieve before planning) | no-limit (0.806) | −0.003 [−0.046, +0.040] | off-topic paragraphs 37% → 45% |
+| − citation expansion (multi-source) | final, ~1,000 words (0.837) | −0.010 [−0.040, +0.019] | AP −0.08 (S2 variant, sig.) |
+| citation expansion via S2 instead of multi-source | final (0.837) | +0.005 n.s. | — |
+| − length budget (no limit) | ~1,000 words, S2 expansion (0.842) | −0.031 [−0.050, −0.006] | IR +0.06, AP −0.17 (§6.2b) |
+| + cross-section deduplication | ~1,000 words, S2 expansion (0.842) | −0.010 [−0.048, +0.027] | AP −0.089 [−0.166, −0.013] |
+| + screening (Multi-108, strict F1) | without screening (0.320) | +0.104 [+0.086, +0.122] | — |
+
+No component of the retrieval/organization stack other than the length budget and per-sentence evidence citation (§6.2b)
+moves the CS2 score beyond noise at n = 15. In particular, retrieving from the compiled state contributes nothing to CS2
+single-question scores; its value is measured where the task asks for field-level judgments (§6.5).
+[TBD: − knowledge base (open retrieval only); DSB deltas.]
 
 ### 6.4 Multi-108: metric definition matters (已有数据)
 
@@ -78,10 +89,42 @@ the question asks about NLP/HCI reading tools (question–answer TF-IDF cosine 0
 contexts for them. On the remaining 98 questions: ours v1 0.935 / 0.352, ours v2 0.929 / 0.467, previous system 0.717 / 0.586,
 LightRAG 0.567 / 0.508, PaperQA2 0.495 / 0.475 (pre-registered / strict).
 
-### 6.5 Field-layer evaluation [TBD]
+### 6.5 Field-layer evaluation
 
 20 held-out surveys (4 each from cs.AI/CL/CV/IR/LG), gold = the surveys' own taxonomy nodes, node properties and stated
-limitations/gaps extracted verbatim. Each survey is removed from the knowledge base; only its cited papers are given.
+limitations/gaps extracted verbatim. Each survey is removed from the knowledge base; only its cited papers are given
+(title + abstract; 18/20 surveys had a resolvable reference list; cited papers with an abstract, median 88 per survey). All systems use the same 27B and
+the same inputs; a different model (DeepSeek-V4.1-Flash) judges whether each gold statement is expressed by some system
+statement. Systems: **state** (compiled field state: per-paper records → family induction → family-level facts with
+verbatim support), **state_v2** (same records, families + cross-paper aggregated open problems), **direct** (one call:
+all papers → write the taxonomy, family properties and open problems), **flat** (per-paper extraction only, no
+cross-paper organization), **memory** (survey title only; measures what the 27B already knows). Gold items were tagged
+self-contained or not by the judge model before any system output was inspected ("clean": 316/460 limitations, 380/528
+properties). Recall@K takes each system's first K items, K = number of gold items.
+
+| System | Families recall / @K | Properties recall (clean) | Limitations recall (clean) | Items (fam / prop / lim) |
+|---|---|---|---|---|
+| state | **0.630** / **0.621** | **0.109** | 0.273 | 10 / 69 / 63 |
+| state_v2 | 0.542 / 0.538 | 0.089 | **0.353** | 10 / 70 / 66 |
+| direct | 0.465 / 0.429 | 0.064 | 0.263 | 8 / 32 / 31 |
+| flat | 0.596 / 0.163 | 0.033 | 0.346 | 188 / 471 / 70 |
+| memory | 0.317 / 0.262 | 0.050 | 0.153 | 5 / 20 / 25 |
+
+Paired bootstrap over surveys (n = 18; properties n = 17):
+- Families: state − direct +0.165 [+0.050, +0.290]; state − memory +0.313 [+0.141, +0.468]; state − flat +0.034 n.s. on
+  recall, but flat needs 19× more items; at matched size (recall@K) state − flat +0.458 [+0.319, +0.592].
+- Family properties: state − direct +0.045 [+0.015, +0.084]; state − flat +0.077 [+0.029, +0.132]; state − memory
+  +0.060 [−0.007, +0.125].
+- Limitations: state_v2 − direct +0.090 [+0.007, +0.175]; state_v2 − memory +0.200 [+0.063, +0.349]; state_v2 − flat
+  +0.007 n.s.
+
+Reading. Cross-paper compilation recovers the surveys' own families and family-level properties better than writing the
+skeleton in one call from the same papers, and the gain is not recall of memorized surveys (memory is lowest on every
+part). For limitations, the compiled open-problem list ties the unorganized per-paper limitations at similar size: the
+organization layer does not add limitations that individual papers do not already state. Absolute property recall is low
+(≈0.1) for every system: survey authors' family-level statements often go beyond what the cited abstracts say. Two
+caveats: flat's recall@K depends on record order (no ranking), and the judge is an LLM; [TBD: human spot-check of 50
+matched / 50 unmatched judgments].
 
 ## 7 Analysis
 

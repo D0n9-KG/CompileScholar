@@ -1,0 +1,204 @@
+{
+ "families": [
+  {
+   "name": "Hierarchical Reinforcement Learning (HRL)",
+   "definition": "HRL decomposes the decision-making process into multiple levels of abstraction, where higher levels set subgoals for lower levels to execute.",
+   "properties": [
+    {
+     "text": "Methods operate by separating long-term planning from short-term control."
+    },
+    {
+     "text": "Higher-level agents typically output discrete or continuous subgoals rather than primitive actions."
+    },
+    {
+     "text": "This structure reduces the effective horizon of the lower-level policy, simplifying credit assignment."
+    },
+    {
+     "text": "It enables the reuse of low-level skills across different high-level tasks."
+    },
+    {
+     "text": "The approach is particularly effective in environments with long time horizons and sparse rewards."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Designing appropriate interfaces between levels is often non-trivial and task-dependent."
+    },
+    {
+     "text": "Suboptimal subgoals from the high level can lead to failure even if the low-level policy is optimal."
+    },
+    {
+     "text": "Training stability can be compromised by the non-stationarity introduced by the changing subgoals."
+    },
+    {
+     "text": "It often requires significant domain knowledge to define the hierarchy structure manually."
+    }
+   ]
+  },
+  {
+   "name": "Options Framework",
+   "definition": "The Options Framework extends MDPs by introducing temporally extended actions called options, which consist of an initiation set, a policy, and a termination condition.",
+   "properties": [
+    {
+     "text": "Options allow agents to commit to a sequence of actions until a specific termination condition is met."
+    },
+    {
+     "text": "This framework provides a formal mathematical basis for hierarchical decision-making."
+    },
+    {
+     "text": "It enables the learning of reusable skills that can be composed to solve complex tasks."
+    },
+    {
+     "text": "The termination condition allows for flexible skill execution based on environmental state."
+    },
+    {
+     "text": "It bridges the gap between primitive actions and high-level planning."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The choice of termination conditions is critical and difficult to learn automatically."
+    },
+    {
+     "text": "The framework can suffer from the curse of dimensionality if the option space is too large."
+    },
+    {
+     "text": "It may not scale well to very high-dimensional continuous action spaces without additional constraints."
+    },
+    {
+     "text": "Learning optimal options often requires extensive exploration, which can be sample-inefficient."
+    }
+   ]
+  },
+  {
+   "name": "Feudal Reinforcement Learning (FRL)",
+   "definition": "FRL employs a manager-worker architecture where a manager sets goals for workers, who then execute actions to achieve those goals within a restricted state space.",
+   "properties": [
+    {
+     "text": "The manager operates on a compressed state representation, focusing on high-level objectives."
+    },
+    {
+     "text": "Workers are constrained to act within a specific region of the state space defined by the manager."
+    },
+    {
+     "text": "This separation of concerns allows for parallelization of learning across different state regions."
+    },
+    {
+     "text": "It effectively handles long-horizon tasks by breaking them into manageable sub-tasks."
+    },
+    {
+     "text": "The manager's goals provide a form of intrinsic motivation for the workers."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The manager may struggle to provide useful goals if the state compression is poor."
+    },
+    {
+     "text": "Workers may fail to achieve the manager's goals if the goals are too ambitious or poorly specified."
+    },
+    {
+     "text": "The method can be sensitive to the choice of state compression for the manager."
+    },
+    {
+     "text": "It may not generalize well to tasks where the optimal strategy requires frequent switching between different state regions."
+    }
+   ]
+  },
+  {
+   "name": "Subgoal-based HRL",
+   "definition": "Subgoal-based HRL methods explicitly learn to predict and achieve intermediate states (subgoals) that partition the trajectory into shorter segments.",
+   "properties": [
+    {
+     "text": "Subgoals are often learned as latent variables that represent key states in the environment."
+    },
+    {
+     "text": "The high-level policy selects subgoals, while the low-level policy navigates to them."
+    },
+    {
+     "text": "This approach facilitates credit assignment by providing dense reward signals for subgoal achievement."
+    },
+    {
+     "text": "It is particularly effective in environments with sparse terminal rewards."
+    },
+    {
+     "text": "Subgoals can be learned end-to-end using deep reinforcement learning techniques."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The quality of the learned subgoals heavily depends on the exploration strategy."
+    },
+    {
+     "text": "Subgoals may not always be meaningful or useful for solving the overall task."
+    },
+    {
+     "text": "The method can be computationally expensive due to the need to learn both the subgoal predictor and the policies."
+    },
+    {
+     "text": "It may struggle in environments where the optimal path does not naturally decompose into distinct subgoals."
+    }
+   ]
+  },
+  {
+   "name": "Skill-based HRL",
+   "definition": "Skill-based HRL focuses on learning a library of reusable, temporally extended behaviors (skills) that can be composed to solve complex tasks.",
+   "properties": [
+    {
+     "text": "Skills are typically learned in a bottom-up manner, often using unsupervised or self-supervised methods."
+    },
+    {
+     "text": "The high-level policy selects which skill to execute based on the current state."
+    },
+    {
+     "text": "This approach promotes modularity and reusability of learned behaviors."
+    },
+    {
+     "text": "Skills can be transferred across different tasks or environments."
+    },
+    {
+     "text": "It reduces the complexity of the high-level decision-making problem."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Learning a diverse and useful set of skills is challenging and often requires careful design of the skill discovery process."
+    },
+    {
+     "text": "Skills may not be optimal for all tasks, leading to suboptimal performance."
+    },
+    {
+     "text": "The composition of skills can be complex and may require additional learning to determine the correct sequence."
+    },
+    {
+     "text": "It can be difficult to ensure that the learned skills are safe and reliable in all contexts."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Automatically discovering the optimal hierarchy structure without human intervention remains a significant challenge."
+    },
+    {
+     "text": "Ensuring the stability and convergence of hierarchical policies during training is an ongoing area of research."
+    },
+    {
+     "text": "Scaling hierarchical methods to high-dimensional continuous action spaces and complex environments is difficult."
+    },
+    {
+     "text": "Developing robust methods for transferring learned hierarchical skills across different tasks and domains is an open problem."
+    },
+    {
+     "text": "Understanding the theoretical guarantees of hierarchical reinforcement learning algorithms is still limited."
+    },
+    {
+     "text": "Integrating hierarchical reinforcement learning with other forms of structured learning, such as graph-based or tree-based representations, is an active area of exploration."
+    }
+   ]
+  }
+ ]
+}

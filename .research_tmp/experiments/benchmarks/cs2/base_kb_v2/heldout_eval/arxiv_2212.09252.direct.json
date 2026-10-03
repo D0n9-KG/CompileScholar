@@ -1,0 +1,317 @@
+{
+ "families": [
+  {
+   "name": "Retrieval-Augmented Generation",
+   "definition": "Methods that retrieve relevant external information from heterogeneous sources or knowledge bases to condition response generation.",
+   "properties": [
+    {
+     "text": "These systems retrieve relevant information from heterogeneous knowledge sources to homogenize them for dialogue generation."
+    },
+    {
+     "text": "They leverage internet search or large corpora to access continually updating knowledge that is not frozen in model weights."
+    },
+    {
+     "text": "Retrieval-based approaches often use a generate-and-rank strategy to fetch a batch of response candidates from various neural models."
+    },
+    {
+     "text": "Some methods use on-demand machine reading to perform QA-style comprehension on retrieved long-form text."
+    },
+    {
+     "text": "This approach helps alleviate factual inaccuracies and hallucinations by grounding responses in retrieved evidence."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Retrieval-based models face the challenge of simultaneously reasoning to provide correct knowledge and generating conversation."
+    },
+    {
+     "text": "Retrieved background knowledge in open settings is often noisy, resulting in severe challenges in information transmission."
+    },
+    {
+     "text": "Existing methods often suffer from inference efficiency issues due to the explicit retrieval process."
+    },
+    {
+     "text": "The precision of knowledge retrieval can be low, and entities may not be included in the knowledge base."
+    },
+    {
+     "text": "Using all retrieved knowledge may introduce noise, while selecting only one may lose valuable information."
+    }
+   ]
+  },
+  {
+   "name": "Knowledge-Integrated Pre-trained Models",
+   "definition": "Architectures that inject domain-specific knowledge directly into pre-trained language model parameters or adapters to bypass explicit retrieval.",
+   "properties": [
+    {
+     "text": "These models use lightweight adapters to inject knowledge into pre-trained language models, bypassing explicit retrieval."
+    },
+    {
+     "text": "Knowledge bases can be embedded directly into model parameters to handle KBs of any size without scaling issues."
+    },
+    {
+     "text": "Some methods use knowledge-injected pre-trained language models for both natural language understanding and generation tasks."
+    },
+    {
+     "text": "This approach allows for end-to-end training where the model learns to utilize knowledge without separate retrieval modules."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Pre-trained models often lack explicit awareness of domain-specific knowledge essential for downstream tasks."
+    },
+    {
+     "text": "Performance drops dramatically when the input contains entities that do not appear in pre-training and fine-tuning datasets."
+    },
+    {
+     "text": "These models may still hallucinate facts if the knowledge is not sufficiently integrated or if the context is ambiguous."
+    }
+   ]
+  },
+  {
+   "name": "Modular and Pipeline Systems",
+   "definition": "Systems that decompose dialogue generation into distinct stages such as knowledge selection, reasoning, and response generation.",
+   "properties": [
+    {
+     "text": "Modular models break down the problem into easier steps, such as first generating a knowledge sequence and then the response."
+    },
+    {
+     "text": "Pipelined approaches handle knowledge-seeking turn detection, knowledge selection, and response generation in sequence."
+    },
+    {
+     "text": "These systems can integrate traditional modular approaches to incorporate domain knowledge with modern deep learning techniques."
+    },
+    {
+     "text": "Modular generation allows for better control over the reasoning process before the final response is produced."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Pipeline systems often use hard-label decisions to activate subtasks, which can hinder model performance."
+    },
+    {
+     "text": "Modularized systems rely on dialogue state tracking to interact with knowledge bases, which is expensive in terms of annotation and inference time."
+    },
+    {
+     "text": "Independent or pipeline systems may fail to capture the bilateral information flow between personal knowledge and conversation."
+    }
+   ]
+  },
+  {
+   "name": "Knowledge Graph Grounding",
+   "definition": "Methods that utilize the structural information of knowledge graphs to guide response generation and ensure factual consistency.",
+   "properties": [
+    {
+     "text": "These systems integrate knowledge graphs into the response generation process by training models to answer using KG elements."
+    },
+    {
+     "text": "Some approaches use attention-based walks over knowledge graphs to introduce engaging and contextually diverse entities."
+    },
+    {
+     "text": "Knowledge graph aware decoding can be used with pre-trained transformers to generate knowledge-grounded responses."
+    },
+    {
+     "text": "Dynamic knowledge graph embeddings can evolve as the dialogue progresses to model structured knowledge."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Integrating knowledge graphs into the dialogue generation process in an end-to-end manner is a non-trivial task."
+    },
+    {
+     "text": "Models may generate factually incorrect statements if they do not strictly adhere to the known facts supplied by the KG."
+    },
+    {
+     "text": "The generation of well-grounded responses requires careful handling of the graph structure to avoid inconsistencies."
+    }
+   ]
+  },
+  {
+   "name": "Document-Grounded Dialogue",
+   "definition": "Systems that ground conversations in specific long-form documents, requiring the identification and utilization of relevant passages.",
+   "properties": [
+    {
+     "text": "These systems identify relevant knowledge in conversational systems grounded in long documents by leveraging document structure."
+    },
+    {
+     "text": "Models use dialogue-contextualized passage encodings to better locate knowledge relevant to the conversation."
+    },
+    {
+     "text": "Document-grounded datasets provide a source of information that models can use to generate more informative responses."
+    },
+    {
+     "text": "Some methods jointly denoise the dialogue context and aggregate document information for response generation."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Dialogue history that is not related to the current dialogue may introduce noise in the knowledge selection processing."
+    },
+    {
+     "text": "Identifying relevant knowledge in long documents is critical but challenging for effective response generation."
+    },
+    {
+     "text": "Existing studies often assume the rule text is provided, neglecting the essential retrieval step in real scenarios."
+    }
+   ]
+  },
+  {
+   "name": "Task-Oriented Knowledge Integration",
+   "definition": "Approaches for task-oriented dialogue that incorporate external knowledge to handle requests beyond the scope of domain APIs.",
+   "properties": [
+    {
+     "text": "These systems expand coverage by incorporating external unstructured knowledge sources for out-of-API-coverage queries."
+    },
+    {
+     "text": "Methods use schema-guided knowledge decision and negatives-enhanced knowledge selection to boost response quality."
+    },
+    {
+     "text": "Some approaches use template-guided hybrid pointer networks to retrieve potentially relevant answers from domain-specific repositories."
+    },
+    {
+     "text": "Entity-aware knowledge retrieval and copy mechanisms are used to generate responses for task-oriented dialogue systems."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Most prior work is restricted to limited coverage of domain APIs, leaving many user requests unaddressed."
+    },
+    {
+     "text": "End-to-end systems using knowledge bases directly cannot scale when the KB is larger than a few hundred entries."
+    },
+    {
+     "text": "The precision of knowledge retrieval and the inclusion of entities in the knowledge base remain practical challenges."
+    }
+   ]
+  },
+  {
+   "name": "Low-Resource and Zero-Resource Learning",
+   "definition": "Techniques designed to build knowledge-grounded dialogue systems with limited or no context-knowledge-response training triples.",
+   "properties": [
+    {
+     "text": "These methods use weakly supervised learning frameworks that benefit from large-scale ungrounded dialogue data."
+    },
+    {
+     "text": "Zero-resource settings assume no context-knowledge-response triples are needed for training."
+    },
+    {
+     "text": "Disentangled response decoders isolate parameters that depend on knowledge-grounded dialogues from the entire generation model."
+    },
+    {
+     "text": "Three-stage learning frameworks are used to address the laborious construction of knowledge-grounded dialogues."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing models usually perform poorly when transferred to new domains with limited training samples."
+    },
+    {
+     "text": "Learning such a model often requires knowledge-grounded dialogues that are difficult to obtain."
+    },
+    {
+     "text": "The lack of training data and heterogeneous knowledge sources makes these systems challenging to build."
+    }
+   ]
+  },
+  {
+   "name": "Emotional and Empathetic Dialogue",
+   "definition": "Models that incorporate emotional perception and expression to generate empathetic and human-like responses.",
+   "properties": [
+    {
+     "text": "These systems integrate multi-source information including emotion flow, facial expressions, and speaker personalities."
+    },
+    {
+     "text": "Generated sentences are designed to be emotive and empathetic, similar to how a doctor communicates."
+    },
+    {
+     "text": "Models use internal and external memory to generate responses that are emotionally consistent."
+    },
+    {
+     "text": "Datasets like EmpatheticDialogues provide conversations grounded in emotional situations to facilitate training."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The paucity of suitable publicly-available datasets for training and evaluation is a significant challenge."
+    },
+    {
+     "text": "Multiple types of emotional information are often insufficiently exploited in emotional conversation fields."
+    },
+    {
+     "text": "Recognizing feelings in the conversation partner and replying accordingly is a significant challenge for AI systems."
+    }
+   ]
+  },
+  {
+   "name": "Response Selection and Matching",
+   "definition": "Retrieval-based methods that select the most appropriate response from a set of candidates based on context matching.",
+   "properties": [
+    {
+     "text": "These systems predict an appropriate response given a dialogue context by matching context and response representations."
+    },
+    {
+     "text": "Speaker-aware models account for speaker change information, which is an intrinsic property of multi-turn dialogues."
+    },
+    {
+     "text": "Source-aware networks distinguish between different information sources such as user utterances and knowledge base results."
+    },
+    {
+     "text": "Sequential match networks match responses with each utterance on multiple granularities to distill important matching information."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing works often ignore relationships among utterances or miss important information in the context."
+    },
+    {
+     "text": "Obtaining key information from a complex, long dialogue context is challenging, especially with multiple information sources."
+    },
+    {
+     "text": "Retrieval-based models may lack the fluency and informativeness of generative models in some contexts."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Building knowledge-grounded dialogue systems is challenging due to the lack of training data and heterogeneous knowledge sources."
+    },
+    {
+     "text": "Existing systems perform poorly on unseen topics due to limited topics covered in the training data."
+    },
+    {
+     "text": "It is challenging to generalize to domains that require different types of knowledge sources."
+    },
+    {
+     "text": "Large language models often hallucinate factual inaccuracies, impeding their widespread adoption."
+    },
+    {
+     "text": "There is a need for methods that can both reason to provide correct knowledge and generate conversation simultaneously."
+    },
+    {
+     "text": "The precision of knowledge retrieval and the handling of entities not included in the knowledge base remain unresolved."
+    },
+    {
+     "text": "Integrating knowledge graphs into the dialogue generation process in an end-to-end manner is non-trivial."
+    },
+    {
+     "text": "There is a lack of large-scale, publicly available datasets for training and evaluating empathetic and emotional dialogue."
+    },
+    {
+     "text": "Most prior work on task-oriented dialogue systems is restricted to limited coverage of domain APIs."
+    },
+    {
+     "text": "End-to-end systems using knowledge bases directly cannot scale when the knowledge base is large."
+    },
+    {
+     "text": "There is a need for metrics that go beyond single-word metrics like perplexity to measure performance across sequences of utterances."
+    },
+    {
+     "text": "The problem of building a coherent and non-monotonous conversational agent with proper discourse and coverage remains open."
+    }
+   ]
+  }
+ ]
+}

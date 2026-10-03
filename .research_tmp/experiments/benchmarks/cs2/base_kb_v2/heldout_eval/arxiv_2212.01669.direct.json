@@ -1,0 +1,212 @@
+{
+ "families": [
+  {
+   "name": "Pre-trained Transformer Summarization",
+   "definition": "Models that leverage large-scale pre-trained language models (such as BART, PEGASUS, or GPT-3) fine-tuned for abstractive summarization tasks.",
+   "properties": [
+    {
+     "text": "These models use denoising autoencoder or gap-sentence pre-training objectives to learn generative capabilities."
+    },
+    {
+     "text": "They can generate fluent and adequate summaries even with limited training data through fine-tuning."
+    },
+    {
+     "text": "They are capable of handling long and noisy transcripts, such as doctor-patient conversations."
+    },
+    {
+     "text": "They can be adapted for specific domains like biomedical or clinical text by incorporating domain-aware pre-training."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They are prone to hallucinating content that is unfaithful to the input document."
+    },
+    {
+     "text": "They may over-rely on the language model to generate fluent but inadequate words."
+    },
+    {
+     "text": "They often fail to capture the gist of the input text if not specifically constrained."
+    },
+    {
+     "text": "They require significant computational resources and large datasets for effective fine-tuning."
+    }
+   ]
+  },
+  {
+   "name": "Extractive and Hybrid Summarization",
+   "definition": "Methods that select key sentences or spans from the source document, often combined with abstractive composition or ranking mechanisms.",
+   "properties": [
+    {
+     "text": "Extractive methods select sentences based on cue words, salience, or policy networks."
+    },
+    {
+     "text": "Hybrid approaches like extract-compose models select key spans and then compose them into a summary."
+    },
+    {
+     "text": "These methods are often more faithful and traceable than purely abstractive models."
+    },
+    {
+     "text": "They can be optimized using multi-objective optimization to balance salience and redundancy."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They may lack the fluency and coherence of fully abstractive summaries."
+    },
+    {
+     "text": "They can be limited by the quality of the selected sentences or spans."
+    },
+    {
+     "text": "They may not effectively handle cases where the summary requires significant rephrasing or synthesis."
+    }
+   ]
+  },
+  {
+   "name": "Domain-Specific Clinical Summarization",
+   "definition": "Summarization techniques tailored for medical and clinical texts, such as radiology reports, discharge summaries, and medical dialogues.",
+   "properties": [
+    {
+     "text": "These methods incorporate domain-specific ontologies and knowledge bases to improve content selection."
+    },
+    {
+     "text": "They address specific clinical tasks like generating radiology impressions or SOAP notes."
+    },
+    {
+     "text": "They often use specialized datasets like MIMIC-CXR or MedDialog for training and evaluation."
+    },
+    {
+     "text": "They aim to produce summaries that are medically accurate and useful for clinical decision-making."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They require large amounts of labeled clinical data, which is often scarce and sensitive."
+    },
+    {
+     "text": "They may struggle with the variability and complexity of clinical language."
+    },
+    {
+     "text": "They face challenges in ensuring factual correctness and avoiding medical errors."
+    }
+   ]
+  },
+  {
+   "name": "Multi-Modal Summarization",
+   "definition": "Techniques that generate summaries from multiple data modalities, such as text, images, and videos.",
+   "properties": [
+    {
+     "text": "These methods integrate information from different modalities to provide a more comprehensive summary."
+    },
+    {
+     "text": "They use multi-objective optimization to balance intra-modality salience and cross-modal redundancy."
+    },
+    {
+     "text": "They can handle asynchronous data streams from various sources."
+    },
+    {
+     "text": "They are useful for summarizing content from platforms like social media or surveillance systems."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They require complex alignment and fusion of different modalities."
+    },
+    {
+     "text": "They may suffer from redundancy or conflict between modalities."
+    },
+    {
+     "text": "They are computationally intensive and require diverse training data."
+    }
+   ]
+  },
+  {
+   "name": "Bias Mitigation and Fairness in NLP",
+   "definition": "Methods designed to reduce or eliminate biases in NLP models, particularly in clinical and healthcare applications.",
+   "properties": [
+    {
+     "text": "These methods use adversarial training to mitigate biases acquired during data collection or model development."
+    },
+    {
+     "text": "They aim to ensure that models do not learn from shortcuts like dataset biases."
+    },
+    {
+     "text": "They focus on fairness metrics and debiasing techniques to improve model trustworthiness."
+    },
+    {
+     "text": "They are crucial for ensuring equitable healthcare outcomes across different demographic groups."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They may reduce model performance on the primary task."
+    },
+    {
+     "text": "They require careful design to avoid introducing new biases."
+    },
+    {
+     "text": "They are difficult to evaluate and validate in real-world clinical settings."
+    }
+   ]
+  },
+  {
+   "name": "Evaluation Metrics for Summarization",
+   "definition": "Metrics and frameworks used to assess the quality of generated summaries, including automatic and human-based evaluations.",
+   "properties": [
+    {
+     "text": "Traditional metrics like ROUGE measure overlap between generated and reference summaries."
+    },
+    {
+     "text": "Newer metrics like BERTScore use contextual embeddings to compute similarity."
+    },
+    {
+     "text": "Fact-based evaluation methods count facts to compute precision, recall, and accuracy."
+    },
+    {
+     "text": "Human evaluation is often used to assess faithfulness, fluency, and informativeness."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "ROUGE has long-established limitations, such as dependence on reference summaries."
+    },
+    {
+     "text": "Automatic metrics may not correlate well with human judgments."
+    },
+    {
+     "text": "Human evaluation is expensive and time-consuming."
+    },
+    {
+     "text": "There is a lack of consensus on evaluation protocols and metrics."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Improving faithfulness and reducing hallucinations in abstractive summarization models."
+    },
+    {
+     "text": "Developing robust evaluation metrics that correlate well with human judgments."
+    },
+    {
+     "text": "Addressing the scarcity of large, high-quality labeled datasets for clinical and medical summarization."
+    },
+    {
+     "text": "Mitigating biases and ensuring fairness in NLP models for healthcare applications."
+    },
+    {
+     "text": "Enhancing the interpretability and explainability of summarization models."
+    },
+    {
+     "text": "Developing efficient methods for multi-modal summarization that handle redundancy and conflict between modalities."
+    },
+    {
+     "text": "Creating scalable and privacy-preserving methods for handling sensitive clinical data."
+    }
+   ]
+  }
+ ]
+}

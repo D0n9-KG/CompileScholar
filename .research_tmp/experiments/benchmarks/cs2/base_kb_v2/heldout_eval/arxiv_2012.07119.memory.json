@@ -1,0 +1,187 @@
+{
+ "families": [
+  {
+   "name": "Feature Attribution",
+   "definition": "Methods that assign importance scores to individual input features to explain specific model predictions.",
+   "properties": [
+    {
+     "text": "These methods typically compute gradients or perturbations to quantify the influence of each feature on the output."
+    },
+    {
+     "text": "They provide local explanations for single instances rather than global model behavior."
+    },
+    {
+     "text": "Common techniques include LIME, SHAP, and Integrated Gradients."
+    },
+    {
+     "text": "They are model-agnostic and can be applied to any differentiable or black-box model."
+    },
+    {
+     "text": "They help identify which parts of an image or text contributed most to a classification decision."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Attribution scores can be unstable and sensitive to small input perturbations."
+    },
+    {
+     "text": "They often fail to capture higher-order interactions between features."
+    },
+    {
+     "text": "The choice of baseline or background distribution significantly affects the resulting attributions."
+    },
+    {
+     "text": "They do not guarantee that the identified features are causally responsible for the prediction."
+    },
+    {
+     "text": "Computational cost can be high for high-dimensional inputs requiring many perturbation samples."
+    }
+   ]
+  },
+  {
+   "name": "Activation Visualization",
+   "definition": "Techniques that visualize internal neuron activations or feature maps to understand what the network has learned.",
+   "properties": [
+    {
+     "text": "These methods display heatmaps of activation values across layers to reveal spatial or temporal patterns."
+    },
+    {
+     "text": "They allow researchers to inspect intermediate representations without modifying the model architecture."
+    },
+    {
+     "text": "Common approaches include visualizing convolutional filters and ReLU activations."
+    },
+    {
+     "text": "They provide insight into the hierarchical structure of learned features."
+    },
+    {
+     "text": "They are particularly useful for understanding computer vision models."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Visualizations can be misleading if not interpreted with knowledge of the specific layer's role."
+    },
+    {
+     "text": "They do not directly explain the final prediction but only show internal states."
+    },
+    {
+     "text": "High-dimensional activations are difficult to interpret visually without dimensionality reduction."
+    },
+    {
+     "text": "They may highlight artifacts or noise rather than meaningful semantic features."
+    },
+    {
+     "text": "They are less applicable to non-spatial data types like tabular data or text."
+    }
+   ]
+  },
+  {
+   "name": "Model Simplification",
+   "definition": "Approaches that replace complex deep networks with simpler, more interpretable surrogate models.",
+   "properties": [
+    {
+     "text": "These methods fit a transparent model, such as a decision tree or linear regression, to mimic the behavior of the deep network."
+    },
+    {
+     "text": "They aim to provide global explanations by capturing the overall decision boundary."
+    },
+    {
+     "text": "Common techniques include distillation and fitting generalized additive models."
+    },
+    {
+     "text": "They allow for easier analysis of the model's general logic and rules."
+    },
+    {
+     "text": "They can be used to detect biases or unfairness in the original model's decisions."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Surrogate models may not accurately capture the complex, non-linear relationships of the original network."
+    },
+    {
+     "text": "The fidelity of the surrogate depends heavily on the choice of the simpler model class."
+    },
+    {
+     "text": "They may fail to explain specific edge cases or local behaviors of the deep model."
+    },
+    {
+     "text": "The process of fitting the surrogate can be computationally expensive for large datasets."
+    },
+    {
+     "text": "There is no guarantee that the simplified model reflects the true causal mechanisms of the original model."
+    }
+   ]
+  },
+  {
+   "name": "Causal Analysis",
+   "definition": "Methods that use causal inference frameworks to determine the causal relationship between inputs and outputs.",
+   "properties": [
+    {
+     "text": "These approaches distinguish between correlation and causation in the model's decision-making process."
+    },
+    {
+     "text": "They often involve interventions or counterfactual reasoning to test the necessity and sufficiency of features."
+    },
+    {
+     "text": "Common techniques include causal graphs and do-calculus applied to neural networks."
+    },
+    {
+     "text": "They provide a more rigorous foundation for understanding model behavior than correlation-based methods."
+    },
+    {
+     "text": "They can help identify spurious correlations that the model may have learned."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Causal assumptions are often difficult to verify or justify in real-world scenarios."
+    },
+    {
+     "text": "The computational complexity of causal inference can be prohibitive for large models."
+    },
+    {
+     "text": "They require strong assumptions about the underlying data-generating process."
+    },
+    {
+     "text": "They are less mature and less widely adopted than feature attribution methods."
+    },
+    {
+     "text": "They may not scale well to high-dimensional inputs with complex dependencies."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Lack of a unified theoretical framework that connects different interpretation methods."
+    },
+    {
+     "text": "Difficulty in evaluating the quality and faithfulness of explanations objectively."
+    },
+    {
+     "text": "Scalability of interpretation methods to very large and complex models."
+    },
+    {
+     "text": "Ensuring that explanations are robust to adversarial attacks and distribution shifts."
+    },
+    {
+     "text": "Bridging the gap between local explanations and global model understanding."
+    },
+    {
+     "text": "Developing standardized benchmarks for comparing different interpretation techniques."
+    },
+    {
+     "text": "Understanding how interpretation methods perform on non-vision tasks like NLP and tabular data."
+    },
+    {
+     "text": "Integrating interpretability into the model training process rather than post-hoc analysis."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,215 @@
+{
+ "families": [
+  {
+   "name": "Spectral Hypergraph Convolution",
+   "definition": "Methods that perform convolution on hypergraphs by leveraging spectral properties, such as hypergraph Laplacians or Markov chains, to capture high-order relationships.",
+   "properties": [
+    {
+     "text": "These methods utilize algebraic descriptors like the hypergraph Laplacian or magnetic Laplacian to define convolution operations."
+    },
+    {
+     "text": "They can model non-reversible Markov chains to preserve directional or asymmetric information in hyperedges."
+    },
+    {
+     "text": "Spectral approaches allow for the derivation of random walk-based Laplacians and mixing time bounds for hypergraphs with edge-dependent vertex weights."
+    },
+    {
+     "text": "They provide a theoretical foundation for understanding how hypergraph structures influence node embeddings through energy minimization."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Many spectral methods reduce hypergraphs to undirected graphs via symmetrized matrix representations, potentially losing important directional or higher-order information."
+    },
+    {
+     "text": "The computational complexity of high-dimensional hypergraph descriptors, such as tensors, can be prohibitive."
+    },
+    {
+     "text": "Spectral methods often rely on pre-defined or static hypergraph topologies, limiting their ability to adapt to dynamic or noisy structures."
+    }
+   ]
+  },
+  {
+   "name": "Spatial Hypergraph Message Passing",
+   "definition": "Architectures that propagate information between nodes and hyperedges through explicit message-passing mechanisms, often following a node-to-hyperedge-to-node paradigm.",
+   "properties": [
+    {
+     "text": "These methods typically adopt a two-stage message passing paradigm where information flows from nodes to hyperedges and back to nodes."
+    },
+    {
+     "text": "They can be extended to handle directed hypergraphs by defining specific propagation rules for source and destination node sets."
+    },
+    {
+     "text": "Spatial approaches allow for the integration of attention mechanisms to weigh the importance of different hyperedges or nodes."
+    },
+    {
+     "text": "They support the modeling of edge-dependent node features, allowing nodes to have different representations in different hyperedges."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The standard two-stage paradigm often focuses on local information propagation and may fail to capture global structural information effectively."
+    },
+    {
+     "text": "Heuristic propagation rules in many existing methods lead to suboptimal performance on certain datasets."
+    },
+    {
+     "text": "Message passing on hypergraphs can suffer from over-smoothing, where node representations become indistinguishable in deep networks."
+    }
+   ]
+  },
+  {
+   "name": "Hypergraph Structure Learning",
+   "definition": "Techniques that dynamically infer or optimize the hypergraph structure (nodes and hyperedges) during the learning process rather than relying on a fixed input structure.",
+   "properties": [
+    {
+     "text": "These methods adaptively optimize hypergraph structures to capture hidden correlations and reduce dependence on noisy or incomplete initial structures."
+    },
+    {
+     "text": "They can adjust the number of hyperedges to better fit the underlying data distribution."
+    },
+    {
+     "text": "Structure learning enables the discovery of task-specific latent relationships that are not explicitly present in the raw data."
+    },
+    {
+     "text": "Dynamic construction modules can be stacked with convolution layers to iteratively refine the hypergraph representation."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The space of possible hypergraph structures grows super-exponentially with the number of nodes, making optimization challenging."
+    },
+    {
+     "text": "Most existing dynamic methods cannot fully explore the underlying structure if they are constrained to a fixed number of hyperedges."
+    },
+    {
+     "text": "Learning both the structure and the model parameters simultaneously can be unstable without sufficient supervision or self-supervision signals."
+    }
+   ]
+  },
+  {
+   "name": "Self-Supervised and Contrastive Hypergraph Learning",
+   "definition": "Unsupervised representation learning methods that use pretext tasks, such as contrastive learning or autoencoding, to learn node and hyperedge embeddings without labels.",
+   "properties": [
+    {
+     "text": "These methods maximize agreements among node embeddings or group-wise collective behaviors within hypergraphs."
+    },
+    {
+     "text": "They employ augmentation strategies, such as masking or sampling, to create positive and negative pairs for contrastive optimization."
+    },
+    {
+     "text": "Self-supervised approaches can leverage virtual label propagation or mutual information maximization to handle featureless or label-free hypergraphs."
+    },
+    {
+     "text": "They aim to capture high-order relationships in unlabeled data by distinguishing similar and dissimilar hypergraph structures."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Arbitrary selection of negative samples in contrastive methods can be unreliable and cause training bias."
+    },
+    {
+     "text": "Many methods require a large number of negative samples, leading to high computational costs."
+    },
+    {
+     "text": "Existing self-supervised models often neglect the capture of group-wise collective behaviors, focusing instead on individual node embeddings."
+    }
+   ]
+  },
+  {
+   "name": "Hypergraph Expansion and Transformation",
+   "definition": "Approaches that transform hypergraphs into standard graphs or other structures (e.g., line graphs, clique expansions) to enable the use of existing graph neural network algorithms.",
+   "properties": [
+    {
+     "text": "These methods convert hypergraphs into standard graphs while attempting to preserve high-order information."
+    },
+    {
+     "text": "Line expansion treats vertices and hyperedges equally by modeling vertex-hyperedge pairs, inducing a homogeneous structure."
+    },
+    {
+     "text": "Cross expansion methods transform both hypervertices and hyperedges into a joint representation space."
+    },
+    {
+     "text": "They allow for the direct application of well-established graph learning algorithms to hypergraph data."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Transformation methods like clique or star expansion can lead to information loss or redundancy."
+    },
+    {
+     "text": "Expansions may not fully capture the symmetric nature of data co-occurrence if they focus solely on vertex or hyperedge levels."
+    },
+    {
+     "text": "The resulting standard graphs may be much larger than the original hypergraphs, increasing computational complexity."
+    }
+   ]
+  },
+  {
+   "name": "Higher-Order Network Analysis and Theory",
+   "definition": "Theoretical and analytical studies that examine the structural properties, dynamics, and expressiveness of hypergraphs and higher-order networks.",
+   "properties": [
+    {
+     "text": "These works define and measure structural properties such as transitivity, reciprocity, and hyperedge overlap in real-world hypergraphs."
+    },
+    {
+     "text": "They analyze the expressiveness of hypergraph neural networks, establishing hierarchies of problems solvable based on depth and edge arity."
+    },
+    {
+     "text": "Theoretical frameworks investigate how higher-order interactions shape collective behaviors in complex systems, such as social contagion or microbial communities."
+    },
+    {
+     "text": "They provide insights into the limitations of pairwise graph models and the necessity of higher-order structures for accurate modeling."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "There is a lack of systematic measures for certain properties, such as reciprocity in general directed hypergraphs."
+    },
+    {
+     "text": "Theoretical analyses often assume idealized conditions that may not hold in noisy, real-world data."
+    },
+    {
+     "text": "Understanding the generalization of hypergraph neural networks to arbitrary input sizes remains an open theoretical challenge."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "How to effectively model edge-dependent node features where a node's label or representation varies across different hyperedges."
+    },
+    {
+     "text": "How to handle the extreme class imbalance in hyperlink prediction, where the number of non-hyperedges grows exponentially with the number of nodes."
+    },
+    {
+     "text": "How to balance the trade-off between the complexity of higher-order interactions and the accuracy of downstream tasks, determining how much abstraction is sufficient."
+    },
+    {
+     "text": "How to develop efficient negative sampling strategies for hyperedge prediction that are both reliable and computationally feasible."
+    },
+    {
+     "text": "How to extend graph neural network architectures to fully relational structures, such as k-ary relations in relational hypergraphs, for link prediction."
+    },
+    {
+     "text": "How to capture global information in hypergraph message passing, as current two-stage paradigms are limited to local propagation."
+    },
+    {
+     "text": "How to design hypergraph neural networks that are robust to heterophily, where adjacent nodes or hyperedges exhibit dissimilar labels or features."
+    },
+    {
+     "text": "How to integrate topological features and structural insights into hypergraph transformers to improve representation learning beyond semantic feature-based attention."
+    },
+    {
+     "text": "How to model the temporal dynamics of high-order interactions in sequential or longitudinal data, such as clinical pathways or stock movements."
+    },
+    {
+     "text": "How to unify the design paradigms of graph and hypergraph neural networks to create universal frameworks that generalize across different data structures."
+    }
+   ]
+  }
+ ]
+}

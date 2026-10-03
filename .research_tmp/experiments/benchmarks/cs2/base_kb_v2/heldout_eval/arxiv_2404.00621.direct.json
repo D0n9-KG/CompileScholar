@@ -1,0 +1,250 @@
+{
+ "families": [
+  {
+   "name": "ID-Based Collaborative Filtering",
+   "definition": "Recommender systems that rely on unique identifiers (IDs) for users and items to model collaborative signals from interaction history.",
+   "properties": [
+    {
+     "text": "These models have dominated the recommender systems literature for over a decade and are considered state-of-the-art for many tasks."
+    },
+    {
+     "text": "They effectively capture collaborative filtering signals from user-item interactions."
+    },
+    {
+     "text": "ID embeddings can be interpreted as subtle features of content and structure, providing value beyond simple identifiers."
+    },
+    {
+     "text": "Randomly-hashed item IDs are ubiquitously used in recommendation models."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "ID-based models struggle with the cold-start problem for new users or items without interaction history."
+    },
+    {
+     "text": "Learned representations from random hashing prevent generalization across similar items, causing issues with long-tail and unseen items."
+    },
+    {
+     "text": "They fail to comprehend the essence of raw item contents across diverse modalities such as text, image, audio, and video."
+    },
+    {
+     "text": "Inconsistent ID mappings hinder model transferability across different recommendation domains."
+    }
+   ]
+  },
+  {
+   "name": "Multimodal Content-Based Recommendation",
+   "definition": "Methods that incorporate raw multimedia content features (visual, textual, acoustic) to enhance item and user representations in recommendation models.",
+   "properties": [
+    {
+     "text": "These systems amalgamate multimodal information into collaborative filtering frameworks to provide more accurate and interpretable recommendations."
+    },
+    {
+     "text": "Multimodal features mitigate cold-start issues and improve generalization compared to ID-only models."
+    },
+    {
+     "text": "Models can leverage pre-trained encoders like Vision Transformers and BERT to extract rich semantic features from raw data."
+    },
+    {
+     "text": "Multimodal approaches allow for the modeling of fine-grained user interests and visual impressions that influence click decisions."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Introducing multimodal encoders with large parameter counts can cause overfitting due to high-dimensional features."
+    },
+    {
+     "text": "There is often a discrepancy between training tasks and model parameters when using pre-extracted content features."
+    },
+    {
+     "text": "Multimodal content often contains noise irrelevant to user preference, such as background layouts or semantic-free words."
+    },
+    {
+     "text": "End-to-end training of multimodal models is computationally costly and challenging to optimize in industrial scenarios."
+    }
+   ]
+  },
+  {
+   "name": "Generative Recommendation",
+   "definition": "Frameworks that frame candidate item retrieval or recommendation as an autoregressive sequence generation problem, often using language models.",
+   "properties": [
+    {
+     "text": "Generative retrieval treats recommendation as a sequence generation task, allowing for flexible handling of various recommendation tasks."
+    },
+    {
+     "text": "Models like P5 unify different recommendation tasks into a text-to-text paradigm, facilitating knowledge transfer between tasks."
+    },
+    {
+     "text": "Generative methods can integrate behavioral and semantic information to address the limitations of focusing solely on one aspect."
+    },
+    {
+     "text": "Large Language Models (LLMs) serve as backbones for these systems, leveraging their reasoning and generation capabilities."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing generative methods often neglect the complementary nature of behavioral and semantic information, resulting in limited effectiveness."
+    },
+    {
+     "text": "There is a significant semantic gap between LLMs and recommender systems because items are indexed by discrete IDs outside the LLM's vocabulary."
+    },
+    {
+     "text": "Controlling the dialogue flow in LLM-based conversational recommenders to ensure target-oriented recommendations is imperative but difficult."
+    },
+    {
+     "text": "Simply prompting LLMs for conversational recommendation often fails to effectively model user preferences from feedback."
+    }
+   ]
+  },
+  {
+   "name": "Pre-trained Multimodal Foundation Models",
+   "definition": "Large-scale models pre-trained on diverse multimodal data to learn universal representations that can be transferred to various recommendation tasks.",
+   "properties": [
+    {
+     "text": "These models aim to unify different modalities (vision, language, audio) into a shared semantic space for understanding and generation."
+    },
+    {
+     "text": "Pre-training on broad-ranging data allows for task-agnostic and unified machine learning systems that break out of task-specific restrictions."
+    },
+    {
+     "text": "Foundation models can leverage recent large-scale vision-language models to extend zero-shot capabilities to new modalities."
+    },
+    {
+     "text": "Instance-centric pretraining paradigms are designed to handle the differences between natural and product images in e-commerce."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Directly applying general domain pretraining frameworks to e-commerce is sub-optimal due to significant differences in image distributions."
+    },
+    {
+     "text": "Training with diverse modalities is challenging and requires specific architectural improvements to stabilize the process."
+    },
+    {
+     "text": "There is a lack of widely-recognized benchmarking standards for evaluating these large-scale multimodal recommendation models."
+    },
+    {
+     "text": "The high computational cost of training and serving these large models poses challenges for real-time industrial applications."
+    }
+   ]
+  },
+  {
+   "name": "Parameter-Efficient Fine-Tuning (PEFT)",
+   "definition": "Techniques that adapt large pre-trained models to downstream recommendation tasks by training only a small subset of parameters.",
+   "properties": [
+    {
+     "text": "Methods like LoRA and adapters add only a few trainable parameters per task, allowing for compact and extensible models."
+    },
+    {
+     "text": "PEFT enables parameter-efficient transfer learning for recommender systems, particularly for adapting pre-trained modality encoders."
+    },
+    {
+     "text": "These techniques allow new tasks to be added without revisiting previous ones, yielding a high degree of parameter sharing."
+    },
+    {
+     "text": "Prompt tuning and prefix tuning optimize continuous task-specific vectors while keeping the language model parameters frozen."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Fine-tuning large pre-trained models is parameter-inefficient if a full copy of the model is required for every task."
+    },
+    {
+     "text": "Existing techniques for combining separate LoRAs for joint generation of styles and subjects often compromise subject or style fidelity."
+    },
+    {
+     "text": "The effectiveness of adapter-based learning for transferable recommendation systems requires further empirical study and practical insight."
+    }
+   ]
+  },
+  {
+   "name": "Conversational Recommender Systems",
+   "definition": "Systems that recommend items through a dialogue interface, utilizing LLMs to manage sub-tasks like preference elicitation and explanation.",
+   "properties": [
+    {
+     "text": "LLMs have the potential to improve CRS performance by conducting fluent, multi-turn conversations with users."
+    },
+    {
+     "text": "These systems aim to control the dialogue flow to successfully recommend appropriate items rather than engaging in aimless chit-chat."
+    },
+    {
+     "text": "User feedback in CRS can assist the system in better modeling user preferences, which is often ignored in existing studies."
+    },
+    {
+     "text": "Neuro-symbolic reasoning frameworks can be used to provide interpretable reasoning chains for task-oriented dialogues."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "It is imperative to control the dialogue flow in LLMs to ensure the system achieves its recommendation target."
+    },
+    {
+     "text": "Existing studies often ignore the utility of user feedback in refining user preference models during conversation."
+    },
+    {
+     "text": "Developing effective CRSs involves challenges in managing multiple sub-tasks and generating correct responses that interact with users."
+    }
+   ]
+  },
+  {
+   "name": "Explainable and Personalized Generation",
+   "definition": "Methods that generate natural language explanations or personalized content (like headlines) to justify recommendations and enhance user trust.",
+   "properties": [
+    {
+     "text": "Providing user-understandable explanations helps users understand recommended items and increases system ease of use."
+    },
+    {
+     "text": "Personalized headline generation incorporates reader preferences to create irresistible reading invitations."
+    },
+    {
+     "text": "These systems can utilize distant supervision from user click behaviors to learn preference representations."
+    },
+    {
+     "text": "Human-AI co-creation methods, such as guiding or selecting model outputs, add benefit to the generation process with low cost."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Previous works mostly adopted recurrent neural networks, leaving potentially more effective pre-trained Transformer models under-exploited."
+    },
+    {
+     "text": "User and item IDs are in a different semantic space than words, making it difficult for pre-trained models to generate explanations directly."
+    },
+    {
+     "text": "LLMs alone can generate satisfactory headlines, but human control is often needed to fix undesirable model outputs."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Bridging the semantic gap between Large Language Models and recommender systems, where items are indexed by discrete IDs outside the LLM's vocabulary."
+    },
+    {
+     "text": "Developing a widely-recognized benchmarking standard for recommender systems to address the lack of consistent experimental settings and reproducibility."
+    },
+    {
+     "text": "Efficiently integrating multimodal encoders into recommendation models without causing overfitting or incurring prohibitive computational costs in industrial scenarios."
+    },
+    {
+     "text": "Resolving the discrepancy between training and testing signals in cold-start multimedia recommendation, where cold items only exist in testing data."
+    },
+    {
+     "text": "Creating a universal model that can effectively harness heterogeneous resources and respond to a wide range of personalized needs across different domains."
+    },
+    {
+     "text": "Improving the interpretability of multimodal recommendation models, which currently represent users and items using entangled numerical vectors."
+    },
+    {
+     "text": "Addressing the challenge of modality forgetting in two-stage approaches, where the sequential objective overshadows modality representation."
+    },
+    {
+     "text": "Developing methods to reliably combine separate LoRAs for joint generation of learned styles and subjects without compromising fidelity."
+    }
+   ]
+  }
+ ]
+}

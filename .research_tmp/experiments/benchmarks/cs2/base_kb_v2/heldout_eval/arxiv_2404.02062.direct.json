@@ -1,0 +1,254 @@
+{
+ "families": [
+  {
+   "name": "Machine Unlearning",
+   "definition": "Techniques that modify trained models to remove specific knowledge or behaviors without full retraining.",
+   "properties": [
+    {
+     "text": "Methods include gradient ascent on target sequences to induce forgetting."
+    },
+    {
+     "text": "Some approaches use parametric arithmetic to subtract old knowledge before learning new information."
+    },
+    {
+     "text": "Ensemble methods like SISA limit the influence of specific data points during training to expedite unlearning."
+    },
+    {
+     "text": "Techniques can target specific copyrighted content, such as unlearning Harry Potter books from LLMs."
+    },
+    {
+     "text": "Unlearning can be applied to reduce hallucinations and remove harmful responses."
+    },
+    {
+     "text": "Some methods use leave-one-out ensembles with teacher-student frameworks to unlearn targeted textual sequences."
+    },
+    {
+     "text": "Knowledge unlearning via gradient ascent can forget target tokens with little degradation of general language capabilities."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Modifications to the model can alter behavior on key dimensions such as fairness."
+    },
+    {
+     "text": "It is difficult to verify if all undesirable data has been removed from the training set."
+    },
+    {
+     "text": "Re-training from scratch is impractical, making unlearning necessary but challenging."
+    },
+    {
+     "text": "Existing techniques may not suffice for aligned models like ChatGPT without new divergence attacks."
+    },
+    {
+     "text": "There is a risk that unlearning one piece of information may inadvertently affect other capabilities."
+    }
+   ]
+  },
+  {
+   "name": "Model Editing and Knowledge Updating",
+   "definition": "Methods that perform local updates to model weights or parameters to inject new knowledge or correct errors.",
+   "properties": [
+    {
+     "text": "Task arithmetic uses task vectors to steer model behavior by moving in specific directions in weight space."
+    },
+    {
+     "text": "Memory-based model editing allows for local updates to inject updated knowledge or correct undesirable behaviors."
+    },
+    {
+     "text": "Model editors can be used to mitigate biases learned during pre-training."
+    },
+    {
+     "text": "Parametric arithmetic facilitates the forgetting of old knowledge and learning of new knowledge."
+    },
+    {
+     "text": "Editing can be used to correct mistakes made by large language models without retraining."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing model editors often suffer from insufficient expressiveness."
+    },
+    {
+     "text": "Editors struggle to accurately model an edit's intended scope, leading to inaccurate predictions for loosely related inputs."
+    },
+    {
+     "text": "Editors often fail altogether after many edits are applied."
+    },
+    {
+     "text": "Local updates may not generalize well to broader contexts."
+    }
+   ]
+  },
+  {
+   "name": "Bias and Fairness Mitigation",
+   "definition": "Techniques designed to reduce social biases, stereotypes, or unfairness in language model outputs and representations.",
+   "properties": [
+    {
+     "text": "Zero-shot self-debiasing leverages LLM capabilities to reduce stereotyping without modifying training data or parameters."
+    },
+    {
+     "text": "Concept erasure methods like LEACE remove specified features from embeddings to improve fairness."
+    },
+    {
+     "text": "Iterative Null-space Projection (INLP) removes information from neural representations by projecting onto the null-space of linear classifiers."
+    },
+    {
+     "text": "Some methods disentangle factual gender information from gender bias in model embeddings."
+    },
+    {
+     "text": "Ensemble post-processing can improve the fairness of unlearning in LLMs."
+    },
+    {
+     "text": "Data augmentation and filtering methods can decrease stereotypical bias while preserving factual signals."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Most bias mitigation techniques require modifications to training data, model parameters, or decoding strategy."
+    },
+    {
+     "text": "These modifications may be infeasible without access to a trainable model."
+    },
+    {
+     "text": "Removing bias can sometimes lead to the loss of factual information, such as grammatical gender."
+    },
+    {
+     "text": "Biases are deeply embedded in the representations of large language models."
+    }
+   ]
+  },
+  {
+   "name": "Privacy Protection and Anonymization",
+   "definition": "Methods that protect sensitive information in textual data or prevent its leakage from models.",
+   "properties": [
+    {
+     "text": "Deduplicating training data mitigates privacy risks by reducing the superlinear relationship between sequence count and regeneration rate."
+    },
+    {
+     "text": "Automatic anonymization detects and removes or generalizes sensitive pieces of text in unstructured documents."
+    },
+    {
+     "text": "Differential privacy techniques can be used to train deep neural networks without exposing private information."
+    },
+    {
+     "text": "Privacy-preserving mechanisms sanitize data so that identities or confidential attributes are not disclosed."
+    },
+    {
+     "text": "Document redaction and sanitization models provide privacy guarantees for sensitive document release."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Automatic anonymization of unstructured text is far from being solved."
+    },
+    {
+     "text": "Textual data protection has received little attention compared to structured databases."
+    },
+    {
+     "text": "Privacy risks scale with model size, particularly for large language models."
+    },
+    {
+     "text": "Manual redaction is burdensome and requires human experts."
+    }
+   ]
+  },
+  {
+   "name": "Extraction and Membership Inference Attacks",
+   "definition": "Adversarial techniques used to extract training data or determine membership in the training set from language models.",
+   "properties": [
+    {
+     "text": "Adversaries can extract gigabytes of training data from open-source, semi-open, and closed models."
+    },
+    {
+     "text": "Divergence attacks can cause aligned models like ChatGPT to diverge from chatbot-style generations to extract data."
+    },
+    {
+     "text": "Membership inference attacks determine if a specific data record was in the model's training dataset."
+    },
+    {
+     "text": "Extractable memorization refers to training data that can be efficiently extracted by querying the model."
+    },
+    {
+     "text": "Attacks can recover personally identifiable information such as names, phone numbers, and email addresses."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Existing techniques may not suffice for unaligned models without new attack strategies."
+    },
+    {
+     "text": "The success of attacks is largely due to duplication in commonly used web-scraped training sets."
+    },
+    {
+     "text": "It is difficult to know which problematic data is included in the training set or in what proportions."
+    }
+   ]
+  },
+  {
+   "name": "Toxicity and Hallucination Mitigation",
+   "definition": "Methods aimed at reducing the generation of offensive, harmful, or factually incorrect content by language models.",
+   "properties": [
+    {
+     "text": "Self-detoxifying language models use negative steering prompts to achieve self-detoxification."
+    },
+    {
+     "text": "Elastic Weight Removal subtracts parameters of a model trained to hallucinate from a dialogue model to negate hallucinated examples."
+    },
+    {
+     "text": "Quark uses quantized reward conditioning to optimize a reward function that quantifies unwanted properties."
+    },
+    {
+     "text": "Internet-augmented dialogue generation conditions on search results to reduce hallucinations and provide up-to-date knowledge."
+    },
+    {
+     "text": "Unlearning can be used to reduce hallucinations as an alignment technique."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Finetuning-based detoxification methods are often resource-intensive."
+    },
+    {
+     "text": "Decoding-based methods rely on additional components and may compromise generation fluency."
+    },
+    {
+     "text": "Large language models are prone to generating hallucinations that conflict with source or factual knowledge."
+    },
+    {
+     "text": "Facts in model weights are frozen in time at the point of model training."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "There is currently no way to know which problematic data is included in the training set of large language models or in what proportions."
+    },
+    {
+     "text": "Automatic anonymization of unstructured text remains far from being solved."
+    },
+    {
+     "text": "Existing model editors struggle to accurately model an edit's intended scope and often fail after many edits."
+    },
+    {
+     "text": "It is difficult to verify if all undesirable data has been removed from the training set during unlearning."
+    },
+    {
+     "text": "Most bias mitigation techniques require access to a trainable model, which may be infeasible for closed-source models."
+    },
+    {
+     "text": "Privacy risks in machine learning scale with model size, posing a serious threat for large language models."
+    },
+    {
+     "text": "There is a lack of convincing demonstrations of knowledge use in open-domain dialogue agents."
+    },
+    {
+     "text": "The underlying cause of privacy risk in machine learning is not well understood beyond anecdotal accounts of overfitting and influence."
+    }
+   ]
+  }
+ ]
+}

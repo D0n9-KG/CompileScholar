@@ -1,0 +1,166 @@
+{
+ "families": [
+  {
+   "name": "Rigid-Body Decomposition",
+   "definition": "Methods that segment an object into distinct rigid parts and model their relative motion using joint parameters.",
+   "properties": [
+    {
+     "text": "These methods assume that each identified part moves as a single rigid body without internal deformation."
+    },
+    {
+     "text": "They typically rely on clustering algorithms or geometric priors to separate the object into components."
+    },
+    {
+     "text": "The kinematic structure is often represented as a tree or graph where edges denote joints."
+    },
+    {
+     "text": "This approach is computationally efficient for objects with clear, non-overlapping rigid segments."
+    },
+    {
+     "text": "It is particularly effective for mechanical objects like robots or vehicles with well-defined hinges."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The method fails when parts undergo significant non-rigid deformation, such as bending or stretching."
+    },
+    {
+     "text": "Segmentation errors can lead to incorrect part identification and subsequent motion modeling failures."
+    },
+    {
+     "text": "It struggles with objects that have complex, interpenetrating, or highly articulated structures."
+    },
+    {
+     "text": "The assumption of rigid parts limits applicability to soft or flexible materials."
+    }
+   ]
+  },
+  {
+   "name": "Non-Rigid Articulation",
+   "definition": "Approaches that model continuous deformations and flexible joints, allowing parts to bend or twist rather than just rotate.",
+   "properties": [
+    {
+     "text": "These methods use continuous deformation fields or spline-based representations to capture smooth motion."
+    },
+    {
+     "text": "They can handle objects with flexible limbs, such as tentacles or fabric-like appendages."
+    },
+    {
+     "text": "The kinematic model often involves higher-order derivatives to describe curvature and torsion."
+    },
+    {
+     "text": "This family is suitable for biological organisms or soft robotic systems."
+    },
+    {
+     "text": "It provides a more realistic representation of motion for objects that do not have discrete rigid segments."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The increased complexity leads to higher computational costs compared to rigid-body models."
+    },
+    {
+     "text": "Parameterizing the deformation field can be ill-posed without strong regularization or prior knowledge."
+    },
+    {
+     "text": "It is difficult to distinguish between true articulation and noise in the data."
+    },
+    {
+     "text": "The methods often require dense correspondence data, which is hard to obtain in practice."
+    }
+   ]
+  },
+  {
+   "name": "Graph-Based Kinematics",
+   "definition": "Techniques that represent the object's structure as a graph where nodes are parts and edges are joints, often learned from data.",
+   "properties": [
+    {
+     "text": "The graph structure encodes the topological relationships between different parts of the object."
+    },
+    {
+     "text": "Message passing or graph neural networks are often used to infer joint states from observations."
+    },
+    {
+     "text": "This approach allows for flexible and scalable modeling of complex hierarchical structures."
+    },
+    {
+     "text": "It can incorporate physical constraints directly into the graph edges."
+    },
+    {
+     "text": "The method is robust to variations in the number of parts or joints."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The quality of the model is heavily dependent on the accuracy of the learned graph structure."
+    },
+    {
+     "text": "It may struggle with objects that have dynamic or changing topologies."
+    },
+    {
+     "text": "The computational complexity can grow rapidly with the size of the graph."
+    },
+    {
+     "text": "It requires careful design of the message passing mechanism to ensure stability and convergence."
+    }
+   ]
+  },
+  {
+   "name": "Deep Learning-Based Articulation",
+   "definition": "Data-driven methods that use neural networks to learn the mapping from observations to articulated object states.",
+   "properties": [
+    {
+     "text": "These methods leverage large datasets to learn complex, non-linear relationships between input and output."
+    },
+    {
+     "text": "They can handle high-dimensional input data, such as point clouds or images, directly."
+    },
+    {
+     "text": "The models can implicitly learn the underlying kinematic structure without explicit parameterization."
+    },
+    {
+     "text": "This approach is highly flexible and can adapt to a wide variety of object types."
+    },
+    {
+     "text": "It often achieves state-of-the-art performance in benchmark tasks."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The methods require large amounts of labeled data for training, which is often scarce."
+    },
+    {
+     "text": "They lack interpretability, making it difficult to understand why a specific prediction was made."
+    },
+    {
+     "text": "The models may not generalize well to unseen object types or environments."
+    },
+    {
+     "text": "They are computationally expensive to train and deploy."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Developing robust methods for segmenting and modeling objects with both rigid and non-rigid parts simultaneously."
+    },
+    {
+     "text": "Improving the generalization of deep learning models to unseen object categories with limited data."
+    },
+    {
+     "text": "Integrating physical constraints and dynamics into learned articulation models to ensure physically plausible motion."
+    },
+    {
+     "text": "Creating efficient algorithms for real-time articulation modeling in dynamic and cluttered environments."
+    },
+    {
+     "text": "Establishing standardized benchmarks and datasets for evaluating articulation modeling methods across diverse object types."
+    }
+   ]
+  }
+ ]
+}

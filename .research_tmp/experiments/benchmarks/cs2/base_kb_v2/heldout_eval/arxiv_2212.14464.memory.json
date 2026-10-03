@@ -1,0 +1,204 @@
+{
+ "families": [
+  {
+   "name": "Diversity-Aware Ranking",
+   "definition": "Methods that modify the ranking score of individual items to penalize redundancy and promote variety within the final list.",
+   "properties": [
+    {
+     "text": "These methods integrate diversity metrics directly into the utility function used for ranking."
+    },
+    {
+     "text": "They typically operate by adjusting scores based on the similarity between candidate items and already selected items."
+    },
+    {
+     "text": "This approach allows for a direct trade-off between relevance and diversity through a tunable parameter."
+    },
+    {
+     "text": "It is computationally efficient as it often requires only a single pass over the candidate set."
+    },
+    {
+     "text": "It applies well to scenarios where item similarity can be easily quantified using embeddings or metadata."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The choice of similarity metric significantly impacts performance and may not capture complex user preferences."
+    },
+    {
+     "text": "It can lead to suboptimal global list structures because decisions are made greedily or locally."
+    },
+    {
+     "text": "It struggles to handle higher-order interactions between multiple items simultaneously."
+    },
+    {
+     "text": "The tuning of the diversity-relevance trade-off parameter is often sensitive and dataset-dependent."
+    }
+   ]
+  },
+  {
+   "name": "Diversity-Aware Re-ranking",
+   "definition": "Techniques that take a pre-ranked list of items and reorder them to optimize for both relevance and diversity constraints.",
+   "properties": [
+    {
+     "text": "These methods treat the initial ranking as a candidate pool and solve a combinatorial optimization problem."
+    },
+    {
+     "text": "They often use algorithms like Maximal Marginal Relevance (MMR) or submodular function maximization."
+    },
+    {
+     "text": "This family allows for more complex constraints, such as ensuring coverage of specific categories."
+    },
+    {
+     "text": "It preserves the relative order of highly relevant items while inserting diverse alternatives."
+    },
+    {
+     "text": "It is applicable when the initial ranking model is strong but lacks diversity awareness."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Combinatorial optimization can be computationally expensive for large candidate sets."
+    },
+    {
+     "text": "It may disrupt the strict relevance ordering, potentially confusing users who expect top results to be most relevant."
+    },
+    {
+     "text": "The quality of the output is heavily dependent on the quality of the initial pre-ranked list."
+    },
+    {
+     "text": "It is difficult to guarantee that the re-ranked list is globally optimal for all possible diversity metrics."
+    }
+   ]
+  },
+  {
+   "name": "Diversity-Aware Retrieval",
+   "definition": "Approaches that modify the retrieval process to ensure that the candidate pool itself contains a diverse set of items before ranking.",
+   "properties": [
+    {
+     "text": "These methods diversify the search space by querying multiple diverse sources or using diverse query expansions."
+    },
+    {
+     "text": "They aim to prevent the retrieval stage from being biased towards a single cluster of similar items."
+    },
+    {
+     "text": "This approach is crucial when the initial candidate set is too small or homogeneous to allow for effective re-ranking."
+    },
+    {
+     "text": "It can involve using multiple retrieval models or diverse indexing strategies."
+    },
+    {
+     "text": "It applies particularly well in large-scale systems where retrieval is the bottleneck for diversity."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "It can reduce the precision of the retrieved candidates if diverse items are less relevant."
+    },
+    {
+     "text": "It increases the computational cost of the retrieval phase."
+    },
+    {
+     "text": "It is difficult to balance the diversity of the candidate pool with the need for high recall of relevant items."
+    },
+    {
+     "text": "It may introduce noise if the diversity mechanisms are not tightly coupled with user intent."
+    }
+   ]
+  },
+  {
+   "name": "Personalized Diversity",
+   "definition": "Methods that tailor the level and type of diversity to individual user preferences and historical behavior.",
+   "properties": [
+    {
+     "text": "These methods recognize that different users have different tolerances for and desires of diversity."
+    },
+    {
+     "text": "They use user profiles or interaction history to predict the optimal diversity level for each user."
+    },
+    {
+     "text": "This approach can improve user satisfaction by aligning diversity with personal taste."
+    },
+    {
+     "text": "It often involves learning a user-specific utility function that weights relevance and diversity differently."
+    },
+    {
+     "text": "It applies in scenarios with rich user data and long-term interaction logs."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "It requires significant data to accurately model individual user preferences for diversity."
+    },
+    {
+     "text": "It can lead to filter bubbles if the model overfits to past behavior and fails to introduce novel diverse items."
+    },
+    {
+     "text": "The cold-start problem is severe for new users with limited history."
+    },
+    {
+     "text": "It is computationally intensive to maintain and update personalized diversity models for large user bases."
+    }
+   ]
+  },
+  {
+   "name": "Fairness and Bias Mitigation",
+   "definition": "Techniques that ensure diversity is achieved in a way that does not unfairly disadvantage specific groups or items.",
+   "properties": [
+    {
+     "text": "These methods explicitly model fairness constraints alongside diversity objectives."
+    },
+    {
+     "text": "They aim to prevent the amplification of biases present in the training data or user interactions."
+    },
+    {
+     "text": "This approach often involves re-weighting items or users to ensure equitable representation."
+    },
+    {
+     "text": "It is critical for ethical AI systems and regulatory compliance."
+    },
+    {
+     "text": "It applies in contexts where demographic or categorical fairness is a primary concern."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Defining fairness and diversity in a mathematically consistent way is challenging and often contradictory."
+    },
+    {
+     "text": "It can reduce overall system efficiency or relevance if fairness constraints are too strict."
+    },
+    {
+     "text": "It requires careful auditing and monitoring to ensure that bias is not being shifted rather than eliminated."
+    },
+    {
+     "text": "It is difficult to generalize fairness definitions across different domains and user populations."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Lack of a unified theoretical framework that reconciles different definitions of diversity and fairness."
+    },
+    {
+     "text": "Scalability of complex diversity-aware algorithms to real-time, large-scale industrial systems."
+    },
+    {
+     "text": "Effective evaluation metrics that capture the subjective and dynamic nature of user-perceived diversity."
+    },
+    {
+     "text": "Handling the cold-start problem for both new users and new items in personalized diversity settings."
+    },
+    {
+     "text": "Integrating diversity objectives with other system goals such as long-term user engagement and ecosystem health."
+    },
+    {
+     "text": "Understanding the causal impact of diversity on user behavior and satisfaction over time."
+    }
+   ]
+  }
+ ]
+}

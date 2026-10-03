@@ -1,0 +1,352 @@
+{
+ "families": [
+  {
+   "name": "Standard Autoregressive NMT",
+   "definition": "Encoder-decoder models that generate target sequences token-by-token from left to right using attention mechanisms.",
+   "properties": [
+    {
+     "text": "These models typically use recurrent neural networks or self-attention to encode source sentences and decode target translations sequentially."
+    },
+    {
+     "text": "They achieve state-of-the-art translation quality on high-resource language pairs."
+    },
+    {
+     "text": "The architecture allows for the integration of various linguistic features such as morphology, part-of-speech tags, and syntactic dependencies."
+    },
+    {
+     "text": "Attention mechanisms allow the decoder to selectively focus on relevant parts of the source sentence during generation."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Inference is slow because decoding is sequential and cannot be parallelized."
+    },
+    {
+     "text": "Errors made early in the generation process are fed back into the model and can be amplified, leading to unbalanced outputs."
+    },
+    {
+     "text": "The model only exploits left-to-right target-side contexts, leaving right-to-left information unexploited."
+    },
+    {
+     "text": "Performance drops considerably in the presence of morphologically rich languages due to large vocabulary and high out-of-vocabulary rates."
+    }
+   ]
+  },
+  {
+   "name": "Non-Autoregressive and Semi-Autoregressive NMT",
+   "definition": "Models that generate multiple or all target tokens in parallel to reduce inference latency, often using iterative refinement or auxiliary regularization.",
+   "properties": [
+    {
+     "text": "These models achieve substantial improvements in generation speed compared to autoregressive models."
+    },
+    {
+     "text": "Methods include predicting all tokens independently, using insertion operations, or generating groups of words in parallel."
+    },
+    {
+     "text": "Techniques such as knowledge distillation, input token fertilities, and policy gradient fine-tuning are used to maintain quality."
+    },
+    {
+     "text": "Semi-autoregressive models keep the autoregressive property globally but relieve it locally to produce multiple successive words in parallel."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They suffer from over-translation and under-translation errors due to the lack of target sequential information."
+    },
+    {
+     "text": "Repeated translations occur because adjacent decoder hidden states are indistinguishable."
+    },
+    {
+     "text": "Incomplete translations happen due to incomplete transfer of source-side information via decoder hidden states."
+    },
+    {
+     "text": "Translation quality is often inferior to autoregressive counterparts without significant additional training techniques."
+    }
+   ]
+  },
+  {
+   "name": "Bidirectional and Synchronous Decoding",
+   "definition": "Approaches that generate translations from both left-to-right and right-to-left directions simultaneously or interactively to leverage full target-side context.",
+   "properties": [
+    {
+     "text": "These methods introduce backward decoders or synchronous bidirectional inference to access future context."
+    },
+    {
+     "text": "They aim to address the issue of unbalanced outputs where left parts are more accurate than right parts."
+    },
+    {
+     "text": "Regularization losses can be used to enforce agreement between forward and backward hidden states."
+    },
+    {
+     "text": "Middle-out decoding starts from an initial middle-word and expands the sequence in both directions."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The complexity of managing two decoding directions can increase computational overhead."
+    },
+    {
+     "text": "Ensuring consistency between the two directions requires specific regularization or interaction mechanisms."
+    },
+    {
+     "text": "These methods are less standard than unidirectional decoding and may require specialized architectural modifications."
+    }
+   ]
+  },
+  {
+   "name": "Syntax-Aware NMT",
+   "definition": "Models that incorporate explicit syntactic structures, such as parse trees or dependency relations, to guide the translation process.",
+   "properties": [
+    {
+     "text": "Syntactic information is integrated via tree-structured decoders, graph convolutional networks, or soft template prediction."
+    },
+    {
+     "text": "These models can improve translation quality, especially for long sentences and in low-resource scenarios."
+    },
+    {
+     "text": "They allow for more explicit reordering during translation compared to syntax-agnostic baselines."
+    },
+    {
+     "text": "Latent variable models can capture co-dependence between syntax and semantics while allowing efficient inference."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Incorporating syntax through latent variables introduces additional complexity in inference."
+    },
+    {
+     "text": "Models often resort to greedy search which limits exploration of the latent space."
+    },
+    {
+     "text": "The choice of specific linguistic formalism (e.g., constituency vs. dependency) remains an open question."
+    },
+    {
+     "text": "Dependency-aware self-attention mechanisms may be parameter-free but require careful design to improve quality."
+    }
+   ]
+  },
+  {
+   "name": "Subword and Character-Level NMT",
+   "definition": "Models that operate at the level of subwords, characters, or bytes to handle open vocabulary and morphological richness.",
+   "properties": [
+    {
+     "text": "Subword segmentation methods like BPE address the open vocabulary problem by splitting rare words into smaller units."
+    },
+    {
+     "text": "Character-level models eliminate the need for explicit segmentation and can learn morphology directly."
+    },
+    {
+     "text": "Byte-level subwords use a fixed 256-byte vocabulary to handle noisy text and character-rich languages."
+    },
+    {
+     "text": "Hybrid word-character models translate mostly at the word level but consult character components for rare words."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Character-level sequences are longer, creating modeling and computational challenges."
+    },
+    {
+     "text": "Standard BPE is deterministic, which may prevent the model from learning compositionality or being robust to segmentation errors."
+    },
+    {
+     "text": "Character-based models are brittle and easily falter when presented with noisy data."
+    },
+    {
+     "text": "High computational cost has historically prevented the wide deployment of byte-level models."
+    }
+   ]
+  },
+  {
+   "name": "Unsupervised and Low-Resource NMT",
+   "definition": "Methods that train translation models using monolingual corpora or limited parallel data, often employing back-translation or dual learning.",
+   "properties": [
+    {
+     "text": "Back-translation generates synthetic parallel data from monolingual corpora to improve model performance."
+    },
+    {
+     "text": "Dual learning mechanisms allow systems to learn from unlabeled data through a primal-dual game."
+    },
+    {
+     "text": "Unsupervised methods map sentences from different languages into a shared latent space without parallel data."
+    },
+    {
+     "text": "Transfer learning from high-resource language pairs can significantly improve low-resource NMT performance."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Synthetic bilingual corpora generated by back-translation are inevitably noisy, and errors can accumulate during training."
+    },
+    {
+     "text": "Bad initialization in unsupervised frameworks may wrongly squeeze the search space."
+    },
+    {
+     "text": "Existing unsupervised systems are far behind their supervised counterparts in translation quality."
+    },
+    {
+     "text": "The lack of large parallel corpora remains a major practical problem for many language pairs."
+    }
+   ]
+  },
+  {
+   "name": "Robustness and Adversarial Training",
+   "definition": "Techniques designed to improve the stability of NMT models against noisy inputs, perturbations, and adversarial examples.",
+   "properties": [
+    {
+     "text": "Adversarial augmentation minimizes vicinal risk over virtual sentences to improve robustness."
+    },
+    {
+     "text": "Joint textual and phonetic embeddings can improve robustness to homophone noises."
+    },
+    {
+     "text": "Contrastive learning approaches reduce word omission errors by assigning lower probabilities to erroneous translations."
+    },
+    {
+     "text": "Adversarial stability training enables models to behave similarly for original and perturbed inputs."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "NMT systems tend to fail on less decent inputs despite significant efficacy on clean data."
+    },
+    {
+     "text": "Small perturbations in the input can severely distort intermediate representations and impact translation quality."
+    },
+    {
+     "text": "Generating natural and legible adversarial examples for complex domains like language is difficult."
+    },
+    {
+     "text": "Reinforcement learning methods for robustness may take infeasibly long time to converge."
+    }
+   ]
+  },
+  {
+   "name": "Pre-training and Transfer Learning",
+   "definition": "Strategies that leverage large-scale monolingual or multilingual data to pre-train models before fine-tuning on specific translation tasks.",
+   "properties": [
+    {
+     "text": "Denoising autoencoders like BART and mBART pre-train sequence-to-sequence models on large-scale monolingual corpora."
+    },
+    {
+     "text": "Cross-lingual language model pretraining extends generative pretraining to multiple languages."
+    },
+    {
+     "text": "Pre-trained representations can be integrated into the encoder or decoder to improve performance in resource-poor setups."
+    },
+    {
+     "text": "Multilingual denoising pre-training produces significant performance gains across a wide variety of MT tasks."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Massively multilingual models often underperform bilingual models and deliver poor zero-shot translations."
+    },
+    {
+     "text": "Pre-training a complete sequence-to-sequence model is computationally expensive."
+    },
+    {
+     "text": "Returns from pre-training diminish with more labeled data."
+    },
+    {
+     "text": "Off-target translation is a major source of inferior zero-shot performance in multilingual models."
+    }
+   ]
+  },
+  {
+   "name": "Sequence-Level Optimization and RL",
+   "definition": "Training methods that optimize non-differentiable metrics like BLEU directly, often using reinforcement learning or minimum risk training.",
+   "properties": [
+    {
+     "text": "Minimum risk training optimizes model parameters directly with respect to arbitrary evaluation metrics."
+    },
+    {
+     "text": "Reinforcement learning can improve performance by exposing pitfalls for a given performance metric."
+    },
+    {
+     "text": "Sequence-level training algorithms directly optimize the metric used at test time."
+    },
+    {
+     "text": "Classical structured prediction losses can perform surprisingly well by slightly outperforming beam search optimization."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Reinforcement learning is unstable and challenging to train successfully, especially with deep models and large datasets."
+    },
+    {
+     "text": "Some common RL methods for MT do not optimize the expected reward."
+    },
+    {
+     "text": "Training with BLEU has limitations such as not assigning partial credit and penalizing semantically correct hypotheses that differ lexically."
+    },
+    {
+     "text": "RL practices in MT are likely to improve performance only where the pre-trained model is already strong."
+    }
+   ]
+  },
+  {
+   "name": "Interpretability and Analysis",
+   "definition": "Methods and tools used to understand the internal workings, attention patterns, and decision-making processes of NMT models.",
+   "properties": [
+    {
+     "text": "Layer-wise relevance propagation (LRP) helps interpret internal workings and analyze translation errors."
+    },
+    {
+     "text": "Gradient-based methods can measure word importance by attributing NMT output to every input word."
+    },
+    {
+     "text": "Visual debugging tools allow interaction and 'what if'-style exploration of trained sequence-to-sequence models."
+    },
+    {
+     "text": "Analysis of attention mechanisms reveals patterns such as attending to delimiter tokens or specific positional offsets."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The interpretability of NMT remains unsatisfactory due to continuous representations and non-linearity."
+    },
+    {
+     "text": "It is not clear if linguistic information is fully distributed or if some of it can be attributed to individual neurons."
+    },
+    {
+     "text": "Black-box probing tasks show that representations learned by the Transformer differ significantly depending on the objective."
+    },
+    {
+     "text": "Understanding how and when neural-based systems fail in adversarial cases is critical but difficult."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "The lack of large parallel corpora poses a major practical problem for many language pairs, limiting the applicability of machine translation systems."
+    },
+    {
+     "text": "NMT systems are prone to word omission errors and unbalanced outputs, which harm subsequent sequence generation."
+    },
+    {
+     "text": "The robustness of NMT models to noisy, non-standard, or adversarial inputs remains a significant challenge, with models often failing on moderately noisy texts."
+    },
+    {
+     "text": "The interpretability of NMT models is unsatisfactory, making it difficult to understand their internal workings and debug errors."
+    },
+    {
+     "text": "Massively multilingual models often underperform bilingual models and suffer from off-target translation issues in zero-shot scenarios."
+    },
+    {
+     "text": "The optimal linguistic formalism for incorporating syntactic information into NMT remains an open question."
+    },
+    {
+     "text": "Reinforcement learning for NMT is unstable and may not optimize the expected reward, limiting its effectiveness in real-world systems."
+    },
+    {
+     "text": "The expressive power of Transformer models, while proven to be universal approximators, is not fully understood in the context of sequence-to-sequence functions."
+    }
+   ]
+  }
+ ]
+}

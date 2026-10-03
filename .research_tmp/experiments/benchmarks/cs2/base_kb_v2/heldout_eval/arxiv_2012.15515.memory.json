@@ -1,0 +1,207 @@
+{
+ "families": [
+  {
+   "name": "Sequence-to-Sequence Models",
+   "definition": "Encoder-decoder architectures that map an input source sequence to an output target sequence using attention mechanisms to align context.",
+   "properties": [
+    {
+     "text": "These models use an encoder to compress the source sentence into a fixed-length vector or a sequence of hidden states."
+    },
+    {
+     "text": "The decoder generates the target sentence token by token, conditioned on the source representation and previously generated tokens."
+    },
+    {
+     "text": "Attention mechanisms allow the model to focus on relevant parts of the source sequence for each target token generation step."
+    },
+    {
+     "text": "They are the foundational architecture for most subsequent neural machine translation improvements."
+    },
+    {
+     "text": "They handle variable-length inputs and outputs more effectively than fixed-length vector approaches."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Standard attention mechanisms have quadratic computational complexity with respect to sequence length."
+    },
+    {
+     "text": "They often struggle with long-range dependencies in very long documents without specific architectural modifications."
+    },
+    {
+     "text": "Training can be unstable due to the exposure bias inherent in teacher forcing during training versus autoregressive generation at inference."
+    },
+    {
+     "text": "They require large amounts of parallel data to achieve competitive performance compared to statistical methods on low-resource pairs."
+    }
+   ]
+  },
+  {
+   "name": "Transformer Models",
+   "definition": "Attention-based architectures that eliminate recurrence and rely entirely on self-attention mechanisms to process sequences in parallel.",
+   "properties": [
+    {
+     "text": "They utilize multi-head self-attention to capture global dependencies within the sequence without sequential processing constraints."
+    },
+    {
+     "text": "Positional encodings are added to the input embeddings to provide information about the relative or absolute position of tokens."
+    },
+    {
+     "text": "The architecture allows for high parallelization during training, significantly reducing training time compared to RNNs."
+    },
+    {
+     "text": "They achieve state-of-the-art performance on many benchmark translation tasks due to their ability to model long-range dependencies."
+    },
+    {
+     "text": "The modular design facilitates the addition of various components like layer normalization and feed-forward networks."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "The self-attention mechanism has quadratic time and space complexity with respect to the sequence length."
+    },
+    {
+     "text": "They require substantial computational resources for training and inference, making them less accessible for low-resource settings."
+    },
+    {
+     "text": "They can be sensitive to the choice of positional encoding scheme for very long sequences."
+    },
+    {
+     "text": "Inference latency can be high for real-time applications due to the autoregressive nature of the decoder."
+    }
+   ]
+  },
+  {
+   "name": "Pre-trained Language Models",
+   "definition": "Models initialized with weights learned from large-scale monolingual or multilingual corpora before being fine-tuned for specific translation tasks.",
+   "properties": [
+    {
+     "text": "They leverage unsupervised or self-supervised learning objectives to capture general linguistic knowledge and syntax."
+    },
+    {
+     "text": "Fine-tuning on parallel data allows these models to adapt to specific language pairs with less data than training from scratch."
+    },
+    {
+     "text": "Multilingual pre-training enables zero-shot or few-shot translation capabilities for language pairs not seen during pre-training."
+    },
+    {
+     "text": "They significantly improve performance in low-resource scenarios by transferring knowledge from high-resource languages."
+    },
+    {
+     "text": "They often incorporate bidirectional context in the encoder and unidirectional context in the decoder."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Pre-training requires massive computational resources and large datasets, creating a barrier to entry for smaller research groups."
+    },
+    {
+     "text": "There is a risk of catastrophic forgetting when fine-tuning on specific tasks if not carefully managed."
+    },
+    {
+     "text": "Performance can degrade if the pre-training data distribution differs significantly from the target domain."
+    },
+    {
+     "text": "They may inherit biases present in the large-scale pre-training corpora."
+    }
+   ]
+  },
+  {
+   "name": "Neural Machine Translation with External Knowledge",
+   "definition": "Methods that integrate external resources such as dictionaries, knowledge graphs, or monolingual corpora into the translation process.",
+   "properties": [
+    {
+     "text": "They incorporate explicit linguistic knowledge to guide the translation of rare words or domain-specific terminology."
+    },
+    {
+     "text": "Knowledge graphs can provide structured information about entities and their relationships to improve semantic accuracy."
+    },
+    {
+     "text": "Monolingual data can be used to augment the model's understanding of the target language's syntax and style."
+    },
+    {
+     "text": "These methods aim to mitigate the data sparsity problem for low-frequency words and phrases."
+    },
+    {
+     "text": "They can improve the factual consistency of translations by grounding them in verified external information."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Integrating external knowledge increases the complexity of the model architecture and training pipeline."
+    },
+    {
+     "text": "The quality of the translation is dependent on the accuracy and coverage of the external knowledge sources."
+    },
+    {
+     "text": "Aligning external knowledge with the neural network's internal representations can be challenging."
+    },
+    {
+     "text": "These methods may not generalize well to domains where the external knowledge is not applicable or is outdated."
+    }
+   ]
+  },
+  {
+   "name": "Low-Resource and Zero-Shot NMT",
+   "definition": "Techniques designed to perform translation for language pairs with little or no parallel data by leveraging transfer learning and multilingual models.",
+   "properties": [
+    {
+     "text": "They utilize multilingual pre-trained models to share representations across multiple languages."
+    },
+    {
+     "text": "Transfer learning from high-resource language pairs can improve performance on low-resource pairs."
+    },
+    {
+     "text": "Zero-shot translation allows for translation between languages that have never been seen together in training data."
+    },
+    {
+     "text": "Data augmentation techniques are often employed to artificially increase the amount of available parallel data."
+    },
+    {
+     "text": "They focus on maximizing the utility of limited data through efficient model design and training strategies."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Performance is still significantly lower than for high-resource language pairs."
+    },
+    {
+     "text": "Zero-shot translation often suffers from lower accuracy and fluency compared to supervised translation."
+    },
+    {
+     "text": "The effectiveness of transfer learning depends on the linguistic similarity between the source and target languages."
+    },
+    {
+     "text": "These methods may struggle with languages that have unique morphological or syntactic structures not well-represented in the pre-training data."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Improving the efficiency of attention mechanisms to handle very long documents without quadratic complexity."
+    },
+    {
+     "text": "Developing robust methods for evaluating translation quality that better align with human judgment, especially for low-resource languages."
+    },
+    {
+     "text": "Enhancing the factual consistency and faithfulness of translations, particularly for domain-specific or scientific texts."
+    },
+    {
+     "text": "Reducing the computational cost of training and inference to make state-of-the-art models accessible to a wider range of users."
+    },
+    {
+     "text": "Addressing the issue of bias and fairness in neural machine translation systems, including gender, cultural, and political biases."
+    },
+    {
+     "text": "Improving the interpretability of neural machine translation models to understand how and why they make specific translation decisions."
+    },
+    {
+     "text": "Developing methods for real-time translation with low latency and high accuracy on edge devices with limited computational resources."
+    }
+   ]
+  }
+ ]
+}

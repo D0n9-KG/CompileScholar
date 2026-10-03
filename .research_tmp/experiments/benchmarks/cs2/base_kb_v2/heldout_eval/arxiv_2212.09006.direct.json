@@ -1,0 +1,328 @@
+{
+ "families": [
+  {
+   "name": "Federated Learning for Speech",
+   "definition": "A distributed training paradigm where models are trained on local devices or silos without sharing raw data, aggregating only model updates to a central server.",
+   "properties": [
+    {
+     "text": "Preserves privacy by keeping raw speech data on local devices or within organizational silos."
+    },
+    {
+     "text": "Addresses non-IID data distributions through personalized models, adaptive averaging strategies, or client-adaptive training."
+    },
+    {
+     "text": "Reduces communication and computation costs using techniques like partial variable training, federated dropout, and lossy compression."
+    },
+    {
+     "text": "Can be combined with differential privacy guarantees to further protect individual user data."
+    },
+    {
+     "text": "Supports semi-supervised and incremental learning scenarios for production-scale systems."
+    },
+    {
+     "text": "Enables joint federated-centralized training to compensate for missing data domains in on-device caches."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Performance degrades significantly when data among clients is not independently and identically distributed (non-IID)."
+    },
+    {
+     "text": "High communication and computation costs are associated with training large state-of-the-art models on edge devices."
+    },
+    {
+     "text": "Vulnerable to privacy attacks such as attribute inference and speaker information retrieval from model updates."
+    },
+    {
+     "text": "Requires careful handling of heterogeneous edge networks and limited device memory."
+    },
+    {
+     "text": "Lacks standardized benchmarks specifically for audio tasks until recent introductions like FedAudio."
+    }
+   ]
+  },
+  {
+   "name": "Speech Anonymization and Privacy-Preserving Transformations",
+   "definition": "Methods that transform speech signals to remove sensitive attributes such as speaker identity, gender, or emotion while preserving linguistic content.",
+   "properties": [
+    {
+     "text": "Uses content/speaker disentanglement and voice conversion to remove source speaker identity."
+    },
+    {
+     "text": "Employs generative adversarial networks (GANs) to synthesize voices that conceal gender or identity."
+    },
+    {
+     "text": "Applies adversarial reweighting or disentanglement to hide specific personal aspects like age, sex, or ethnicity."
+    },
+    {
+     "text": "Can generate utterance-specific perturbations to obscure sensitive words like digits in credit card numbers."
+    },
+    {
+     "text": "Utilizes secure multi-party computation or homomorphic encryption for privacy-preserving processing."
+    },
+    {
+     "text": "Aims to prevent attribute inference attacks by removing demographic traits from acoustic features."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "There is no clear agreement on which privacy metrics to use, with different metrics exhibiting blind spots."
+    },
+    {
+     "text": "Transformations may degrade the utility of the speech for downstream tasks like recognition or emotion analysis."
+    },
+    {
+     "text": "Current methods often rely on pre-trained acoustic models that may themselves leak information."
+    },
+    {
+     "text": "Balancing the level of privacy achieved with the preservation of spoken content remains a challenge."
+    },
+    {
+     "text": "Some approaches require significant computational resources or complex cryptographic overhead."
+    }
+   ]
+  },
+  {
+   "name": "Adversarial Attacks on Speech Systems",
+   "definition": "Techniques that craft imperceptible or robust perturbations to speech inputs to cause misclassification, mistranscription, or misidentification in machine learning models.",
+   "properties": [
+    {
+     "text": "Includes targeted attacks that force specific malicious outputs and untargeted attacks that degrade performance."
+    },
+    {
+     "text": "Can be performed in white-box settings with full model access or black-box settings with only query access."
+    },
+    {
+     "text": "Utilizes psychoacoustic hiding to make perturbations imperceptible to humans."
+    },
+    {
+     "text": "Includes physical-world attacks that remain effective despite reverberation and noise from playback environments."
+    },
+    {
+     "text": "Targets various components including automatic speech recognition (ASR), speaker verification, and speech emotion recognition."
+    },
+    {
+     "text": "Can involve data poisoning, such as clean-label poisoning, to corrupt models during training."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Many attacks are not robust to physical-world conditions like background noise or reverberation."
+    },
+    {
+     "text": "Black-box attacks are more challenging and may have lower success rates than white-box attacks."
+    },
+    {
+     "text": "Adversarial examples can be detected by analyzing temporal dependencies or using transformation-based defenses."
+    },
+    {
+     "text": "Poisoning attacks require control over a fraction of the training data, which may be difficult to achieve in practice."
+    },
+    {
+     "text": "Attacks on speaker recognition systems are less studied in practical black-box settings compared to white-box scenarios."
+    }
+   ]
+  },
+  {
+   "name": "Adversarial Defenses and Robustness",
+   "definition": "Methods designed to detect, mitigate, or prevent the impact of adversarial perturbations on speech recognition and verification systems.",
+   "properties": [
+    {
+     "text": "Includes input transformation methods like mel domain noise flooding and cyclic GAN reconstruction."
+    },
+    {
+     "text": "Uses adversarial training to improve model robustness against known attack types."
+    },
+    {
+     "text": "Employs certified defenses like randomized smoothing to provide provable robustness guarantees."
+    },
+    {
+     "text": "Detects adversarial inputs by analyzing the consistency of transcriptions across different audio transformations."
+    },
+    {
+     "text": "Utilizes high-level representation guided denoisers to remove adversarial noise without amplifying errors."
+    },
+    {
+     "text": "Can be applied to both end-to-end ASR systems and modular pipelines."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Defenses may introduce a trade-off between robustness and clean-data accuracy."
+    },
+    {
+     "text": "Adversarial training can introduce disparities in performance across different demographic groups."
+    },
+    {
+     "text": "Certified defenses often provide loose guarantees or require significant computational overhead."
+    },
+    {
+     "text": "Many defenses are specific to certain attack types or threat models and may not generalize well."
+    },
+    {
+     "text": "Detecting adversarial examples in real-time with low latency remains a challenge."
+    }
+   ]
+  },
+  {
+   "name": "Fairness and Bias Mitigation in Speech AI",
+   "definition": "Approaches to identify, measure, and reduce performance disparities across demographic subgroups such as gender, race, and age in speech technologies.",
+   "properties": [
+    {
+     "text": "Identifies subgroups suffering from subpar performance using geographic and demographic information."
+    },
+    {
+     "text": "Applies adversarial reweighting to force models to focus on poorly performing instances."
+    },
+    {
+     "text": "Uses mixed-effects Poisson regression to control for confounding factors and interpret word error rate gaps."
+    },
+    {
+     "text": "Develops automated testing frameworks to simulate different environments and assess effectiveness for various populations."
+    },
+    {
+     "text": "Incorporates fairness constraints into model training objectives to learn fair representations."
+    },
+    {
+     "text": "Evaluates bias in speaker verification, ASR, and speech emotion recognition systems."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "There is no clear agreement on which fairness definition to apply in each situation."
+    },
+    {
+     "text": "Fairness mitigation measures may reduce overall model accuracy."
+    },
+    {
+     "text": "Bias can arise from unrepresentative datasets, inadequate models, or human stereotypes in labeling."
+    },
+    {
+     "text": "Measuring fairness is complicated by unobserved heterogeneity across speakers."
+    },
+    {
+     "text": "Adversarial training for robustness can inadvertently introduce or exacerbate fairness disparities."
+    }
+   ]
+  },
+  {
+   "name": "Privacy Attacks and Inference",
+   "definition": "Methods that exploit vulnerabilities in speech models to infer sensitive information about training data or users, such as membership, speaker identity, or attributes.",
+   "properties": [
+    {
+     "text": "Includes membership inference attacks to determine if a specific data sample was used in training."
+    },
+    {
+     "text": "Performs attribute inference to predict sensitive traits like gender, age, or health status from acoustic models."
+    },
+    {
+     "text": "Extracts targeted training data from trained models using noise masking or fill-in-the-blank techniques."
+    },
+    {
+     "text": "Analyzes model updates in federated learning to retrieve speaker information."
+    },
+    {
+     "text": "Uses black-box access to evaluate the vulnerability of self-supervised and end-to-end models."
+    },
+    {
+     "text": "Can be used to audit whether a user has unwillingly contributed audio to a model."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Success of attacks depends on the specific model architecture and training data distribution."
+    },
+    {
+     "text": "Black-box attacks are more difficult to execute and may have lower precision and recall than white-box attacks."
+    },
+    {
+     "text": "Privacy-preserving techniques like differential privacy may not fully prevent all types of inference attacks."
+    },
+    {
+     "text": "Attacks on federated learning models require access to model updates, which may be restricted in some deployments."
+    },
+    {
+     "text": "There is a lack of comprehensive benchmarks for evaluating the privacy risks of speech models."
+    }
+   ]
+  },
+  {
+   "name": "Self-Supervised and Large-Scale Speech Representation Learning",
+   "definition": "Methods that learn general-purpose speech representations from large amounts of unlabeled audio data, which can be fine-tuned for downstream tasks.",
+   "properties": [
+    {
+     "text": "Pre-trains models on massive datasets of unlabeled speech to capture rich acoustic features."
+    },
+    {
+     "text": "Uses contrastive tasks or masked language modeling objectives to learn representations."
+    },
+    {
+     "text": "Achieves state-of-the-art performance on ASR and other tasks with minimal labeled data."
+    },
+    {
+     "text": "Generalizes well to standard benchmarks in zero-shot transfer settings."
+    },
+    {
+     "text": "Can be used for semi-supervised learning to improve performance with limited labeled data."
+    },
+    {
+     "text": "Enables the development of foundation models for robust speech processing."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Requires significant computational resources for pre-training."
+    },
+    {
+     "text": "May encode biases present in the pre-training data, such as gender or racial disparities."
+    },
+    {
+     "text": "Vulnerable to membership inference attacks due to memorization of training data."
+    },
+    {
+     "text": "Performance can vary across different demographic groups if the pre-training data is not representative."
+    },
+    {
+     "text": "Interpretability of the learned representations remains a challenge."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Developing standardized benchmarks for evaluating privacy, fairness, and robustness in speech AI systems."
+    },
+    {
+     "text": "Improving the efficiency of federated learning for large speech models on resource-constrained edge devices."
+    },
+    {
+     "text": "Designing privacy-preserving techniques that maintain high utility for downstream tasks like ASR and emotion recognition."
+    },
+    {
+     "text": "Mitigating the trade-off between adversarial robustness and fairness in speech models."
+    },
+    {
+     "text": "Creating effective defenses against black-box adversarial attacks in practical, real-world deployment scenarios."
+    },
+    {
+     "text": "Understanding and mitigating the privacy risks associated with self-supervised speech models, including memorization and membership inference."
+    },
+    {
+     "text": "Developing interpretable and fair speech representations that do not encode sensitive demographic attributes."
+    },
+    {
+     "text": "Standardizing the evaluation of speech anonymization techniques with metrics that balance privacy and utility."
+    },
+    {
+     "text": "Addressing the non-IID data challenge in federated learning to improve model convergence and performance."
+    },
+    {
+     "text": "Investigating the long-term societal and psychological impacts of speech AI errors and biases on marginalized groups."
+    }
+   ]
+  }
+ ]
+}

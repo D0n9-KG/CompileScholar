@@ -1,0 +1,154 @@
+{
+ "families": [
+  {
+   "name": "Rehearsal-Based Methods",
+   "definition": "These methods mitigate catastrophic forgetting by storing or generating a subset of past data to replay during the training of new tasks.",
+   "properties": [
+    {
+     "text": "They maintain performance on previous tasks by mixing old and new data in the training batch."
+    },
+    {
+     "text": "They are generally easy to implement and integrate with standard deep learning pipelines."
+    },
+    {
+     "text": "They are effective when a small, representative subset of past data is sufficient to retain knowledge."
+    },
+    {
+     "text": "They apply well in scenarios where data storage is feasible and privacy constraints allow for data retention."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They face significant storage constraints as the number of tasks and data points grows over time."
+    },
+    {
+     "text": "They are vulnerable to privacy and legal issues regarding the retention of personal smart city data."
+    },
+    {
+     "text": "They suffer from representational bias if the stored subset does not adequately cover the distribution of past tasks."
+    },
+    {
+     "text": "They become computationally expensive if large amounts of data must be replayed frequently."
+    }
+   ]
+  },
+  {
+   "name": "Regularization-Based Methods",
+   "definition": "These approaches constrain the model's weight updates to prevent significant changes to parameters that are critical for previously learned tasks.",
+   "properties": [
+    {
+     "text": "They do not require storing any past data, making them memory-efficient."
+    },
+    {
+     "text": "They work by adding penalty terms to the loss function that measure the importance of weights."
+    },
+    {
+     "text": "They are suitable for scenarios with strict privacy requirements where data retention is prohibited."
+    },
+    {
+     "text": "They are particularly effective when the model architecture remains fixed across tasks."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They often struggle with high task similarity, where important weights for different tasks overlap."
+    },
+    {
+     "text": "They can lead to underfitting on new tasks due to excessive regularization."
+    },
+    {
+     "text": "They are sensitive to the estimation of weight importance, which can be inaccurate in dynamic smart city environments."
+    },
+    {
+     "text": "They generally perform worse than rehearsal-based methods when the number of tasks is large."
+    }
+   ]
+  },
+  {
+   "name": "Architecture-Based Methods",
+   "definition": "These techniques modify the neural network structure to isolate knowledge for different tasks, such as through dynamic expansion or parameter isolation.",
+   "properties": [
+    {
+     "text": "They prevent interference by allocating separate parameters or sub-networks for each task."
+    },
+    {
+     "text": "They allow for the addition of new modules as new tasks emerge without retraining the entire model."
+    },
+    {
+     "text": "They are highly effective for scenarios with distinct, non-overlapping task domains."
+    },
+    {
+     "text": "They support efficient inference by routing inputs to the specific module trained for that task."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They suffer from model size explosion as the number of tasks increases."
+    },
+    {
+     "text": "They require a mechanism to identify which task an input belongs to, which can be ambiguous in smart cities."
+    },
+    {
+     "text": "They do not share knowledge across tasks, potentially missing generalizable patterns."
+    },
+    {
+     "text": "They are less effective when tasks are highly related and could benefit from shared representations."
+    }
+   ]
+  },
+  {
+   "name": "Prompt-Based Methods",
+   "definition": "These methods learn task-specific prompts or adapters that condition a frozen or partially frozen backbone model to perform different tasks.",
+   "properties": [
+    {
+     "text": "They leverage pre-trained foundation models, reducing the need for extensive retraining."
+    },
+    {
+     "text": "They are parameter-efficient, as only the small prompt vectors or adapter modules are updated."
+    },
+    {
+     "text": "They are well-suited for smart city applications where large pre-trained models are available."
+    },
+    {
+     "text": "They allow for rapid adaptation to new tasks by learning new prompts without altering the core model."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "They depend heavily on the quality and generalizability of the pre-trained backbone."
+    },
+    {
+     "text": "They may struggle with tasks that are fundamentally different from the pre-training distribution."
+    },
+    {
+     "text": "They require careful management of prompt storage and retrieval for many tasks."
+    },
+    {
+     "text": "They can suffer from prompt interference if prompts are not sufficiently distinct."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "Developing robust task identification mechanisms for streaming smart city data where task boundaries are not explicitly defined."
+    },
+    {
+     "text": "Addressing the trade-off between model efficiency and performance in resource-constrained edge devices common in smart cities."
+    },
+    {
+     "text": "Ensuring privacy and security in continual learning systems that process sensitive urban data without retaining raw data."
+    },
+    {
+     "text": "Creating benchmarks and evaluation metrics that reflect the dynamic, multi-modal, and heterogeneous nature of real-world smart city environments."
+    },
+    {
+     "text": "Integrating continual learning with federated learning to enable collaborative model updates across distributed smart city nodes without centralizing data."
+    }
+   ]
+  }
+ ]
+}

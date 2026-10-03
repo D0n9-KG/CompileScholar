@@ -1,0 +1,218 @@
+{
+ "families": [
+  {
+   "name": "Gradient-Based Attribution",
+   "definition": "Methods that compute the gradient of the output score with respect to the input to identify influential features.",
+   "properties": [
+    {
+     "text": "These methods interpret the gradient as a sensitivity map indicating which pixels or features strongly influence the decision."
+    },
+    {
+     "text": "SmoothGrad improves visual sharpness by averaging gradients over multiple noisy inputs to remove noise."
+    },
+    {
+     "text": "Integrated Gradients satisfies axioms of Sensitivity and Implementation Invariance by integrating gradients along a path from a baseline to the input."
+    },
+    {
+     "text": "Grad-CAM uses gradients flowing into the final convolutional layer to produce coarse localization maps for target concepts."
+    },
+    {
+     "text": "Layer-Wise Relevance Propagation decomposes classification decisions by pixel-wise relevance propagation through the network layers."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Basic gradient maps can be noisy and require elaboration techniques like smoothing to be visually useful."
+    },
+    {
+     "text": "Most known attribution methods fail to satisfy fundamental axioms such as Sensitivity and Implementation Invariance."
+    },
+    {
+     "text": "These methods provide local explanations for specific inputs but do not necessarily explain the global behavior of the model."
+    }
+   ]
+  },
+  {
+   "name": "Perturbation and Occlusion",
+   "definition": "Techniques that explain predictions by observing how model outputs change when input features are perturbed, occluded, or replaced.",
+   "properties": [
+    {
+     "text": "LIME explains predictions by learning an interpretable surrogate model in the local neighborhood of the prediction."
+    },
+    {
+     "text": "DeepLIFT decomposes output predictions by backpropagating the difference between neuron activations and reference activations."
+    },
+    {
+     "text": "Flip points are identified as inputs on the boundary between output classes to interpret network decisions."
+    },
+    {
+     "text": "Adversarial evaluation schemes insert distracting sentences to test if reading comprehension systems truly understand language."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "LIME and similar local surrogate methods do not scale to explaining entire datasets."
+    },
+    {
+     "text": "These methods often cannot correct the problems they reveal, such as models being right for the wrong reasons."
+    },
+    {
+     "text": "Adversarial evaluation can be defeated by constructing new loss functions, making detection of true understanding difficult."
+    }
+   ]
+  },
+  {
+   "name": "Representation Analysis and Visualization",
+   "definition": "Approaches that inspect internal network activations or synthesize inputs to understand what features the network has learned.",
+   "properties": [
+    {
+     "text": "Network Dissection quantifies interpretability by scoring the alignment between hidden units and semantic concepts like objects or textures."
+    },
+    {
+     "text": "Activation maximization synthesizes preferred inputs for neurons to visualize what each unit detects."
+    },
+    {
+     "text": "Saliency maps are used to understand what deep reinforcement learning agents attend to and how their policies evolve."
+    },
+    {
+     "text": "Analysis of DQNs reveals that learned features aggregate the state space in a hierarchical fashion."
+    },
+    {
+     "text": "Object detectors emerge in deep scene CNNs trained on scene classification, revealing internal object representations."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "There is no clear understanding of why deep networks perform well or how they might be improved based solely on visualization."
+    },
+    {
+     "text": "Interpretability is often an axis of trade-off, where high discrimination power comes at the cost of low interpretability."
+    },
+    {
+     "text": "It is unclear whether individual high-level units have distinct meanings or if it is the space of units that matters."
+    }
+   ]
+  },
+  {
+   "name": "Disentangled and Structured Representations",
+   "definition": "Architectures or training objectives designed to learn representations where factors of variation are encoded independently or in structured forms.",
+   "properties": [
+    {
+     "text": "InfoGAN maximizes mutual information between latent variables and observations to learn disentangled representations unsupervised."
+    },
+    {
+     "text": "Capsules use activity vectors to represent instantiation parameters of entities, with length indicating existence probability."
+    },
+    {
+     "text": "Gradient-isolated learning splits networks into modules trained to preserve input information without end-to-end backpropagation."
+    },
+    {
+     "text": "Contrastive Predictive Coding learns representations by predicting the future in latent space using autoregressive models."
+    },
+    {
+     "text": "Part graphs embed object-part concepts into CNNs to create semantically interpretable graphical models."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "There is little empirical evidence that disentangled representations are more suitable for abstract reasoning tasks."
+    },
+    {
+     "text": "Biological-inspired methods like gradient isolation rely on greedy training which may not optimize global performance."
+    },
+    {
+     "text": "Disentangled representations are often argued to be useful but lack rigorous proof of their benefit for downstream tasks."
+    }
+   ]
+  },
+  {
+   "name": "Adversarial Robustness and Detection",
+   "definition": "Methods aimed at understanding, detecting, or mitigating the vulnerability of neural networks to adversarial examples.",
+   "properties": [
+    {
+     "text": "Adversarial examples are inputs with small perturbations that cause high-confidence misclassification."
+    },
+    {
+     "text": "Virtual Adversarial Training uses local smoothness of the conditional label distribution as a regularization method."
+    },
+    {
+     "text": "Robust optimization provides a unifying view on adversarial robustness by treating it as a minimax problem."
+    },
+    {
+     "text": "Adversarial patches are universal, robust, and targeted perturbations that can fool classifiers in the real world."
+    },
+    {
+     "text": "One-pixel attacks use differential evolution to generate minimal perturbations that fool networks in a black-box setting."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Adversarial examples are significantly harder to detect than previously appreciated, with ten detection methods being defeated."
+    },
+    {
+     "text": "The existence of adversarial attacks may be an inherent weakness of deep learning models due to their linear nature."
+    },
+    {
+     "text": "Cross-entropy loss and low-rank features are responsible for the existence of adversarial examples, requiring rethinking of loss functions."
+    }
+   ]
+  },
+  {
+   "name": "Interpretable Model Architectures",
+   "definition": "Model designs that inherently provide transparency or verifiability, such as decision trees or attention mechanisms.",
+   "properties": [
+    {
+     "text": "VIPER trains decision tree policies that are nonparametric and can be efficiently verified using existing techniques."
+    },
+    {
+     "text": "Attention mechanisms, such as bottom-up and top-down attention, allow models to focus on specific image regions or source words."
+    },
+    {
+     "text": "Residual Attention Networks incorporate attention modules to generate attention-aware features in an end-to-end fashion."
+    },
+    {
+     "text": "Adaptive attention models decide whether to use visual information at each time step, improving efficiency and interpretability."
+    }
+   ],
+   "limitations": [
+    {
+     "text": "Decision tree policies are difficult to train despite their verifiability."
+    },
+    {
+     "text": "Attention mechanisms may not always align with human attention, as shown by discrepancies in VQA tasks."
+    },
+    {
+     "text": "Interpretable models may sacrifice accuracy for interpretability, creating a trade-off."
+    }
+   ]
+  },
+  {
+   "name": "Open problems of the area",
+   "definition": "",
+   "properties": [],
+   "limitations": [
+    {
+     "text": "There is very little consensus on what interpretable machine learning is and how it should be measured."
+    },
+    {
+     "text": "It remains unclear to what extent reading comprehension systems truly understand language versus relying on superficial patterns."
+    },
+    {
+     "text": "The real-world applicability of deep reinforcement learning is limited by the inability to ensure the safety of learned policies."
+    },
+    {
+     "text": "It is not well understood how to explain the strategies used by deep reinforcement learning agents to maximize rewards."
+    },
+    {
+     "text": "There is a lack of empirical evidence supporting the claim that disentangled representations are useful for solving real-world downstream tasks."
+    },
+    {
+     "text": "Adversarial examples are difficult to detect, and the properties believed to be intrinsic to them are not actually intrinsic."
+    },
+    {
+     "text": "The transition of features from general to specific in deep neural networks has not been studied extensively."
+    }
+   ]
+  }
+ ]
+}
