@@ -35,7 +35,7 @@ os.environ.setdefault("SCIVERSE_MAX_WAIT_S", "600")
 
 from kb_infra.llm import call_local, parse_json_response  # noqa: E402
 from kb_compiler.retrieve.hybrid import HybridIndex  # noqa: E402
-from cutoff import allowed as _cut_allowed, set_thread_cutoff as _set_cut  # noqa: E402
+from cutoff import allowed as _cut_allowed, raw_cutoff as _cut_raw, set_thread_cutoff as _set_cut  # noqa: E402
 
 MODEL = os.environ.get("ANSWER_MODEL", "Qwen3.8-27B")
 
@@ -274,15 +274,45 @@ Break the answer into 3-6 sections. Each section answers one sub-question a doma
 (e.g. definitions/background, main approaches and how they differ, empirical findings, limitations and open problems,
 applications) — choose what THIS question actually needs, most important first. For each section give 2-3 short
 search queries (keyword style, as you would type into a scholarly search engine; include synonyms/acronyms).
-
+{probe}
 Question: {question}
 
 Return JSON only: {{"sections": [{{"title": "...", "goal": "one sentence: what this section must establish", "queries": ["...", "..."]}}]}}"""
 
+PROBE_BLOCK = """
+An initial search for the question returned the papers below (title: excerpt). Use them to work out which field and
+which meaning of the question's terms the question is about, and what the literature on THAT subject actually covers.
+If they mix several meanings of a term, follow the one that fits every part of the question. Every section must be
+about the question's own subject; do not plan sections on broader or adjacent topics that merely share a term.
 
-def plan(question: str) -> list[dict]:
+{items}
+"""
+
+
+def probe(question: str, kb: KB | None, use_ext: bool = True, k: int = 10) -> list[dict]:
+    """先检索再规划：用原题直接检一次（KB+外部），供 plan 判断题目所指的领域/词义。
+    10-03 dev 失分分析：盲拆计划时 27B 按先验猜词义（"tree covering"→图论覆盖、"LLM 辅助写 SQL"→泛 text-to-SQL），
+    整节检索与写作都跟着跑题——20/74 节 ≥75% 段落被判无关，占全部无关段 61%。"""
+    with cf.ThreadPoolExecutor(2, initializer=_set_cut, initargs=(_cut_raw(),)) as ex:
+        fk = ex.submit(kb.search, question, k) if kb is not None else None
+        fe = ex.submit(ext_search, question, k) if use_ext else None
+        # 外部语义检索在前：KB 是 BM25+向量混合，整句题面的 BM25 会被泛词带偏（实测 SQL 题命中红队综述）
+        rows = (fe.result() if fe else []) + (fk.result() if fk else [])
+    seen, out = set(), []
+    for r in rows:
+        if r.get("error") or r["title"].lower() in seen:
+            continue
+        seen.add(r["title"].lower())
+        out.append(r)
+    return out
+
+
+def plan(question: str, probe_rows: list[dict] | None = None) -> list[dict]:
+    pb = ""
+    if probe_rows:
+        pb = PROBE_BLOCK.format(items="\n".join(f"- {r['title'][:150]}: {r['snippet'][:220]}" for r in probe_rows[:16]))
     for t in (0.0, 0.3):
-        obj = parse_json_response(chat(PLAN.format(question=question), max_tokens=1500, temperature=t))
+        obj = parse_json_response(chat(PLAN.format(question=question, probe=pb), max_tokens=1500, temperature=t))
         secs = (obj or {}).get("sections") if isinstance(obj, dict) else None
         if isinstance(secs, list) and secs:
             out = []
@@ -356,7 +386,8 @@ Rules:
    one sentence, cite both, and make sure each part is supported by its own citation.
 3. Synthesize across papers: group related work, compare approaches, state agreements/disagreements, limitations and open
    problems when the evidence supports them. Name methods, datasets and papers concretely.
-4. Be comprehensive: use every evidence item that is relevant to the section goal. There is no length limit.
+4. Be comprehensive: use every evidence item that bears on the overall question within this section's goal. Skip items
+   that only match the section title but are about a different subject than the overall question. There is no length limit.
 5. Write plain academic prose (paragraphs, optionally a short bulleted list). Do not repeat the section title. No references list.
 
 Section text:"""
@@ -403,11 +434,29 @@ def screen(question: str, goal: str, items: list[dict], batch: int = 20, min_kee
     return kept if len(kept) >= min(min_keep, len(items)) else items
 
 
-def write_sections(question: str, sections: list[dict], evidence: list[dict], max_ev: int = 40,
+def _interleave(items: list[dict]) -> list[dict]:
+    """按来源轮转排序（来源内保持检索排名）。证据表按"每条检索式：kb→state→ext"插入、引文扩展最后追加，
+    原先直接截前 max_ev 条——10-03 实测每节前 40 条里 ext 只占 20%（却是被引最多的来源），引文扩展条目最早在第 54 位、
+    从未进入写作上下文（引文扩展消融因此无意义）。"""
+    by = {}
+    for e in items:
+        by.setdefault(e["src"], []).append(e)
+    order = [s for s in ("target", "ext", "kb", "cite", "state") if s in by] + [s for s in by if s not in
+                                                                               ("target", "ext", "kb", "cite", "state")]
+    out, i = [], 0
+    while len(out) < len(items):
+        for s in order:
+            if i < len(by[s]):
+                out.append(by[s][i])
+        i += 1
+    return out
+
+
+def write_sections(question: str, sections: list[dict], evidence: list[dict], max_ev: int = 60,
                    use_screen: bool = True) -> list[str]:
     def one(si):
         s = sections[si]
-        items = [e for e in evidence if si in e["sections"]]
+        items = _interleave([e for e in evidence if si in e["sections"]])
         if use_screen and items:
             items = screen(question, s["goal"], items)
         items = items[:max_ev]
@@ -464,13 +513,15 @@ def assemble(sections: list[dict], texts: list[str], evidence: list[dict]) -> tu
 
 # ---------------------------------------------------------------- entry
 def answer(question: str, kb: KB | None, use_ext=True, use_cite=True, cutoff: str | None = None,
-           use_screen: bool = True, use_state: bool = True, task_context: dict | None = None) -> dict:
+           use_screen: bool = True, use_state: bool = True, task_context: dict | None = None,
+           use_probe: bool = True) -> dict:
     """task_context：任务本身给定的材料（如 DSB 的目标论文标题+摘要），作为一条 src="target" 证据加入每一节；
     写作时可引用（标为本文），但装配时不生成外部 citation（它不是被引文献）。"""
     t0 = time.time()
-    sections = plan(question)
-    t_plan = time.time() - t0
     _set_cut(cutoff)
+    probe_rows = probe(question, kb, use_ext=use_ext) if use_probe else []
+    sections = plan(question, probe_rows)
+    t_plan = time.time() - t0
     evidence, trace = gather(question, sections, kb, use_ext=use_ext, use_cite=use_cite, cutoff=cutoff, use_state=use_state)
     if task_context and task_context.get("text"):
         evidence.insert(0, {"src": "target", "paper_key": "target:self", "title": task_context.get("title") or "this paper",
@@ -482,7 +533,7 @@ def answer(question: str, kb: KB | None, use_ext=True, use_cite=True, cutoff: st
     out_secs, st = assemble(sections, texts, evidence)
     words = sum(len(s["text"].split()) for s in out_secs)
     return {"sections": out_secs,
-            "trace": {"plan": sections, **trace, "assemble": st, "words": words,
+            "trace": {"plan": sections, "probe": [r["title"] for r in probe_rows], **trace, "assemble": st, "words": words,
                       "used_eids": sorted({m for t in texts for m in _EID.findall(t)}, key=lambda x: int(x[1:])),
                       "evidence": [{k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items()} for e in evidence],
                       "t_plan_s": round(t_plan, 1), "t_write_s": round(t_write, 1),

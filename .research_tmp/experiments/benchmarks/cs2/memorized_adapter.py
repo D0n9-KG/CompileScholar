@@ -15,6 +15,7 @@ Output: arm_memorized/answers_{system}_{split}.json — rows keyed by
 question text matching the rubrics, ready for the official scorer.
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -40,29 +41,23 @@ def adapt_elicit(split="dev"):
     question+response pairs. We emit Elicit rows paired with their
     best-matching rubric question via title-token overlap.
     """
+    # 10-03 修正：存档 id 就是题面原文（201 行里 200 行归一化后与 dev/test 题面逐字相等，一一对应）。
+    # 旧版按 token 重叠"最佳匹配"配题——148 行配到 100 个 dev qid，其中 48 行是别的题的回答被配给 dev 题
+    # （同一 qid 多行时后写覆盖前写），判分输入错位。改为归一化精确匹配，无匹配则不配。
     data = json.load(open(MEM / "sqa_elicit_responses.json",
                           encoding="utf-8"))
     rubrics = load_rubrics(split)
+    norm = lambda s: re.sub(r"\W+", " ", (s or "").lower()).strip()  # noqa: E731
+    qmap = {norm(q["question"]): q for q in rubrics}
     out = []
     for r in data:
-        if not r.get("sections"):
+        q = qmap.get(norm(r.get("id")))
+        if q is None:
             continue
-        # title-slug -> question matching (token overlap)
-        slug = (r.get("id") or "").lower()
-        best, best_score = None, 0
-        for q in rubrics:
-            qtoks = {t for t in q["question"].lower().split() if len(t) > 3}
-            stoks = {t for t in slug.replace("-", " ").split()}
-            ov = len(qtoks & stoks)
-            if ov > best_score:
-                best, best_score = q, ov
-        if best is None or best_score < 2:
-            continue
-        out.append({"qid": best["case_id"][:24],
-                    "question": best["question"],
-                    "sections": r["sections"],
-                    "source": "elicit",
-                    "match_score": best_score})
+        out.append({"qid": q["case_id"][:24],
+                    "question": q["question"],
+                    "sections": r.get("sections") or [],
+                    "source": "elicit"})
     return out
 
 

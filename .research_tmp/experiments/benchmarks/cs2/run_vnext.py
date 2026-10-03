@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--no-cite", action="store_true")
     ap.add_argument("--no-screen", action="store_true")
     ap.add_argument("--no-state", action="store_true")
+    ap.add_argument("--no-probe", action="store_true")
     ap.add_argument("--workers", type=int, default=3)
     a = ap.parse_args()
     qs = json.load(open(os.path.join(HERE, "..", "scholarqa_multi", RUB[a.split]), encoding="utf-8"))
@@ -45,7 +46,7 @@ def main():
     done = {r["qid"]: r for r in json.load(open(ans_p, encoding="utf-8"))} if os.path.exists(ans_p) else {}
     kb = None if a.no_kb else AP.KB(os.path.join(HERE, "base_kb_v2"))
     cfg = {"split": a.split, "offset": a.offset, "limit": a.limit, "kb": not a.no_kb, "ext": not a.no_ext,
-           "cite": not a.no_cite, "screen": not a.no_screen, "state": not a.no_state, "model": AP.MODEL, "cutoff": os.environ.get("KNOWLEDGE_CUTOFF")}
+           "cite": not a.no_cite, "screen": not a.no_screen, "state": not a.no_state, "probe": not a.no_probe, "model": AP.MODEL, "cutoff": os.environ.get("KNOWLEDGE_CUTOFF")}
     json.dump(cfg, open(os.path.join(out_dir, f"config_{a.tag}.json"), "w"), indent=1)
     print("[vnext]", cfg, f"todo {sum(1 for q in qs if q['case_id'][:24] not in done)}", flush=True)
 
@@ -53,7 +54,8 @@ def main():
         qid = q["case_id"][:24]
         t = time.time()
         try:
-            r = AP.answer(q["question"], kb, use_ext=not a.no_ext, use_cite=not a.no_cite, use_screen=not a.no_screen, use_state=not a.no_state)
+            r = AP.answer(q["question"], kb, use_ext=not a.no_ext, use_cite=not a.no_cite, use_screen=not a.no_screen, use_state=not a.no_state,
+                          use_probe=not a.no_probe)
             r.update({"qid": qid, "question": q["question"]})
         except Exception as e:
             r = {"qid": qid, "question": q["question"], "sections": [], "error": f"{type(e).__name__}: {str(e)[:300]}"}

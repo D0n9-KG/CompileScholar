@@ -88,10 +88,14 @@ def run_q(question: str, timeout_s: int = 1800) -> dict:
            "--strict-mcp-config",
            "--allowedTools",
            "mcp__retrieval__search_papers,mcp__retrieval__fetch_chunk"]
+    # 中性工作目录（home 与仓库之外）：cwd 在 home 下时 Claude Code 沿祖先目录把 ~/.claude/CLAUDE.md
+    # 当项目指令注入、并注入本仓库 git status（10-03 抓包实测），与任务无关的个人指令会污染 harness 臂
+    cwd = Path(os.environ.get("HARNESS_CWD", r"C:\cs2_harness_cwd"))
+    cwd.mkdir(exist_ok=True)
     try:
         p = subprocess.run(cmd, env=env, capture_output=True, text=True,
                            encoding="utf-8", errors="replace",
-                           timeout=timeout_s, cwd=str(ARM))
+                           timeout=timeout_s, cwd=str(cwd))
         out = p.stdout or ""
         try:
             envelope = json.loads(out.strip().splitlines()[-1])
@@ -134,9 +138,13 @@ def main():
                                                     encoding="utf-8"))}
     results = list(done.values())
 
+    def _good(r):
+        # Claude Code 把 API 层失败也包成 ok 信封（is_error=True / result="API Error: ..."）——不算完成
+        return r.get("ok") and not r.get("is_error") and not str(r.get("result", "")).startswith("API Error")
+
     todo = [q for q in rubrics
-            if q["case_id"][:24] not in done or not done[
-                q["case_id"][:24]].get("ok")]
+            if q["case_id"][:24] not in done or not _good(done[q["case_id"][:24]])]
+    results = [r for r in results if _good(r)]
     print(f"[harness] {len(done)} done, {len(todo)} todo, "
           f"fanout={fanout}", flush=True)
 
