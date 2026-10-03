@@ -1,9 +1,9 @@
-# 系统升级总计划（UPGRADE-PLAN，10-04，草稿 v0）
+# 系统升级总计划（UPGRADE-PLAN，10-04，v1 待用户裁定）
 
 > 输入：AUDIT-VENUE-READINESS.md（顶会就绪度）、DESIGN-CROSSPAPER.md（跨论文层设计）、
-> AUDIT-CODE-ARCHITECTURE.md（代码架构，待回）、AUDIT-WORKSPACE.md（工作区治理，待回）。
+> AUDIT-CODE-ARCHITECTURE.md（代码架构）、AUDIT-WORKSPACE.md（工作区治理）。
 > 用户裁定（10-04）：不管时间；按顶会要求彻底升级（跨论文层为重点）+ 项目规范化；必要时联网调研。
-> 状态：v0 只合并了前两份；后两份回来后补 §4 并定稿，交用户裁 §6 的决策项后开工。
+> 状态：四份已全部合并；交用户裁 §6 的决策项后开工。
 
 ## 0. 一句话
 
@@ -65,7 +65,8 @@
 
 ## 2. 顺序与并行
 
-W0 → W1 ‖ W6（规范化先做，后续新代码直接写进新结构）→ W2 → W3 → W4 → W5。
+W0（test 跑完 + 备份 + 推送解堵：工作区 Phase 1–3）→ W1 ‖ W6（规范化先做，后续新代码直接写进新结构）→ W2 → W3 → W4 → W5。
+推送解堵排在最前：215 个提交只在一块硬盘上，是当前最大的单点风险。
 W5 里 FieldQA 题集构建（人工标注）可以和 W2–W3 并行（题集只依赖留出综述，不依赖系统）。
 
 ## 3. 预注册规则（摘自审查 §5，开工前写进 PREREG.md）
@@ -103,6 +104,30 @@ W5 里 FieldQA 题集构建（人工标注）可以和 W2–W3 并行（题集�
 
 ### 4.3 代码审查提出的待拍板项（并入 §6 第 7–12 条）
 
+### 4.4 工作区治理审查要点（AUDIT-WORKSPACE.md）
+- 盘点：项目约 65 GB；.git 14 GB（有用 pack 237 MB，散对象 10.2 GiB，中断操作残留 tmp 文件 2.94 GiB + 死掉的 gc.pid）；
+  .research_tmp ≈49.6 GB，其中已退役实验 ≈28.5 GB（paperscope 归档 19.2 GB）、可重建缓存 ≈12.5 GB。
+- **最急：main 推不上 GitHub。** 09-20 后 215 个提交只在这块硬盘上；17 个 >100 MB 文件（13.79 GB，主要是 09-23 的 LightRAG 向量库）。
+  已推送历史干净（最大 35 MB），所以只需重写 origin/main..main 这一段，push 仍是 fast-forward。
+- HEAD 树 5.78 GB，83% 是 16 个向量/嵌入缓存；两个 .bin 处于已修改状态（**不能 git commit -a**，否则再塞 ~0.9 GB）。
+- ignore 规则与跟踪状态脱节：1,039 个文件是强制 add 的；反过来 RESULTS-LEDGER、paper_drafts、phase0、104 份决策档、test100 答案都没入库（只有一份）。
+  deepscholar/venv311 没被 ignore，git status 里 3.3 万条噪声。
+- 第二处密钥：GPUStack EMBEDDING_API_KEY 写在 _shared/tools/multi_closedbook_recall.py:36 和 STORM 的 run_config.json 产出里（未推送）。
+- 冻结 v9b 14 个哈希重算全部一致；但 direct_judge 依赖未跟踪的 scratch/asta-bench；record_vecs.f32（453 MB）只此一份。
+- .git/config 的 branch.main.merge 有两个值（一个指向远端不存在的分支），直接 git pull 可能出错。
+- 根目录文档（README/DIRECTION/ASSET-STATE）停在 09-20～09-25；当前口径分散在 5 处，memory 里多条"最新"互相矛盾。
+- 目标布局与治理规则（与代码审查 §5 合并，以代码审查的包结构为准）：conf/ + src/compilescholar/ + bench（= experiments）/<bench>/ +
+  third_party/ + tests/ + docs/{README 状态行, ARCHITECTURE, EXPERIMENTS, RESULTS, DECISIONS, paper/, archive/} +
+  data/、artifacts/（ignore，只跟踪 MANIFEST.tsv）+ results/（只放冻结 run，单文件 <5 MB）+ runs/、cache/、scratch/（ignore）；
+  单文件 >5 MB 不进 git（pre-commit 拦）、禁止 git add -f、gitleaks、run_id 命名 <bench>-<split>-<arm>-<yyyymmdd>-<tag>、每天 push。
+- 迁移阶段（与代码审查 §6 合并）：
+  - Phase 1（test 跑完后）：整仓备份到外部盘 + git bundle，校验 FREEZE 哈希。
+  - Phase 2（低风险）：删 tmp_* 与 gc.pid；修 .git/config；两处密钥改读 env、STORM 落盘抹 key；补 .gitignore；
+    向量缓存 git rm --cached（文件留盘，先登记 MANIFEST）；补跟踪 paper_drafts/phase0/docs_decisions/test 答案。
+  - Phase 3（高风险，需批准）：git-filter-repo 只重写 origin/main..main（去 >20 MB blob 与两个密钥），先在副本上 dry-run，保存 commit-map，推新分支再 fast-forward。
+  - Phase 4（论文 test 数字定稿后）：目录迁移 + 包重构（即 W6），每步冒烟比对。
+  - Phase 5：冷存储释放 ~27 GB。Phase 6：pre-commit + manifest + 每日 push 防复发。
+
 ## 5. 风险
 - KB 只有 1,262 篇，题目落不进族 → 下游消融仍 ≈0：按"状态覆盖率"分层报；退路 = 领域层直接检验 + 分析论文。
 - 局限/开放问题仍 ≈ flat：如实报。
@@ -122,3 +147,8 @@ W5 里 FieldQA 题集构建（人工标注）可以和 W2–W3 并行（题集�
 10. 重构阶段行为零变化、有等价测试守着；行为修复逐条单独提交、只在 dev 评估（推荐）。
 11. 判分适配层（重试次数、编号平移、Connection: close、DeepSeek 判分模型）在论文里逐条披露；官方 judge 重判用去掉补丁的原样 scorer。
 12. 数据制品托管位置（Zenodo / HF dataset / 校内）与许可：KB 含论文逐字片段，发布前确认可再分发范围。
+13. 历史重写（工作区审查 Phase 3）：只重写未推送的 215 个提交、去大文件与密钥，提交哈希会变（保存对照表）；
+    或备选：从 origin/main 开新分支放一个瘦身快照提交，细粒度历史只留在 bundle 里。两者都需要你明确同意。
+14. 外部盘备份：Phase 1 要整仓（~65 GB）或关键子集复制到外部盘，需要你提供盘符/位置。
+15. 修 .git/config 重复项、临时设 gc.auto 0（防止后台 auto-gc 去打包 10 GB 散对象）——改 git 配置需你同意。
+16. 轮换 MinerU token 与 GPUStack embedding key（需你在对应服务上操作）。
