@@ -15,7 +15,7 @@ import time
 os.environ.setdefault("KNOWLEDGE_CUTOFF", "2025-05")
 # 实测 GPUStack 27B 8 路并发与单路同速（7.4s vs 7.6s 墙钟）——瓶颈在客户端闸门而非服务端。
 # 写作调用 max_tokens 5000（<8000）走共享车道；把共享车道放宽到 12。
-os.environ.setdefault("LOCAL_MAX_CONCURRENT", "12")
+os.environ.setdefault("LOCAL_MAX_CONCURRENT", "48")  # 10-03 压测：96 路内吞吐仍升，48 路内延迟基本不涨
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "_shared", "tools"))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")

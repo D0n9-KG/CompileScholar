@@ -16,7 +16,7 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-os.environ.setdefault("LOCAL_MAX_CONCURRENT", "12")  # 见 run_vnext.py：服务端 8 路并发不降速
+os.environ.setdefault("LOCAL_MAX_CONCURRENT", "48")  # 10-03 压测：96 路内吞吐仍升，48 路内延迟基本不涨  # 见 run_vnext.py：服务端 8 路并发不降速
 sys.path.insert(0, os.path.join(HERE, "..", "_shared", "tools"))
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 import answer_pipeline as AP  # noqa: E402

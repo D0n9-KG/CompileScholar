@@ -1496,11 +1496,45 @@ class _TokenBucket:
             time.sleep(min(need_s, remaining))
 
 
+class _FileTokenBucket:
+    """Cross-process token bucket (2026-10-03): Sciverse's 30 req/min is an ACCOUNT limit, but _TokenBucket is
+    per-process — running DSB + CS2 test + harness MCP at once multiplied the effective rate and reintroduced 429s.
+    State (tokens, last) lives in a small JSON file guarded by a filelock, shared by every process on this machine.
+    Same acquire() contract as _TokenBucket. Enabled by SCIVERSE_SHARED_BUCKET=<path>."""
+
+    def __init__(self, path: str, rate_per_min: float, capacity: int):
+        from filelock import FileLock
+        self.path, self.rate, self.capacity = path, rate_per_min / 60.0, float(capacity)
+        self._lock = FileLock(path + ".lock")
+
+    def acquire(self, max_wait_s: float = 10.0) -> bool:
+        deadline = time.time() + max_wait_s
+        while True:
+            with self._lock:
+                try:
+                    st = json.load(open(self.path, encoding="utf-8"))
+                except Exception:
+                    st = {"tokens": self.capacity, "last": time.time()}
+                now = time.time()
+                tokens = min(self.capacity, st["tokens"] + (now - st["last"]) * self.rate)
+                if tokens >= 1.0:
+                    json.dump({"tokens": tokens - 1.0, "last": now}, open(self.path, "w", encoding="utf-8"))
+                    return True
+                json.dump({"tokens": tokens, "last": now}, open(self.path, "w", encoding="utf-8"))
+                need_s = (1.0 - tokens) / self.rate
+            remaining = deadline - time.time()
+            if need_s >= remaining:
+                return False
+            time.sleep(min(need_s, remaining) + 0.05)
+
+
 def _sciverse_bucket() -> "_TokenBucket":
     global _SCIVERSE_BUCKET
     if _SCIVERSE_BUCKET is None:
         rate = float(os.environ.get("SCIVERSE_RATE_PER_MIN", "30"))
-        _SCIVERSE_BUCKET = _TokenBucket(rate, max(1, int(rate)))
+        shared = os.environ.get("SCIVERSE_SHARED_BUCKET")
+        _SCIVERSE_BUCKET = (_FileTokenBucket(shared, rate, max(1, int(rate))) if shared
+                            else _TokenBucket(rate, max(1, int(rate))))
     return _SCIVERSE_BUCKET
 
 

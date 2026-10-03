@@ -32,6 +32,8 @@ for _p in (_REPO, _HERE):
 os.environ["NO_PROXY"] = os.environ.get("NO_PROXY", "") + ",192.168.199.73,localhost,127.0.0.1"
 # Sciverse 30 req/min 配额：本管线并发检索，令牌等不到时宁可排队也不要"照发吃 429→熔断→整题外检为 0"
 os.environ.setdefault("SCIVERSE_MAX_WAIT_S", "600")
+# 跨进程共享 Sciverse 令牌桶（账户级 30/min；多基准并行时进程内桶会叠加超限）——同机所有进程共用一个文件
+os.environ.setdefault("SCIVERSE_SHARED_BUCKET", os.path.join(os.path.expanduser("~"), ".sciverse_bucket.json"))
 
 from kb_infra.llm import call_local, parse_json_response  # noqa: E402
 from kb_compiler.retrieve.hybrid import HybridIndex  # noqa: E402
@@ -200,6 +202,24 @@ _S2_LAST = [0.0]
 _S2_LOCK = __import__("threading").Lock()  # 无 key 的 S2 ~1 req/s：全进程串行，避免多线程同时撞 429 退避
 
 
+_S2_SHARED = os.environ.get("S2_SHARED_PACE", os.path.join(os.path.expanduser("~"), ".s2_pace.json"))
+
+
+def _s2_pace(gap_s: float = 1.1):
+    """S2 无 key ~1 req/s 是 IP 级限额：进程内锁只管本进程，多基准并行时需跨进程节流（文件锁 + 共享上次时间戳）。"""
+    from filelock import FileLock
+    with FileLock(_S2_SHARED + ".lock"):
+        try:
+            last = json.load(open(_S2_SHARED, encoding="utf-8"))["last"]
+        except Exception:
+            last = 0.0
+        gap = gap_s - (time.time() - last)
+        if gap > 0:
+            time.sleep(gap)
+        json.dump({"last": time.time()}, open(_S2_SHARED, "w", encoding="utf-8"))
+    _S2_LAST[0] = time.time()
+
+
 def _s2(path: str, params: dict, tries: int = 4, deadline: float | None = None):
     import random
     import urllib.error
@@ -214,10 +234,7 @@ def _s2(path: str, params: dict, tries: int = 4, deadline: float | None = None):
         if deadline is not None and time.time() > deadline:
             return {}
         with _S2_LOCK:
-            gap = 1.1 - (time.time() - _S2_LAST[0])
-            if gap > 0:
-                time.sleep(gap)
-            _S2_LAST[0] = time.time()
+            _s2_pace()
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "compilescholar-answer"})
             with urllib.request.urlopen(req, timeout=20) as r:
