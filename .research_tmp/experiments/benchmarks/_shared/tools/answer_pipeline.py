@@ -373,9 +373,6 @@ def gather(question: str, sections: list[dict], kb: KB | None, use_ext=True, use
 WRITE = """Write one section of a literature-grounded research report.
 
 Overall question: {question}
-Report outline (each section is written separately):
-{outline}
-You are writing section {idx}.
 Section title: {title}
 Section goal: {goal}
 
@@ -395,9 +392,7 @@ Rules:
    Evidence about a neighboring topic — it shares terms with the question but does not bear on what is asked — is not
    used; leaving it out is correct, not a loss. Cover every distinct point that the relevant evidence supports, then
    stop: do not keep adding paragraphs from evidence that is only loosely related. There is no length limit.
-5. Write only this section's part of the answer. Do not restate definitions, background or points that belong to another
-   section of the outline; start directly with this section's own content.
-6. Write plain academic prose (paragraphs, optionally a short bulleted list). Do not repeat the section title. No references list.
+5. Write plain academic prose (paragraphs, optionally a short bulleted list). Do not repeat the section title. No references list.
 
 Section text:"""
 
@@ -465,28 +460,18 @@ def write_sections(question: str, sections: list[dict], evidence: list[dict], ma
                    use_screen: bool = True, word_budget: int | None = None) -> list[str]:
     """word_budget：仅用于长度对照消融（整篇总词数上限，按节均分）；None=无长度上限（默认，prompt 与不传时逐字相同）。"""
     per_sec = max(80, word_budget // max(1, len(sections))) if word_budget else None
-    # 跨节去重（10-03 dev 实测：各节并行写、互不知情 → 每节开头重述定义、同一批论文在多节重复；引用了前节已用论文的段落
-    # 被判离题 35%，只引新论文的段落 24%；18% 的证据同时归入多节）。①每条证据只归它排位最靠前的那一节（并列取前节）；
-    # ②写作时给出整篇提纲，要求不写属于其他节的内容。任务材料（src=target）各节都保留。
-    lists = {si: _interleave([e for e in evidence if si in e["sections"]]) for si in range(len(sections))}
-    best = {}
-    for si, items in lists.items():
-        for i, e in enumerate(items):
-            if e["eid"] not in best or i < best[e["eid"]][1]:
-                best[e["eid"]] = (si, i)
-    lists = {si: [e for e in items if e.get("src") == "target" or best[e["eid"]][0] == si] for si, items in lists.items()}
-    outline = "\n".join(f"{j + 1}. {x['title']} — {x['goal']}" for j, x in enumerate(sections))
+    # 跨节去重（每条证据只归一节 + 提纲约束）10-03 试过、判否撤销：1000 词下 AP −0.089 [−0.166,−0.013]——
+    # 后节失去主证据后转写邻近话题；跨节复用 14%→4% 但离题段 12%→21%。保持各节独立取证据。
 
     def one(si):
         s = sections[si]
-        items = lists[si]
+        items = _interleave([e for e in evidence if si in e["sections"]])
         if use_screen and items:
             items = screen(question, s["goal"], items)
         items = items[:max_ev]
         if not items:
             return ""
-        prompt = WRITE.format(question=question, title=s["title"], goal=s["goal"], evidence=_fmt_ev(items),
-                              outline=outline, idx=si + 1)
+        prompt = WRITE.format(question=question, title=s["title"], goal=s["goal"], evidence=_fmt_ev(items))
         if per_sec:
             prompt = prompt.replace("There is no length limit.",
                                     f"Keep this section under {per_sec} words: include the most important points first.")
