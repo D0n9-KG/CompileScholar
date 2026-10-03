@@ -31,7 +31,8 @@ os.environ.setdefault("LOCAL_MAX_CONCURRENT", "16")
 import gpustack_httpx_fix  # noqa: F401
 
 BASE_DIR = os.path.join(_HERE, "arm_gptr")
-ANSWERS = os.path.join(BASE_DIR, "answers_gptr_cs2.json")
+# 10-03：test 终测用 CS2_SPLIT=test + GPTR_OUT（不覆盖 dev 产物）；缺省=原 dev 行为
+ANSWERS = os.path.join(BASE_DIR, os.environ.get("GPTR_OUT", "answers_gptr_cs2.json"))
 
 MODEL = "Qwen3.8-27B"
 
@@ -227,8 +228,9 @@ def report_to_cs2(report_md: str, sources=None) -> list[dict]:
 
 
 def load_cs2_questions():
-    src = os.path.normpath(os.path.join(
-        _HERE, "..", "scholarqa_multi", "sqa2_rubrics_v1_recomputed.json"))
+    rub = {"dev": "sqa2_rubrics_v1_recomputed.json",
+           "test": "sqa2_rubrics_v2_recomputed.json"}[os.environ.get("CS2_SPLIT", "dev")]
+    src = os.path.normpath(os.path.join(_HERE, "..", "scholarqa_multi", rub))
     qs = json.load(open(src, encoding="utf-8"))
     # 全量 100 题（GPTR 臂与 ours/harness 同尺）；GPTR_LIMIT 可截断
     n = int(os.environ.get("GPTR_LIMIT", str(len(qs))))
@@ -353,7 +355,7 @@ async def run(smoke: bool = False):
     judge_input = [{"qid": r["qid"], "question": r["question"],
                     "sections": r["sections"]}
                    for r in done.values() if r.get("sections")]
-    jip = os.path.join(BASE_DIR, "judge_input_gptr_cs2.json")
+    jip = os.path.join(BASE_DIR, "judge_input_" + os.path.basename(ANSWERS).replace("answers_", ""))
     json.dump(judge_input, open(jip, "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     print(f"[gptr-cs2] judge input: {jip} ({len(judge_input)} rows)",

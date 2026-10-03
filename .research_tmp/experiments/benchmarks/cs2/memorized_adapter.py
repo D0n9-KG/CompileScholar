@@ -141,6 +141,29 @@ def adapt_openai_dr(fname, split):
     return out
 
 
+def adapt_scispace(split="test"):
+    """SciSpace 存档（asta-bench-solver-data/sqa/scispace/test.json，只有 test）：{question, response:{sections}}，
+    已是官方 sections 形态（citation id 在正文 4244/4245、全部带 snippets）。只做题面精确配题 + 保留 title/snippets/id
+    （paper 元数据收进 metadata），不改正文。"""
+    data = json.load(open(MEM / "sqa_scispace_test.json", encoding="utf-8"))
+    norm = lambda s: re.sub(r"\W+", " ", (s or "").lower()).strip()  # noqa: E731
+    qmap = {norm(q["question"]): q for q in load_rubrics(split)}
+    out = []
+    for r in data:
+        q = qmap.get(norm(r.get("question")))
+        if q is None:
+            continue
+        secs = []
+        for s in (r.get("response") or {}).get("sections") or []:
+            cites = [{"id": c.get("id"), "snippets": c.get("snippets") or [],
+                      "title": (c.get("paper") or {}).get("title"),
+                      "metadata": {"year": (c.get("paper") or {}).get("year"), "corpus_id": c.get("corpus_id")}}
+                     for c in s.get("citations") or []]
+            secs.append({"title": s.get("title") or "", "text": s.get("text") or "", "citations": cites})
+        out.append({"qid": q["case_id"][:24], "question": q["question"], "sections": secs, "source": "scispace"})
+    return out
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     out = []
