@@ -1,0 +1,28 @@
+## Related Work
+
+**Timing of Control Application**
+A significant portion of prior research on prosody and pronunciation control relies on training-time interventions, specifically fine-tuning pre-trained models to adapt to specific styles or speaking rates [2, 3, 5, 6, 7, 8]. These approaches typically require substantial computational resources and labeled datasets to adjust model parameters, limiting their flexibility for real-time or on-demand adjustments. In contrast, a smaller body of work explores inference-time (post-hoc) control, which allows for dynamic modification of outputs without altering the underlying model weights [9, 10]. While these inference-time methods offer greater agility, they have historically been limited in scope. This paper aligns with the inference-time paradigm, extending post-hoc control capabilities to address both prosodic features and mispronunciations simultaneously, thereby enabling real-time refinement of TTS outputs without the overhead of retraining.
+
+**Mechanism of Intervention**
+Existing methods for speech synthesis control predominantly operate through external conditioning mechanisms, such as prompt engineering, conditioning vectors, or specific architectural modifications. For instance, several studies employ prompt engineering or conditioning vectors to guide synthesis [6, 7, 8], while others utilize specific architectural components like length regulators with attention alignments [2], conditional inputs for pitch, energy, and duration [3], or conditioning the duration predictor [5]. A distinct approach involves direct manipulation of internal representations; specifically, [9] demonstrates the efficacy of counterfactual activation editing by manipulating encoder output embeddings to control speaking rate. Another line of work, [10], employs speech-based correction using non-target speaker audio rather than internal model manipulation. This paper adopts the mechanism of counterfactual activation editing, directly manipulating internal representations to achieve control. Unlike [9], which focuses solely on speaking rate, our method generalizes this internal manipulation strategy to broader prosodic and pronunciation corrections, bypassing the need for external linguistic resources or additional architectural components.
+
+**Model Dependency**
+Most prior work in controllable speech synthesis is model-specific, requiring access to specific layers, parameters, or architectural details of the TTS system to implement control mechanisms [2, 3, 5, 6, 7, 8, 9]. This dependency restricts the applicability of these methods to systems with known internal structures, hindering their use with proprietary or black-box models. In contrast, [10] introduces a model-agnostic approach that applies to pre-trained black-box models by leveraging external speech samples for correction. This paper shares the model-agnostic property of [10], designed to apply to a wide variety of existing TTS systems without modifying their underlying architecture. By operating on internal activations in a way that does not require specific implementation details beyond standard access to hidden states, our method bridges the gap between specialized, model-specific controllers and generalizable, post-hoc editing techniques.
+
+**Resource Requirement for Correction**
+Traditional approaches to prosody and pronunciation control are often data-intensive, requiring large labeled datasets for fine-tuning or specific training procedures [2, 3, 5, 6, 7, 8]. This reliance on extensive data makes these methods less practical in low-resource settings or for languages with limited linguistic resources. Some recent works address this by reducing resource needs; for example, [9] achieves control without external dictionaries, and [10] requires specific non-target speaker speech samples rather than large labeled datasets. This paper stands with [9] in its low-resource requirement, operating without the need for external grapheme-to-phoneme dictionaries or large labeled datasets for fine-tuning. By leveraging counterfactual activation editing, our method enables effective prosody and mispronunciation correction in settings where traditional dictionary-based or data-intensive fine-tuning approaches are impractical.
+
+## References
+
+[1] Expressive prosody for unit-selection speech synthesis.
+[2] FastSpeech: Fast, Robust and Controllable Text to Speech
+[3] FastSpeech 2: Fast and High-Quality End-to-End Text to Speech
+[4] Ctrl-P: Temporal control of prosodic variation for speech synthesis
+[5] Speaking rate attention-based duration prediction for speed control TTS
+[6] Style Tokens: Unsupervised Style Modeling, Control and Transfer in
+  End-to-End Speech Synthesis
+[7] Towards End-to-End Prosody Transfer for Expressive Speech Synthesis with
+  Tacotron
+[8] Hierarchical Generative Modeling for Controllable Speech Synthesis
+[9] Speaking Rate Control of end-to-end TTS Models by Direct Manipulation of the Encoder's Output Embeddings
+[10] Speech Audio Corrector: using speech from non-target speakers for one-off correction of mispronunciations in grapheme-input text-to-speech

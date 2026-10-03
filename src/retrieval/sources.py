@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import json
 import re
 import sqlite3
@@ -28,6 +29,18 @@ ENV_TOKEN = object()
 OPENALEX_MAILTO = os.environ.get("OPENALEX_MAILTO", "sci-evo-extract@example.com")
 OPENALEX_MAX_RETRIES = int(os.environ.get("OPENALEX_MAX_RETRIES", "4"))
 
+
+
+def _knowledge_cutoff() -> str:
+    """知识截止（YYYY-MM）：优先 benchmarks/_shared/tools/cutoff.py 的线程局部值（DSB 每题不同截止），
+    否则读环境变量 KNOWLEDGE_CUTOFF；都没有返回空串（不过滤）。"""
+    mod = sys.modules.get("cutoff")
+    if mod is not None and hasattr(mod, "raw_cutoff"):
+        try:
+            return mod.raw_cutoff()
+        except Exception:
+            pass
+    return os.environ.get("KNOWLEDGE_CUTOFF", "").strip()
 
 @dataclass(frozen=True)
 class SourceCandidate:
@@ -799,10 +812,14 @@ class SciverseClient:
             return []
         if not self.token:
             raise SourceAdapterError("缺少 SCIVERSE_API_TOKEN，无法调用 Sciverse。")
+        payload: dict[str, Any] = {"query": query_text, "page_size": limit}
+        _cut = _knowledge_cutoff()  # 同 semantic_search 截止口径
+        if _cut[:4].isdigit():
+            payload["filters"] = {"publication_published_year": {"lte": int(_cut[:4]) - 1}}
         response = self.request_json(
             "POST",
             "/agentic-search",
-            payload={"query": query_text, "page_size": limit},
+            payload=payload,
             query=None,
             timeout_seconds=self.timeout_seconds,
         )
@@ -832,10 +849,17 @@ class SciverseClient:
             return [blocked_candidate(
                 "sciverse-semantic", "semantic",
                 "缺少 SCIVERSE_API_TOKEN，无法调用 Sciverse 语义检索。")]
+        payload: dict[str, Any] = {"query": query_text, "page_size": limit}
+        # 知识截止（REBUILD-PLAN-1003 E3）：设了 KNOWLEDGE_CUTOFF=YYYY-MM 时下推服务端年份过滤
+        # （实测 Sciverse 支持 filters.publication_published_year.lte，且单页上限 10 条——客户端事后
+        # 过滤会把一页滤到只剩 3-4 条）。只有年份粒度：截止当年整体排除（月份不可判，保守）。
+        _cut = _knowledge_cutoff()
+        if _cut[:4].isdigit():
+            payload["filters"] = {"publication_published_year": {"lte": int(_cut[:4]) - 1}}
         try:
             response = self.request_json(
                 "POST", "/agentic-search",
-                payload={"query": query_text, "page_size": limit},
+                payload=payload,
                 query=None, timeout_seconds=self.timeout_seconds,
             )
             if not isinstance(response, dict):
@@ -1500,7 +1524,10 @@ def sciverse_request_json(
     # dominated by agentic-search anyway). Waits up to 10s for a token; if
     # still dry the call proceeds anyway (server 429 is then the backstop)
     # rather than fabricating a source failure.
-    _sciverse_bucket().acquire(max_wait_s=10.0)
+    # 2026-10-03：等待上限可配（SCIVERSE_MAX_WAIT_S，默认 10s 保持分层检索的 15s 档期语义）。
+    # 直连调用方（answer_pipeline）设 600：限流是排队问题不是源故障——旧行为令牌等不到就照发，
+    # 服务端 429 被断路器记成源故障（3 次/120s 熔断 600s），实测 dev15 后半程 6/11 题外部检索为 0。
+    _sciverse_bucket().acquire(max_wait_s=float(os.environ.get("SCIVERSE_MAX_WAIT_S", "10")))
     url = "https://api.sciverse.space" + path
     if query:
         url += "?" + urlencode(query)
@@ -1512,14 +1539,15 @@ def sciverse_request_json(
     }
     if body is not None:
         headers["Content-Type"] = "application/json"
-    for attempt in range(2):  # one 429 backoff retry (belt: bucket should prevent it)
+    for attempt in range(5):  # 429 退避重试（令牌桶之外的兜底；多进程共享配额时仍可能 429）
         request = Request(url, data=body, headers=headers, method=method)
         try:
             with urlopen(request, timeout=timeout_seconds) as response:
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as exc:
-            if exc.code == 429 and attempt == 0:
-                time.sleep(2.5)  # let the bucket refill a little, then retry once
+            if exc.code == 429 and attempt < 4:
+                time.sleep(3.0 * (attempt + 1))
+                _sciverse_bucket().acquire(max_wait_s=120.0)
                 continue
             raise SourceAdapterError(f"HTTP {exc.code} {exc.reason} for {method} {url}") from exc
         except URLError as exc:

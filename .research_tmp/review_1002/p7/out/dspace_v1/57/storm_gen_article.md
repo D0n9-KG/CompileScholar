@@ -1,0 +1,35 @@
+## Related Work
+
+**Corpus Dynamics**
+The majority of prior research in generative retrieval (GR) has been conducted and evaluated on static document collections, where the corpus remains fixed during both training and inference. This includes foundational models such as the Differentiable Search Index (DSI) [2], Neural Corpus Indexer (NCI) [4], Ultron [5], RIPOR [6], GenRet [7], GERE [8], CorpusBrain [9], GR^2 [10], Multiview Identifiers [11], and Autoregressive Search Engines [12], as well as entity-based retrieval systems like GENRE [1]. In contrast, a smaller body of work has begun to address the challenges of dynamic corpora, where document collections evolve continuously. These studies include DynamicRetriever [3], DSI++ [13], Corpusbrain++ [14], and CLEVER [15], which explore methods for updating or adapting models to new documents. While these dynamic approaches exist, they often focus on specific adaptation mechanisms rather than providing a systematic comparison of how different GR paradigms perform under such conditions. Our work stands in the latter category, systematically evaluating representative GR approaches over dynamic corpora to reveal performance gaps that are masked in static settings.
+
+**DocID Representation**
+Existing GR models employ diverse strategies for document identification, which significantly impact their generalization capabilities. A prominent group utilizes text-based docids, leveraging semantic alignment and lexical diversity; this includes GENRE [1], NCI [4], Ultron [5], GERE [8], GR^2 [10], and Autoregressive Search Engines [12]. Another group relies on numeric-based docids, such as the sequential integers used in standard DSI [2] or the incremental product quantization in CLEVER [15]. Other approaches include separate term-level and document-level identifiers in DynamicRetriever [3], relevance-based docids in RIPOR [6], implicit parametric docids in CorpusBrain [9], and hybrid docids combining numeric and text elements in Multiview Identifiers [11]. Our analysis contrasts these groups, demonstrating that text-based docids exhibit superior generalization to unseen documents in dynamic corpora, whereas numeric-based docids suffer from significant performance drops due to overfitting on the initial document set.
+
+**DocID Granularity**
+The structure and granularity of docids vary across prior work, influencing retrieval precision and adaptability. Some models employ fixed-length hierarchical docids, as seen in DSI [2] and RIPOR [6]. Others utilize entity-level identifiers, where a single entity corresponds to an ID, as in GENRE [1]. GenRet [7] introduces learned discrete tokens as short semantic representations, while GERE [8] adopts a hierarchical structure combining document titles and sentence IDs. Notably, no cited prior work explicitly adopts a fine-grained docid design as a primary architectural choice for dynamic corpus performance. Our study identifies fine-grained docid design as a critical factor, showing that finer granularity correlates with better performance in dynamic settings, allowing GR models to surpass BM25 and compete with dense retrieval methods.
+
+**Evaluation Methodology**
+Most prior contributions in this field focus on the proposal of a single new model architecture or optimization framework. This includes the introduction of GENRE [1], DSI [2], DynamicRetriever [3], NCI [4], Ultron [5], RIPOR [6], GenRet [7], GERE [8], CorpusBrain [9], GR^2 [10], Multiview Identifiers [11], Autoregressive Search Engines [12], and CLEVER [15]. In contrast, systematic replication and comparative analysis of existing GR approaches is rare, with only Exploring the Practicality of Generative Retrieval on Dynamic Corpora [16] sharing this methodological focus. Our paper aligns with [16] in prioritizing empirical evidence through systematic replication, but extends this by providing an in-depth diagnosis of why certain docid representations fail in dynamic environments, thereby offering a comprehensive benchmark for advancing generalized GR models.
+
+## References
+
+[1] Autoregressive Entity Retrieval
+[2] Transformer Memory as a Differentiable Search Index
+[3] DynamicRetriever: A Pre-training Model-based IR System with Neither
+  Sparse nor Dense Index
+[4] A Neural Corpus Indexer for Document Retrieval
+[5] Ultron: An Ultimate Retriever on Corpus with a Model-based Indexer
+[6] Scalable and Effective Generative Information Retrieval
+[7] Learning to Tokenize for Generative Retrieval
+[8] GERE: Generative Evidence Retrieval for Fact Verification
+[9] CorpusBrain: Pre-train a Generative Retrieval Model for
+  Knowledge-Intensive Language Tasks
+[10] Generative Retrieval Meets Multi-Graded Relevance
+[11] Multiview Identifiers Enhanced Generative Retrieval
+[12] Autoregressive Search Engines: Generating Substrings as Document
+  Identifiers
+[13] DSI++: Updating transformer memory with new documents
+[14] Corpusbrain++: A continual generative pre-training framework for knowledge-intensive language tasks
+[15] Continual Learning for Generative Retrieval over Dynamic Corpora
+[16] Exploring the Practicality of Generative Retrieval on Dynamic Corpora

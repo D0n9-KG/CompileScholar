@@ -1,0 +1,27 @@
+## Related Work
+
+**Operational Phase and Training Requirements**
+Prior research in open-vocabulary detection largely relies on extensive pre-training or fine-tuning to align visual and semantic spaces. A significant body of work focuses on pre-training data curation and large-scale model initialization, utilizing datasets like COCO [3], ImageNet [5], and LVIS [4] to establish foundational representations, as exemplified by the CLIP framework [2] and its regional extension, RegionCLIP [7]. Alternatively, other approaches employ training-time fine-tuning to adapt detectors to broader vocabularies; for instance, Detic trains detectors on image-level supervision to expand class coverage [6], while CoDet reformulates region-word alignment through co-occurrence discovery during training [8]. In contrast, SHiNe operates via offline pre-computation, generating class vectors without requiring any model retraining [9]. However, no cited prior work performs vocabulary adaptation strictly at inference time without any training or offline pre-computation. This paper distinguishes itself by introducing VocAda, a plug-and-play adapter that operates entirely at test time, requiring no training or fine-tuning of the underlying detector.
+
+**Vocabulary Handling Strategy**
+Existing methods typically handle the class vocabulary through static definitions, global expansion, or open-set generation. Some approaches rely on static fixed vocabularies derived from standard benchmarks such as COCO [3] and ImageNet [5], which limit flexibility for user-specific queries. To address the long-tail distribution and limited class coverage, other works pursue global vocabulary expansion, such as Detic, which leverages image-level labels to detect tens of thousands of concepts [6], or open-set generation techniques that create new class definitions, as seen in CLIP-based zero-shot transfer [2], RegionCLIP [7], and CoDet [8]. SHiNe offers a different perspective by augmenting the vocabulary through semantic hierarchies to improve robustness across granularities [9]. Unlike these methods that either fix the vocabulary, expand it globally, or generate new classes, this paper proposes an adaptive filtering strategy. VocAda actively refines the user-defined vocabulary by discarding irrelevant classes based on image content, thereby mitigating the performance degradation caused by overly broad or mis-specified vocabularies.
+
+**Signal Source for Adaptation**
+The source of information used to guide detection varies across prior works, ranging from direct visual matching to external knowledge structures. Several methods leverage image captioning and natural language descriptions to bridge visual and textual domains; CLIP uses natural language prompts for zero-shot transfer [2], RegionCLIP aligns image regions with template captions [7], and CoDet utilizes shared concepts in captions for region-word alignment [8]. Other approaches rely on direct visual feature matching, such as Detic, which uses image-level classification signals to expand vocabulary [6], or external knowledge graphs, as employed by SHiNe to construct semantic hierarchies for class vector generation [9]. While this paper shares the use of image captioning as a signal source with CLIP [2], RegionCLIP [7], and CoDet [8], it uniquely employs this signal not for training alignment or feature matching, but for real-time vocabulary pruning. By parsing nouns from generated captions, VocAda identifies visible objects to filter the user-provided class list, a distinct application of captioning signals compared to prior alignment-based methods.
+
+**Model Integration Architecture**
+The architectural integration of open-vocabulary capabilities into detection pipelines is generally achieved through end-to-end joint training or modular additions. Most state-of-the-art methods, including CLIP-based detectors [2], RegionCLIP [7], CoDet [8], and Detic [6], require end-to-end joint training or significant architectural modifications to integrate semantic information into the detection head. In contrast, SHiNe introduces a plug-and-play classifier that generates robust class vectors without modifying the base detector’s internal architecture [9]. This paper aligns with the plug-and-play paradigm established by SHiNe [9] but extends it by operating as a pre-processing adapter. VocAda functions as an independent module that refines input labels before they reach the detector, ensuring versatility across different state-of-the-art detectors without altering their internal structures or requiring joint training.
+
+## References
+
+[1] A Survey on Open-Vocabulary Detection and Segmentation: Past, Present,
+  and Future
+[2] Learning Transferable Visual Models From Natural Language Supervision
+[3] Microsoft COCO: Common Objects in Context
+[4] LVIS: A Dataset for Large Vocabulary Instance Segmentation
+[5] {ImageNet: a Large-Scale Hierarchical Image Database}
+[6] Detecting Twenty-thousand Classes using Image-level Supervision
+[7] RegionCLIP: Region-based Language-Image Pretraining
+[8] CoDet: Co-Occurrence Guided Region-Word Alignment for Open-Vocabulary
+  Object Detection
+[9] SHiNe: Semantic Hierarchy Nexus for Open-vocabulary Object Detection

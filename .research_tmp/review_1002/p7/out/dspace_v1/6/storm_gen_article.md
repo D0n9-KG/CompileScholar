@@ -1,0 +1,36 @@
+## Related Work
+
+### Model Adaptation Strategy
+Prior research on long-context processing has predominantly focused on architectural modifications to extend the effective context window of Transformer models. A significant body of work introduces specialized attention mechanisms to reduce computational complexity, including sparse attention [4], linear attention [5], locality-sensitive hashing [6], and low-rank matrix approximations [8]. Other approaches modify positional encodings or reuse existing architectures, such as extending context windows via positional interpolation with minimal fine-tuning [9], re-using short-text pretrained language models with fusion-in-decoder strategies [11], and wrapping existing transformers with k-nearest-neighbor indexing [12]. In contrast, a smaller subset of studies relies on inference-time prompting without fine-tuning [14, 15, 16], while others employ supervised fine-tuning on specific narrative datasets [13] or distinct extraction and selection pipelines [1, 3]. Unlike these methods that either require architectural changes, domain-specific training, or complex extraction heuristics, NexusSum adopts an inference-time prompting strategy with no fine-tuning, ensuring scalability and generalizability across diverse storytelling domains without the need for domain-specific training data.
+
+### Architectural Topology
+The structural organization of summarization pipelines varies widely in the literature. Many foundational models operate as single monolithic LLM calls, processing the entire input in one pass [4, 5, 6, 7, 8, 9, 10, 12]. Alternatively, some approaches utilize flat map-reduce summarization techniques [11, 13] or specialized extraction pipelines, such as extractive alignment [1], graph-based extraction [2], and two-stage select-and-summarize methods [3]. Recent advancements have introduced hierarchical multi-agent sequential pipelines, where multiple agents collaborate to process and synthesize information [14, 15], alongside evaluation frameworks like Agent-as-a-Judge [16]. While [14] and [15] share the hierarchical multi-agent topology, NexusSum distinguishes itself by integrating this structure specifically for narrative summarization, decomposing the task into specialized, sequential steps to handle the complexity of long-form plots and character interactions.
+
+### Input Preprocessing Method
+Preprocessing strategies in long-form summarization often aim to manage input length or extract structural entities. Some methods employ simple sliding window segmentation [11, 13] or break input documents into smaller chunks [15], while others segment text into portions for sequential processing [14]. In the domain of narrative and script summarization, specific preprocessing techniques include graph-based entity extraction prior to summarization [2, 16], sentence-level alignment [1], and scene saliency identification [3]. However, no cited prior work employs a Dialogue-to-Description Transformation. This gap highlights the unique contribution of NexusSum, which standardizes heterogeneous narrative elements—specifically character dialogue and descriptive text—into a unified format to improve coherence, a step not addressed by the segmentation or entity-extraction methods used in previous studies.
+
+### Content Scope
+The application domains of long-context models range from general-purpose NLP tasks to specific narrative genres. Several studies target general long-sequence or long-document tasks, including general long-sequence NLP tasks [4], general long-document tasks [5], general long-sequence tasks [6], general long-sequence text-to-text tasks [7], and general long-sequence NLP applications [8]. Other works focus on specific applications such as multi-document question answering and key-value retrieval [10], long text understanding across stories and scientific articles [11], or long-context tasks like question answering and code completion [14]. A distinct group of research is dedicated specifically to long-form narrative summarization, covering books, movies, and TV scripts [1, 2, 3, 12, 15, 16]. NexusSum aligns with this latter group by targeting the specific challenges of intricate plotlines and character interactions found in long-form narratives, rather than addressing general-purpose text summarization.
+
+## References
+
+[1] Exploring Content Selection in Summarization of Novel Chapters
+[2] Movie Script Summarization as Graph-based Scene Extraction
+[3] Select and Summarize: Scene Saliency for Movie Script Summarization
+[4] Big Bird: Transformers for Longer Sequences
+[5] Longformer: The Long-Document Transformer
+[6] Reformer: The Efficient Transformer
+[7] {L}ong{T}5: {E}fficient Text-To-Text Transformer for Long Sequences
+[8] Linformer: Self-Attention with Linear Complexity
+[9] Extending Context Window of Large Language Models via Positional
+  Interpolation
+[10] Lost in the Middle: How Language Models Use Long Contexts
+[11] Efficient Long-Text Understanding with Short-Text Models
+[12] Unlimiformer: Long-Range Transformers with Unlimited Length Input
+[13] End-to-End Long Document Summarization using Gradient Caching
+[14] Chain of Agents: Large Language Models Collaborating on Long-Context
+  Tasks
+[15] BooookScore: A systematic exploration of book-length summarization in
+  the era of LLMs
+[16] Agent-as-Judge for Factual Summarization of Long Narratives
+[17] Advances in Neural Information Processing Systems 33, NeurIPS 2020

@@ -1,0 +1,548 @@
+{
+ "rows": [
+  {
+   "system": "openai_dr",
+   "arxiv_id": "2302.04732",
+   "sent": "Domain-specific efforts have addressed fairness and bias in CV models: one study found object detectors had far higher error rates for small or darkly lit objects [[19]], underscoring the need to test vision models under varied conditions.",
+   "judge": "misattributed",
+   "manual": "misattributed",
+   "note": "Zeno paper has no 'small/darkly lit objects' finding (grep 0 hits)",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "openai_dr",
+   "arxiv_id": "2407.12514",
+   "sent": "(2024)* conducted an extensive empirical study and found that a transformer initialized with **GloVe word embeddings** or even subword embeddings extracted from a T5 model actually **performed worse than a model with randomly initialized embeddings** in several tasks [22][[8]].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "openai_dr",
+   "arxiv_id": "2504.13629",
+   "sent": "On the positive side, early adopters demonstrate how LLMs can be used as equalizers within a field – for instance, the arXiv study also found that **junior scientists and non-native English writers were significantly more likely to use GPT for writing help** than senior or native English authors, hinting that LLMs are serving as a support tool for those who traditionally face disadvantages in academic publishing [[1]].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "openai_dr",
+   "arxiv_id": "1703.0056",
+   "sent": "An empirical assessment showed that at various score cutoffs, COMPAS could not attain both equal PPV and equal FPR/TPR simultaneously [14][[7]].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2509.26173",
+   "sent": "These \"activity cascades\" are \"a statistically significant phenomenon in more than half of the studied projects\" [14], and the co-editing structure even shapes how fast developers work: \"developers are faster to edit their own code compared to code by other developers\" [14].",
+   "judge": "misattributed",
+   "manual": "version_drift",
+   "note": "quotes v1; 2nd clause absent from current version",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2512.03868",
+   "sent": "That reuse is what makes dependency vulnerabilities an ecosystem-level problem: vulnerabilities in third-party components propagate into the dependent applications, and the 2021 Apache Log4j disclosure (CVE-2021-44228, Log4Shell) showed the consequence, when injecting prepared strings into the logging library allowed remote code execution in a component Google estimated was present in 17k Maven Central packages [1].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "background fact",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2511.14718",
+   "sent": "In a controlled user study comparing 'SQL-LLM, a state-of-the-art NL2SQL system built on the SeekAI platform, with Snowflake, a traditional SQL analytics platform', 20 participants each completed 12 realistic database querying tasks; SQL-LLM 'significantly reduced query completion times by 10 - 30% (mean: 418 s vs. 629 s, p = 0.036 )' and 'improved overall accuracy from 50% to 75% ( p = 0.002 )', and participants 'exhibited fewer query reformulations, recovered from errors 30–40 seconds faster, and reported lower frustration levels compared to Snowflake users' [6].",
+   "judge": "misrepresented",
+   "manual": "version_drift",
+   "note": "v1 abstract: accuracy 50->75% p=0.002; current version reverses: 46% vs 64% favoring Snowflake",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2410.01774",
+   "sent": "Their central overfitting result is what they call \"benign overfitting in-context\": \"when in-context examples are corrupted by label flipping noise, the transformer memorizes all of its in-context examples (including those with noisy labels) yet still generalizes near-optimally for clean test examples\" [4].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "1906.09936",
+   "sent": "At the level of the diagnostic decision, a deep convolutional system reached 81% accuracy for OSA severity diagnosis against 75% for human sleep experts, and an event-detection F1 of 0.57 versus 0.55 for experts, demonstrating that an automatic approach can perform at a sleep-expert level [1].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "author-level generality inherited; critical hidden limitation: single centre, 52 recordings",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2112.08787",
+   "sent": "AcTune couples active annotation with self-training for such fine-tuning: it queries high-uncertainty samples for annotation and reuses low-uncertainty pseudo-labels for self-training, and in experiments on six text classification datasets it outperforms the strongest active learning and self-training baselines, improving the label efficiency of pre-trained language model fine-tuning by 56.2% on average [4].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2412.16926",
+   "sent": "For under-utilized context windows, a simple data augmentation approach \"substantially improve[s] ICL performance by 5%\" when available examples do not fill the window [7].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "author-level generality inherited; critical hidden limitation: Gemini Pro/Flash only",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2411.13868",
+   "sent": "Ordinary human editing is also more damaging than it looks: with just 5% of tokens human-modified, 'the detection power when text length is 400 drops from 87.8% in the edit-free case to 64.7% with paraphrase edits and further to 30.2% with adversarial edits', and the 'sum-based detection rules' used by most schemes 'fail to achieve optimal robustness' under such edits [6].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2105.06442",
+   "sent": "Empirically, this robustness matters: across four real-world high-stakes policy problems, post-processing by choosing group-specific score thresholds consistently removes disparities, with little or no trade-off in model accuracy [7].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2510.21970",
+   "sent": "That specialization can close the accuracy gap is no longer hypothetical: a large-scale study fine-tuning over 300 models “confirmed that specialized models can consistently rival GPT-4 on narrow tasks, suggesting that a 'many small models' approach is a viable and efficient strategy” [2].",
+   "judge": "misattributed",
+   "manual": "misattributed",
+   "note": "quote is the paper's related-work sentence about LoRA Land [15], not its own result",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2209.11302",
+   "sent": "ProgPrompt demonstrated state-of-the-art success rates on VirtualHome household tasks and deployed its method on a physical robot arm for tabletop tasks [17].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2509.15356",
+   "sent": "A large-scale study of zero-shot LLM probabilistic prediction on 316 tasks across 31 tabular datasets found that LLM performance is highly variable, both among tasks within the same dataset and across datasets, so success cannot be inferred from subject-matter expertise; metrics assessed without labeled data provide a strong task-level signal of whether an LLM will perform well on a new task [4].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "2511.13722",
+   "sent": "One comparative study concluded that the schemes it tested 'are susceptible to adversarial attacks, especially for the back translation attack' [13].",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "harness",
+   "arxiv_id": "1812.05473",
+   "sent": "At node level, embedding methods 'with added subgraph features (triad distribution for a node)' beat node-only baselines on network classification tasks [18], and graphlets have been studied 'in network embedding and graph neural networks for network classification' [19].",
+   "judge": "overreach_fixed",
+   "manual": "overreach_report",
+   "note": "node-classification gain on Cora/Pubmed that paper calls 'not that significant' -> 'beat node-only baselines on network classification tasks'; critical hidden limitation",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2207.14711",
+   "sent": "An empirical study on 100 JavaScript projects using npm found that less than 1% of installed dependencies are actually released to production, suggesting that while projects depend on many packages, the subset posing a direct threat to production security is smaller. ### Developer Behavior and Response to Vulnerabilities Developers frequently struggle with updating vulnerable dependencies, a challenge that persists despite the availability of automated tools.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "1707.06209",
+   "sent": "Analysis showed that humans could not distinguish these crowdsourced questions from original ones, and using SciQ as additional training data improved model performance.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "1212.1186",
+   "sent": "This \"staircase mechanism\" can be viewed as a geometric mixture of uniform probability distributions and outperforms the standard Laplacian mechanism in terms of minimum expectation of noise amplitude and power.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2007.04439",
+   "sent": "This hybrid model generalizes better to new situations than pure neural networks and outperforms the coarse CFD simulation alone.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2104.13457",
+   "sent": "For random permutations of $n$ elements, the space usage drops to $1.736n + o(n)$ bits on average. ### Applications in Graph Distance Oracles Novel succinct data structures for ordinal trees have also been applied to graph theory, specifically for distance oracles in interval graphs.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2211.16971",
+   "sent": "One study utilized a pipeline to validate synthetic data and an online interface for human annotation, where crowdworkers labeled 1,117 synthetic QA pairs, resulting in an **8.75 F1 point improvement** in domain-specific QA performance.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2211.08473",
+   "sent": "Generalization Gaps and Scaling * **Compositional Generalization:** Pretrained large generative models exhibit a gap between in-distribution (ID) and out-of-distribution (OOD) performance in semantic parsing tasks when using in-context learning.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2211.11798",
+   "sent": "Empirical results show that this strategy can achieve a mean AUC gain of 10.5% compared to no transfer when using a large 22b parameter PLM, demonstrating the efficacy of active learning in few-shot settings.",
+   "judge": "in_scope",
+   "manual": "overreach_report",
+   "note": "tested only social-media toxicity/bias classification with Megatron PLMs -> 'efficacy of active learning in few-shot settings'; critical hidden limitation",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2212.04214",
+   "sent": "For instance, the MUS model finetunes a pre-trained encoder on the citation graph via link prediction tasks, demonstrating that citation graph information is helpful even in simple unsupervised frameworks.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "author-level generality inherited (SSN only)",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "1012.5696",
+   "sent": "An index over grammar-compressed trees allows for the execution of arbitrary tree algorithms with a slow-down comparable to the space improvement, and certain algorithms, such as structural XPath count queries, can execute up to two orders of magnitude faster over the index than in previous implementations due to the avoidance of decompression.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2008.12228",
+   "sent": "General RL frameworks can learn sophisticated locomotion for a wide spectrum of legged robots, including bipeds, quadrupeds, and hexapods, from raw sensory inputs with minimal prior knowledge.",
+   "judge": "in_scope",
+   "manual": "overreach_report",
+   "note": "borderline: 'We develop a framework' -> 'General RL frameworks can learn...'",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2010.07586",
+   "sent": "A deep learning approach using \"super cell representation\" and automatic injection of perturbations to training data has been proposed to make models robust to schema changes in unmanaged data, demonstrating effectiveness in real-world integration scenarios. ### 3.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "gptr",
+   "arxiv_id": "2207.03034",
+   "sent": "This approach learns robot-specific inertial features to approximate rewards, improving model fidelity and providing state-dependent rewards during deployment.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2311.03099",
+   "sent": "Task-Specific Improvements : - DARE technique: Improved GSM8K zero-shot accuracy from 2.2 to 66.3  - Demonstrates significant task-specific learning through fine-tuning  These comparative results suggest that supervised fine-tuning can lead to meaningful improvements in LLM performance across various tasks and benchmarks, indicating effective learning of new information and capabilities.",
+   "judge": "misattributed",
+   "manual": "misrepresented",
+   "note": "2.20->66.34 GSM8K is Task-Arithmetic merging of LM&Math (table), attributed to DARE",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2302.02104",
+   "sent": "This approach reports an 88.4% improvement in computational metrics compared to previous techniques but poses challenges related to interpretability and potential overfitting.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2110.07143",
+   "sent": "(2021): 45-47% cost reduction with bert2BERT method  - Samragh et al.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2312.10136",
+   "sent": "(2023): GPS method tunes 0.36% of pretrained model\\'s parameters  - Yin et al.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2403.02884",
+   "sent": "Their MathScale-7B model achieved state-of-the-art performance across all datasets in this benchmark, suggesting good cross-task generalization.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2210.08823",
+   "sent": "(2022): 2.46% and 11.48% accuracy improvements on FGVC and VTAB-1k  These results suggest that the parameter-efficient methods examined often achieved a favorable balance between accuracy and efficiency in their specific contexts.",
+   "judge": "misattributed",
+   "manual": "in_scope",
+   "note": "judge FP: 'examined methods' hedged + 'specific contexts'",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2202.03734",
+   "sent": "However, the likelihood of achieving both high performance and high fairness increased with a larger number of interventions.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "critical hidden limitation: 4 tabular datasets, logistic regression only",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2201.04687",
+   "sent": "The authors report an average success rate of 89.3% in company entity matching tasks.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2306.08891",
+   "sent": "They report that their approach outperforms both Pre-trained Language Model-based and Large Language Model-based methods in execution accuracy.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2303.06247",
+   "sent": "The consistently high success rates across various task complexities suggest that Large Language Models can effectively contribute to both simple and complex robot planning scenarios.",
+   "judge": "overreach_fixed",
+   "manual": "overreach_report",
+   "note": "tableware rearrangement, 3-5 objects, GPT-3 -> 'LLMs can effectively contribute to both simple and complex robot planning scenarios'; critical hidden limitation",
+   "critical_hidden_limitation": true
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2305.14992",
+   "sent": "RAP showed a 33% relative improvement over Chain-of-Thought in plan generation tasks.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2305.10276",
+   "sent": "A spatial-to-relational method paired with curriculum Q-learning raised path-planning success and optimality rates by 23--40% in maze environments, while a two-phase self-planning approach in code generation achieved up to a 25.4% improvement in Pass@1 metrics.",
+   "judge": "misattributed",
+   "manual": "misattributed",
+   "note": "Q-learning maze / self-planning codegen results not in this paper",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2309.11987",
+   "sent": "SHAP reduced comprehensibility near decision boundaries (1 study)  5.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  },
+  {
+   "system": "elicit",
+   "arxiv_id": "2304.01904",
+   "sent": "This approach showed significant improvements over baseline LMs on diverse reasoning tasks.",
+   "judge": "in_scope",
+   "manual": "in_scope",
+   "note": "",
+   "critical_hidden_limitation": false
+  }
+ ],
+ "summary": {
+  "openai_dr": {
+   "n": 4,
+   "in_scope": 3,
+   "overreach_report": 0,
+   "misrepresented": 0,
+   "misattributed": 1,
+   "version_drift": 0,
+   "overreach_rate": [
+    0.0,
+    0,
+    0.49
+   ],
+   "any_report_error_rate": [
+    0.25,
+    0.046,
+    0.699
+   ],
+   "critical_hidden_limitation": [
+    0.0,
+    0,
+    0.49
+   ]
+  },
+  "harness": {
+   "n": 14,
+   "in_scope": 10,
+   "overreach_report": 1,
+   "misrepresented": 0,
+   "misattributed": 1,
+   "version_drift": 2,
+   "overreach_rate": [
+    0.071,
+    0.013,
+    0.315
+   ],
+   "any_report_error_rate": [
+    0.143,
+    0.04,
+    0.399
+   ],
+   "critical_hidden_limitation": [
+    0.214,
+    0.076,
+    0.476
+   ]
+  },
+  "gptr": {
+   "n": 13,
+   "in_scope": 11,
+   "overreach_report": 2,
+   "misrepresented": 0,
+   "misattributed": 0,
+   "version_drift": 0,
+   "overreach_rate": [
+    0.154,
+    0.043,
+    0.422
+   ],
+   "any_report_error_rate": [
+    0.154,
+    0.043,
+    0.422
+   ],
+   "critical_hidden_limitation": [
+    0.077,
+    0.014,
+    0.333
+   ]
+  },
+  "elicit": {
+   "n": 14,
+   "in_scope": 11,
+   "overreach_report": 1,
+   "misrepresented": 1,
+   "misattributed": 1,
+   "version_drift": 0,
+   "overreach_rate": [
+    0.071,
+    0.013,
+    0.315
+   ],
+   "any_report_error_rate": [
+    0.214,
+    0.076,
+    0.476
+   ],
+   "critical_hidden_limitation": [
+    0.143,
+    0.04,
+    0.399
+   ]
+  },
+  "ALL": {
+   "n": 45,
+   "in_scope": 35,
+   "overreach_report": 4,
+   "misrepresented": 1,
+   "misattributed": 3,
+   "version_drift": 2,
+   "overreach_rate": [
+    0.089,
+    0.035,
+    0.207
+   ],
+   "any_report_error_rate": [
+    0.178,
+    0.093,
+    0.313
+   ],
+   "critical_hidden_limitation": [
+    0.133,
+    0.063,
+    0.262
+   ]
+  },
+  "overreach_strict_excl_borderline_and_strength": [
+   0.044,
+   0.012,
+   0.148
+  ],
+  "judge_vs_manual_problem_flag": {
+   "tp": 8,
+   "fp": 1,
+   "fn": 2,
+   "tn": 34,
+   "precision": 0.889,
+   "recall": 0.8
+  },
+  "judge_overreach_flags": {
+   "flagged": 2,
+   "confirmed": 2,
+   "manual_overreach": 4
+  },
+  "calls": {
+   "llm": 95,
+   "fetch": 65
+  }
+ }
+}

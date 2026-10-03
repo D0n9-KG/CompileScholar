@@ -408,8 +408,12 @@ class ExternalTools:
             # pass with keyword fallback
             # 组件5:实体别名扩展(见 _expand_query_aliases)
             q_exp = self._expand_query_aliases(query)
-            r = self._service().search(q_exp, mode="agent", limit=k)
-            rows = [_cand_row(c) for c in r.candidates[:k]]
+            # 知识截止（REBUILD-PLAN-1003 E3）：多取一倍再按截止过滤，保证 k 条有效
+            from cutoff import filter_rows as _cut_rows, cutoff as _cut
+            want = k * 5 if _cut() else k
+            r = self._service().search(q_exp, mode="agent", limit=want)
+            rows, _n_cut = _cut_rows([_cand_row(c) for c in r.candidates[:want]])
+            rows = rows[:k]
             for row in rows:
                 t = row.get("title") or ""
                 if t:

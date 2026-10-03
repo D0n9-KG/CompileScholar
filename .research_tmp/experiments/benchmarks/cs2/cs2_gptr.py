@@ -69,6 +69,7 @@ class SciverseRetriever:
                 if len(content) < 80:
                     continue   # 无摘要的命中不成证据
                 out.append({"url": url, "raw_content": content})
+                _SNIPPETS.setdefault(url, (p.get("abstract") or "").strip())
             return out
         except Exception as e:
             print(f"[sciverse-retriever] {str(e)[:100]}", flush=True)
@@ -120,6 +121,11 @@ _NUM_CITE = re.compile(r"\[(\d+)\]")
 # 编号 → cites=0。md 链接正则（普通链接+括号包裹链接两种形态）。
 _MD_CITE = re.compile(r"\(?\[([^\]\[]{2,120})\]\((https?://[^)\s]+)\)?\)?")
 _MD_CITE_PAREN = re.compile(r"\(\[([^\]\[]{2,120})\]\((https?://[^)\s]+)\)\)")
+
+
+# url -> 检索返回的 raw_content（标题+摘要）；SciverseRetriever.search 登记，
+# report_to_cs2 用作 snippet。进程内共享（同一运行内 url 唯一对应一篇论文）。
+_SNIPPETS: dict = {}
 
 
 def report_to_cs2(report_md: str, sources=None) -> list[dict]:
@@ -183,7 +189,9 @@ def report_to_cs2(report_md: str, sources=None) -> list[dict]:
             seen[u] = len(cites) + 1
             cites.append({
                 "id": f"[{seen[u]}]",
-                "snippets": [],
+                # 有检索到的摘要就作 snippet（与 ours 的 abstract 档对称；
+                # REBUILD-PLAN-1003 E5）——retriever 契约里本就带 raw_content
+                "snippets": ([_SNIPPETS[u][:1600]] if u in _SNIPPETS else []),
                 "title": info["title"],
                 "metadata": {"url": u},
             })
@@ -205,6 +213,15 @@ def report_to_cs2(report_md: str, sources=None) -> list[dict]:
         text2 = _NUM_CITE.sub(
             lambda m: f"[{seen[('md', int(m.group(1)))]}]"
             if ("md", int(m.group(1))) in seen else m.group(0), text)
+        # 官方契约：citation id 必须原样出现在正文（task.py:81）。之前 id 改成 [k]
+        # 但正文仍是 md 链接 → grader 返回的 supporting 是标题文本、与 id 永不相交 →
+        # 半信用扣减静默失效（REBUILD-PLAN-1003 E5）。把正文里的 md 链接替换成 [k]：
+        # 先替换外层带括号的形态，再替换裸链接。
+        def _md_to_id(m):
+            k = seen.get(m.group(2))
+            return f"[{k}]" if k else m.group(0)
+        text2 = _MD_CITE_PAREN.sub(_md_to_id, text2)
+        text2 = re.sub(r"\[([^\]\[]{2,120})\]\((https?://[^)\s]+)\)", _md_to_id, text2)
         out.append({"title": title, "text": text2, "citations": cites})
     return out
 

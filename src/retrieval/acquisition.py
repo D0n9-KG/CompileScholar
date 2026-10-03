@@ -180,7 +180,10 @@ def discover_tiered(
             ready = [r for r in rows if r.status == "ready"]
             errored = [r for r in rows if r.status in ("failed", "blocked")]
             if errored:
-                circ.record(source, ok=False)
+                # 限流（429）是配额排队，不是源故障——不计入断路器（2026-10-03：并发答题时 429 曾
+                # 3 次/120s 触发熔断 600s，整段时间外部检索静默为 0）
+                if not all("429" in (r.error_summary or "") for r in errored):
+                    circ.record(source, ok=False)
                 trace.append({"source": source, "outcome": "error",
                               "error": errored[0].error_summary,
                               "latency_s": dt})

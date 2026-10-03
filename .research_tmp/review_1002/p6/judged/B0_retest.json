@@ -1,0 +1,935 @@
+[
+ {
+  "gt_dir": "3",
+  "qid": "2506.00832v1",
+  "nugget_coverage": 0.16666666666666666,
+  "strict_vital": 0.5,
+  "all_partial": 0.3333333333333333,
+  "vital_partial": 0.75,
+  "n_nuggets": 12,
+  "n_failed": 0,
+  "words": 499,
+  "judge_s": 168.9,
+  "nuggets": [
+   {
+    "text": "Prosody control is vital for expressive TTS",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Mispronunciation correction often uses grapheme-to-phoneme dictionaries",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Recent works predict prosodic features from embeddings",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Reference encoders capture nuanced prosodic variation",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Embedding bias enables intermediate representation control",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Prior methods risk deviating from data manifold",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Duration control is a common focus in prosody editing",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "End-to-end TTS struggles with polyphone disambiguation",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Unit selection mitigates mispronunciation but causes join artifacts",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Unit selection requires single-speaker databases",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Speech Audio Corrector (SAC) uses self-supervised speech codes",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "SAC corrects mispronunciations at the word level",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "4",
+  "qid": "2506.00418v1",
+  "nugget_coverage": 0.18181818181818182,
+  "strict_vital": 0.2,
+  "all_partial": 0.45454545454545453,
+  "vital_partial": 0.6,
+  "n_nuggets": 11,
+  "n_failed": 0,
+  "words": 663,
+  "judge_s": 83.5,
+  "nuggets": [
+   {
+    "text": "In-context learning (ICL) uses LLMs for downstream NLP tasks",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "ICL typically assumes clean, high-quality demonstrations",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Noisy annotations in ICL can degrade performance",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "LLMs exhibit biases from pre-training corpora affecting task performance",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Other methods address context and label bias in LLM classification tasks",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Recent work explores ICL with random or noisy labels",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Min et al. found limited impact of random retrievers in some settings",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Yoo et al. showed significant degradation with noisy demonstrations",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Kang et al. proposed Rectification for noisy ICL classification, requiring fine-tuning",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Gao et al. introduced a noise-robust ICL method for generation, limited under high noise",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Contrastive Decoding debiases LLM outputs using smaller models",
+    "importance": "okay",
+    "assignment": "partial_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "6",
+  "qid": "2505.24575v1",
+  "nugget_coverage": 0.16666666666666666,
+  "strict_vital": 0.2,
+  "all_partial": 0.3611111111111111,
+  "vital_partial": 0.3,
+  "n_nuggets": 18,
+  "n_failed": 0,
+  "words": 552,
+  "judge_s": 45.0,
+  "nuggets": [
+   {
+    "text": "Narrative summarization requires handling complex plots and character arcs",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Extractive-abstractive pipelines risk losing narrative coherence and event dependencies",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Prior methods struggle with full text processing and truncate key content",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Dialogue-to-description transformation enables holistic, coherent narrative processing",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Transformer models face scalability issues with long-context summarization",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Chunking-based methods segment text for hierarchical summarization",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Existing multi-agent LLMs lack narrative-specific adaptations for coherence and character interactions",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "NexusSum offers a training-free, multi-agent LLM approach for full text summarization",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "NexusSum integrates dialogue-to-description transformation and systematic length control",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "NexusSum ensures coherent, contextually faithful summaries for long-form storytelling",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "BookSum, MENSA, MovieSum, SummScreenFD are key narrative summarization datasets",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Scene-based and discourse-aware models use graphs and saliency classifiers",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Sparse attention, memory-efficient encoding, and long-context finetuning address scalability",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Expanded context windows help but degrade in multi-turn dependencies and coherence",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "SLED and Unlimiformer use chunking for long-form summarization",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "CachED improves efficiency via gradient caching but requires finetuning",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Multi-agent LLM frameworks like CoA and BooookScore use hierarchical merging and refinement",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Retrieval-augmented generation improves factuality but misses thematic continuity in narratives",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "9",
+  "qid": "2505.23353v1",
+  "nugget_coverage": 0.21428571428571427,
+  "strict_vital": 0.25,
+  "all_partial": 0.42857142857142855,
+  "vital_partial": 0.5,
+  "n_nuggets": 14,
+  "n_failed": 0,
+  "words": 606,
+  "judge_s": 297.5,
+  "nuggets": [
+   {
+    "text": "Synthetic data generation helps with small datasets and label scarcity",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Rim lesion segmentation addresses class imbalance via latent space oversampling",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "GANs learn mapping from noise to synthetic paramagnetic rim lesions",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Susceptibility images differentiate rim from non-rim lesions on QSM",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Latent projection recovers ambiguous rim lesions using pretrained GANs",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "GAN inversion relates to ambiguous lesion denoising",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Conditional GANs address label noise in minority and majority classes",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Modeling label noise as latent space shift corrects classifications",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Synthetic MRI data generated via signal models and deep learning",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Deep learning enables synthetic data mapping across contrasts and resolutions",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Transfer learning addresses limited MRI data and domain adaptation",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Variational autoencoders generate synthetic MS lesions on T2FLAIR",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Noise transition matrix estimation calibrates classifiers with noisy labels",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "GAN inversion used for under-sampled MRI reconstruction, not label noise mitigation",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "21",
+  "qid": "2505.22616v1",
+  "nugget_coverage": 0.18181818181818182,
+  "strict_vital": 0.0,
+  "all_partial": 0.36363636363636365,
+  "vital_partial": 0.0,
+  "n_nuggets": 11,
+  "n_failed": 0,
+  "words": 582,
+  "judge_s": 18.2,
+  "nuggets": [
+   {
+    "text": "Conventional VFI uses motion estimation, blending, morphing",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Deep learning has advanced VFI with end-to-end neural networks",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "DAIN, RIFE, M2M, EMA-VFI are notable deep VFI models",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Deep VFI uses depth estimation, deformable convolution, feature extraction",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Challenges remain in VFI: large motion, fine detail preservation",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "AlignNeRF uses optical flow for better view alignment in neural rendering",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "DiffusionNeRF and 3DGS-enhancer use diffusion models for regularization",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Diffusion-based methods can introduce artifacts, increase training time",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "NeRFs are used in autonomous driving for 3D scene simulation",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "UniSim and Neurad optimize NeRF for realistic autonomous driving data",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Lightning-NeRF accelerates NeRF with fast neural initialization",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "27",
+  "qid": "2504.21282v1",
+  "nugget_coverage": 0.46153846153846156,
+  "strict_vital": 0.7142857142857143,
+  "all_partial": 0.5384615384615384,
+  "vital_partial": 0.7857142857142857,
+  "n_nuggets": 13,
+  "n_failed": 0,
+  "words": 534,
+  "judge_s": 91.7,
+  "nuggets": [
+   {
+    "text": "NL-driven table discovery retrieves tables using natural language queries",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Traditional methods use a representation-index-search pipeline with dense vectors",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Errors in representation and indexing phases reduce search accuracy",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Insufficient query-table interaction limits semantic alignment and accuracy",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Differentiable search index (DSI) unifies indexing and search in one model",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Birdie is the first to use DSI for table discovery",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Birdie introduces parameter isolation to mitigate catastrophic forgetting",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "OpenDTR uses TAPAS as a bi-encoder for table representation",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Solo encodes cell-attribute-cell triplets for finer table representation",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "OpenWikiTable explores various query and table encoder options",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Cross-encoder re-ranking enables deep query-table interactions but lacks scalability",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "DSI was first used for document retrieval, now applied to tables",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Replay-based continual learning in DSI struggles to balance new and old data",
+    "importance": "okay",
+    "assignment": "partial_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "29",
+  "qid": "2504.21752v1",
+  "nugget_coverage": 0.3333333333333333,
+  "strict_vital": 0.0,
+  "all_partial": 0.4166666666666667,
+  "vital_partial": 0.25,
+  "n_nuggets": 6,
+  "n_failed": 0,
+  "words": 560,
+  "judge_s": 47.9,
+  "nuggets": [
+   {
+    "text": "MPC-based DP mechanisms lack external verifiability of randomness and computation",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Prior work does not address external analyst verification in distributed DP",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Verifiable executions of DP mechanisms use cryptographic proofs for correctness",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "VFuzz and DPrio pioneered verifiable DP computation in database systems",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Recent work verifies correct noise sampling in DP: KCY21, STC+24, VDBM",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Secure randomness generation and DP via secure computation, including MPC",
+    "importance": "okay",
+    "assignment": "support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "38",
+  "qid": "2505.11554v1",
+  "nugget_coverage": 0.35294117647058826,
+  "strict_vital": 0.5555555555555556,
+  "all_partial": 0.5294117647058824,
+  "vital_partial": 0.6111111111111112,
+  "n_nuggets": 17,
+  "n_failed": 0,
+  "words": 616,
+  "judge_s": 137.4,
+  "nuggets": [
+   {
+    "text": "Task-resource co-allocation is critical for real-time system predictability",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Partitioned scheduling requires careful task and resource allocation to cores",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Cache partitioning and memory bandwidth regulation improve timing predictability",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Existing MILP approaches struggle with scalability for large systems",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Multi-objective heuristics optimize resource usage and schedulability",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Knapsack problem formulation enables optimal task allocation via dynamic programming",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "MMO heuristic improves on CaM with multi-layer, multi-objective optimization",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "MMO outperforms CaM in schedulability, resource usage, and efficiency",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Inter-task interference impacts allocation strategies and predictability",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Cache coloring and MemGuard are common software-based partitioning techniques",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Mixed-integer linear programming (MILP) used for exact task allocation",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "State-of-the-art CaM algorithm uses k-means clustering and bin-packing heuristics",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "MMO yields multiple non-dominated solutions, CaM produces only one",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Intel RDT and Arm MPAM provide hardware support for resource partitioning",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Dynamic memory bandwidth allocation adapts to runtime variations",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Parallel and gang task scheduling require specialized allocation methods",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Non-preemptive scheduling introduces additional allocation challenges",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "43",
+  "qid": "2504.09307v1",
+  "nugget_coverage": 0.3076923076923077,
+  "strict_vital": 0.25,
+  "all_partial": 0.6153846153846154,
+  "vital_partial": 0.5625,
+  "n_nuggets": 13,
+  "n_failed": 0,
+  "words": 505,
+  "judge_s": 21.8,
+  "nuggets": [
+   {
+    "text": "Transformer-based LLMs require 3D parallelism: data, tensor, pipeline",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "3D parallelism enables efficient large-scale LLM training",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Configuring parallelism strategies is complex and error-prone",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Analytical models (AmPeD, Calculon) estimate LLM training performance",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Analytical models often lack generality and fine-grained accuracy",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Trace-based models (ASTRA-sim, Daydream, dPRO) simulate distributed training",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Existing trace-based models struggle with LLM execution complexity",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Lumos is the first to accurately model LLMs using detailed traces",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Profiling tools like NVProf, CUPTI, Nsight expose hardware performance counters",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "PyTorch Kineto integrates hardware-level traces for operator-level statistics",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "GSPMD, Alpa, Galvatron automate parallelism configuration and optimization",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Sequence parallelism reduces memory and communication for long sequences",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Trace-based models predict runtime using profiled execution traces",
+    "importance": "okay",
+    "assignment": "support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "46",
+  "qid": "2505.21811v1",
+  "nugget_coverage": 0.3333333333333333,
+  "strict_vital": 0.5,
+  "all_partial": 0.625,
+  "vital_partial": 0.75,
+  "n_nuggets": 12,
+  "n_failed": 0,
+  "words": 556,
+  "judge_s": 53.3,
+  "nuggets": [
+   {
+    "text": "Sequential recommendation predicts user behaviors from historical interactions",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Transformers excel at modeling long sequential data in recommendation",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Cross-domain recommendation leverages multiple domains for better performance",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "CDSR injects domain-specific components like supervision signals, reweighting, module blocks",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Most CDSR methods overlook the core self-attention in transformers",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Self-attention captures fine-grained correlations among heterogeneous behaviors",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "SASRec and BERT4Rec are transformer-based sequential recommenders",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Early cross-domain methods used matrix factorization, ignoring sequence",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "π-net uses domain-aware gating for cross-domain knowledge transfer",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "C2DSR and MIFN use graphs/knowledge graphs for CDSR",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "MAN and SyNCRec use domain-aware blocks and supervision for CDSR",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Recent works explore large language models for sequential recommendation",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "56",
+  "qid": "2505.03484v1",
+  "nugget_coverage": 0.7058823529411765,
+  "strict_vital": 0.7,
+  "all_partial": 0.7647058823529411,
+  "vital_partial": 0.8,
+  "n_nuggets": 17,
+  "n_failed": 0,
+  "words": 718,
+  "judge_s": 60.1,
+  "nuggets": [
+   {
+    "text": "Transformers and RNNs are foundational for sequential recommendation",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "TransRec and matrix factorization struggled with multiple behaviors, long sequences",
+    "importance": "vital",
+    "assignment": "not_support"
+   },
+   {
+    "text": "SASRec uses multi-head attention for sequence modeling",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "BERT4Rec employs bidirectional transformers for contextual information",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "Transformer models face quadratic complexity with long sequences",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "State-space models (SSMs) excel at capturing temporal dynamics",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "SSMs struggle to balance long/short-term modeling and pattern diversity",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "STAR-Rec unifies preference-aware attention and state-space modeling",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "STAR-Rec uses mixture-of-experts for diverse behavioral patterns",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "STAR-Rec efficiently handles variable-length sequences and diverse item relationships",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "LinRec introduces linear complexity attention for efficiency",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "GRU4Rec offers linear complexity but limited effectiveness",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Mamba4Rec improves efficiency with selective state space modeling",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "ECHO-Mamba4Rec combines bidirectional Mamba and frequency-domain filtering",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "RecMamba handles lifelong recommendation scenarios",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "Mamba4KT adapts Mamba for knowledge tracing",
+    "importance": "okay",
+    "assignment": "support"
+   },
+   {
+    "text": "SIGMA uses bi-directional structure and selective gating for context modeling",
+    "importance": "okay",
+    "assignment": "not_support"
+   }
+  ]
+ },
+ {
+  "gt_dir": "58",
+  "qid": "2504.20458v1",
+  "nugget_coverage": 0.2222222222222222,
+  "strict_vital": 0.6666666666666666,
+  "all_partial": 0.5,
+  "vital_partial": 0.8333333333333334,
+  "n_nuggets": 9,
+  "n_failed": 0,
+  "words": 531,
+  "judge_s": 51.3,
+  "nuggets": [
+   {
+    "text": "Conversational recommender systems (CRSs) use multi-turn interactions",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "CRSs elicit user preferences via free-form natural language conversations",
+    "importance": "vital",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Simulated users can automate CRS interaction and preference elicitation",
+    "importance": "vital",
+    "assignment": "support"
+   },
+   {
+    "text": "CRSs optimize interaction policy with pre-defined actions and templates",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "External knowledge sources: knowledge graphs, LLMs, conversational corpora",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Generative reward models unify generation and reward modeling",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Best-of-N strategy: reward models rank and select candidate solutions",
+    "importance": "okay",
+    "assignment": "partial_support"
+   },
+   {
+    "text": "Generative reward models represent reward as token probabilities",
+    "importance": "okay",
+    "assignment": "not_support"
+   },
+   {
+    "text": "Critiques in generation improve reward modeling",
+    "importance": "okay",
+    "assignment": "partial_support"
+   }
+  ]
+ }
+]

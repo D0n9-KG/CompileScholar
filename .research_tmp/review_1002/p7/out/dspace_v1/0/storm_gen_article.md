@@ -1,0 +1,29 @@
+## Related Work
+
+### Policy Optimization Mechanism
+Prior research on tax policy design has predominantly relied on either static statutory frameworks or closed-form mathematical solutions. Static statutory rules, such as those embodied in the U.S. federal income tax system, have been extensively analyzed for their structural impact on income distribution, particularly through mechanisms like the Earned Income Tax Credit [1, 2]. In contrast, a substantial body of literature employs closed-form mathematical solutions to derive optimal tax rates, ranging from foundational theories of optimum income taxation [4] and the case for progressive taxation [3] to specific applications involving production efficiency [5], labor supply elasticities [6, 7], and unemployment responses [8]. While these mathematical approaches provide rigorous theoretical bounds, they often lack the flexibility to adapt to complex, dynamic contexts. More recently, deep reinforcement learning has been introduced as an alternative optimization mechanism, allowing for dynamic policy learning in simulated economies [9]. However, no prior work utilizes LLM-driven iterative reasoning and adaptation to dynamically adjust tax rates, a gap that TaxAgent addresses by leveraging the flexible reasoning capabilities of large language models.
+
+### Taxpayer Behavior Modeling
+The modeling of taxpayer behavior in economic simulations varies significantly across the literature, primarily distinguishing between homogeneous rational agents and heterogeneous agents that capture real-world diversity. Standard economic models, including those exploring optimal taxation and public production, typically assume homogeneous rational agents who maximize utility under specific constraints [4, 5, 6, 7, 8]. This assumption simplifies analysis but often fails to account for the heterogeneity and irrational behaviors observed in actual taxpayer populations. In contrast, recent agent-based approaches have begun to simulate heterogeneous agents that reflect real-world irrationality and diversity, such as the AI Economist framework which employs a two-level deep reinforcement learning approach within a simulated economy [9]. TaxAgent aligns with this latter group by explicitly modeling heterogeneous H-Agents (households) that simulate real-world taxpayer behaviors, thereby enhancing the realism of the macroeconomic simulation compared to traditional rational agent models.
+
+### System Architecture
+The architectural choices in computational economics have historically favored pure mathematical optimization frameworks or traditional macroeconomic simulations. The majority of theoretical works on optimal taxation utilize pure mathematical optimization frameworks to solve for policy parameters without explicit agent-based simulation [3, 4, 5, 6, 7, 8]. While agent-based modeling (ABM) has gained traction in economics and finance [11], and large language models (LLMs) are increasingly surveyed for their potential in financial applications [12], their integration remains limited. Specifically, prior work such as the AI Economist employs traditional macroeconomic simulation without LLMs, relying instead on deep reinforcement learning for policy optimization [9]. Furthermore, general discussions on the impact of machine learning on economics [10] do not typically detail the specific architectural integration of LLMs with ABM. TaxAgent distinguishes itself by introducing a novel system architecture that integrates Large Language Models with Agent-Based Modeling, enabling the government agent to process complex contexts and iterate on solutions in a manner that static mathematical or non-LLM-based simulations cannot achieve.
+
+### Evaluation Benchmarking
+To validate the efficacy of new tax policy designs, researchers typically benchmark against established theoretical and practical standards. The AI Economist, for instance, evaluates its deep reinforcement learning approach by comparing it against baselines such as Saez Optimal Taxation and other standard economic models [9]. Similarly, studies on the Earned Income Tax Credit evaluate policy impacts against existing distributional outcomes [1, 2]. However, comprehensive benchmarking that simultaneously compares a new method against Saez Optimal Taxation, U.S. Federal Tax implementations, and free market scenarios is less common in the literature. TaxAgent adopts this multi-faceted evaluation strategy, benchmarking its LLM-driven policy against Saez Optimal Taxation, U.S. Federal Tax, and free market conditions. This approach allows for a robust assessment of the equity-efficiency trade-offs, validating the contribution in terms of both theoretical optimality and practical applicability relative to both sophisticated theoretical models and real-world implementations.
+
+## References
+
+[1] Effective Policy for Reducing Inequality? The Earned Income Tax Credit and the Distribution of Income
+[2] The Earned Income Tax Credit (EITC)
+[3] The Case for a Progressive Tax: From Basic Research to Policy Recommendations
+[4] An Exploration in the Theory of Optimum Income Taxation12
+[5] Optimal Taxation and Public Production: I--Production Efficiency
+[6] Using Elasticities to Derive Optimal Income Tax Rates
+[7] Optimal Taxation of Top Labor Incomes: A Tale of Three Elasticities
+[8] Optimal Income Taxation with Unemployment and Wage Responses: A Sufficient Statistics Approach
+[9] The AI Economist: Improving Equality and Productivity with AI-Driven Tax
+  Policies
+[10] The Impact of Machine Learning on Economics
+[11] Agent Based Modeling in Economics and Finance: Past, Present, and Future
+[12] A Survey of Large Language Models for Financial Applications: Progress, Prospects and Challenges

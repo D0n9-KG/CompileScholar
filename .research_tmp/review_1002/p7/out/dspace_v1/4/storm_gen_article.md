@@ -1,0 +1,31 @@
+## Related Work
+
+### Noise Detection Mechanisms
+Prior research on handling noisy demonstrations in in-context learning (ICL) has employed diverse detection strategies, ranging from statistical ranking to heuristic safeguards. Some approaches utilize unified list-wise ranking with iterative mining to select high-quality candidates [3], while others draw inspiration from studies in learning with noisy labels to act as a safeguard against performance degradation caused by corrupted labels [6]. A prominent paradigm relies on raw local perplexity ranking, where noisy samples are presumed to yield higher perplexities than clean counterparts, a method specifically applied to mitigate negative impacts in text generation by replacing noisy candidates with nearest clean neighbors [7]. In contrast, our work introduces a dual debiasing framework that uses synthesized neighbors to explicitly correct perplexity estimates, addressing the limitations of raw perplexity assumptions when the noise ratio is high.
+
+### Robustness to Noise Ratio
+The resilience of ICL to label noise has been characterized through various lenses, with some studies identifying controlling factors such as prompt verbosity and model size that influence noise resilience [1]. Other work argues that ground-truth labels are not strictly required, demonstrating that random labels barely hurt performance and that input distribution and format are the key drivers of ICL success [5]. Furthermore, specific methods have been proposed to serve as safeguards against performance degradation caused by noisy labels [6], and techniques like Local Perplexity Ranking have been shown to be effective for text generation tasks where noisy annotations significantly hurt performance [7]. However, these approaches often rely on assumptions that break down under extreme conditions; unlike prior work that may fail when the "clean majority" assumption is violated, our method remains robust even when noise ratios are extremely high.
+
+### Bias Correction Strategies
+Existing methods attempt to mitigate biases in LLM inference through various calibration and decoding techniques. For instance, some approaches decouple matching perplexity by ranking among neighbors in semantic space [7], while others employ contrastive decoding with adversarial negative samples to improve context grounding [9]. In the domain of classification, bias calibration methods have been proposed to estimate and mitigate label biases using random in-domain words [10], and contextual calibration has been introduced to mitigate instability caused by model bias towards certain answers using content-free test inputs [11]. Distinct from these strategies, which often target general model biases or specific decoding objectives, our work explicitly corrects two specific sources of bias inherent in perplexity estimation: the annotation noise itself and the domain-specific knowledge embedded in large language models.
+
+### Output Metric Nature
+The nature of the metrics used to evaluate sample quality varies across the literature. Many existing frameworks, such as unified demonstration retrievers [3] and local perplexity ranking methods [7], provide relative rankings of samples within a specific corpus, making their effectiveness dependent on the overall composition of the input data. Other studies focus on quantifiable metrics for label impact, such as Label-Correctness Sensitivity and GLER, to analyze the deeper impact of ground-truth label correctness [1]. In contrast to these relative or analytical metrics, our approach yields an absolute Sample Cleanliness Score that is independent of the corpus noise level, enabling robust sample cleanliness assessment regardless of the overall noise distribution in the demonstration set.
+
+## References
+
+[1] Ground-Truth Labels Matter: A Deeper Look into Input-Label
+  Demonstrations
+[2] Contrastive Decoding Improves Reasoning in Large Language Models
+[3] Unified Demonstration Retriever for In-Context Learning
+[4] In-context Vectors: Making In Context Learning More Effective and
+  Controllable Through Latent Space Steering
+[5] Rethinking the Role of Demonstrations: What Makes In-Context Learning
+  Work?
+[6] In-Context Learning with Noisy Labels
+[7] On the Noise Robustness of In-Context Learning for Text Generation
+[8] Contrastive Decoding: Open-ended Text Generation as Optimization
+[9] Enhancing Contextual Understanding in Large Language Models through
+  Contrastive Decoding
+[10] Mitigating Label Biases for In-context Learning
+[11] Calibrate Before Use: Improving Few-Shot Performance of Language Models

@@ -35,7 +35,8 @@ import sys
 from pathlib import Path
 
 CS_REPO = Path(r"C:\Users\D0n9\Desktop\CompileScholar")
-for _p in (str(CS_REPO / "src"),):
+for _p in (str(CS_REPO / "src"),
+           str(Path(__file__).resolve().parent.parent / "tools")):  # cutoff.py
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
@@ -194,14 +195,21 @@ def _sciverse():
 
 def _open_search(query: str, k: int, before_year: int | None) -> list[dict]:
     client = _sciverse()
-    cands = client.semantic_search(query, limit=max(k * 2, 12))
+    from cutoff import cutoff as _c0
+    # 截止开启时语义检索头部多为 2025+ 新文（实测 16 取 4），多取以保证 k 条有效
+    cands = client.semantic_search(query, limit=max(k * (5 if _c0() else 2), 12))
     out = []
+    from cutoff import allowed as _allowed, cutoff as _cut
     for c in cands:
         if c.status != "ready":
             continue
         year = c.year
+        # 知识截止（REBUILD-PLAN-1003 E3）：服务端强制，不依赖模型是否传 before_year
+        # （harness 691 次检索 0 次传参）；与 external_tools 同一实现（_shared/tools/cutoff.py）
+        if _cut() is not None and not _allowed(year):
+            continue
         if before_year is not None and year is not None and year > before_year:
-            continue  # CS2 截止纪律：服务器侧过滤（披露：无年份命中的不滤）
+            continue
         raw = c.raw or {}
         out.append({
             "doc_id": raw.get("doc_id"),

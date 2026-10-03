@@ -140,12 +140,18 @@ async def judge_one(question, rubric_json, report_json_str,
             state = _State(report_json_str, {"initial_prompt": question})
             s = await sc(state, target)
         v = s.value if isinstance(s.value, dict) else {"score": s.value}
-        md = getattr(s, "explanation", None)
+        # 官方 scorer 把逐 criterion / 逐 claim 明细放在 Score.metadata
+        # （task.py:207/353），explanation 只是摘要——之前只读 explanation，
+        # 763 行判分 _meta 全空（REBUILD-PLAN-1003 E8）。
+        md = getattr(s, "metadata", None)
         if md:
             try:
-                v["_meta"] = json.loads(md) if isinstance(md, str) else md
+                v["_meta"] = json.loads(json.dumps(md, default=str))
             except Exception:
-                v["_meta_explanation"] = str(md)[:2000]
+                v["_meta_raw"] = str(md)[:4000]
+        ex = getattr(s, "explanation", None)
+        if ex:
+            v["_explanation"] = str(ex)[:2000]
         return name, v
     pairs = await asyncio.gather(*[_run(n, sc) for n, sc in scorers],
                                  return_exceptions=True)
@@ -175,7 +181,12 @@ async def main():
     global _scorer_sem
     _scorer_sem = asyncio.Semaphore(_SCORER_CAP)
     rows = json.load(open(in_path, encoding="utf-8"))
-    rubrics = json.load(open(r"..\scholarqa_multi\sqa2_rubrics_v1_recomputed.json", encoding="utf-8"))
+    # 官方划分：dev=rubrics_v1、test=rubrics_v2（astabench task.py:444-451）
+    split = os.environ.get("CS2_SPLIT", "dev")
+    rub_file = {"dev": "sqa2_rubrics_v1_recomputed.json",
+                "test": "sqa2_rubrics_v2_recomputed.json"}[split]
+    rubrics = json.load(open(os.path.join("..", "scholarqa_multi", rub_file), encoding="utf-8"))
+    print(f"[judge] split={split} rubrics={rub_file}", flush=True)
     rmap = {q["case_id"][:24]: q for q in rubrics}
     done = {}
     if os.path.exists(out_path):

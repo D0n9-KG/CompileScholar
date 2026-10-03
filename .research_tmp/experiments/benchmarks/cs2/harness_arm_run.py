@@ -49,9 +49,31 @@ Here is an example `section` to help you with formatting:
 Question: {question}"""
 
 
+def _ensure_proxy(port: int = 8765):
+    import socket
+    import subprocess as _sp
+    s = socket.socket()
+    try:
+        s.settimeout(1)
+        s.connect(("127.0.0.1", port))
+        return
+    except OSError:
+        pass
+    finally:
+        s.close()
+    _sp.Popen([sys.executable, str(CS2.parent / "_shared" / "mcp" / "cc_compat_proxy.py"), "--port", str(port)],
+              stdout=_sp.DEVNULL, stderr=_sp.DEVNULL)
+    time.sleep(2)
+
+
 def run_q(question: str, timeout_s: int = 1800) -> dict:
+    _ensure_proxy()
     env = {**os.environ.copy(),
-           "ANTHROPIC_BASE_URL": "http://192.168.199.73",
+           # 经 cc_compat_proxy（127.0.0.1:8765）转发到 GPUStack：Claude Code 2.1.287 在 messages 中插入
+           # role=system 消息，GPUStack 报 400 "System message must be at the beginning"；代理只把它并入
+           # 顶层 system 字段（语义等价）。代理由 _ensure_proxy() 自动拉起。
+           "ANTHROPIC_BASE_URL": os.environ.get("HARNESS_ANTHROPIC_BASE_URL", "http://127.0.0.1:8765"),
+           "NO_PROXY": "127.0.0.1,localhost,192.168.199.73",
            "ANTHROPIC_AUTH_TOKEN": _local_key(),
            "ANTHROPIC_MODEL": "Qwen3.8-27B"}
     cmd = [str(CLAUDE_EXE), "-p",
@@ -60,6 +82,10 @@ def run_q(question: str, timeout_s: int = 1800) -> dict:
            "--output-format", "json",
            "--max-turns", "40",
            "--mcp-config", str(MCP_CONFIG),
+           # 隔离用户级 ~/.claude/settings.json：其 env 块把 ANTHROPIC_BASE_URL 指到第三方网关，
+           # 会覆盖本进程传入的本地 27B 地址（2026-10-03 实测：全部 503 "No available channel"）
+           "--setting-sources", "project",
+           "--strict-mcp-config",
            "--allowedTools",
            "mcp__retrieval__search_papers,mcp__retrieval__fetch_chunk"]
     try:
@@ -95,10 +121,13 @@ def main():
     fanout = int(os.environ.get("HARNESS_FANOUT", "2"))  # 服务器余量实测
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ARM.mkdir(exist_ok=True)
-    rubrics = json.load(open(RUBRICS,
+    # 官方划分：dev=rubrics_v1、test=rubrics_v2；输出文件可配置（截止重跑不覆盖历史产物）
+    split = os.environ.get("CS2_SPLIT", "dev")
+    rub = RUBRICS if split == "dev" else RUBRICS.with_name("sqa2_rubrics_v2_recomputed.json")
+    rubrics = json.load(open(rub,
                              encoding="utf-8"))[offset:offset + limit]
 
-    out_path = ARM / "answers_harness_dev20.json"
+    out_path = ARM / os.environ.get("HARNESS_OUT", "answers_harness_dev20.json")
     done = {}
     if out_path.exists():
         done = {r["qid"]: r for r in json.load(open(out_path,
