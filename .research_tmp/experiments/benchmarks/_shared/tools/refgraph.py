@@ -27,8 +27,9 @@ _CACHE = os.path.join(_HERE, "..", "refgraph_cache")
 os.makedirs(_CACHE, exist_ok=True)
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 _UA = {"User-Agent": "compilescholar-eval/0.1 (mailto:compilescholar-eval@example.org)"}
-# arXiv 礼貌要求 ~1 req/3s（export API）；HTML 页同样节流。Crossref polite pool ~1 req/s 足够保守。
-_GAP = {"arxiv": 3.1, "crossref": 1.0}
+# 访问礼仪（硬约束）：export.arxiv.org API 使用条款 = 每 3 秒不超过 1 次；arxiv.org（/html 页）robots.txt
+# Crawl-delay: 15（10-03 实查；此前误用 3.1s，已改）。Crossref polite pool ~1 req/s。
+_GAP = {"arxiv": 3.1, "arxiv_html": 15.5, "crossref": 1.0}
 
 
 def norm(s: str) -> str:
@@ -125,7 +126,7 @@ def _bib_title(entry: str) -> str:
 
 
 def arxiv_references(arxiv_id: str) -> list[dict]:
-    t = _get("arxiv", f"https://arxiv.org/html/{arxiv_id}")
+    t = _get("arxiv_html", f"https://arxiv.org/html/{arxiv_id}")
     if not t:
         return []
     out = []
