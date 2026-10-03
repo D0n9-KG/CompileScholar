@@ -273,23 +273,26 @@ def cite_expand(seed_titles: list[str], k: int = 10, max_seeds: int = 8, budget_
             if len(key.split()) < 2 or key in seen:
                 continue
             seen.add(key)
-            if r.get("year") and not _cut_allowed(r["year"]):
+            if (r.get("year") or r.get("date")) and not _cut_allowed(r.get("year"), r.get("date")):
                 continue
             freq[key] += 1
-            info.setdefault(key, r)
+            # 同一篇被多个来源列出时，保留带摘要的那条
+            if key not in info or (r.get("abstract") and not info[key].get("abstract")):
+                info[key] = dict(r)
+    top = [info[key] | {"_n": n} for key, n in freq.most_common() if n >= 2][:k * 2]
+    if top and time.time() < deadline:
+        refgraph.resolve_abstracts([r for r in top if not r.get("abstract")])
     out = []
-    for key, n in freq.most_common():
-        if n < 2 or len(out) >= k or time.time() > deadline:
+    for r in top:
+        if len(out) >= k:
             break
-        a = refgraph.resolve_abstract(info[key]["title"])
-        if not a:
+        if not r.get("abstract") or len(r["abstract"]) < 80:
+            continue  # 证据必须有可引用原文
+        if not _cut_allowed(r.get("year"), r.get("date")):
             continue
-        date = f"{a['year']}-{a['month']:02d}" if a.get("year") and a.get("month") else None
-        if not _cut_allowed(a.get("year"), date):
-            continue
-        out.append({"src": "cite", "paper_key": "ext:" + hashlib.md5(a["title"].lower().encode()).hexdigest()[:12],
-                    "title": a["title"], "year": a.get("year"), "arxiv": a.get("arxiv"),
-                    "snippet": a["abstract"][:1200], "co_cited_by": n})
+        out.append({"src": "cite", "paper_key": "ext:" + hashlib.md5(r["title"].lower().encode()).hexdigest()[:12],
+                    "title": r["title"], "year": r.get("year"), "arxiv": (r.get("ids") or {}).get("arxiv"),
+                    "snippet": r["abstract"][:1200], "co_cited_by": r["_n"]})
     return out
 
 
