@@ -54,9 +54,20 @@ def adapt_elicit(split="dev"):
         q = qmap.get(norm(r.get("id")))
         if q is None:
             continue
+        # 10-03：Elicit 存档的论文标题在 citation.metadata.paper.title，顶层没有 title；官方 scorer 在片段与正文重合时
+        # 走"只给标题"分支读 c["title"] → KeyError，整题引用两项被记 0（test 10/100 题）。按官方 sections 形态把标题提到顶层。
+        secs = []
+        for s in r.get("sections") or []:
+            cites = []
+            for c in s.get("citations") or []:
+                c = dict(c)
+                if not c.get("title"):
+                    c["title"] = ((c.get("metadata") or {}).get("paper") or {}).get("title") or ""
+                cites.append(c)
+            secs.append({**s, "citations": cites})
         out.append({"qid": q["case_id"][:24],
                     "question": q["question"],
-                    "sections": r.get("sections") or [],
+                    "sections": secs,
                     "source": "elicit"})
     return out
 
