@@ -266,7 +266,7 @@ def cite_expand(seed_titles: list[str], k: int = 10, max_seeds: int = 8, budget_
     for t in seed_titles[:max_seeds]:
         if time.time() > deadline:
             break
-        refs, _src = refgraph.references(t)
+        refs, _src = refgraph.references(t, deadline=deadline)
         seen = set()
         for r in refs:
             key = refgraph.norm(r["title"])
@@ -281,7 +281,7 @@ def cite_expand(seed_titles: list[str], k: int = 10, max_seeds: int = 8, budget_
                 info[key] = dict(r)
     top = [info[key] | {"_n": n} for key, n in freq.most_common() if n >= 2][:k * 2]
     if top and time.time() < deadline:
-        refgraph.resolve_abstracts([r for r in top if not r.get("abstract")])
+        refgraph.resolve_abstracts([r for r in top if not r.get("abstract")], deadline=deadline)
     out = []
     for r in top:
         if len(out) >= k:
@@ -372,11 +372,15 @@ def gather(question: str, sections: list[dict], kb: KB | None, use_ext=True, use
         raw = [(si, src, q, f.result()) for si, src, q, f in jobs]
     t_ret = time.time()
     if use_cite:
-        # 引文扩展：每节取外部命中前 4 篇作种子（S2 无 key 限速 ~1 req/s，每种子 2 次调用——
-        # 5 节×8 种子 曾让单题耗到 600s；4 种子×5 节≈40 次调用≈45s，且被缓存跨题复用）
+        # 引文扩展（10-03 多来源版）：每节取外部命中前 6 篇作种子；先对全题种子做一次 OpenAlex 批量解析
+        # （refgraph.prefetch：6 个标题/次 = 10 credits，参考文献元数据 1 credit/50 篇），各节再按共引排序。
+        import refgraph
+        seeds_by_sec = {si: [r["title"] for (sj, src, _, rows) in raw if sj == si and src == "ext"
+                             for r in rows if not r.get("error")][:6] for si in range(len(sections))}
+        refgraph.prefetch([t for v in seeds_by_sec.values() for t in v], deadline=time.time() + 120)
         for si, s in enumerate(sections):
-            sec_seeds = [r["title"] for (sj, src, _, rows) in raw if sj == si and src == "ext" for r in rows][:4]
-            raw.append((si, "cite", "cite-expand", cite_expand(sec_seeds, k=cite_k, max_seeds=4) if sec_seeds else []))
+            sec_seeds = seeds_by_sec[si]
+            raw.append((si, "cite", "cite-expand", cite_expand(sec_seeds, k=cite_k, max_seeds=6) if sec_seeds else []))
     evidence, by_text, trace = [], {}, {"calls": []}
     for si, src, q, rows in raw:
         trace["calls"].append({"section": si, "src": src, "query": q, "n": len(rows),

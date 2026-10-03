@@ -218,8 +218,8 @@ def openalex_references(title: str, arxiv_id: str | None = None, allow_search: b
                      "select": "id,display_name,referenced_works"}, 1)
         w = ((d or {}).get("results") or [None])[0]
     if (not w or not w.get("referenced_works")) and allow_search:
-        q = re.sub(r"[,:|()\"]", " ", title)[:250]
-        d = _oa_get({"filter": f"title.search:{q}", "per-page": 3, "select": "id,display_name,referenced_works"}, 10)
+        q = re.sub(r"[,:|()\"?!]", " ", title)[:250]
+        d = _oa_get({"filter": f"title.search:{q}", "per-page": 5, "select": "id,display_name,referenced_works"}, 10)
         cands = [x for x in (d or {}).get("results") or [] if norm(x.get("display_name"))[:40] == norm(title)[:40]]
         if cands:
             w = max(cands, key=lambda x: len(x.get("referenced_works") or []))
@@ -329,10 +329,67 @@ def crossref_references(title: str) -> list[dict]:
     return []
 
 
+# ---------------------------------------------------------------- batched prefetch（一题所有种子一次性解析）
+_PREFETCHED: set[str] = set()  # 本进程内已由批量搜索尝试过的种子（不再单篇花 10 credits 重搜）
+def _route_fn(title: str) -> str:
+    return os.path.join(_CACHE, "route_" + hashlib.sha1(norm(title).encode()).hexdigest() + ".json")
+
+
+def prefetch(titles: list[str], deadline: float | None = None, chunk: int = 6) -> None:
+    """把一题全部种子的 OpenAlex 记录按 OR 批量标题搜索一次解析（实测 6 个标题/次 = 10 credits，逐篇则 60），
+    再把所有种子的 referenced_works 合并去重后按 id 批量取元数据（1 credit/50 篇）。命中且 ≥5 条参考文献的种子
+    直接写路由缓存（source=openalex_search）；其余留给 references() 逐篇走 S2/Crossref。"""
+    todo = [t for t in dict.fromkeys(titles) if t and not os.path.exists(_route_fn(t))]
+    _PREFETCHED.update(norm(t) for t in todo)
+    works: dict[str, dict] = {}
+    for i in range(0, len(todo), chunk):
+        if deadline is not None and time.time() > deadline:
+            break
+        part = todo[i:i + chunk]
+        q = "|".join(re.sub(r"[,:|()\"?!]", " ", t)[:200] for t in part)
+        d = _oa_get({"filter": f"title.search:{q}", "per-page": 50, "select": "id,display_name,referenced_works"}, 10)
+        res = (d or {}).get("results") or []
+        for t in part:
+            cands = [x for x in res if norm(x.get("display_name"))[:40] == norm(t)[:40]]
+            if cands:
+                works[t] = max(cands, key=lambda x: len(x.get("referenced_works") or []))
+    ids = sorted({x.split("/")[-1] for w in works.values() for x in (w.get("referenced_works") or [])})
+    meta: dict[str, dict] = {}
+    for i in range(0, len(ids), 50):
+        if deadline is not None and time.time() > deadline:
+            break
+        d = _oa_get({"filter": "openalex:" + "|".join(ids[i:i + 50]), "per-page": 50,
+                     "select": "id,display_name,publication_year,publication_date,abstract_inverted_index,doi"}, 1)
+        for x in (d or {}).get("results") or []:
+            doi = (x.get("doi") or "").replace("https://doi.org/", "")
+            meta[x["id"].split("/")[-1]] = {
+                "title": clean_title(x.get("display_name") or ""), "year": x.get("publication_year"),
+                "date": x.get("publication_date"), "abstract": _oa_abstract(x.get("abstract_inverted_index")),
+                "ids": {"openalex": x["id"].split("/")[-1], "doi": doi or None,
+                        "arxiv": doi.split("arxiv.")[-1] if "10.48550/arxiv." in doi.lower() else None}}
+    for t, w in works.items():
+        refs = [meta[x.split("/")[-1]] for x in (w.get("referenced_works") or []) if x.split("/")[-1] in meta]
+        refs = [r for r in refs if r["title"]]
+        if len(refs) >= 5:
+            json.dump({"refs": refs, "source": "openalex_search"}, open(_route_fn(t), "w", encoding="utf-8"),
+                      ensure_ascii=False)
+            _bump("prefetch_hit")
+        else:
+            _bump("prefetch_short")
+
+
 # ---------------------------------------------------------------- router
-def references(title: str) -> tuple[list[dict], str]:
-    """种子论文的参考文献：按路由顺序取第一个 ≥5 条的来源；都不足则取条数最多的。返回 (refs, source)。"""
-    fn = os.path.join(_CACHE, "route_" + hashlib.sha1(norm(title).encode()).hexdigest() + ".json")
+def references(title: str, deadline: float | None = None, use_arxiv_html: bool = False) -> tuple[list[dict], str]:
+    """种子论文的参考文献：按路由顺序取第一个 ≥5 条的来源；都不足则取条数最多的。返回 (refs, source)。
+
+    路由（10-03 dev v9 实测后修订）：S2 无 key 在多进程下一放开就 429、冷却期一结束再 429，实际不可用；
+    arXiv HTML 15.5s/页 → 种子解析仅 0.48 篇/分钟（dev 需 ~180 篇 ≈ 6h）。改为：
+      1. OpenAlex 标题搜索（10 credits，无间隔；同题多条记录取 referenced_works 最多者，预印本与正式版互补）
+      2. S2（仅在不冷却时，单次尝试）
+      3. Crossref
+      4. arXiv HTML（默认关；use_arxiv_html=True 时启用，离线补缓存用）
+    deadline：墙钟上限；超时后跳过慢来源。"""
+    fn = _route_fn(title)
     if os.path.exists(fn):
         d = json.load(open(fn, encoding="utf-8"))
         _bump(f"route_cache_{d['source']}")
@@ -345,19 +402,17 @@ def references(title: str) -> tuple[list[dict], str]:
             best = (refs, src)
         return len(refs) >= 5
 
-    done = take(s2_references(title), "s2")
-    arx = None
-    if not done:
+    late = lambda: deadline is not None and time.time() > deadline  # noqa: E731
+    # prefetch() 已对本题全部种子做过批量 OpenAlex 解析；这里只对未命中的种子补单篇 OpenAlex 搜索（10 credits）
+    done = take(openalex_references(title, allow_search=norm(title) not in _PREFETCHED), "openalex_search")
+    if not done and not late() and not _s2_cooling():
+        done = take(s2_references(title), "s2")
+    if not done and not late():
+        done = take(crossref_references(title), "crossref")
+    if not done and use_arxiv_html and not late():
         a = arxiv_lookup(title)
-        arx = (a or {}).get("arxiv")
-        if arx:
-            done = take(openalex_references(title, arxiv_id=arx), "openalex_doi") or \
-                take(s2_references(arxiv_id=arx), "s2_arxiv") or \
-                take(arxiv_html_references(arx), "arxiv_html")
-    if not done:
-        done = take(openalex_references(title, allow_search=True), "openalex_search")
-    if not done:
-        take(crossref_references(title), "crossref")
+        if a and a.get("arxiv"):
+            take(arxiv_html_references(a["arxiv"]), "arxiv_html")
     refs, src = best
     for r in refs:
         r["title"] = clean_title(r["title"])
@@ -368,10 +423,12 @@ def references(title: str) -> tuple[list[dict], str]:
     return refs, src
 
 
-def resolve_abstracts(rows: list[dict]) -> None:
-    """就地为共引候选补摘要：OpenAlex 按 DOI 批量（便宜）→ arXiv 精确标题（每条 3s）。"""
+def resolve_abstracts(rows: list[dict], deadline: float | None = None) -> None:
+    """就地为共引候选补摘要：OpenAlex 按 DOI 批量（便宜）→ arXiv 精确标题（每条 3s，受 deadline 约束）。"""
     openalex_abstracts_by_ids(rows)
     for r in rows:
+        if deadline is not None and time.time() > deadline:
+            break
         if r.get("abstract") and len(r["abstract"]) > 80:
             continue
         a = arxiv_lookup(r["title"])
