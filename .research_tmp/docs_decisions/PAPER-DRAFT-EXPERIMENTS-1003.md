@@ -20,17 +20,41 @@ client-side check). CS2: before 2025-05; DSB: before the target paper's publicat
 precision); unanswered or failed questions score 0. DSB: nugget coverage (official assignment prompt), 48 unique questions.
 Multi-108: citation F1 (pre-registered) and a strict variant (§6.4).
 
-### 6.2 Main results [TBD — test split]
+### 6.2 Main results
 
-| System | CS2 test (G / IR / AP / CR / CP) | DSB nugget | Multi F1 (pre-reg / strict) |
-|---|---|---|---|
-| Ours (full) | [TBD] | [TBD] | [TBD] |
-| Claude Code + 27B + retrieval MCP (harness) | [TBD] | [TBD] | — |
-| GPT-Researcher + 27B | [TBD] | — | — |
-| OpenAI Deep Research (archived answers, re-judged) | [TBD] | — | — |
-| Elicit (archived, re-judged) | [TBD] | — | — |
-| STORM + 27B | — | [TBD] | — |
-| LightRAG / PaperQA2 (closed corpus) | — | — | 0.515 / 0.461 ; 0.449 / 0.431 |
+CS2 test, 100 questions, frozen configuration (FREEZE_CS2_TEST_1003_v9b.json; recorded before any upgrade). Ours = per-question
+mean of two runs (run 1 0.828 / run 2 0.830; run difference −0.002 [−0.013, +0.009], per-question r = 0.723). All arms
+answered all 100 questions; the harness failed one (context overflow) and it is scored 0; no judge errors in any arm.
+Paired differences: percentile bootstrap (10,000) and sign-flip permutation; Holm across the five global comparisons.
+Produced by `cs2/paired_stats.py` (validated by reproducing the dev numbers of §6.2b).
+
+| System | G | IR | AP | CR | CP | words (median) | snippet chars / citation (median) | ours − system (G) |
+|---|---|---|---|---|---|---|---|---|
+| Ours (frozen v9b) | **0.829** | .743 | .785 | .837 | .953 | 1,042 | 1,142 | — |
+| SciSpace (archived, re-judged) | **0.837** | .852 | .875 | .739 | .883 | 1,567 | 957 | −0.008 [−0.024, +0.009], n.s. |
+| Elicit (archived, re-judged) | 0.798 | .744 | .919 | .690 | .839 | 3,952 | 242 | +0.031 [+0.011, +0.052], Holm p = .009 |
+| Claude Code + 27B + retrieval MCP (harness) | 0.744 | .764 | .981 | .418 | .811 | 752 | 239 | +0.086 [+0.066, +0.107], Holm p < .001 |
+| GPT-Researcher + 27B | 0.736 | .506 | .758 | .777 | .903 | 808 | 901 | +0.094 [+0.074, +0.113], Holm p < .001 |
+| OpenAI Deep Research (archived, re-judged) | 0.684 | .922 | .900 | .226 | .686 | 4,676 | 416 | +0.146 [+0.129, +0.162], Holm p < .001 |
+
+Reading. Ours ties the strongest system (SciSpace) and beats the others. Against the same-model harness, ingredient recall ties
+(−0.022 [−0.052, +0.010]) and answer precision is lower (−0.196); the whole gain is citation recall (+0.419) and precision
+(+0.142). Against SciSpace, lower ingredient recall (−0.109) and answer precision (−0.091) are offset by higher citation
+recall (+0.098) and precision (+0.070). Citation facets are judged by checking each claim against the attached snippets, and
+our snippets are the longest (median 1,142 characters vs 239 for the harness), so part of the citation gain may be a format
+effect; a format-aligned re-judgment (snippets truncated to ~250 characters; harness snippets expanded to full abstracts)
+is required before claiming better grounding [TBD].
+
+| Other benchmarks | DSB nugget (48 q) | Multi-108 F1 (pre-reg / strict) |
+|---|---|---|
+| Ours | 0.310 (median 2,130 words) | 0.846 / 0.424 |
+| Claude Code + 27B harness (per-question cutoff) | 0.241, 3 failures scored 0 (median 668 words) | — |
+| Oracle references, direct writing | 0.369 | — |
+| LightRAG / PaperQA2 (closed corpus) | — | 0.515 / 0.461 ; 0.449 / 0.431 |
+
+DSB ours − harness +0.069 [+0.035, +0.104] (both answered: +0.055 [+0.023, +0.087]); answers differ 3× in length and nugget
+coverage grows with length, so this is not yet a like-for-like comparison [TBD: length-matched run]. The DSB arm above is an
+earlier configuration (no citation expansion, no length budget), not the CS2 frozen configuration.
 
 ### 6.2b Answer length (dev, 15 questions; reported because the official CS2 configuration has no length term)
 
@@ -167,5 +191,7 @@ querying from the task input cannot close it. [TBD: full-48 numbers]
   proxy that changes no model-generated content fixes both; we rerun the harness arm through it and count any remaining
   failure as 0. [TBD: whether earlier harness failures (12/100 dev, 7 timeouts) share this cause]
 - **Judge noise.** Re-judging identical inputs: mean |Δ global| 0.043 per question (5 questions).
-- **Statistical power.** With per-question paired SD ≈ 0.24, detecting Δ = 0.05 at 80% power needs ≈ 176 paired questions;
-  CS2 test (100 questions) supports non-inferiority claims at ≈ ±0.05 but not small differences.
+- **Statistical power.** Measured per-question paired SD of global score on CS2 test is 0.08–0.11 (ours vs SciSpace 0.083,
+  vs harness 0.105, vs Elicit 0.106); with n = 100 the minimum detectable difference at 80% power (α = 0.05, two-sided) is
+  ≈ 0.023–0.030. (An earlier draft used SD ≈ 0.24, which was wrong.) The SciSpace tie (−0.008) is therefore a tie at this
+  resolution, not an underpowered non-result.
