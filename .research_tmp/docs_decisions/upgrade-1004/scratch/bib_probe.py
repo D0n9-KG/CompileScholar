@@ -16,6 +16,8 @@ NUM_MARK = re.compile(r"\[\s*(\d+(?:\s*[,–\-]\s*\d+)*)\s*\]")
 # bare-number markers ("... humans 13 ."): only used for surveys whose entries are bare numbers
 BARE_MARK = re.compile(r"(?<=[A-Za-z\)]) (\d{1,3}(?:\s?,\s?\d{1,3})*)(?=\s*[ .,;:)])")
 AY_MARK = re.compile(r"([A-Z][A-Za-z'\-]+(?:\s(?:et\s?al\.|and\s[A-Z][A-Za-z'\-]+))?)\s?[\[(]((?:19|20)\d\d[a-z]?)[\])]")
+# parenthetical form inside one bracket: "( Andriluka et al., 2014 )", "(Smith and Doe, 2019; Lee et al., 2020a)"
+AY_PAREN = re.compile(r"([A-Z][A-Za-z'\-]+)(?:\s+(?:et\s?al\s?\.?|and\s+(?:et\s?al\.?|[A-Z][A-Za-z'\-]+)))?\s*,\s*((?:19|20)\d\d[a-z]?)")
 ARXIV = re.compile(r"(?:arXiv[:\s]*|arxiv\.org/abs/)(\d{4}\.\d{4,5})", re.I)
 DOI = re.compile(r"\b(10\.\d{4,9}/[^\s,;]+)")
 
@@ -71,6 +73,8 @@ for f in sorted(os.listdir(D)):
             keys[k] += 1
             entries[k] = re.sub(r"\s+", " ", refs[h.end():end]).strip()
         marks = [norm_ay(a, y) for a, y in AY_MARK.findall(body)]
+        for grp in re.findall(r"\(([^()]{4,400})\)", body):  # "( A et al., 2014 ; B and C, 2019 )"
+            marks += [norm_ay(a, y) for a, y in AY_PAREN.findall(grp)]
         resolved = sum(1 for k in marks if k in entries and keys[k] == 1)
         style = "author-year"
     ids = sum(1 for e in entries.values() if ARXIV.search(e) or DOI.search(e))
