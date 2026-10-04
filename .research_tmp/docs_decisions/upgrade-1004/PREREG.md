@@ -58,4 +58,7 @@ v9b test 结果不做逐题失分分析，不用来指导升级。
 
 ## 修订记录
 
-（空）
+- **2026-10-04 修订 1（主口径判分器）**：§2 原定主口径为官方 judge `google/gemini-3-flash-preview`。实测 OpenRouter 上 Gemini 全系
+  按出口地区拦截（HTTP 403 "This model is not available in your region"，指定 google-vertex / google-ai-studio 提供方同样被拒），
+  其余可用网关均无 Gemini。用户裁定：**主口径改为 DeepSeek-V4.1-Flash（并行科技 Paratera）**，官方 scorer 原样调用，
+  只保留不改语义的网络修复；论文披露判分模型替换及原因。本修订在任何升级版结果产生之前写入。

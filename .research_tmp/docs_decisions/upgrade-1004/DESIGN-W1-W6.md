@@ -85,7 +85,7 @@ legacy/      旧代码 + INDEX.md（不打包、不进 CI）
 | W1-11 | Multi runner 重跑必崩（H9） | KB 统一加载；无状态层时 state_search 返回 [] | 冒烟 2 题 | 无（Multi 已报数字来自崩溃前的运行） |
 | W1-12 | KB 两个检索通道不按截止过滤（DSB 公平性，DESIGN-CROSSPAPER P0-0） | Cutoff 对象显式传入 KB 检索，按论文年月过滤；trace 记被过滤条数 | 单测；DSB 48 题统计"若当时开启会过滤掉多少被引 KB 证据" | 若 DSB 已报的 0.310 里有超截止的 KB 证据被引用，**如实报告条数**；是否重跑由数量决定（>0 即重跑 DSB 我们的臂，作为修正版） |
 | W1-13 | 同一论文两通道两个引用编号（M16） | 证据表按 DOI / arXiv id / 规范化标题合并论文身份 | 单测；对 v9b r1 统计受影响节数（已知 11/355） | 行为修复，只对升级版生效 |
-| W1-14 | 判分器效度（B1–B3） | (a) 官方 judge `google/gemini-3-flash-preview` 经 OpenRouter 全量重判 CS2 test 7 臂（用户已批费用；去掉 4 处补丁的原样 scorer，只保留 Connection: close 这类不改语义的网络修复）；(b) DeepSeek 作为第二 judge 已有；报两 judge 排名 Kendall τ 与每个配对差的方向一致性；(c) 人工 60 题一致性 | 费用估算见 §4 | 主表增加"官方 judge"列；**主口径按预注册改为官方 judge**，DeepSeek 列作次口径 |
+| W1-14 | 判分器效度（B1–B3）〔10-04 修订：官方 judge 地区受限不可用，用户裁定主口径 = DeepSeek-V4.1-Flash（Paratera），见 PREREG 修订 1〕 | (a) 官方 judge `google/gemini-3-flash-preview` 经 OpenRouter 全量重判 CS2 test 7 臂（用户已批费用；去掉 4 处补丁的原样 scorer，只保留 Connection: close 这类不改语义的网络修复）；(b) DeepSeek 作为第二 judge 已有；报两 judge 排名 Kendall τ 与每个配对差的方向一致性；(c) 人工 60 题一致性 | 费用估算见 §4 | 主表增加"官方 judge"列；**主口径按预注册改为官方 judge**，DeepSeek 列作次口径 |
 
 ---
 

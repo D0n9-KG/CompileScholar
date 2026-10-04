@@ -14,9 +14,10 @@ server-side in every retrieval tool. Missing answers and system failures score 0
 
 ## Judges
 
-- CS2: official astabench scorers (`score_sqa`, `score_precision`, `score_citation`, official arguments). Legacy runs used
-  DeepSeek-V4.1-Flash with three local deviations (`third_party/README.md`); the upgraded system is judged with the
-  official model `google/gemini-3-flash-preview` (OpenRouter) as the primary measure, DeepSeek as secondary (PREREG §2).
+- CS2: official astabench scorers (`score_sqa`, `score_precision`, `score_citation`, official arguments), judge model
+  DeepSeek-V4.1-Flash via Paratera for every arm. The official model `google/gemini-3-flash-preview` is region-blocked
+  from our network (HTTP 403 on every OpenRouter route); PREREG amendment 1 makes DeepSeek the primary measure.
+  Legacy runs used three local deviations (`third_party/README.md`); new runs keep only the network fix.
 - DSB: Nuggetizer, DeepSeek-V4.1-Flash via Paratera.
 - Field test: DeepSeek-V4.1-Flash; human spot-check pending.
 
