@@ -17,8 +17,15 @@ Paired: percentile bootstrap 10,000 + sign-flip permutation, Holm over the five 
 | GPT-Researcher + 27B | 0.736 | .506 | .758 | .777 | .903 | +0.094 [+0.074, +0.113] |
 | OpenAI Deep Research (archived) | 0.684 | .922 | .900 | .226 | .686 | +0.146 [+0.129, +0.162] |
 
-Recompute: `results/README.md`. Code: tag `freeze-cs2-v9b`. Open caveat: citation snippets are longest for ours
-(median 1,142 characters vs 239 for the harness); a format-aligned re-judgment is pending (W1-6).
+Recompute: `results/README.md`. Code: tag `freeze-cs2-v9b`. BCa intervals differ from the percentile ones by ≤ 0.001.
+
+**Length (W1-7).** score ~ question fixed effects + system + log(words), question-cluster bootstrap
+(`results/cs2-test100-v9b-20261004/length_regression.json`): slope +0.052 per log-word [+0.016, +0.065]; length-adjusted
+ours − harness +0.063 [+0.044, +0.084] (unadjusted +0.086), SciSpace − harness +0.051 [+0.027, +0.082]. Length explains
+part of the gap, not all of it.
+
+**Citation format (W1-6).** Our snippets are the longest (median 1,142 characters vs 239 for the harness); the
+format-aligned re-judgment (snippets trimmed to 240 characters; titles only) is running — reading rule in PREREG §4.
 
 ## DeepScholar-Bench, 48 questions (earlier configuration: no citation expansion, no length budget)
 
@@ -28,8 +35,12 @@ Recompute: `results/README.md`. Code: tag `freeze-cs2-v9b`. Open caveat: citatio
 | Claude Code + 27B harness (per-question cutoff; 3 failures = 0) | 0.241 | 668 |
 | Oracle references, direct writing (B0) | 0.369 | — |
 
-Ours − harness +0.069 [+0.034, +0.104]; not length-matched. Recompute: `compilescholar.eval.dsb.summarize/paired` over
-`.research_tmp/review_1002/p6/judged/`. Tag `cs2-test-v9b-final`.
+Ours − harness +0.069 [+0.034, +0.104] at original lengths. **Length-matched (W1-7): ours cut per question to the
+harness answer's length (median 614 vs 668 words, keeping leading paragraphs) scores 0.179; ours − harness −0.062
+[−0.097, −0.028] (8 wins / 13 ties / 27 losses).** The DSB advantage at original length comes from length; the cut is a
+lower bound (median 2 of 4 sections survive), and a generation-time ~650-word budget is the fair control (pending).
+Recompute: `compilescholar.eval.dsb.summarize/paired` over `.research_tmp/review_1002/p6/judged/` and
+`runs/w1-7-dsb-length-matched-20261004/`. Tag `cs2-test-v9b-final`.
 
 ## Held-out survey field test (18 surveys) — protocol fixes pending (W1-4), numbers provisional
 

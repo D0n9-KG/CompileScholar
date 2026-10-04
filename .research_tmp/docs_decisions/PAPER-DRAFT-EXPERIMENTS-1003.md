@@ -52,9 +52,15 @@ is required before claiming better grounding [TBD].
 | Oracle references, direct writing | 0.369 | — |
 | LightRAG / PaperQA2 (closed corpus) | — | 0.515 / 0.461 ; 0.449 / 0.431 |
 
-DSB ours − harness +0.069 [+0.035, +0.104] (both answered: +0.055 [+0.023, +0.087]); answers differ 3× in length and nugget
-coverage grows with length, so this is not yet a like-for-like comparison [TBD: length-matched run]. The DSB arm above is an
-earlier configuration (no citation expansion, no length budget), not the CS2 frozen configuration.
+DSB ours − harness +0.069 [+0.035, +0.104] at original lengths (both answered: +0.055 [+0.023, +0.087]), but answers
+differ 3× in length. Cut per question to the harness answer's length (median 614 vs 668 words, leading paragraphs kept),
+ours scores 0.179 and loses: −0.062 [−0.097, −0.028] (8 / 13 / 27). The original-length advantage is a length effect;
+the cut is a lower bound for our system (half of each answer's sections are removed), and the fair control — a ~650-word
+budget at generation time — is pending. The DSB arm above is an earlier configuration (no citation expansion, no length
+budget), not the CS2 frozen configuration.
+
+CS2 length control (question fixed effects + log words, cluster bootstrap): slope +0.052 per log-word; length-adjusted
+ours − harness +0.063 [+0.044, +0.084] (unadjusted +0.086).
 
 ### 6.2b Answer length (dev, 15 questions; reported because the official CS2 configuration has no length term)
 
