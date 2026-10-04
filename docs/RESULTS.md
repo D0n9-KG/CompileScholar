@@ -24,8 +24,14 @@ Recompute: `results/README.md`. Code: tag `freeze-cs2-v9b`. BCa intervals differ
 ours − harness +0.063 [+0.044, +0.084] (unadjusted +0.086), SciSpace − harness +0.051 [+0.027, +0.082]. Length explains
 part of the gap, not all of it.
 
-**Citation format (W1-6).** Our snippets are the longest (median 1,142 characters vs 239 for the harness); the
-format-aligned re-judgment (snippets trimmed to 240 characters; titles only) is running — reading rule in PREREG §4.
+**Citation format (W1-6, pre-registered reading rule PREREG §4).** Our snippets are the longest (median 1,142
+characters vs 239 for the harness). With our snippets trimmed to 240 characters (the 1–2 sentences with the most token
+overlap with the citing sentence; same judge, both runs): ours − harness CR+CP **−0.246 [−0.298, −0.187]** (original
+format +0.561), CR −0.169, CP −0.078, G −0.117 [−0.135, −0.096]. **By the pre-registered rule, the CS2 citation advantage
+over the harness is a snippet-format effect; "better-grounded citations" is not claimed.** Caveat: the trim is a
+deterministic lexical selection and covers less of the citing sentence's vocabulary than the harness's own snippets
+(33% vs 45% of tokens), so it is a lower bound for our system. Title-only variants: pending.
+(`runs/w1-6-format-align-20261004/`)
 
 ## DeepScholar-Bench, 48 questions (earlier configuration: no citation expansion, no length budget)
 

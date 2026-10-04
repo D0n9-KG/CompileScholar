@@ -41,9 +41,13 @@ Reading. Ours ties the strongest system (SciSpace) and beats the others. Against
 (−0.022 [−0.052, +0.010]) and answer precision is lower (−0.196); the whole gain is citation recall (+0.419) and precision
 (+0.142). Against SciSpace, lower ingredient recall (−0.109) and answer precision (−0.091) are offset by higher citation
 recall (+0.098) and precision (+0.070). Citation facets are judged by checking each claim against the attached snippets, and
-our snippets are the longest (median 1,142 characters vs 239 for the harness), so part of the citation gain may be a format
-effect; a format-aligned re-judgment (snippets truncated to ~250 characters; harness snippets expanded to full abstracts)
-is required before claiming better grounding [TBD].
+our snippets are the longest (median 1,142 characters vs 239 for the harness). A format-aligned re-judgment settles it
+(reading rule pre-registered): with our snippets trimmed to 240 characters (the sentences with the most token overlap with
+the citing sentence), ours − harness on CR+CP drops from +0.561 to −0.246 [−0.298, −0.187] and the global score from
++0.086 to −0.117 [−0.135, −0.096]. **The citation-facet advantage is a snippet-length effect of the scorer, not evidence of
+better grounding**, and we do not claim the latter. (The lexical trim covers 33% of the citing sentence's tokens vs 45%
+for the harness's own snippets, so it understates our system; but a judge-format artifact of this size is the main
+finding.)
 
 | Other benchmarks | DSB nugget (48 q) | Multi-108 F1 (pre-reg / strict) |
 |---|---|---|
