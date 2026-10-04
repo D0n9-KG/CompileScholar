@@ -60,7 +60,7 @@ def main():
         name, fs = spec.split("=", 1)
         arms[name] = (per_q(fs.split(","), qids), fs.split(","))
 
-    print(f"split={a.split} n={len(qids)} (缺答/报错按 0 计)")
+    print(f"split={a.split} n={len(qids)} (缺答按 0 计；判分报错行拒绝汇总，须先重判)")
     print(f"{'arm':10s} " + " ".join(f"{k[:6]:>7s}" for k in KEYS) + "  missing")
     for name, (pq, fs) in arms.items():
         miss = sum(S.summarize(f, qids)["n_missing_as_zero"] for f in fs)

@@ -64,13 +64,20 @@ def compute(impl: str) -> dict:
     json.dump(d, open(p, "w"))
     s = S.summarize(str(p), qids)
     out["missing3"] = {"n_missing_as_zero": s["n_missing_as_zero"], "global": round(s["mean"]["global"], 12)}
-    # a judge-error row (scorer structure missing) is counted as 0 by the OLD code (W1-1 will change this)
+    # a judge-error row (scorer structure missing) was counted as 0 by the OLD code. W1-1 changed this on purpose:
+    # the new code refuses to summarize unless allow_judge_errors=True, and then still scores it 0 — so the number
+    # with the flag set must equal the old behaviour.
     d = dict(facets["harness"])
     d[qids[0]] = {"_errors": ["TimeoutError: x"]}
     p = tmp / "harness_err1.json"
     json.dump(d, open(p, "w"))
-    s = S.summarize(str(p), qids)
-    out["judge_error1_old_behaviour"] = {"n_missing_as_zero": s["n_missing_as_zero"], "global": round(s["mean"]["global"], 12)}
+    try:
+        s = S.summarize(str(p), qids, allow_judge_errors=True)
+        n0 = s["n_missing_as_zero"] + s.get("n_judge_error", 0)
+    except TypeError:  # old signature
+        s = S.summarize(str(p), qids)
+        n0 = s["n_missing_as_zero"]
+    out["judge_error1_old_behaviour"] = {"n_missing_as_zero": n0, "global": round(s["mean"]["global"], 12)}
     return out
 
 

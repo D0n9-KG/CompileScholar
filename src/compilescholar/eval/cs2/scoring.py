@@ -5,8 +5,8 @@
   ingredient_recall, answer_precision, citation_recall, citation_precision
 （不是 (IR+AP+F1)/3；旧 score_compare.py 用的是后者，见 REBUILD-PLAN-1003 E6）。
 
-缺题口径：题集 = 该 split 的全部题；某臂缺答 / 判分报错 → 该题四项按 0 计
-（官方 inspect 跑法下无答案即 0 分；之前剔除超时题=幸存者偏差，E7）。
+缺题口径：题集 = 该 split 的全部题；某臂缺答 → 该题四项按 0 计（官方 inspect 跑法下无答案即 0 分；之前剔除超时题=幸存者偏差，E7）。
+判分报错的行不计 0、拒绝汇总（W1-1，10-04）：判分器故障与系统没答出是两回事，必须重判到 0 错误行。
 """
 import json
 import os
@@ -50,20 +50,44 @@ def split_qids(split: str = "dev") -> list[str]:
     return [r["case_id"][:24] for r in rows]
 
 
-def summarize(score_file: str, qids: list[str]) -> dict:
-    """在给定题集上按官方口径汇总；缺答/报错按 0 计并报数。"""
-    d = json.load(open(score_file, encoding="utf-8")) if os.path.exists(score_file) else {}
+class JudgeErrorRows(RuntimeError):
+    """Some questions have judge-error rows: re-judge them (they are never scored as 0)."""
+
+
+def state(scores) -> str:
+    """answered: all four facets present | missing: no row (the system gave no answer -> 0) |
+    judge_error: a row exists but the judge failed (error / _errors, or facets missing)."""
+    if scores is None:
+        return "missing"
+    if facets(scores) is not None:
+        return "answered"
+    return "judge_error"
+
+
+def summarize(score_file: str, qids: list[str], allow_judge_errors: bool = False) -> dict:
+    """Official aggregate over the given question set. A question with no row scores 0 (missing answer).
+    W1-1 (2026-10-04): a judge-error row used to score 0 as well, mixing judge failures with system failures; it now
+    raises JudgeErrorRows unless allow_judge_errors=True (then it scores 0 and is reported separately). A score file
+    that does not exist raises FileNotFoundError (it used to silently score every question 0)."""
+    if not os.path.exists(score_file):
+        raise FileNotFoundError(score_file)
+    d = json.load(open(score_file, encoding="utf-8"))
     d = {k[:24]: v for k, v in d.items()}
-    per, missing = {}, []
+    per, missing, errors = {}, [], []
     for q in qids:
-        f = facets(d.get(q))
-        if f is None:
+        st = state(d.get(q))
+        if st == "missing":
             missing.append(q)
-            f = {k: 0.0 for k in FACETS}
+        elif st == "judge_error":
+            errors.append(q)
+        f = facets(d.get(q)) or {k: 0.0 for k in FACETS}
         per[q] = {**f, "global": official_global(f)}
+    if errors and not allow_judge_errors:
+        raise JudgeErrorRows(f"{score_file}: {len(errors)} judge-error rows, re-judge first: {errors[:5]}")
     n = len(qids)
     mean = {k: sum(per[q][k] for q in qids) / n for k in (*FACETS, "global")} if n else {}
-    return {"n": n, "n_missing_as_zero": len(missing), "missing": missing, "mean": mean, "per_q": per}
+    return {"n": n, "n_missing_as_zero": len(missing), "missing": missing, "n_judge_error": len(errors),
+            "judge_error": errors, "mean": mean, "per_q": per}
 
 
 if __name__ == "__main__":
