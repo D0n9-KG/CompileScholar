@@ -1,0 +1,37 @@
+split=test n=100 (缺答/报错按 0 计)
+arm         global  ingred  answer  citati  citati  missing
+ours         0.829   0.743   0.785   0.837   0.953  0
+harness      0.744   0.764   0.981   0.418   0.811  0
+gptr         0.736   0.506   0.758   0.777   0.903  0
+elicit       0.798   0.744   0.919   0.690   0.839  0
+scispace     0.837   0.852   0.875   0.739   0.883  0
+openai_dr    0.684   0.922   0.900   0.226   0.686  0
+
+ours − arm（逐题配对；Holm 只在 global 一族内校正）
+  vs harness    global               +0.086 [+0.066, +0.107]  perm p=0.0001  holm p=0.0005
+  vs harness    ingredient_recall    -0.022 [-0.052, +0.010]  perm p=0.1688
+  vs harness    answer_precision     -0.196 [-0.232, -0.161]  perm p=0.0001
+  vs harness    citation_recall      +0.419 [+0.379, +0.458]  perm p=0.0001
+  vs harness    citation_precision   +0.142 [+0.112, +0.177]  perm p=0.0001
+  vs gptr       global               +0.094 [+0.074, +0.113]  perm p=0.0001  holm p=0.0005
+  vs gptr       ingredient_recall    +0.237 [+0.195, +0.280]  perm p=0.0001
+  vs gptr       answer_precision     +0.027 [-0.023, +0.076]  perm p=0.2918
+  vs gptr       citation_recall      +0.060 [+0.025, +0.095]  perm p=0.0012
+  vs gptr       citation_precision   +0.050 [+0.031, +0.071]  perm p=0.0001
+  vs elicit     global               +0.031 [+0.011, +0.052]  perm p=0.0046  holm p=0.0092
+  vs elicit     ingredient_recall    -0.001 [-0.034, +0.032]  perm p=0.9552
+  vs elicit     answer_precision     -0.135 [-0.176, -0.095]  perm p=0.0001
+  vs elicit     citation_recall      +0.147 [+0.115, +0.183]  perm p=0.0001
+  vs elicit     citation_precision   +0.114 [+0.088, +0.146]  perm p=0.0001
+  vs scispace   global               -0.008 [-0.024, +0.009]  perm p=0.3389  holm p=0.3389
+  vs scispace   ingredient_recall    -0.109 [-0.137, -0.082]  perm p=0.0001
+  vs scispace   answer_precision     -0.091 [-0.128, -0.053]  perm p=0.0001
+  vs scispace   citation_recall      +0.098 [+0.069, +0.128]  perm p=0.0001
+  vs scispace   citation_precision   +0.070 [+0.055, +0.086]  perm p=0.0001
+  vs openai_dr  global               +0.146 [+0.129, +0.162]  perm p=0.0001  holm p=0.0005
+  vs openai_dr  ingredient_recall    -0.180 [-0.212, -0.144]  perm p=0.0001
+  vs openai_dr  answer_precision     -0.115 [-0.156, -0.074]  perm p=0.0001
+  vs openai_dr  citation_recall      +0.611 [+0.587, +0.634]  perm p=0.0001
+  vs openai_dr  citation_precision   +0.267 [+0.243, +0.291]  perm p=0.0001
+
+run1 − run2 global -0.002 [-0.013, +0.009]; per-question Pearson r = 0.723; |Δ| mean 0.044
