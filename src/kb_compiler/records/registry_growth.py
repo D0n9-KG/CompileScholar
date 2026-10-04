@@ -45,6 +45,11 @@ MAP_PROMPT = """下面是抽取管线产出的未解析实体表面名（编号|
 {queue_lines}"""
 
 
+
+# raw outputs that failed direct JSON parse (diagnosis only); repo-relative (10-04: was an absolute user path)
+_FAIL_DUMP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".research_tmp", "experiments",
+                          "benchmarks", "scholarqa_multi", "kb", "forensic_map_fail.txt")
+
 def _norm(s: str) -> str:
     # keep in sync with registry._norm (entity ids are md5 of this)
     return re.sub(r"\s+", " ", (s or "").strip().lower())
@@ -96,8 +101,7 @@ def _map_batch(batch: list[dict], registry_lines: str, model: str) -> list:
         .replace("{queue_lines}", queue_lines),
         model, max_tokens=12000, retries=3, salvage=True,
         salvage_key="i", salvage_wrapper="assignments",
-        fail_dump="C:/Users/D0n9/Desktop/CompileScholar/.research_tmp/"
-                  "experiments/benchmarks/scholarqa_multi/kb/forensic_map_fail.txt"),
+        fail_dump=_FAIL_DUMP),
         "round2 mapping batch")
     return obj.get("assignments") or []
 
@@ -265,9 +269,7 @@ def run_round2(registry: dict, queue: list[dict], model: str,
                 _CONSOL_PROMPT + prop_lines, model,
                 max_tokens=8000, retries=2, salvage=True,
                 salvage_key="members", salvage_wrapper="groups",
-                fail_dump="C:/Users/D0n9/Desktop/CompileScholar/.research_tmp/"
-                          "experiments/benchmarks/scholarqa_multi/kb/"
-                          "forensic_consol_fail.txt"),
+                fail_dump=os.path.join(os.path.dirname(_FAIL_DUMP), "forensic_consol_fail.txt")),
                 "round2 proposal consolidation")
             return [(g, pb) for g in (cobj.get("groups") or [])]
 
