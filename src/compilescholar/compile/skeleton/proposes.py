@@ -38,7 +38,9 @@ Abstract: {abstract}
 Return JSON only: {{"proposes": [{{"name": "...", "aliases": ["..."], "evidence": "..."}}]}}"""
 
 PROPOSAL = re.compile(r"\b(we|this (?:paper|work|article)|our|the authors?)\b[^.]{0,80}?\b(propos|introduc|present|develop|"
-                      r"design|describ|creat|releas|construct|formulat)\w*|\b(a|an) (?:novel|new)\b|\bnamed\b|\bcalled\b",
+                      r"design|describ|creat|releas|construct|formulat)\w*|\b(a|an) (?:novel|new)\b|\bnamed\b|\bcalled\b|"
+                      r"\b(?:the|a|our) proposed\b|\bproposed (?:method|model|approach|framework|metric|technique|algorithm)\b|"
+                      r"\bcreated (?:through|for|by)\b|\bis (?:introduced|proposed|presented)\b",
                       re.I)
 # reliance statements: the sentence is about something the paper uses / extends, not proposes
 RELIANCE = re.compile(r"\b(build[s]?|built|based|relies|rely|relying|extend[s]?|extending|follow[s]?|adopt[s]?|"
