@@ -73,6 +73,12 @@ def test_title_must_be_substring():
      "Auto-debias: Debiasing masked language models with automated biased prompts"),
     ("D. Li, C. Du, H. He, Semi-supervised cross-modal image generation with generative adversarial networks, Pattern Recognition 100 (1) (2020) 107085.",
      "Semi-supervised cross-modal image generation with generative adversarial networks"),
+    ("L. E. Baum, T. Petrie, Statistical inference for probabilistic functions of finite state Markov chains, Annals of Mathematical Statistics 37 (1966) 1554–1563.",
+     "Statistical inference for probabilistic functions of finite state Markov chains"),
+    ("A. P. Dempster, N. M. Laird, D. B. Rubin, Maximum likelihood from incomplete data via the EM algorithm, Journal of the Royal Statistical Society: Series B 39 (1977) 1–38.",
+     "Maximum likelihood from incomplete data via the EM algorithm"),
+    ("M. I. Jordan, Serial order: A parallel distributed processing approach, in: Neural-network models of cognition, Vol. 121, 1997, pp. 471–495.",
+     "Serial order: A parallel distributed processing approach"),
 ])
 def test_title_styles(raw, want):
     assert entry_title_year(raw)[0] == want

@@ -33,8 +33,8 @@ class Resolution:
 
 QUOTED = re.compile(r"[“\"]([^“”\"]{12,300}?)[,.]?[”\"]")
 # Vancouver / Elsevier: "Surname A, Surname B. Title. Venue" or "A. Surname, B. Surname, Title, Venue (2020)"
-AUTH_LIST = re.compile(r"^(?:(?:[A-Z][A-Za-z'\-]+(?:\s[A-Z]{1,3})?|[A-Z]\.(?:\s?[A-Z]\.)*\s[A-Z][A-Za-z'\-]+)(?:,\s|\sand\s|,\sand\s))+"
-                       r"(?:[A-Z][A-Za-z'\-]+(?:\s[A-Z]{1,3})?|[A-Z]\.(?:\s?[A-Z]\.)*\s[A-Z][A-Za-z'\-]+|et al\.?)[.,]\s")
+_NAME = r"(?:[A-Z][A-Za-z'\-]+(?:\s[A-Z]{1,3})?|[A-Z]\.(?:[\s\-]?[A-Z]\.)*\s(?:[a-z]+\s)?[A-Z][A-Za-z'\-]+)"
+AUTH_LIST = re.compile(rf"^(?:{_NAME}(?:,\s|\sand\s|,\sand\s))*(?:{_NAME}|et al\.?)[.,]\s")
 
 
 def entry_title_year(raw: str) -> tuple[str, int | None]:
@@ -48,7 +48,12 @@ def entry_title_year(raw: str) -> tuple[str, int | None]:
         a = AUTH_LIST.match(raw)
         if a:
             rest = raw[a.end():]
-            t = re.split(r"\.\s|,\s(?=[A-Z][a-z]+\s(?:Recognition|Learning|Conference|Journal|Proceedings|Transactions))|\sIn:?\s", rest)[0].strip(" ,.")
+            # title ends at ". ", " In:", ", in:", or the comma before a venue / volume ("..., Annals of X 37 (1966)",
+            # "..., Signal Processing 90 (2010)", "..., IEEE Transactions on ...")
+            t = re.split(r"\.\s|\sIn:?\s|,\sin:?\s|,\s(?=(?:[A-Z][A-Za-z&\-]*\s){0,8}?(?:\d+\s?\(|vol\.|pp\.))|"
+                         r",\s(?=(?:IEEE|ACM|Proc|Proceedings|Journal|Annals|Bulletin|Transactions|Advances|arXiv|"
+                         r"Computers|Signal|Pattern|Neural|Machine|Artificial|Information|Knowledge|Expert|"
+                         r"Nature|Science|Physical|Medical|International)\b)", rest)[0].strip(" ,.")
     if not t:
         t = refgraph.clean_title(refgraph._bib_title(raw))
     if norm(t) and norm(t) not in norm(raw):
