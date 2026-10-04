@@ -3,7 +3,8 @@
   1. is larger than 5 MB (except compressed frozen runs under results/),
   2. contains the value of any credential found in .env (exact match; values are never printed),
      or a credential-looking literal assignment (KEY/TOKEN/SECRET/PASSWORD = "<16+ chars>"),
-  3. is Python/shell/YAML/TOML under src/, tests/, configs/ or tools/ and contains an absolute user path.
+  3. is Python/shell/YAML/TOML under src/, tests/, configs/ or tools/ and contains an absolute user path,
+  4. is bytecode (*.pyc / __pycache__/) — `git add -f` bypasses .gitignore, so it is checked here too.
 Checks 2 (literal) and 3 skip lines carrying the marker `precommit: allow` (intentional fixtures only).
 Install:  python tools/precommit_check.py --install     (writes .git/hooks/pre-commit)
 Run:      python tools/precommit_check.py               (checks the staged files)
@@ -56,6 +57,9 @@ def check(paths: list[str]) -> list[str]:
     secrets = _env_values()
     problems = []
     for p in paths:
+        if p.endswith(".pyc") or "__pycache__/" in p:
+            problems.append(f"{p}: bytecode must not be committed")
+            continue
         data = staged_blob(p)
         if len(data) > LIMIT and not (p.startswith("results/") and p.endswith(".gz")):
             problems.append(f"{p}: {len(data) / 1048576:.1f} MB > 5 MB (put it in artifacts/MANIFEST.tsv, not git)")
