@@ -1,0 +1,12 @@
+description: >
+  CS2 dev confirmation set for the upgraded system (PREREG §6): dev offset 25-99. Offset 10-24 is selection-contaminated
+  and only used for regression checks.
+answer:
+  cite: true
+  word_budget: 1000
+  cutoff: 2025-05
+bench:
+  name: cs2
+  split: dev
+  offset: 25
+  limit: 75

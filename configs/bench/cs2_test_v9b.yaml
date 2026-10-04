@@ -1,0 +1,14 @@
+description: >
+  CS2 test, frozen v9b (FREEZE_CS2_TEST_1003_v9b.json; git tag freeze-cs2-v9b): multi-source citation expansion,
+  ~1,000-word budget, cutoff 2025-05. Used for the pre-upgrade record (ours 0.829).
+answer:
+  cite: true
+  word_budget: 1000
+  cutoff: 2025-05
+runtime:
+  workers: 4
+bench:
+  name: cs2
+  split: test
+  offset: 0
+  limit: 100

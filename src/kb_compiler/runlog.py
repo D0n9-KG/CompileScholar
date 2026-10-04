@@ -35,7 +35,7 @@ from contextlib import contextmanager
 _RUNS_DIR = os.environ.get(
     "KB_RUNS_DIR",
     os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__)))), "runs"))
+        os.path.abspath(__file__)))), "runs", "_legacy_build_manifests"))
 
 _tls = threading.local()
 

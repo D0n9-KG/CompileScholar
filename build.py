@@ -399,15 +399,15 @@ def build(targets: list[str], force: set[str], dry: bool, exp: str | None):
             sys.exit(1)
         i += 1
 
-    run_dir = REPO / "runs"
-    run_dir.mkdir(exist_ok=True)
+    run_dir = REPO / "runs" / "_legacy_build_manifests"  # 10-04: runs/<run_id>/ now belongs to the compilescholar CLI
+    run_dir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%d-%H%M%S")
     (run_dir / f"manifest-{stamp}.json").write_text(
         json.dumps({"git": git_state(), "config": cfg, "stages": manifest["stages"],
                     "ran": ran, "skipped": skipped}, indent=1, ensure_ascii=False),
         encoding="utf-8")
     print(f"\nbuild: ran={ran or '-'} skipped={skipped or '-'} "
-          f"| run manifest: runs/manifest-{stamp}.json")
+          f"| run manifest: runs/_legacy_build_manifests/manifest-{stamp}.json")
 
 
 def list_stages(exp: str | None):

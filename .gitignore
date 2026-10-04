@@ -178,3 +178,10 @@ kb/tmp_surfaces.json
 .research_tmp/experiments/benchmarks/**/*.f32
 .research_tmp/experiments/benchmarks/_shared/s2_cache/
 .research_tmp/experiments/benchmarks/_shared/refgraph_cache/
+
+# machine-local run config overrides
+configs/local.yaml
+
+# run outputs: everything under runs/ except the archived build.py manifests (promote frozen runs to results/)
+runs/*
+!runs/_legacy_build_manifests/
