@@ -162,6 +162,18 @@ kb/tmp_surfaces.json
 .research_tmp/experiments/benchmarks/scholarqa_multi/kb/growth/pdfs/
 .research_tmp/experiments/benchmarks/scholarqa_multi/kb/embed_cache/
 
+# 10-04 历史重写：向量 / 嵌入缓存 / 检索索引一律不入库（重写时已从未推送历史中移除；文件留在磁盘与 NAS 备份）
+**/embed_cache/
+**/lightrag/work/
+**/paperqa/index/
+**/arm_paperqa/index/
+*.bin
+*.npy
+*.store
+*.pos
+**/tmp_qe.npy
+**/tmp_ce.npy
+**/venv*/
 # 10-03 重构：大向量与外部 API 缓存不入库（可由 embed_kb_v2.py / 重新请求重建）
 .research_tmp/experiments/benchmarks/**/*.f32
 .research_tmp/experiments/benchmarks/_shared/s2_cache/
