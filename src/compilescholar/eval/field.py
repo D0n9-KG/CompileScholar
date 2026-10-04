@@ -46,8 +46,11 @@ Return JSON only: {{"families": [{{"name": "...", "definition": "...", "properti
 "open_problems": ["..."]}}"""
 
 
-def run_direct(papers):
-    lines = "\n".join(f"- {p['title'][:150]}: {(p.get('abstract') or '')[:600]}" for p in papers)
+def run_direct(papers, abstract_chars: int | None = 600):
+    """One call over all papers. abstract_chars=None passes full abstracts (W1-4: the compiler reads full abstracts,
+    so the v2 protocol gives direct the same input); 600 = the original protocol."""
+    lines = "\n".join(f"- {p['title'][:150]}: {(p.get('abstract') or '')[:abstract_chars] if abstract_chars else (p.get('abstract') or '')}"
+                      for p in papers)
     obj = FS._chat(DIRECT.format(lines=lines), max_tokens=8000) or {}
     fams = []
     for f in obj.get("families") or []:
@@ -123,24 +126,45 @@ Candidates:
 Return JSON only: {{"matches": {{"G1": ["C4"], "G2": []}}}}"""
 
 
-def judge_match(gold: list[str], cand: list[str], what: str) -> dict[str, list[str]]:
+class JudgeFailed(RuntimeError):
+    """A judge call returned no parseable matches after all retries (W1-4: never scored as "no match")."""
+
+
+CAND_CHUNK = 250  # candidates per judge call (prompt size); W1-4: all candidates are judged, in chunks
+
+
+def judge_match(gold: list[str], cand: list[str], what: str, chunk: int = CAND_CHUNK,
+                stats: dict | None = None) -> dict[str, list[str]]:
+    """Every gold item against every candidate. Candidates are judged in chunks of `chunk` (ids stay global: C1..Cn)
+    and the matches are unioned. W1-4 changes (2026-10-04): (1) the old code showed the judge only the first 250
+    candidates, so later candidates could never match (flat's properties were cut on 14/18 surveys); (2) a call whose
+    output never parsed was silently recorded as "no match" — it now raises JudgeFailed after 3 attempts.
+    With <= `chunk` candidates the prompts are byte-identical to the old ones."""
     if not gold or not cand:
         return {f"G{i + 1}": [] for i in range(len(gold))}
-    res = {}
+    res = {f"G{i + 1}": [] for i in range(len(gold))}
     for gs in range(0, len(gold), 25):
         g = gold[gs:gs + 25]
         gtxt = "\n".join(f"G{gs + i + 1}: {t[:300]}" for i, t in enumerate(g))
-        ctxt = "\n".join(f"C{i + 1}: {t[:300]}" for i, t in enumerate(cand[:250]))
-        obj = None
-        for _ in range(3):
-            obj = parse_json_response(call_paratera(MATCH.format(what=what, gold=gtxt, cand=ctxt), model=JUDGE,
-                                                    max_tokens=4000, enable_thinking=False) or "")
-            if isinstance(obj, dict) and isinstance(obj.get("matches"), dict):
-                break
-        m = (obj or {}).get("matches") or {}
-        for i in range(len(g)):
-            k = f"G{gs + i + 1}"
-            res[k] = [c for c in (m.get(k) or []) if isinstance(c, str) and re.fullmatch(r"C\d+", c)]
+        for cs in range(0, len(cand), chunk):
+            ctxt = "\n".join(f"C{cs + i + 1}: {t[:300]}" for i, t in enumerate(cand[cs:cs + chunk]))
+            obj = None
+            for _ in range(3):
+                obj = parse_json_response(call_paratera(MATCH.format(what=what, gold=gtxt, cand=ctxt), model=JUDGE,
+                                                        max_tokens=4000, enable_thinking=False) or "")
+                if stats is not None:
+                    stats["calls"] = stats.get("calls", 0) + 1
+                if isinstance(obj, dict) and isinstance(obj.get("matches"), dict):
+                    break
+            else:
+                raise JudgeFailed(f"no parseable matches for gold {gs + 1}-{gs + len(g)}, candidates {cs + 1}-{cs + chunk}")
+            m = obj["matches"]
+            lo, hi = cs + 1, cs + len(cand[cs:cs + chunk])
+            for i in range(len(g)):
+                k = f"G{gs + i + 1}"
+                for c in m.get(k) or []:
+                    if isinstance(c, str) and re.fullmatch(r"C\d+", c) and lo <= int(c[1:]) <= hi and c not in res[k]:
+                        res[k].append(c)
     return res
 
 
@@ -167,6 +191,58 @@ def score(gold: dict, sys_state: dict) -> dict:
                      "recall_at_k": rec_at_k,
                      "cand_hit_rate": (len(hit_c) / len(c)) if c else None, "matches": m}
     return out
+
+
+# ---------------------------------------------------------------- protocol v2 (W1-4)
+def load_surveys(limit: int = 0):
+    gold = json.load(open(os.path.join(V2, "survey_gold.json"), encoding="utf-8"))
+    todo = []
+    for pid, g in gold.items():
+        p = os.path.join(REFS, f"{pid}.json")
+        if not os.path.exists(p):
+            continue
+        papers = [r for r in json.load(open(p, encoding="utf-8")) if (r.get("abstract") or "").strip()]
+        if len(papers) >= MIN_PAPERS and (g["limitations"] or g["properties"]):
+            todo.append((pid, g, papers))
+    return (todo[:limit] if limit else todo), gold
+
+
+def run_v2(out_dir: str, runs: int = 3, systems=("state", "direct", "flat", "memory"), limit: int = 0):
+    """Protocol v2: every LLM arm run `runs` times (state recompiles families/facts/problems from ONE shared set of
+    per-paper records, so run-to-run variance is the organization layer's; flat is deterministic given the records);
+    direct gets full abstracts; judging covers all candidates and fails loudly. Outputs:
+    <out_dir>/<survey>.<system>.r<k>.json and <out_dir>/<survey>.<system>.r<k>.scores.json. Resumable."""
+    os.makedirs(out_dir, exist_ok=True)
+    todo, _ = load_surveys(limit)
+    print(f"[field-eval v2] surveys {len(todo)} | systems {systems} | runs {runs}", flush=True)
+    for pid, g, papers in todo:
+        rec_p = os.path.join(out_dir, f"{pid}.records.json")
+        if os.path.exists(rec_p):
+            records = json.load(open(rec_p, encoding="utf-8"))
+        else:
+            records = FS.extract_records([p for p in papers if (p.get("abstract") or "").strip()])
+            json.dump(records, open(rec_p, "w", encoding="utf-8"), ensure_ascii=False)
+        for s in systems:
+            for k in range(1, (1 if s == "flat" else runs) + 1):
+                op = os.path.join(out_dir, f"{pid}.{s}.r{k}.json")
+                if not os.path.exists(op):
+                    if s == "state":
+                        st = FS.compile_field_state(papers, records=records)
+                        st.pop("records", None)
+                    elif s == "direct":
+                        st = run_direct(papers, abstract_chars=None)
+                    elif s == "flat":
+                        st = run_flat(records)
+                    elif s == "memory":
+                        st = run_memory(g)
+                    else:
+                        raise ValueError(s)
+                    json.dump(st, open(op, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+                sp = op[:-5] + ".scores.json"
+                if not os.path.exists(sp):
+                    st = json.load(open(op, encoding="utf-8"))
+                    json.dump(score(g, st), open(sp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print(f"[field-eval v2] {pid} done", flush=True)
 
 
 # ---------------------------------------------------------------- main
