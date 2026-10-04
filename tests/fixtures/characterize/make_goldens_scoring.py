@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Scoring goldens from the OLD cs2_scoring / paired_stats on the frozen v9b CS2 test facets (run once, before the move).
+The old modules now live in legacy/; regenerating requires a checkout of tag cs2-test-v9b-final.
 
 Usage:  python tests/fixtures/characterize/make_goldens_scoring.py
 """

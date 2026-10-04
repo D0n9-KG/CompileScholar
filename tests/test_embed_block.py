@@ -7,9 +7,6 @@ the blocking/coverage/cross-block-recovery machinery deterministically.
 import os
 import re
 import sys
-
-sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
-
 import numpy as np  # noqa: E402
 
 from kb_compiler.records import embed_block, registry, registry_growth  # noqa: E402

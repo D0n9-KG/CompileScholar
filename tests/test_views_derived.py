@@ -4,8 +4,6 @@ explosion fix): absence(e, f) is derived only when some paper evaluating e
 ALSO evaluates family f on >=3 distinct entities. Cross-domain trivial pairs
 must NOT be derived; the informative PS16 form must survive."""
 import sys
-
-sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 from kb_compiler.views.compiler import build_coverage  # noqa: E402
 
 

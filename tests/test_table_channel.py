@@ -10,8 +10,6 @@ plus the preserved PS16 regression guarantees (rowspan mis-quote, fused
 cells -> residue).
 """
 import sys
-
-sys.path.insert(0, r"C:\Users\D0n9\Desktop\CompileScholar\src")
 from kb_compiler.records.table_channel import (  # noqa: E402
     extract_tables, _group_row_text, _row_quote)
 

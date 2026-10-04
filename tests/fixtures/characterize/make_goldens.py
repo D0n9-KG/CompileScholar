@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Generate characterization goldens from the OLD answer path (run once, before the move; never re-run on new code).
+The old modules now live in legacy/; regenerating requires a checkout of tag cs2-test-v9b-final.
 
 Usage:  python tests/fixtures/characterize/make_goldens.py
 Writes tests/fixtures/characterize/goldens.json and kb_tiny/record_vecs.f32(+meta) built with the fake embedder.

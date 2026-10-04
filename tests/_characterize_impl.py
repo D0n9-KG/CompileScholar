@@ -21,8 +21,10 @@ REPO = Path(__file__).resolve().parents[1]
 FIX = REPO / "tests" / "fixtures" / "characterize"
 OLD_TOOLS = REPO / ".research_tmp" / "experiments" / "benchmarks" / "_shared" / "tools"
 
-IMPLS = ["old", "new"]
-SCORING_IMPLS = ["old", "new"]
+# Goldens were generated from the OLD code (now in legacy/, reproducible from tag cs2-test-v9b-final); only the new
+# implementation is checked against them.
+IMPLS = ["new"]
+SCORING_IMPLS = ["new"]
 
 
 def load(impl: str) -> types.SimpleNamespace:
