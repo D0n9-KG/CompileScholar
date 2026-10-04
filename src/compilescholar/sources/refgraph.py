@@ -89,9 +89,27 @@ def _oa_key() -> str | None:
 
 _OA_REMAINING = [None]
 
+# W1-9 (2026-10-04): set when any HTTP call in the current thread failed TRANSIENTLY (S2 cooling / 429, OpenAlex
+# budget skip, network error, retries exhausted). references() never caches an empty route while it is set, so a
+# temporary failure is retried next time instead of being remembered as "this paper has no references" forever.
+_TL = __import__("threading").local()
+
+
+def _mark_transient():
+    _TL.transient = True
+    _bump("transient_fail")
+
+
+def _write_atomic(fn: str, text: str):
+    tmp = fn + f".tmp{os.getpid()}"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, fn)
+
 
 def _http(source: str, url: str, *, headers=None, data=None, timeout=40, cache=True) -> str | None:
-    """带缓存与节流的 GET/POST。返回文本；404/空 → None（负缓存）；S2 429 → 冷却并返回 None（不缓存）。"""
+    """Cached, paced GET/POST. Three outcomes: text (cached); a definitive negative — 404 — returns None and is
+    cached as empty; a transient failure returns None, is NOT cached, and marks the thread (see _mark_transient)."""
     key = url + ("|" + data.decode() if data else "")
     fn = os.path.join(_CACHE, hashlib.sha1(key.encode()).hexdigest() + ".txt")
     if cache and os.path.exists(fn):
@@ -99,6 +117,7 @@ def _http(source: str, url: str, *, headers=None, data=None, timeout=40, cache=T
         _bump(f"{source}_cache")
         return t or None
     if source == "s2" and _s2_cooling():
+        _mark_transient()
         return None
     for attempt in range(3):
         _pace(source)
@@ -111,23 +130,26 @@ def _http(source: str, url: str, *, headers=None, data=None, timeout=40, cache=T
                 _OA_REMAINING[0] = int(rem) if rem and rem.isdigit() else _OA_REMAINING[0]
             _bump(f"{source}_net")
             if cache:
-                open(fn, "w", encoding="utf-8").write(t)
+                _write_atomic(fn, t)
             return t
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 if cache:
-                    open(fn, "w", encoding="utf-8").write("")
+                    _write_atomic(fn, "")
                 return None
             if e.code == 429:
                 if source == "s2":
                     _s2_cool()
+                    _mark_transient()
                     return None
                 if source == "openalex":
                     _OA_REMAINING[0] = 0
+                    _mark_transient()
                     return None
             time.sleep(4 * (attempt + 1))
         except Exception:
             time.sleep(4 * (attempt + 1))
+    _mark_transient()
     return None
 
 
@@ -175,6 +197,7 @@ def _oa_get(params: dict, cost: int) -> dict | None:
         return None
     if cost >= 10 and _OA_REMAINING[0] is not None and _OA_REMAINING[0] < _OA_MIN_REMAINING:
         _bump("openalex_budget_skip")
+        _mark_transient()
         return None
     url = "https://api.openalex.org/works?" + urllib.parse.urlencode(params)
     return _json(_http("openalex", url, headers={"Authorization": f"Bearer {key}"}))
@@ -379,6 +402,7 @@ def references(title: str, deadline: float | None = None, use_arxiv_html: bool =
         d = json.load(open(fn, encoding="utf-8"))
         _bump(f"route_cache_{d['source']}")
         return d["refs"], d["source"]
+    _TL.transient = False
     best: tuple[list[dict], str] = ([], "none")
 
     def take(refs, src):
@@ -402,9 +426,14 @@ def references(title: str, deadline: float | None = None, use_arxiv_html: bool =
     for r in refs:
         r["title"] = clean_title(r["title"])
     _bump(f"route_{src}")
-    # 只在有结果或所有来源都正常应答时写路由缓存；S2 冷却期内的空结果不缓存（下次可能拿到）
-    if refs or not _s2_cooling():
-        json.dump({"refs": refs, "source": src}, open(fn, "w", encoding="utf-8"), ensure_ascii=False)
+    # Cache the route when there are references, or when it is a definitive empty: every source answered and none
+    # failed transiently, and the deadline did not cut the route short (W1-9: the old condition only checked the S2
+    # cooldown, so timeouts / budget skips / network errors were cached as "no references" forever).
+    definitive_empty = not getattr(_TL, "transient", False) and not late() and not _s2_cooling()
+    if refs or definitive_empty:
+        _write_atomic(fn, json.dumps({"refs": refs, "source": src}, ensure_ascii=False))
+    else:
+        _bump("route_not_cached_transient")
     return refs, src
 
 
