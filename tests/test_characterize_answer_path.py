@@ -54,8 +54,9 @@ def test_answer_path_matches_golden(answer_path, key):
         for name, v in GOLD["answer"].items():
             want = INTENDED.get(f"answer.{name}", v)
             got = json.loads(C.canon(answer_path["answer"][name]))
-            # W1-10 adds trace.degradation (new field, no change to any existing field)
+            # W1-10 adds trace.degradation; W1-13 adds trace.assemble.merged_identities (new fields only)
             assert set(got["result"]["trace"].pop("degradation")) == set(ADDED_DEGRADATION_KEYS)
+            assert isinstance(got["result"]["trace"]["assemble"].pop("merged_identities"), int)
             assert C.canon(got) == C.canon(want), name
         return
     assert C.canon(answer_path[key]) == C.canon(GOLD[key])

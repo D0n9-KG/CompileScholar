@@ -313,13 +313,27 @@ def write_sections(question: str, sections: list[dict], evidence: list[dict], ma
 _EID = re.compile(r"\[(E\d+)\]")
 
 
+def _identity(e: dict) -> str:
+    """One paper, one citation (W1-13): the same paper reached through KB / external search / citation expansion
+    carried different paper_keys and got two numbers (v9b test r1: 11/355 sections). Identity = arXiv id (version
+    stripped) if known, else the normalized title when it is specific enough (>= 4 words or >= 25 characters),
+    else the channel's own paper_key."""
+    ax = (e.get("arxiv") or "").strip().lower()
+    if ax:
+        return "arxiv:" + re.sub(r"v\d+$", "", ax.split("arxiv:")[-1])
+    t = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", (e.get("title") or "").lower())).strip()
+    if len(t.split()) >= 4 or len(t) >= 25:
+        return "title:" + t
+    return e["paper_key"]
+
+
 def assemble(sections: list[dict], texts: list[str], evidence: list[dict]) -> tuple[list[dict], dict]:
     ev = {e["eid"]: e for e in evidence}
-    out, stats = [], {"cited": 0, "unresolved": 0}
+    out, stats = [], {"cited": 0, "unresolved": 0, "merged_identities": 0}
     for s, text in zip(sections, texts):
         if not text:
             continue
-        cites, n_map = [], {}
+        cites, n_map, keys_by_id = [], {}, {}
         def sub(m):
             eid = m.group(1)
             e = ev.get(eid)
@@ -329,16 +343,21 @@ def assemble(sections: list[dict], texts: list[str], evidence: list[dict]) -> tu
             if e["src"] == "target":
                 stats["target_refs"] = stats.get("target_refs", 0) + 1
                 return ""
-            if e["paper_key"] not in n_map:
-                n_map[e["paper_key"]] = len(n_map) + 1
-                cites.append({"id": f"[{n_map[e['paper_key']]}]", "snippets": [], "title": e["title"],
+            ident = _identity(e)
+            if ident not in n_map:
+                n_map[ident] = len(n_map) + 1
+                keys_by_id[ident] = {e["paper_key"]}
+                cites.append({"id": f"[{n_map[ident]}]", "snippets": [], "title": e["title"],
                               "metadata": {"year": e.get("year"), "arxiv": e.get("arxiv"), "doi": e.get("doi"),
                                            "source": e["src"], "paper_key": e["paper_key"]}})
-            c = cites[n_map[e["paper_key"]] - 1]
+            elif e["paper_key"] not in keys_by_id[ident]:
+                keys_by_id[ident].add(e["paper_key"])
+                stats["merged_identities"] += 1
+            c = cites[n_map[ident] - 1]
             if e["snippet"] not in c["snippets"] and len(c["snippets"]) < 4:
                 c["snippets"].append(e["snippet"])
             stats["cited"] += 1
-            return f"[{n_map[e['paper_key']]}]"
+            return f"[{n_map[ident]}]"
         # 无引用句只计数、不删除：删句是迎合判分器（每句当一个 claim），属过拟合纪律禁止项；
         # "每个事实句都要有出处"由写作规则 1 约束，这里只做可审计的统计。
         for para in text.split("\n"):
