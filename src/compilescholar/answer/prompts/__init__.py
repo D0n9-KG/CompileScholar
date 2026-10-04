@@ -8,7 +8,9 @@ from importlib import resources
 
 
 def _load(name: str) -> str:
-    return resources.files(__package__).joinpath(f"{name}.txt").read_bytes().decode("utf-8")
+    # normalise line endings: a Windows checkout with core.autocrlf would otherwise turn every \n into \r\n and
+    # silently change the prompts (the originals contain no \r)
+    return resources.files(__package__).joinpath(f"{name}.txt").read_bytes().decode("utf-8").replace("\r\n", "\n")
 
 
 PLAN = _load("plan")

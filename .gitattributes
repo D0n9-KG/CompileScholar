@@ -1,0 +1,5 @@
+# Prompt templates and test goldens are compared byte for byte: always LF, on every platform.
+src/compilescholar/answer/prompts/*.txt text eol=lf
+tests/fixtures/**/*.json text eol=lf
+tests/fixtures/**/*.html text eol=lf
+*.f32 binary
