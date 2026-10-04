@@ -1,0 +1,406 @@
+{
+ "sections": [
+  {
+   "title": "Landscape",
+   "text": "Photonic metamaterial surfaces have emerged as critical substrates for label-free imaging, primarily through two distinct modalities: photonic crystal-enhanced microscopy (PCEM) and dielectric metasurface-based refractometry. PCEM utilizes a photonic crystal biosensor surface as a substrate to enable quantitative, submicron-resolution, and time-resolved imaging of cell-surface interactions without the need for dyes or stains [4]. The system is typically integrated into standard microscope bodies, such as the Carl Zeiss Axio Observer Z1, to facilitate these measurements [3]. In parallel, dielectric metasurfaces offer a platform for label-free sensing through refractometric, surface-enhanced spectroscopy, and chiral schemes [2]. These metasurfaces rely on the physics of optical Mie scattering from subwavelength resonators, which exhibit strong responses to both electric and magnetic fields, a property that distinguishes them from plasmonic counterparts that respond weakly to magnetic fields [2]. The spectral position of defect modes in these structures is highly sensitive to local environmental changes, such as refractive index shifts caused by analyte binding, making them effective transduction signals [1].",
+   "citations": [
+    {
+     "id": "[1]",
+     "snippets": [
+      "Since spectral position of the defect mode is highly sensitive to the change in the local environment around the \"defect\", it can be used as the sensing transduction signal when the RI changes as a result of the binding of the molecules to the defect."
+     ],
+     "title": "Sensitive optical biosensors for unlabeled targets: a review.",
+     "metadata": {
+      "year": 2008,
+      "doi": "10.1016/j.aca.2008.05.022",
+      "arxiv": null,
+      "authors": [
+       "Xudong Fan",
+       "I. White",
+       "S. Shopova"
+      ],
+      "evidence_loc": [
+       {
+        "section": "2.6. Photonic crystal based sensors",
+        "chunk_id": "Sensitive_optical_biosensors_for_unlabeled_targets_a_review_#c19",
+        "char_start": 70688
+       }
+      ]
+     }
+    },
+    {
+     "id": "[2]",
+     "snippets": [
+      "Notably, individual subwavelength dielectric resonators can show a strong response to both electric and magnetic fields of light. This property is in contrast to the plasmonic counterparts that respond weakly to the magnetic field.",
+      "The physics of optical resonances in dielectric metasurfaces is mostly associated with Mie scattering of subwavelength resonators.",
+      "For instance, in refractometric biosensing the Q factor influences the resolution to measure refractive index changes $^{33, 34}$ .",
+      "Therefore, for different sensing techniques, the resonance wavelengths of dielectric metasurfaces can be precisely tuned from the visible, $^{27, 30}$ to infrared (IR) $^{31, 32}$ by the choice of the feature sizes of the meta-atoms and the materials."
+     ],
+     "title": "Dielectric Metasurfaces Enabling Advanced Optical Biosensors",
+     "metadata": {
+      "year": 2020,
+      "doi": "10.1021/acsphotonics.0c01030",
+      "arxiv": null,
+      "authors": [
+       "Ming Lun Tseng",
+       "Yasaman Jahani",
+       "A. Leitis"
+      ],
+      "evidence_loc": [
+       {
+        "section": "TOC art",
+        "chunk_id": "Dielectric_Metasurfaces_Enabling_Advanced_Optical_Biosensors#c4",
+        "char_start": 3329
+       }
+      ]
+     }
+    },
+    {
+     "id": "[3]",
+     "snippets": [
+      "The system is built upon the body of a standard microscope (Carl Zeiss Axio Observer Z1)",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains, so a population of cells can be measured repeatedly without disrupting their culture environment.",
+      "As a label-free detection approach, PCEM enables continuous monitoring of these phenomena over extended time periods that are compatible with the biological time scales of chemotaxis, apoptosis, differentiation, and proliferation.",
+      "To our knowledge, this represents the first label-free time-lapse imaging of the attachment localization of living cells during chemotaxis."
+     ],
+     "title": "Label-free imaging of cell attachment with photonic crystal enhanced microscopy.",
+     "metadata": {
+      "year": 2011,
+      "doi": "10.1039/c1an15171a",
+      "arxiv": null,
+      "authors": [
+       "Erich A. Lidstone",
+       "V. Chaudhery",
+       "Anja Kohl"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Hyperspectral imaging microscope detection instrument",
+        "chunk_id": "Label-free_imaging_of_cell_attachment_with_photonic_crystal_enhanced_microscopy_#c3",
+        "char_start": 10420
+       }
+      ]
+     }
+    },
+    {
+     "id": "[4]",
+     "snippets": [
+      "A form of microscopy that utilizes a photonic crystal biosensor surface as a substrate for cell attachment enables label-free, quantitative, submicron resolution, time-resolved imaging of cell-surface interactions without cytotoxic staining agents or temporally-unstable fluorophores.",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains",
+      "As the observed migration occurs on the order of days, label-based assays are not feasible for extended time course studies.",
+      "While it provides information about biological surfaces by making measurements from above, AFM does not analyse the interaction between cells and their substrates.",
+      "SPRi requires illumination to pass through cell structures, which introduces changes in reflected light intensity that are not related to cell surface attachment, and the lateral propagation distance of surface plasmons limits spatial resolution.",
+      "PCEM is unique in the fact that the biosensor response is a direct quantification and 2D localization of attachment at the single cell level, as opposed to indirect methods of staining for actin bundle formation or even ensemble averaging of bulk dielectric properties.",
+      "Clearly visible boundaries of $\\sim 0.5\\mathrm{nm}$ PWV shifts demonstrate the ability of PCEM to provide information about the geometry of attachment",
+      "Other forms of microscopy do not provide this direct measurement of live cell-surface attachment localization and strength that includes unique, dynamic morphological signatures critical to the investigation of important biological phenomena such as stem cell differentiation, chemotaxis, apoptosis, and metastasis.",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "The key innovation enabling these capabilities is the use of noncoherent illumination of a photonic crystal biosensor and a spectroscopic scanning system that couples with a microscope objective.",
+      "Critically, this method retains the ability to monitor cell behavior with spatial resolution sufficient for observing both attachment footprints of filopodial extensions and intracellular attachment strength gradients.",
+      "The resonant wavelength is modulated by the addition of biomaterial upon the PC surface, resulting in a shift to a higher wavelength.",
+      "As cells attach and spread, positive PWV shifts are observed due to an increase in the concentration of cellular material within the evanescent field region of the PC.",
+      "PCEM provides rich, dynamic information about the evolution of cell-surface attachment profiles over biologically relevant time-scales."
+     ],
+     "title": "Photonic crystal enhanced microscopy for imaging of live cell adhesion.",
+     "metadata": {
+      "year": 2013,
+      "doi": "10.1364/fio.2013.ftu5a.4",
+      "arxiv": null,
+      "authors": [
+       "Weili Chen",
+       "K. Long",
+       "Meng Lu"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Comparison",
+   "text": "PCEM offers unique advantages over other microscopy techniques by providing a direct quantification and two-dimensional localization of cell attachment at the single-cell level [4]. Unlike surface plasmon resonance imaging (SPRi), which requires illumination to pass through cell structures and suffers from limited lateral resolution due to plasmon propagation distances, PCEM avoids these artifacts [4]. Similarly, while atomic force microscopy (AFM) provides information about biological surfaces, it does not directly analyze the interaction between cells and their substrates and is limited in throughput by probe scanning [4]. PCEM is particularly effective for extended time-course studies where label-based assays are not feasible, such as observing cell migration over days [4]. In terms of refractometric sensing, dielectric metasurfaces allow for precise engineering of resonance wavelengths from the visible to the infrared spectrum by adjusting feature sizes [2]. The quality factor (Q factor) of these resonances directly influences the resolution for measuring refractive index changes [2]. Furthermore, high-index all-dielectric metasurfaces avoid the optical losses associated with free charges found in plasmonic systems [5].",
+   "citations": [
+    {
+     "id": "[5]",
+     "snippets": [
+      "Recently, high-index all-dielectric metasurfaces driven by the physics of optical Mie resonances have emerged as an alternative platform as they do not suffer from losses due to the absence of free charges",
+      "In particular, when combined with a small-scale light source – i.e., laser or light-emitting diode (LED) – and an imaging camera (i.e., complementary metal-oxide-semiconductor (CMOS) or charge-coupled device (CCD) cameras), the intensity-based optical readers can be ultra-compact, low-weight, and portable by eliminating the need for sophisticated spectroscopy instrumentations",
+      "Thus, spectrometer-less readers can reduce cost and improve mechanical robustness",
+      "Compared to single-unit metasurfaces, such diatomic structures provide advanced flexibility in the engineering of the in-plane asymmetry while keeping the design easier to fabricate and make it more feasible for biosensing applications."
+     ],
+     "title": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+     "metadata": {
+      "year": 2021,
+      "doi": "10.1038/s41467-021-23257-y",
+      "arxiv": null,
+      "authors": [
+       "Yasaman Jahani",
+       "Eduardo Arvelo",
+       "F. Yesilkoy"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+        "chunk_id": "Imaging-based_spectrometer-less_optofluidic_biosensors_based_on_dielectric_metas#c0",
+        "char_start": 160
+       }
+      ]
+     }
+    },
+    {
+     "id": "[2]",
+     "snippets": [
+      "Notably, individual subwavelength dielectric resonators can show a strong response to both electric and magnetic fields of light. This property is in contrast to the plasmonic counterparts that respond weakly to the magnetic field.",
+      "The physics of optical resonances in dielectric metasurfaces is mostly associated with Mie scattering of subwavelength resonators.",
+      "For instance, in refractometric biosensing the Q factor influences the resolution to measure refractive index changes $^{33, 34}$ .",
+      "Therefore, for different sensing techniques, the resonance wavelengths of dielectric metasurfaces can be precisely tuned from the visible, $^{27, 30}$ to infrared (IR) $^{31, 32}$ by the choice of the feature sizes of the meta-atoms and the materials."
+     ],
+     "title": "Dielectric Metasurfaces Enabling Advanced Optical Biosensors",
+     "metadata": {
+      "year": 2020,
+      "doi": "10.1021/acsphotonics.0c01030",
+      "arxiv": null,
+      "authors": [
+       "Ming Lun Tseng",
+       "Yasaman Jahani",
+       "A. Leitis"
+      ],
+      "evidence_loc": [
+       {
+        "section": "TOC art",
+        "chunk_id": "Dielectric_Metasurfaces_Enabling_Advanced_Optical_Biosensors#c4",
+        "char_start": 3329
+       }
+      ]
+     }
+    },
+    {
+     "id": "[4]",
+     "snippets": [
+      "A form of microscopy that utilizes a photonic crystal biosensor surface as a substrate for cell attachment enables label-free, quantitative, submicron resolution, time-resolved imaging of cell-surface interactions without cytotoxic staining agents or temporally-unstable fluorophores.",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains",
+      "As the observed migration occurs on the order of days, label-based assays are not feasible for extended time course studies.",
+      "While it provides information about biological surfaces by making measurements from above, AFM does not analyse the interaction between cells and their substrates.",
+      "SPRi requires illumination to pass through cell structures, which introduces changes in reflected light intensity that are not related to cell surface attachment, and the lateral propagation distance of surface plasmons limits spatial resolution.",
+      "PCEM is unique in the fact that the biosensor response is a direct quantification and 2D localization of attachment at the single cell level, as opposed to indirect methods of staining for actin bundle formation or even ensemble averaging of bulk dielectric properties.",
+      "Clearly visible boundaries of $\\sim 0.5\\mathrm{nm}$ PWV shifts demonstrate the ability of PCEM to provide information about the geometry of attachment",
+      "Other forms of microscopy do not provide this direct measurement of live cell-surface attachment localization and strength that includes unique, dynamic morphological signatures critical to the investigation of important biological phenomena such as stem cell differentiation, chemotaxis, apoptosis, and metastasis.",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "The key innovation enabling these capabilities is the use of noncoherent illumination of a photonic crystal biosensor and a spectroscopic scanning system that couples with a microscope objective.",
+      "Critically, this method retains the ability to monitor cell behavior with spatial resolution sufficient for observing both attachment footprints of filopodial extensions and intracellular attachment strength gradients.",
+      "The resonant wavelength is modulated by the addition of biomaterial upon the PC surface, resulting in a shift to a higher wavelength.",
+      "As cells attach and spread, positive PWV shifts are observed due to an increase in the concentration of cellular material within the evanescent field region of the PC.",
+      "PCEM provides rich, dynamic information about the evolution of cell-surface attachment profiles over biologically relevant time-scales."
+     ],
+     "title": "Photonic crystal enhanced microscopy for imaging of live cell adhesion.",
+     "metadata": {
+      "year": 2013,
+      "doi": "10.1364/fio.2013.ftu5a.4",
+      "arxiv": null,
+      "authors": [
+       "Weili Chen",
+       "K. Long",
+       "Meng Lu"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Open Gaps",
+   "text": "Despite the advancements in photonic surfaces, certain technical limitations and challenges remain. For PCEM, the method relies on noncoherent illumination of the photonic crystal biosensor coupled with a spectroscopic scanning system to achieve its capabilities [4]. The sensitivity of the system is characterized by photonic wavelength shifts (PWV), with average shifts of approximately 0.12 nm over 12 hours and a standard deviation of 0.09 nm in uniform media [3] [4]. While PCEM can resolve boundaries of approximately 0.5 nm PWV shifts, other forms of microscopy do not provide direct measurements of live cell-surface attachment localization and strength with the same dynamic morphological detail [4]. In the context of metasurfaces, the development of ultrasensitive biosensors faces challenges that require specific solutions to optimize performance [6]. Additionally, while dielectric metasurfaces offer low loss, the integration of these surfaces into portable, spectrometer-less readers is an area of active development to reduce cost and improve mechanical robustness [5].",
+   "citations": [
+    {
+     "id": "[5]",
+     "snippets": [
+      "Recently, high-index all-dielectric metasurfaces driven by the physics of optical Mie resonances have emerged as an alternative platform as they do not suffer from losses due to the absence of free charges",
+      "In particular, when combined with a small-scale light source – i.e., laser or light-emitting diode (LED) – and an imaging camera (i.e., complementary metal-oxide-semiconductor (CMOS) or charge-coupled device (CCD) cameras), the intensity-based optical readers can be ultra-compact, low-weight, and portable by eliminating the need for sophisticated spectroscopy instrumentations",
+      "Thus, spectrometer-less readers can reduce cost and improve mechanical robustness",
+      "Compared to single-unit metasurfaces, such diatomic structures provide advanced flexibility in the engineering of the in-plane asymmetry while keeping the design easier to fabricate and make it more feasible for biosensing applications."
+     ],
+     "title": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+     "metadata": {
+      "year": 2021,
+      "doi": "10.1038/s41467-021-23257-y",
+      "arxiv": null,
+      "authors": [
+       "Yasaman Jahani",
+       "Eduardo Arvelo",
+       "F. Yesilkoy"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+        "chunk_id": "Imaging-based_spectrometer-less_optofluidic_biosensors_based_on_dielectric_metas#c0",
+        "char_start": 160
+       }
+      ]
+     }
+    },
+    {
+     "id": "[6]",
+     "snippets": [],
+     "title": "Challenges and Solutions in Developing Ultrasensitive Biosensors.",
+     "metadata": {
+      "year": 2018,
+      "doi": "10.1021/jacs.8b09397",
+      "arxiv": null,
+      "authors": [
+       "Yanfang Wu",
+       "R. Tilley",
+       "J. Gooding"
+      ]
+     }
+    },
+    {
+     "id": "[4]",
+     "snippets": [
+      "A form of microscopy that utilizes a photonic crystal biosensor surface as a substrate for cell attachment enables label-free, quantitative, submicron resolution, time-resolved imaging of cell-surface interactions without cytotoxic staining agents or temporally-unstable fluorophores.",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains",
+      "As the observed migration occurs on the order of days, label-based assays are not feasible for extended time course studies.",
+      "While it provides information about biological surfaces by making measurements from above, AFM does not analyse the interaction between cells and their substrates.",
+      "SPRi requires illumination to pass through cell structures, which introduces changes in reflected light intensity that are not related to cell surface attachment, and the lateral propagation distance of surface plasmons limits spatial resolution.",
+      "PCEM is unique in the fact that the biosensor response is a direct quantification and 2D localization of attachment at the single cell level, as opposed to indirect methods of staining for actin bundle formation or even ensemble averaging of bulk dielectric properties.",
+      "Clearly visible boundaries of $\\sim 0.5\\mathrm{nm}$ PWV shifts demonstrate the ability of PCEM to provide information about the geometry of attachment",
+      "Other forms of microscopy do not provide this direct measurement of live cell-surface attachment localization and strength that includes unique, dynamic morphological signatures critical to the investigation of important biological phenomena such as stem cell differentiation, chemotaxis, apoptosis, and metastasis.",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "The key innovation enabling these capabilities is the use of noncoherent illumination of a photonic crystal biosensor and a spectroscopic scanning system that couples with a microscope objective.",
+      "Critically, this method retains the ability to monitor cell behavior with spatial resolution sufficient for observing both attachment footprints of filopodial extensions and intracellular attachment strength gradients.",
+      "The resonant wavelength is modulated by the addition of biomaterial upon the PC surface, resulting in a shift to a higher wavelength.",
+      "As cells attach and spread, positive PWV shifts are observed due to an increase in the concentration of cellular material within the evanescent field region of the PC.",
+      "PCEM provides rich, dynamic information about the evolution of cell-surface attachment profiles over biologically relevant time-scales."
+     ],
+     "title": "Photonic crystal enhanced microscopy for imaging of live cell adhesion.",
+     "metadata": {
+      "year": 2013,
+      "doi": "10.1364/fio.2013.ftu5a.4",
+      "arxiv": null,
+      "authors": [
+       "Weili Chen",
+       "K. Long",
+       "Meng Lu"
+      ]
+     }
+    },
+    {
+     "id": "[3]",
+     "snippets": [
+      "The system is built upon the body of a standard microscope (Carl Zeiss Axio Observer Z1)",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains, so a population of cells can be measured repeatedly without disrupting their culture environment.",
+      "As a label-free detection approach, PCEM enables continuous monitoring of these phenomena over extended time periods that are compatible with the biological time scales of chemotaxis, apoptosis, differentiation, and proliferation.",
+      "To our knowledge, this represents the first label-free time-lapse imaging of the attachment localization of living cells during chemotaxis."
+     ],
+     "title": "Label-free imaging of cell attachment with photonic crystal enhanced microscopy.",
+     "metadata": {
+      "year": 2011,
+      "doi": "10.1039/c1an15171a",
+      "arxiv": null,
+      "authors": [
+       "Erich A. Lidstone",
+       "V. Chaudhery",
+       "Anja Kohl"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Hyperspectral imaging microscope detection instrument",
+        "chunk_id": "Label-free_imaging_of_cell_attachment_with_photonic_crystal_enhanced_microscopy_#c3",
+        "char_start": 10420
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Dynamics",
+   "text": "The dynamic capabilities of photonic metamaterial surfaces are highlighted by their ability to monitor biological processes in real-time. PCEM provides rich, dynamic information about the evolution of cell-surface attachment profiles over biologically relevant time scales [4]. As cells attach and spread, positive PWV shifts are observed due to the increased concentration of cellular material within the evanescent field region of the photonic crystal [4]. This method retains sufficient spatial resolution to observe attachment footprints of filopodial extensions and intracellular attachment strength gradients [4]. PCEM has been used to enable the first label-free time-lapse imaging of attachment localization in living cells during chemotaxis [3]. It allows for continuous monitoring of spatial gradients in cell-surface attachment and the extension of fine-structured filopodia over extended periods compatible with processes like apoptosis and differentiation [3]. Because the technology is label-free, populations of cells can be measured repeatedly without disrupting their culture environment [3]. In metasurface-based systems, intensity-based readers can detect analyte binding through spatially resolved intensity changes at a fixed wavelength, offering a compact and portable alternative to traditional spectroscopic methods [5].",
+   "citations": [
+    {
+     "id": "[5]",
+     "snippets": [
+      "Recently, high-index all-dielectric metasurfaces driven by the physics of optical Mie resonances have emerged as an alternative platform as they do not suffer from losses due to the absence of free charges",
+      "In particular, when combined with a small-scale light source – i.e., laser or light-emitting diode (LED) – and an imaging camera (i.e., complementary metal-oxide-semiconductor (CMOS) or charge-coupled device (CCD) cameras), the intensity-based optical readers can be ultra-compact, low-weight, and portable by eliminating the need for sophisticated spectroscopy instrumentations",
+      "Thus, spectrometer-less readers can reduce cost and improve mechanical robustness",
+      "Compared to single-unit metasurfaces, such diatomic structures provide advanced flexibility in the engineering of the in-plane asymmetry while keeping the design easier to fabricate and make it more feasible for biosensing applications."
+     ],
+     "title": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+     "metadata": {
+      "year": 2021,
+      "doi": "10.1038/s41467-021-23257-y",
+      "arxiv": null,
+      "authors": [
+       "Yasaman Jahani",
+       "Eduardo Arvelo",
+       "F. Yesilkoy"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Imaging-based spectrometer-less optofluidic biosensors based on dielectric metasurfaces for detecting extracellular vesicles",
+        "chunk_id": "Imaging-based_spectrometer-less_optofluidic_biosensors_based_on_dielectric_metas#c0",
+        "char_start": 160
+       }
+      ]
+     }
+    },
+    {
+     "id": "[3]",
+     "snippets": [
+      "The system is built upon the body of a standard microscope (Carl Zeiss Axio Observer Z1)",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains, so a population of cells can be measured repeatedly without disrupting their culture environment.",
+      "As a label-free detection approach, PCEM enables continuous monitoring of these phenomena over extended time periods that are compatible with the biological time scales of chemotaxis, apoptosis, differentiation, and proliferation.",
+      "To our knowledge, this represents the first label-free time-lapse imaging of the attachment localization of living cells during chemotaxis."
+     ],
+     "title": "Label-free imaging of cell attachment with photonic crystal enhanced microscopy.",
+     "metadata": {
+      "year": 2011,
+      "doi": "10.1039/c1an15171a",
+      "arxiv": null,
+      "authors": [
+       "Erich A. Lidstone",
+       "V. Chaudhery",
+       "Anja Kohl"
+      ],
+      "evidence_loc": [
+       {
+        "section": "Hyperspectral imaging microscope detection instrument",
+        "chunk_id": "Label-free_imaging_of_cell_attachment_with_photonic_crystal_enhanced_microscopy_#c3",
+        "char_start": 10420
+       }
+      ]
+     }
+    },
+    {
+     "id": "[4]",
+     "snippets": [
+      "A form of microscopy that utilizes a photonic crystal biosensor surface as a substrate for cell attachment enables label-free, quantitative, submicron resolution, time-resolved imaging of cell-surface interactions without cytotoxic staining agents or temporally-unstable fluorophores.",
+      "As a label-free technology, cell attachment to a PC sensor is measured without the use of dyes or stains",
+      "As the observed migration occurs on the order of days, label-based assays are not feasible for extended time course studies.",
+      "While it provides information about biological surfaces by making measurements from above, AFM does not analyse the interaction between cells and their substrates.",
+      "SPRi requires illumination to pass through cell structures, which introduces changes in reflected light intensity that are not related to cell surface attachment, and the lateral propagation distance of surface plasmons limits spatial resolution.",
+      "PCEM is unique in the fact that the biosensor response is a direct quantification and 2D localization of attachment at the single cell level, as opposed to indirect methods of staining for actin bundle formation or even ensemble averaging of bulk dielectric properties.",
+      "Clearly visible boundaries of $\\sim 0.5\\mathrm{nm}$ PWV shifts demonstrate the ability of PCEM to provide information about the geometry of attachment",
+      "Other forms of microscopy do not provide this direct measurement of live cell-surface attachment localization and strength that includes unique, dynamic morphological signatures critical to the investigation of important biological phenomena such as stem cell differentiation, chemotaxis, apoptosis, and metastasis.",
+      "The average PWV shifted by only $0.12\\mathrm{nm}$ over 12 hours, and the standard deviation of PWV within an image of a PC uniformly exposed to cell media wa s $0.09\\mathrm{nm}$ (ESI, Fig. S2†).",
+      "The key innovation enabling these capabilities is the use of noncoherent illumination of a photonic crystal biosensor and a spectroscopic scanning system that couples with a microscope objective.",
+      "Critically, this method retains the ability to monitor cell behavior with spatial resolution sufficient for observing both attachment footprints of filopodial extensions and intracellular attachment strength gradients.",
+      "The resonant wavelength is modulated by the addition of biomaterial upon the PC surface, resulting in a shift to a higher wavelength.",
+      "As cells attach and spread, positive PWV shifts are observed due to an increase in the concentration of cellular material within the evanescent field region of the PC.",
+      "PCEM provides rich, dynamic information about the evolution of cell-surface attachment profiles over biologically relevant time-scales."
+     ],
+     "title": "Photonic crystal enhanced microscopy for imaging of live cell adhesion.",
+     "metadata": {
+      "year": 2013,
+      "doi": "10.1364/fio.2013.ftu5a.4",
+      "arxiv": null,
+      "authors": [
+       "Weili Chen",
+       "K. Long",
+       "Meng Lu"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

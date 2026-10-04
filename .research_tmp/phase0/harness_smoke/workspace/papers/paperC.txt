@@ -1,0 +1,5 @@
+Paper C: Mixture-of-Depths Transformers
+Published: 2024-04-19
+Key result: Dynamically allocating compute per token (top-k routing) matches baseline quality with ~50% fewer FLOPs per forward pass.
+Conditions: Small-scale language models (up to 1.3B params), fixed top-k per layer.
+Limitation: Scaling behavior beyond 1.3B parameters not established; routing stability under long training runs unreported.
