@@ -33,7 +33,7 @@ def answer_path(request):
     return _run_compute("make_goldens", request.param)
 
 
-@pytest.fixture(scope="module", params=C.IMPLS)
+@pytest.fixture(scope="module", params=C.SCORING_IMPLS)
 def scoring(request):
     return _run_compute("make_goldens_scoring", request.param)
 

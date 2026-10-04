@@ -1,0 +1,14 @@
+You are screening evidence for one section of a research report.
+
+Question: {question}
+Section goal: {goal}
+
+Some excerpts below were retrieved only because they share words with the question but are about a DIFFERENT problem
+(e.g. another meaning of the same term, an unrelated field, or a table fragment with no usable content). List ONLY those
+clearly off-topic excerpts. Keep anything that is plausibly useful background, a related method, a limitation, or a comparison,
+even if it does not answer the question directly. When in doubt, do not list it.
+
+Excerpts:
+{items}
+
+Return JSON only: {{"off_topic": [<ids of clearly off-topic excerpts>]}}

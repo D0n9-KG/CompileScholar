@@ -21,7 +21,8 @@ REPO = Path(__file__).resolve().parents[1]
 FIX = REPO / "tests" / "fixtures" / "characterize"
 OLD_TOOLS = REPO / ".research_tmp" / "experiments" / "benchmarks" / "_shared" / "tools"
 
-IMPLS = ["old"]
+IMPLS = ["old", "new"]
+SCORING_IMPLS = ["old"]
 
 
 def load(impl: str) -> types.SimpleNamespace:
@@ -35,6 +36,13 @@ def load(impl: str) -> types.SimpleNamespace:
         cut = importlib.import_module("cutoff")
         hy = importlib.import_module("kb_compiler.retrieve.hybrid")
         emb = importlib.import_module("kb_infra.embedding")
+        return types.SimpleNamespace(AP=ap, RG=rg, CUT=cut, HY=hy, EMB_MOD=emb)
+    if impl == "new":
+        ap = importlib.import_module("compilescholar.answer.pipeline")
+        rg = importlib.import_module("compilescholar.sources.refgraph")
+        cut = importlib.import_module("compilescholar.core.cutoff")
+        hy = importlib.import_module("compilescholar.kb.index")
+        emb = importlib.import_module("compilescholar.llm.embedding")
         return types.SimpleNamespace(AP=ap, RG=rg, CUT=cut, HY=hy, EMB_MOD=emb)
     raise ValueError(impl)
 
