@@ -54,6 +54,7 @@ def test_blocks_large_secret_literal_and_abs_path(repo):
 
 
 def test_allows_compressed_results_placeholders_and_marker(repo):
+    """The marker exempts literal / path patterns, never a real credential value from .env."""
     _stage(repo, "results/run/x.json.gz", b"1" * (6 << 20))
     _stage(repo, "src/pkg/d.py", b'os.environ["OPENAI_API_KEY"] = "sk-placeholder"\nkey = secrets.get("LOCAL_API_KEY")\n')
     _stage(repo, "src/pkg/e.py", ALLOWED_LINE)
