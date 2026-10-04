@@ -62,3 +62,5 @@ v9b test 结果不做逐题失分分析，不用来指导升级。
   按出口地区拦截（HTTP 403 "This model is not available in your region"，指定 google-vertex / google-ai-studio 提供方同样被拒），
   其余可用网关均无 Gemini。用户裁定：**主口径改为 DeepSeek-V4.1-Flash（并行科技 Paratera）**，官方 scorer 原样调用，
   只保留不改语义的网络修复；论文披露判分模型替换及原因。本修订在任何升级版结果产生之前写入。
+  补充（同日，仍在任何升级版结果之前）：DeepSeek 输出的 criteria_idx 从 0 编号，官方校验器要求从 1 编号——编号平移只改格式、不改判分，
+  保留；重试次数恢复官方值（20）。对应 `JudgeAdapter.primary()`。v9b 记录用的是 `legacy()`（另含重试次数 4），两者判分模型相同。

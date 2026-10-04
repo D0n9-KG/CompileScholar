@@ -2,7 +2,7 @@
 """compilescholar command line.
 
   compilescholar answer --config configs/bench/cs2_dev_confirm.yaml --run-id cs2-dev-vnext-20261005-x [--set k=v ...]
-  compilescholar judge  --run-id <id> [--official]
+  compilescholar judge  --run-id <id> [--legacy]
   compilescholar score  --split test --ref runs/<a>/scores.json,runs/<b>/scores.json --others harness=<file> ...
   compilescholar verify --run-id <id>
 
@@ -99,8 +99,9 @@ def cmd_judge(a):
     from .eval.cs2 import judge as J
     rd = _run_dir(a.run_id)
     cfg = C.load(rd / "config.resolved.yaml")
-    adapter = J.JudgeAdapter.official() if a.official else J.JudgeAdapter.legacy()
-    out = rd / ("scores_official.json" if a.official else "scores.json")
+    # default = primary measure (PREREG amendment 1); --legacy reproduces the v9b judging setup exactly
+    adapter = J.JudgeAdapter.legacy() if a.legacy else J.JudgeAdapter.primary()
+    out = rd / ("scores_legacy.json" if a.legacy else "scores.json")
     res = asyncio.run(J.judge_file(str(rd / "judge_input.json"), str(out), cfg.bench.split, adapter, parallel=a.parallel))
     print(f"[judge] {res}", flush=True)
     if res["judge_error_rows"]:
@@ -138,7 +139,7 @@ def main(argv=None):
     p.set_defaults(fn=cmd_answer)
     p = sub.add_parser("judge")
     p.add_argument("--run-id", required=True)
-    p.add_argument("--official", action="store_true", help="official judge (gemini-3-flash-preview via OpenRouter)")
+    p.add_argument("--legacy", action="store_true", help="v9b judging setup (adds max_retries 4); default is the primary measure")
     p.add_argument("--parallel", type=int, default=6)
     p.set_defaults(fn=cmd_judge)
     p = sub.add_parser("score")

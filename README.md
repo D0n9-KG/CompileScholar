@@ -19,7 +19,7 @@ python -m pytest -q                            # characterization + unit tests, 
 
 # answer CS2 questions with a config, judge, compare
 compilescholar answer --config configs/bench/cs2_dev_confirm.yaml --run-id cs2-dev-<tag>
-compilescholar judge  --run-id cs2-dev-<tag>            # add --official for the official judge model
+compilescholar judge  --run-id cs2-dev-<tag>            # DeepSeek-V4.1-Flash, official scorers (PREREG amendment 1)
 compilescholar verify --run-id cs2-dev-<tag>            # recompute code / input hashes from the run manifest
 ```
 

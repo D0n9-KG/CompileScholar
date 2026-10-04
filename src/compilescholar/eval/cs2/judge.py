@@ -47,6 +47,13 @@ class JudgeAdapter:
     def official(cls) -> "JudgeAdapter":
         return cls(connection_close=True, max_retries_4=False, idx_zero_to_one=False, judge_model=OFFICIAL_JUDGE)
 
+    @classmethod
+    def primary(cls) -> "JudgeAdapter":
+        """Primary measure for upgraded-system runs (PREREG amendment 1): DeepSeek-V4.1-Flash, official retry count;
+        keeps only the two format/network fixes that do not change scoring (Connection: close; 0-based criteria
+        indices that DeepSeek emits renumbered to the 1-based form the official validator expects)."""
+        return cls(connection_close=True, max_retries_4=False, idx_zero_to_one=True, judge_model=LEGACY_JUDGE)
+
 
 def astabench_path() -> str:
     """astabench is a pinned third-party checkout (editable install); CS_ASTABENCH overrides the location."""
