@@ -185,3 +185,33 @@ configs/local.yaml
 # run outputs: everything under runs/ except the archived build.py manifests (promote frozen runs to results/)
 runs/*
 !runs/_legacy_build_manifests/
+
+# 10-04 W6 S8: large intermediate files untracked (pinned by sha256 in artifacts/MANIFEST.tsv)
+.research_tmp/experiments/benchmarks/cs2/arm_memorized/answers_elicit_dev.json
+.research_tmp/experiments/benchmarks/cs2/arm_memorized/answers_openai_dr_dev.json
+.research_tmp/experiments/benchmarks/cs2/arm_memorized/sqa_elicit_responses.json
+.research_tmp/experiments/benchmarks/cs2/arm_ours/text_index/chunks.jsonl
+.research_tmp/experiments/benchmarks/cs2/base_kb/deep_read_cache.jsonl
+.research_tmp/experiments/benchmarks/cs2/base_kb/deep_read_records.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/records_merged.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/records_survey.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/registry_v2.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/survey_records_adapted.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/views_consensus.json
+.research_tmp/experiments/benchmarks/cs2/base_kb/views_cs2.json
+.research_tmp/experiments/benchmarks/cs2/base_kb_v2/records.json
+.research_tmp/experiments/benchmarks/cs2/direct_scores_gptr_fixed_ds.json
+.research_tmp/experiments/benchmarks/cs2/direct_scores_vnext_dev15_v1_ds.json
+.research_tmp/experiments/benchmarks/cs2/judge_input_openai_dr_dev.json
+.research_tmp/experiments/benchmarks/qasa/data/qasa_test.jsonl
+.research_tmp/experiments/benchmarks/scholarqa_multi/baselines/ours/text_index/chunks.jsonl
+.research_tmp/experiments/benchmarks/scholarqa_multi/baselines/paperqa/run.log.archive1
+.research_tmp/experiments/benchmarks/scholarqa_multi/baselines/vnext/answers_vnext_v1.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/growth/views_growth.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/postcheck/dropped.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/postcheck/records_checked.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_slot.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_tables.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/records_tables_by_paper.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/views.json
+.research_tmp/experiments/benchmarks/scholarqa_multi/kb/views.json.bak_v2
