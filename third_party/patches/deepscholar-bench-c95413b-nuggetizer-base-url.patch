@@ -1,0 +1,23 @@
+diff --git a/eval/nuggetizer/src/nuggetizer/core/llm.py b/eval/nuggetizer/src/nuggetizer/core/llm.py
+index 1120a09..ab718e9 100644
+--- a/eval/nuggetizer/src/nuggetizer/core/llm.py
++++ b/eval/nuggetizer/src/nuggetizer/core/llm.py
+@@ -1,3 +1,4 @@
++import os
+ import time
+ from typing import Dict, List, Optional, Union, Tuple
+ import tiktoken
+@@ -52,6 +53,13 @@ class LLMHandler:
+                 azure_endpoint=api_base,
+             )
+         elif api_type == "openai":
++            # Paratera judge 接线（09-30 补）：显式 base_url 支持——
++            # OPENAI_API_BASE 指向 OpenAI 兼容端点（Paratera DeepSeek）
++            # 时走它；不设=官方 OpenAI 原行为不变。
++            _base = os.environ.get("OPENAI_API_BASE") or os.environ.get(
++                "OPENAI_BASE_URL")
++            if _base:
++                return OpenAI(api_key=self.api_keys[0], base_url=_base)
+             return OpenAI(api_key=self.api_keys[0])
+         else:
+             raise ValueError(f"Invalid API type: {api_type}")
