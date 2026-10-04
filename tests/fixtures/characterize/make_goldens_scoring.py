@@ -23,6 +23,10 @@ def load_scoring(impl: str):
         import cs2_scoring
         import paired_stats
         return cs2_scoring, paired_stats
+    if impl == "new":
+        from compilescholar.eval import stats
+        from compilescholar.eval.cs2 import scoring
+        return scoring, stats
     raise ValueError(impl)
 
 

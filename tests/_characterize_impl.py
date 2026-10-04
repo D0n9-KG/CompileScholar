@@ -22,7 +22,7 @@ FIX = REPO / "tests" / "fixtures" / "characterize"
 OLD_TOOLS = REPO / ".research_tmp" / "experiments" / "benchmarks" / "_shared" / "tools"
 
 IMPLS = ["old", "new"]
-SCORING_IMPLS = ["old"]
+SCORING_IMPLS = ["old", "new"]
 
 
 def load(impl: str) -> types.SimpleNamespace:
