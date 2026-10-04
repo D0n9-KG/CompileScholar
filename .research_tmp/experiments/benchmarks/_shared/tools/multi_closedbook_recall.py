@@ -31,9 +31,14 @@ sys.path.insert(0, os.path.join(
 
 # local GPUStack env for the A3 understand + A4 embed calls
 os.environ.setdefault("LOCAL_BASE_URL", "http://192.168.199.73/v1")
-os.environ.setdefault(
-    "LOCAL_API_KEY",
-    "***REMOVED-LOCAL_API_KEY***")
+# LOCAL_API_KEY 只从环境变量 / 仓库根 .env 读（10-04：原先硬编码在此，已移除）
+if not os.environ.get("LOCAL_API_KEY"):
+    try:
+        for line in open(os.path.join(_HERE, *[".."] * 5, ".env"), encoding="utf-8"):
+            if line.strip().startswith("LOCAL_API_KEY"):
+                os.environ["LOCAL_API_KEY"] = line.strip().partition("=")[2].strip().strip('"')
+    except Exception:
+        pass
 os.environ.setdefault("LOCAL_MODEL", "Qwen3.8-27B")
 os.environ.setdefault("LOCAL_EMBED_MODEL", "qwen3-embedding-8b-local")
 # Sciverse semantic channel (2026-09-25: it was ABSENT from the first

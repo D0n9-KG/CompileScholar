@@ -44,7 +44,9 @@ GROWTH = os.path.join(KB, "growth")
 GROWTH_TEXTS = os.path.join(GROWTH, "texts")
 MODEL = "local:Qwen3.8-27B"
 MINERU_SERVER = "http://192.168.199.73:9600"
-MINERU_TOKEN = "***REMOVED-MINERU_TOKEN***"
+# 凭据只从环境变量 / 仓库根 .env 读（10-04：原先硬编码在此，已移除）
+from kb_infra.llm import ENV as _ENV  # noqa: E402
+MINERU_TOKEN = os.environ.get("MINERU_TOKEN") or _ENV.get("MINERU_TOKEN", "")
 
 FIELDS = {"enable_formula": "true", "language": "en", "enable_table": "true",
           "model_version": "pipeline", "return_md": "true",

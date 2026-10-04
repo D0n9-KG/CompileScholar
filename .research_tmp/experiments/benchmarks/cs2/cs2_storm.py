@@ -184,6 +184,27 @@ def _safe_topic(t):
     return re.sub(r'[^A-Za-z0-9_\- ]+', '', t)[:80].strip().replace(' ', '_') or 'topic'
 
 
+def scrub_run_config(out_dir: str) -> None:
+    """STORM 把各 LM 的构造参数（含 api_key）原样写进 run_config.json（knowledge_storm engine.py:298）；
+    落盘后立即把所有 *key* 字段改成 <redacted>，避免凭据进入运行产物 / git（10-04）。"""
+    def red(o):
+        if isinstance(o, dict):
+            for k in list(o):
+                if "key" in k.lower() and isinstance(o[k], str):
+                    o[k] = "<redacted>"
+                else:
+                    red(o[k])
+        elif isinstance(o, list):
+            for v in o:
+                red(v)
+    for root, _dirs, files in os.walk(out_dir):
+        if "run_config.json" in files:
+            p = os.path.join(root, "run_config.json")
+            d = json.load(open(p, encoding="utf-8"))
+            red(d)
+            json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+
+
 def article_to_cs2(article_md: str, url_to_info: dict | None = None) -> list[dict]:
     """STORM 产物 → CS2 sections/citations。polished 文章引用是 [n] 数字
     标记；url_to_info.json 给 n → {url, title, snippets}（snippets=检索
@@ -280,6 +301,7 @@ def run(smoke: bool = False):
                 ground_truth_url="",
                 do_research=True, do_generate_outline=True,
                 do_generate_article=True, do_polish_article=True)
+            scrub_run_config(out_dir)
             # 产物直接在 run() 内部落盘（storm_gen_article.txt +
             # polished 变体；老版 API 的 post_run/end 已不存在）
             art_path = None

@@ -19,7 +19,7 @@ sys.path.insert(0, _HERE)
 sys.path.insert(0, os.path.normpath(os.path.join(_HERE, "..", "_shared", "tools")))
 
 from cs2_storm import (SciverseRM, build_lm_configs, _safe_topic,
-                       article_to_cs2)  # 复用 CS2 臂全部组件
+                       article_to_cs2, scrub_run_config)  # 复用 CS2 臂全部组件
 
 DSB = os.path.normpath(os.path.join(_HERE, "..", "deepscholar", "dsb"))
 BASE_DIR = os.path.join(_HERE, "arm_storm_dsb")
@@ -81,6 +81,7 @@ def run(smoke=False, limit=None):
                 topic=_topic, ground_truth_url="",
                 do_research=True, do_generate_outline=True,
                 do_generate_article=True, do_polish_article=True)
+            scrub_run_config(out_dir)
             art_path = None
             for root, _dirs, files in os.walk(out_dir):
                 if "storm_gen_article_polished.txt" in files:
