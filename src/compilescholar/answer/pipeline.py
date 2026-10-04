@@ -17,6 +17,7 @@ import concurrent.futures as cf
 import hashlib
 import os
 import re
+import threading
 import time
 
 from ..core.cutoff import allowed as _cut_allowed, raw_cutoff as _cut_raw, set_thread_cutoff as _set_cut
@@ -147,7 +148,22 @@ def probe(question: str, kb: KB | None, use_ext: bool = True, k: int = 10) -> li
     return out
 
 
-def plan(question: str, probe_rows: list[dict] | None = None) -> list[dict]:
+class Degradation:
+    """Per-question counters of silent fallbacks (W1-10). Every stage below degrades instead of failing when the LLM
+    returns nothing usable; these counters make that visible in the trace and in run health summaries."""
+    KEYS = ("plan_unparseable", "plan_fallback", "screen_unparseable", "screen_kept_all", "write_empty",
+            "ext_query_failed", "cite_section_empty")
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self.counts = {k: 0 for k in self.KEYS}
+
+    def add(self, key: str, n: int = 1):
+        with self._lock:
+            self.counts[key] += n
+
+
+def plan(question: str, probe_rows: list[dict] | None = None, deg: Degradation | None = None) -> list[dict]:
     pb = ""
     if probe_rows:
         pb = PROBE_BLOCK.format(items="\n".join(f"- {r['title'][:150]}: {r['snippet'][:220]}" for r in probe_rows[:16]))
@@ -162,6 +178,10 @@ def plan(question: str, probe_rows: list[dict] | None = None) -> list[dict]:
                                 "queries": [str(q)[:200] for q in s["queries"][:3]]})
             if out:
                 return out
+        if deg:
+            deg.add("plan_unparseable")
+    if deg:
+        deg.add("plan_fallback")
     return [{"title": "Overview", "goal": question, "queries": [question]}]
 
 
@@ -219,7 +239,8 @@ def _fmt_ev(items: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def screen(question: str, goal: str, items: list[dict], batch: int = 20, min_keep: int = 5) -> list[dict]:
+def screen(question: str, goal: str, items: list[dict], batch: int = 20, min_keep: int = 5,
+           deg: Degradation | None = None) -> list[dict]:
     """证据相关性筛选：只剔除"同词异义/无关领域/无内容碎片"（检索召回 ≠ 相关；旧管线无此步）。
     v1 用"保留列表"，实测 27B 过严（fb607 题 245 条全拒）→ 改为"剔除列表 + 存疑不剔"；
     剔除后少于 min_keep 条则回退到不筛（宁可多给写作器材料，也不让一节空掉）。失败时不丢证据。"""
@@ -232,8 +253,14 @@ def screen(question: str, goal: str, items: list[dict], batch: int = 20, min_kee
         ids = (obj or {}).get("off_topic") if isinstance(obj, dict) else None
         if isinstance(ids, list):
             drop |= {str(x).strip("[] ") for x in ids}
+        elif deg:
+            deg.add("screen_unparseable")
     kept = [e for e in items if e["eid"] not in drop or e.get("src") == "target"]
-    return kept if len(kept) >= min(min_keep, len(items)) else items
+    if len(kept) >= min(min_keep, len(items)):
+        return kept
+    if deg:
+        deg.add("screen_kept_all")
+    return items
 
 
 def _interleave(items: list[dict]) -> list[dict]:
@@ -255,7 +282,8 @@ def _interleave(items: list[dict]) -> list[dict]:
 
 
 def write_sections(question: str, sections: list[dict], evidence: list[dict], max_ev: int = 60,
-                   use_screen: bool = True, word_budget: int | None = None) -> list[str]:
+                   use_screen: bool = True, word_budget: int | None = None,
+                   deg: Degradation | None = None) -> list[str]:
     """word_budget：仅用于长度对照消融（整篇总词数上限，按节均分）；None=无长度上限（默认，prompt 与不传时逐字相同）。"""
     per_sec = max(80, word_budget // max(1, len(sections))) if word_budget else None
     # 跨节去重（每条证据只归一节 + 提纲约束）10-03 试过、判否撤销：1000 词下 AP −0.089 [−0.166,−0.013]——
@@ -265,7 +293,7 @@ def write_sections(question: str, sections: list[dict], evidence: list[dict], ma
         s = sections[si]
         items = _interleave([e for e in evidence if si in e["sections"]])
         if use_screen and items:
-            items = screen(question, s["goal"], items)
+            items = screen(question, s["goal"], items, deg=deg)
         items = items[:max_ev]
         if not items:
             return ""
@@ -273,7 +301,10 @@ def write_sections(question: str, sections: list[dict], evidence: list[dict], ma
         if per_sec:
             prompt = prompt.replace("There is no length limit.",
                                     f"Keep this section under {per_sec} words: include the most important points first.")
-        return chat(prompt, max_tokens=5000, temperature=0.2).strip()
+        text = chat(prompt, max_tokens=5000, temperature=0.2).strip()
+        if not text and deg:
+            deg.add("write_empty")
+        return text
     with cf.ThreadPoolExecutor(4) as ex:
         return list(ex.map(one, range(len(sections))))
 
@@ -329,21 +360,25 @@ def answer(question: str, kb: KB | None, use_ext=True, use_cite=True, cutoff: st
     写作时可引用（标为本文），但装配时不生成外部 citation（它不是被引文献）。"""
     t0 = time.time()
     _set_cut(cutoff)
+    deg = Degradation()
     probe_rows = probe(question, kb, use_ext=use_ext) if use_probe else []
-    sections = plan(question, probe_rows)
+    sections = plan(question, probe_rows, deg=deg)
     t_plan = time.time() - t0
     evidence, trace = gather(question, sections, kb, use_ext=use_ext, use_cite=use_cite, cutoff=cutoff, use_state=use_state)
+    deg.add("ext_query_failed", sum(1 for c in trace["calls"] if c["src"] == "ext" and c["errors"]))
+    deg.add("cite_section_empty", sum(1 for c in trace["calls"] if c["src"] == "cite" and c["n"] == 0))
     if task_context and task_context.get("text"):
         evidence.insert(0, {"src": "target", "paper_key": "target:self", "title": task_context.get("title") or "this paper",
                             "year": None, "snippet": task_context["text"][:2000], "eid": "E0",
                             "sections": set(range(len(sections)))})
     t_g = time.time()
-    texts = write_sections(question, sections, evidence, use_screen=use_screen, word_budget=word_budget)
+    texts = write_sections(question, sections, evidence, use_screen=use_screen, word_budget=word_budget, deg=deg)
     t_write = time.time() - t_g
     out_secs, st = assemble(sections, texts, evidence)
     words = sum(len(s["text"].split()) for s in out_secs)
     return {"sections": out_secs,
             "trace": {"plan": sections, "probe": [r["title"] for r in probe_rows], **trace, "assemble": st, "words": words,
+                      "degradation": deg.counts,
                       "used_eids": sorted({m for t in texts for m in _EID.findall(t)}, key=lambda x: int(x[1:])),
                       "evidence": [{k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items()} for e in evidence],
                       "t_plan_s": round(t_plan, 1), "t_write_s": round(t_write, 1),

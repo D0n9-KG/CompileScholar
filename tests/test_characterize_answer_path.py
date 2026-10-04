@@ -43,6 +43,8 @@ GOLD_SCORING = json.load(open(FIXDIR / "goldens_scoring.json", encoding="utf-8")
 
 
 INTENDED = json.load(open(FIXDIR / "goldens_intended.json", encoding="utf-8"))
+ADDED_DEGRADATION_KEYS = ("plan_unparseable", "plan_fallback", "screen_unparseable", "screen_kept_all", "write_empty",
+                          "ext_query_failed", "cite_section_empty")
 
 
 @pytest.mark.parametrize("key", sorted(GOLD))
@@ -51,7 +53,10 @@ def test_answer_path_matches_golden(answer_path, key):
     if key == "answer":
         for name, v in GOLD["answer"].items():
             want = INTENDED.get(f"answer.{name}", v)
-            assert C.canon(answer_path["answer"][name]) == C.canon(want), name
+            got = json.loads(C.canon(answer_path["answer"][name]))
+            # W1-10 adds trace.degradation (new field, no change to any existing field)
+            assert set(got["result"]["trace"].pop("degradation")) == set(ADDED_DEGRADATION_KEYS)
+            assert C.canon(got) == C.canon(want), name
         return
     assert C.canon(answer_path[key]) == C.canon(GOLD[key])
 
