@@ -1,0 +1,746 @@
+{
+ "answer.task_context_cutoff": {
+  "prompts": [
+   "Write one section of a literature-grounded research report.\n\nOverall question: Related work for a paper on reward models.\nSection title: Limitations of work for\nSection goal: establish limitations\n\nEVIDENCE (each item is a verbatim excerpt from a paper; cite by its id):\n[E0] (Reward models) We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. \n[E33] (Paper 59 on paper, 2021) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E14] (Neural Storage: A New Paradigm of Elastic Memory, 2021) In this paper, we introduce Neural Storage (NS), a brain-inspired learning memory paradigm that organizes the memory as a flexible neural memory network.\n[E34] (Paper 63 on on, 2019) We study on and related problems. We study on and related problems. We study on and related problems.\n[E15] (New Challenges in Reinforcement Learning: A Survey of Security and Privacy, 2022) Another survey paper [ 14 ] conducted a literature review on securing IoT devices using reinforcement learning.\n[E35] (Paper 88 on a, 2018) We study a and related problems. We study a and related problems. We study a and related problems.\n[E16] (A Survey on Federated Recommendation Systems, 2022) Therefore, combining federated learning with recommendation systems becomes a promising solution for privacy-preserving recommendation systems. In this paper, we term it federated recommendation system (FedRS).\n[E36] (Paper 70 on paper, 2018) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E37] (Paper 28 on a, 2022) We study a and related problems. We study a and related problems. We study a and related problems.\n[E19] (A Survey on Human Action Recognition, 2022) This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.\n[E21] (On the Control of Attentional Processes in Vision, 2021) The key conclusions of this paper are that an executive controller is necessary for human attentional function in vision, and that there is a 'first principles' computational approach to its understanding that is complementary to the previous approaches that focus on modelling or learning from experimental observations directly.\n[E22] (Learning Matching Representations for Individualized Organ Transplantation Allocation, 2021) To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance.\n[E32] (Harvest -- An Open Source Toolkit for Extracting Posts and Post Metadata from Web Forums, 2021) This paper, therefore, presents a method that determines the XPath of forum posts, eliminating incorrect mergers and splits of the extracted posts that were common in systems from the previous generation.\n\nRules:\n1. EVERY sentence ends with the citation id(s) of the evidence that supports it, e.g. \"... [E3]\" or \"... [E3][E7]\".\n   This includes topic, transition and summary sentences: if a sentence cannot be tied to specific evidence, delete it.\n   Use only ids listed above. Do not cite anything else and do not invent papers.\n2. Each sentence must stay within what its cited excerpts actually say. Do not add interpretation, motivation or\n   implications the excerpt does not state (\"this suggests...\", \"demonstrating that...\"). When combining two papers in\n   one sentence, cite both, and make sure each part is supported by its own citation.\n3. Synthesize across papers: group related work, compare approaches, state agreements/disagreements, limitations and open\n   problems when the evidence supports them. Name methods, datasets and papers concretely.\n4. Answer the overall question. Every paragraph must directly address the overall question (within this section's goal).\n   Evidence about a neighboring topic — it shares terms with the question but does not bear on what is asked — is not\n   used; leaving it out is correct, not a loss. Cover every distinct point that the relevant evidence supports, then\n   stop: do not keep adding paragraphs from evidence that is only loosely related. There is no length limit.\n5. Write plain academic prose (paragraphs, optionally a short bulleted list). Do not repeat the section title. No references list.\n\nSection text:",
+   "Write one section of a literature-grounded research report.\n\nOverall question: Related work for a paper on reward models.\nSection title: Methods for related work\nSection goal: establish the main methods\n\nEVIDENCE (each item is a verbatim excerpt from a paper; cite by its id):\n[E0] (Reward models) We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. \n[E11] (Paper 47 on related, 2022) We study related and related problems. We study related and related problems. We study related and related problems.\n[E1] (Towards Continual Reinforcement Learning: A Review and Perspectives, 2020) Recent theoretical work ( Du et al., 2019a ) suggests that perhaps for a class of tree-like MDPs, generalization might even be improbable.\n[E12] (Paper 9 on related, 2022) We study related and related problems. We study related and related problems. We study related and related problems.\n[E2] (Hierarchical principles of embodied reinforcement learning: A review, 2020) Forward models predict how an action affects the world, while inverse models determine the actions that need to be executed to achieve a goal or to obtain a reward. Note that inverse models may be implicitly inferred from the available forward models, but more compact inverse models, which are closely related to habits and motion primitives, certainly foster the proficiency of particular behavioural skills further 6 , 13 , 25 , 105 .\n[E13] (Paper 2 on work, 2020) We study work and related problems. We study work and related problems. We study work and related problems.\n[E23] (Paper 85 on for, 2020) We study for and related problems. We study for and related problems. We study for and related problems.\n[E4] (Source-Free Unsupervised Domain Adaptation: A Survey, 2022) In addition, their work does not cover commonly used datasets in this research field.\n[E5] (A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal, 2020) The work [ 158 ] surveys on CNN-based approach for a single image, but it only roughly discussed the recent advances on CNN-based methods. It has not discussed the advanced convolutional operations and attention-based model, loss function, and supervisory signal, and only up to the year 2017.\n[E25] (Paper 11 on paper, 2018) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E6] (Mapping Knowledge Representations to Concepts: A Review and New Perspectives, 2022) In the reviewed research this type of question is addressed by: exposing typical and atypical images related to a concept ( Chen et al. 2020 ; Lucieri et al. 2020 ) , relate a decision to one of a number of predefined disentangled concepts ( Chen et al. 2020 ) or building simplified models over the decision logic ( Elshawi, Sherif, and Sakr 2021 ; Rabold, Schwalbe, and Schmid 2020 ) .\n[E26] (Paper 27 on for, 2022) We study for and related problems. We study for and related problems. We study for and related problems.\n[E7] (Mapping Knowledge Representations to Concepts: A Review and New Perspectives, 2022) Related to popular explainability methods: six of the nine papers mention CAV ( Kim et al. 2018 ) , five mentions Grad-CAM ( Selvaraju et al. 2017 ) , one LIME ( Ribeiro, Singh, and Guestrin 2016 ) and not any mentions SHAP ( Lundberg and Lee 2016 ) .\n[E27] (Paper 6 on a, 2020) We study a and related problems. We study a and related problems. We study a and related problems.\n[E8] (Towards Continual Reinforcement Learning: A Review and Perspectives, 2020) Domain randomization is a related approach that deals with a transfer type of setting. The goal here is to be able to generalize learning from source domains to target domains.\n[E28] (Paper 49 on for, 2020) We study for and related problems. We study for and related problems. We study for and related problems.\n[E9] (Survey of the Detection and Classification of Pulmonary Lesions via CT and X-Ray, 2020) A 3D CNN and its related methods inherit the advantages of CNNs and can be used to easily extract the characteristics of images and the algorithms introduced by serial information.\n[E29] (Paper 85 on a, 2019) We study a and related problems. We study a and related problems. We study a and related problems.\n[E30] (Paper 21 on paper, 2018) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E14] (Neural Storage: A New Paradigm of Elastic Memory, 2021) In this paper, we introduce Neural Storage (NS), a brain-inspired learning memory paradigm that organizes the memory as a flexible neural memory network.\n[E15] (New Challenges in Reinforcement Learning: A Survey of Security and Privacy, 2022) Another survey paper [ 14 ] conducted a literature review on securing IoT devices using reinforcement learning.\n[E16] (A Survey on Federated Recommendation Systems, 2022) Therefore, combining federated learning with recommendation systems becomes a promising solution for privacy-preserving recommendation systems. In this paper, we term it federated recommendation system (FedRS).\n[E18] (Sequential Search with Off-Policy Reinforcement Learning, 2022) To this end, we propose a highly scalable hybrid learning model that consists of an RNN learning framework leveraging all features in short-term user-item interactions, and an attention model utilizing selected item-only features from long-term interactions.\n[E19] (A Survey on Human Action Recognition, 2022) This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.\n[E20] (C2-CRS: Coarse-to-Fine Contrastive Learning for Conversational Recommender System, 2022) To effectively leverage multi-type external data, we propose a novel coarse-to-fine contrastive learning framework to improve data semantic fusion for CRS.\n[E21] (On the Control of Attentional Processes in Vision, 2021) The key conclusions of this paper are that an executive controller is necessary for human attentional function in vision, and that there is a 'first principles' computational approach to its understanding that is complementary to the previous approaches that focus on modelling or learning from experimental observations directly.\n[E22] (Learning Matching Representations for Individualized Organ Transplantation Allocation, 2021) To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance.\n\nRules:\n1. EVERY sentence ends with the citation id(s) of the evidence that supports it, e.g. \"... [E3]\" or \"... [E3][E7]\".\n   This includes topic, transition and summary sentences: if a sentence cannot be tied to specific evidence, delete it.\n   Use only ids listed above. Do not cite anything else and do not invent papers.\n2. Each sentence must stay within what its cited excerpts actually say. Do not add interpretation, motivation or\n   implications the excerpt does not state (\"this suggests...\", \"demonstrating that...\"). When combining two papers in\n   one sentence, cite both, and make sure each part is supported by its own citation.\n3. Synthesize across papers: group related work, compare approaches, state agreements/disagreements, limitations and open\n   problems when the evidence supports them. Name methods, datasets and papers concretely.\n4. Answer the overall question. Every paragraph must directly address the overall question (within this section's goal).\n   Evidence about a neighboring topic — it shares terms with the question but does not bear on what is asked — is not\n   used; leaving it out is correct, not a loss. Cover every distinct point that the relevant evidence supports, then\n   stop: do not keep adding paragraphs from evidence that is only loosely related. There is no length limit.\n5. Write plain academic prose (paragraphs, optionally a short bulleted list). Do not repeat the section title. No references list.\n\nSection text:",
+   "You are planning a literature-grounded research report that answers the question below.\nBreak the answer into 2-6 sections. Each section answers one sub-question that is part of answering THIS question —\nderive the sections from what the question asks (its entities, the comparison or relation it asks about, the aspects it\nnames), most important first. Add a background, limitations or applications section only when the question asks for\nit or the answer cannot be understood without it; a generic section that would fit any question on the topic is not\npart of the answer. For each section give 2-3 short search queries (keyword style, as you would type into a scholarly\nsearch engine; include synonyms/acronyms).\n\nAn initial search for the question returned the papers below (title: excerpt). Use them to work out which field and\nwhich meaning of the question's terms the question is about, and what the literature on THAT subject actually covers.\nIf they mix several meanings of a term, follow the one that fits every part of the question. Every section must be\nabout the question's own subject; do not plan sections on broader or adjacent topics that merely share a term.\n\n- Paper 91 on related: We study related and related problems. We study related and related problems. We study related and related problems.\n- Paper 71 on work: We study work and related problems. We study work and related problems. We study work and related problems.\n- Paper 77 on a: We study a and related problems. We study a and related problems. We study a and related problems.\n- Paper 93 on related: We study related and related problems. We study related and related problems. We study related and related problems.\n- Hierarchical principles of embodied reinforcement learning: A review: Forward models predict how an action affects the world, while inverse models determine the actions that need to be executed to achieve a goal or to obtain a reward. Note that inverse models may be implicitly inferred fro\n- New Challenges in Reinforcement Learning: A Survey of Security and Privacy: Chen et al. [ 31 ] reviewed the research related to reinforcement learning from the perspective of artificial intelligence security about adversarial attacks and defence.\n- Sequential Search with Off-Policy Reinforcement Learning: Specifically, we design a pairwise Deep Deterministic Policy Gradient model that efficiently captures users' long term reward in terms of pairwise classification error.\n- Towards Continual Reinforcement Learning: A Review and Perspectives: Recent theoretical work ( Du et al., 2019a ) suggests that perhaps for a class of tree-like MDPs, generalization might even be improbable.\n- Deep Unified Representation for Heterogeneous Recommendation: Experimental results demonstrate that with the unified representation, our model achieves remarkable improvement (e.g., 4.1% ~ 34.9% lift by AUC score and 3.7% lift by online CTR) over existing state-of-the-art models.\n- A Survey on Human Action Recognition: This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.\n- Learning to Emphasize: Dataset and Shared Task Models for Selecting Emphasis in Presentation Slides: Despite a large volume of studies on automatic slide generation, few studies have addressed the automation of design assistance during the creation process.\n- A Review of Hidden Markov Models and Recurrent Neural Networks for Event Detection and Localization in Biomedical Signals: For the model to be useful for trending applications, it must address three fundamental problems\n- Mapping Knowledge Representations to Concepts: A Review and New Perspectives: In the reviewed research this type of question is addressed by: exposing typical and atypical images related to a concept ( Chen et al. 2020 ; Lucieri et al. 2020 ) , relate a decision to one of a number of predefined di\n\nQuestion: Related work for a paper on reward models.\n\nReturn JSON only: {\"sections\": [{\"title\": \"...\", \"goal\": \"one sentence: what this section must establish\", \"queries\": [\"...\", \"...\"]}]}",
+   "You are screening evidence for one section of a research report.\n\nQuestion: Related work for a paper on reward models.\nSection goal: establish limitations\n\nSome excerpts below were retrieved only because they share words with the question but are about a DIFFERENT problem\n(e.g. another meaning of the same term, an unrelated field, or a table fragment with no usable content). List ONLY those\nclearly off-topic excerpts. Keep anything that is plausibly useful background, a related method, a limitation, or a comparison,\neven if it does not answer the question directly. When in doubt, do not list it.\n\nExcerpts:\n[E0] (Reward models) We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward mo\n[E33] (Paper 59 on paper) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E14] (Neural Storage: A New Paradigm of Elastic Memory) In this paper, we introduce Neural Storage (NS), a brain-inspired learning memory paradigm that organizes the memory as a flexible neural memory network.\n[E34] (Paper 63 on on) We study on and related problems. We study on and related problems. We study on and related problems.\n[E15] (New Challenges in Reinforcement Learning: A Survey of Security and Privacy) Another survey paper [ 14 ] conducted a literature review on securing IoT devices using reinforcement learning.\n[E35] (Paper 88 on a) We study a and related problems. We study a and related problems. We study a and related problems.\n[E16] (A Survey on Federated Recommendation Systems) Therefore, combining federated learning with recommendation systems becomes a promising solution for privacy-preserving recommendation systems. In this paper, we term it federated recommendation system (FedRS).\n[E36] (Paper 70 on paper) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E17] (A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal) This survey discusses the challenges faced by crowd counting systems and focuses on developing a more robust crowd counting methodology. However, this survey is a short paper. The network design discussion misses some important recent approaches such as DM-Count, SASNet. It also lacks unsupervised learning counting approaches.\n[E37] (Paper 28 on a) We study a and related problems. We study a and related problems. We study a and related problems.\n[E19] (A Survey on Human Action Recognition) This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.\n[E38] (Paper 48 on paper) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E21] (On the Control of Attentional Processes in Vision) The key conclusions of this paper are that an executive controller is necessary for human attentional function in vision, and that there is a 'first principles' computational approach to its understanding that is complementary to the previous approaches that focus on modelling or learning from experimental observations directly.\n[E22] (Learning Matching Representations for Individualized Organ Transplantation Allocation) To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance.\n[E31] (A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal) This paper focus on elaborating deep learning-based counting methods, which is board-based and mainly focus on the network design considerations without discussing loss functions and supervisory signals.\n[E32] (Harvest -- An Open Source Toolkit for Extracting Posts and Post Metadata from Web Forums) This paper, therefore, presents a method that determines the XPath of forum posts, eliminating incorrect mergers and splits of the extracted posts that were common in systems from the previous generation.\n\nReturn JSON only: {\"off_topic\": [<ids of clearly off-topic excerpts>]}",
+   "You are screening evidence for one section of a research report.\n\nQuestion: Related work for a paper on reward models.\nSection goal: establish the main methods\n\nSome excerpts below were retrieved only because they share words with the question but are about a DIFFERENT problem\n(e.g. another meaning of the same term, an unrelated field, or a table fragment with no usable content). List ONLY those\nclearly off-topic excerpts. Keep anything that is plausibly useful background, a related method, a limitation, or a comparison,\neven if it does not answer the question directly. When in doubt, do not list it.\n\nExcerpts:\n[E0] (Reward models) We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward mo\n[E11] (Paper 47 on related) We study related and related problems. We study related and related problems. We study related and related problems.\n[E1] (Towards Continual Reinforcement Learning: A Review and Perspectives) Recent theoretical work ( Du et al., 2019a ) suggests that perhaps for a class of tree-like MDPs, generalization might even be improbable.\n[E12] (Paper 9 on related) We study related and related problems. We study related and related problems. We study related and related problems.\n[E2] (Hierarchical principles of embodied reinforcement learning: A review) Forward models predict how an action affects the world, while inverse models determine the actions that need to be executed to achieve a goal or to obtain a reward. Note that inverse models may be implicitly inferred from the available forward models, but more compact inverse models, which are closely related to habits and motion primitives, certainly foster the proficiency of particular behaviour\n[E13] (Paper 2 on work) We study work and related problems. We study work and related problems. We study work and related problems.\n[E3] (New Challenges in Reinforcement Learning: A Survey of Security and Privacy) Chen et al. [ 31 ] reviewed the research related to reinforcement learning from the perspective of artificial intelligence security about adversarial attacks and defence.\n[E23] (Paper 85 on for) We study for and related problems. We study for and related problems. We study for and related problems.\n[E4] (Source-Free Unsupervised Domain Adaptation: A Survey) In addition, their work does not cover commonly used datasets in this research field.\n[E24] (Paper 45 on a) We study a and related problems. We study a and related problems. We study a and related problems.\n[E5] (A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal) The work [ 158 ] surveys on CNN-based approach for a single image, but it only roughly discussed the recent advances on CNN-based methods. It has not discussed the advanced convolutional operations and attention-based model, loss function, and supervisory signal, and only up to the year 2017.\n[E25] (Paper 11 on paper) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E6] (Mapping Knowledge Representations to Concepts: A Review and New Perspectives) In the reviewed research this type of question is addressed by: exposing typical and atypical images related to a concept ( Chen et al. 2020 ; Lucieri et al. 2020 ) , relate a decision to one of a number of predefined disentangled concepts ( Chen et al. 2020 ) or building simplified models over the decision logic ( Elshawi, Sherif, and Sakr 2021 ; Rabold, Schwalbe, and Schmid 2020 ) .\n[E26] (Paper 27 on for) We study for and related problems. We study for and related problems. We study for and related problems.\n[E7] (Mapping Knowledge Representations to Concepts: A Review and New Perspectives) Related to popular explainability methods: six of the nine papers mention CAV ( Kim et al. 2018 ) , five mentions Grad-CAM ( Selvaraju et al. 2017 ) , one LIME ( Ribeiro, Singh, and Guestrin 2016 ) and not any mentions SHAP ( Lundberg and Lee 2016 ) .\n[E27] (Paper 6 on a) We study a and related problems. We study a and related problems. We study a and related problems.\n[E8] (Towards Continual Reinforcement Learning: A Review and Perspectives) Domain randomization is a related approach that deals with a transfer type of setting. The goal here is to be able to generalize learning from source domains to target domains.\n[E28] (Paper 49 on for) We study for and related problems. We study for and related problems. We study for and related problems.\n[E9] (Survey of the Detection and Classification of Pulmonary Lesions via CT and X-Ray) A 3D CNN and its related methods inherit the advantages of CNNs and can be used to easily extract the characteristics of images and the algorithms introduced by serial information.\n[E29] (Paper 85 on a) We study a and related problems. We study a and related problems. We study a and related problems.\n\nReturn JSON only: {\"off_topic\": [<ids of clearly off-topic excerpts>]}",
+   "You are screening evidence for one section of a research report.\n\nQuestion: Related work for a paper on reward models.\nSection goal: establish the main methods\n\nSome excerpts below were retrieved only because they share words with the question but are about a DIFFERENT problem\n(e.g. another meaning of the same term, an unrelated field, or a table fragment with no usable content). List ONLY those\nclearly off-topic excerpts. Keep anything that is plausibly useful background, a related method, a limitation, or a comparison,\neven if it does not answer the question directly. When in doubt, do not list it.\n\nExcerpts:\n[E10] (Continual Lifelong Learning in Natural Language Processing: A Survey) Multi-task learning | Learning multiple related tasks jointly, using parameter sharing, to improve the generalization of all the tasks. | + positive transfer – negative transfer – task boundaries – off-line learning | ( Caruana, 1997 ) ( Zhang and Yang, 2017 ) ( Ruder, 2017 ) ( McCann et al., 2018 ) ( Stickland and Murray, 2019 ) ( Phang et al., 2020 )\n[E30] (Paper 21 on paper) We study paper and related problems. We study paper and related problems. We study paper and related problems.\n[E14] (Neural Storage: A New Paradigm of Elastic Memory) In this paper, we introduce Neural Storage (NS), a brain-inspired learning memory paradigm that organizes the memory as a flexible neural memory network.\n[E15] (New Challenges in Reinforcement Learning: A Survey of Security and Privacy) Another survey paper [ 14 ] conducted a literature review on securing IoT devices using reinforcement learning.\n[E16] (A Survey on Federated Recommendation Systems) Therefore, combining federated learning with recommendation systems becomes a promising solution for privacy-preserving recommendation systems. In this paper, we term it federated recommendation system (FedRS).\n[E17] (A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal) This survey discusses the challenges faced by crowd counting systems and focuses on developing a more robust crowd counting methodology. However, this survey is a short paper. The network design discussion misses some important recent approaches such as DM-Count, SASNet. It also lacks unsupervised learning counting approaches.\n[E18] (Sequential Search with Off-Policy Reinforcement Learning) To this end, we propose a highly scalable hybrid learning model that consists of an RNN learning framework leveraging all features in short-term user-item interactions, and an attention model utilizing selected item-only features from long-term interactions.\n[E19] (A Survey on Human Action Recognition) This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.\n[E20] (C2-CRS: Coarse-to-Fine Contrastive Learning for Conversational Recommender System) To effectively leverage multi-type external data, we propose a novel coarse-to-fine contrastive learning framework to improve data semantic fusion for CRS.\n[E21] (On the Control of Attentional Processes in Vision) The key conclusions of this paper are that an executive controller is necessary for human attentional function in vision, and that there is a 'first principles' computational approach to its understanding that is complementary to the previous approaches that focus on modelling or learning from experimental observations directly.\n[E22] (Learning Matching Representations for Individualized Organ Transplantation Allocation) To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance.\n\nReturn JSON only: {\"off_topic\": [<ids of clearly off-topic excerpts>]}"
+  ],
+  "result": {
+   "sections": [
+    {
+     "citations": [
+      {
+       "id": "[1]",
+       "metadata": {
+        "arxiv": null,
+        "doi": null,
+        "paper_key": "ext:53f9277d60c7",
+        "source": "ext",
+        "year": 2022
+       },
+       "snippets": [
+        "We study related and related problems. We study related and related problems. We study related and related problems."
+       ],
+       "title": "Paper 47 on related"
+      },
+      {
+       "id": "[2]",
+       "metadata": {
+        "arxiv": "2101.11769",
+        "doi": null,
+        "paper_key": "kb:arxiv_2101.11769",
+        "source": "kb",
+        "year": 2021
+       },
+       "snippets": [
+        "To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance."
+       ],
+       "title": "Learning Matching Representations for Individualized Organ Transplantation Allocation"
+      }
+     ],
+     "text": "First claim about the topic. A combined claim [1]. An uncited framing sentence.\n\nA claim with a missing id  and a real one [2]. Repeated id [2].",
+     "title": "Methods for related work"
+    },
+    {
+     "citations": [
+      {
+       "id": "[1]",
+       "metadata": {
+        "arxiv": null,
+        "doi": null,
+        "paper_key": "ext:2351a25c84c1",
+        "source": "ext",
+        "year": 2021
+       },
+       "snippets": [
+        "We study paper and related problems. We study paper and related problems. We study paper and related problems."
+       ],
+       "title": "Paper 59 on paper"
+      },
+      {
+       "id": "[2]",
+       "metadata": {
+        "arxiv": "2102.02240",
+        "doi": null,
+        "paper_key": "kb:arxiv_2102.02240",
+        "source": "kb",
+        "year": 2021
+       },
+       "snippets": [
+        "This paper, therefore, presents a method that determines the XPath of forum posts, eliminating incorrect mergers and splits of the extracted posts that were common in systems from the previous generation."
+       ],
+       "title": "Harvest -- An Open Source Toolkit for Extracting Posts and Post Metadata from Web Forums"
+      }
+     ],
+     "text": "First claim about the topic. A combined claim [1]. An uncited framing sentence.\n\nA claim with a missing id  and a real one [2]. Repeated id [2].",
+     "title": "Limitations of work for"
+    }
+   ],
+   "trace": {
+    "assemble": {
+     "cited": 8,
+     "sentences": 10,
+     "target_refs": 4,
+     "uncited_sentences": 2,
+     "unresolved": 2
+    },
+    "by_src": {
+     "cite": 0,
+     "ext": 17,
+     "kb": 21,
+     "state": 0
+    },
+    "calls": [
+     {
+      "errors": [],
+      "n": 10,
+      "query": "related work for",
+      "section": 0,
+      "src": "kb"
+     },
+     {
+      "errors": [],
+      "n": 0,
+      "query": "related work for",
+      "section": 0,
+      "src": "state"
+     },
+     {
+      "errors": [],
+      "n": 3,
+      "query": "related work for",
+      "section": 0,
+      "src": "ext"
+     },
+     {
+      "errors": [],
+      "n": 10,
+      "query": "for a paper",
+      "section": 0,
+      "src": "kb"
+     },
+     {
+      "errors": [],
+      "n": 0,
+      "query": "for a paper",
+      "section": 0,
+      "src": "state"
+     },
+     {
+      "errors": [],
+      "n": 8,
+      "query": "for a paper",
+      "section": 0,
+      "src": "ext"
+     },
+     {
+      "errors": [],
+      "n": 10,
+      "query": "a paper on",
+      "section": 1,
+      "src": "kb"
+     },
+     {
+      "errors": [],
+      "n": 0,
+      "query": "a paper on",
+      "section": 1,
+      "src": "state"
+     },
+     {
+      "errors": [],
+      "n": 6,
+      "query": "a paper on",
+      "section": 1,
+      "src": "ext"
+     }
+    ],
+    "evidence": [
+     {
+      "eid": "E0",
+      "paper_key": "target:self",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. We propose a reward model. ",
+      "src": "target",
+      "title": "Reward models",
+      "year": null
+     },
+     {
+      "arxiv": "2012.13490",
+      "eid": "E1",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.13490",
+      "record_id": "svy_57182dccda06",
+      "sections": [
+       0
+      ],
+      "snippet": "Recent theoretical work ( Du et al., 2019a ) suggests that perhaps for a class of tree-like MDPs, generalization might even be improbable.",
+      "src": "kb",
+      "title": "Towards Continual Reinforcement Learning: A Review and Perspectives",
+      "year": 2020
+     },
+     {
+      "arxiv": "2012.10147",
+      "eid": "E2",
+      "kind": "domain_snapshot",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.10147",
+      "record_id": "svy_3e303c0997d8",
+      "sections": [
+       0
+      ],
+      "snippet": "Forward models predict how an action affects the world, while inverse models determine the actions that need to be executed to achieve a goal or to obtain a reward. Note that inverse models may be implicitly inferred from the available forward models, but more compact inverse models, which are closely related to habits and motion primitives, certainly foster the proficiency of particular behavioural skills further 6 , 13 , 25 , 105 .",
+      "src": "kb",
+      "title": "Hierarchical principles of embodied reinforcement learning: A review",
+      "year": 2020
+     },
+     {
+      "arxiv": "2301.00188",
+      "eid": "E3",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00188",
+      "record_id": "svy_5a1c568bc701",
+      "sections": [
+       0
+      ],
+      "snippet": "Chen et al. [ 31 ] reviewed the research related to reinforcement learning from the perspective of artificial intelligence security about adversarial attacks and defence.",
+      "src": "kb",
+      "title": "New Challenges in Reinforcement Learning: A Survey of Security and Privacy",
+      "year": 2022
+     },
+     {
+      "arxiv": "2301.00265",
+      "eid": "E4",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00265",
+      "record_id": "svy_96f98878dca1",
+      "sections": [
+       0
+      ],
+      "snippet": "In addition, their work does not cover commonly used datasets in this research field.",
+      "src": "kb",
+      "title": "Source-Free Unsupervised Domain Adaptation: A Survey",
+      "year": 2022
+     },
+     {
+      "arxiv": "2012.15685",
+      "eid": "E5",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.15685",
+      "record_id": "svy_06f57d83e2ca",
+      "sections": [
+       0
+      ],
+      "snippet": "The work [ 158 ] surveys on CNN-based approach for a single image, but it only roughly discussed the recent advances on CNN-based methods. It has not discussed the advanced convolutional operations and attention-based model, loss function, and supervisory signal, and only up to the year 2017.",
+      "src": "kb",
+      "title": "A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal",
+      "year": 2020
+     },
+     {
+      "arxiv": "2301.00189",
+      "eid": "E6",
+      "kind": "domain_snapshot",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00189",
+      "record_id": "svy_e5efd4b5f404",
+      "sections": [
+       0
+      ],
+      "snippet": "In the reviewed research this type of question is addressed by: exposing typical and atypical images related to a concept ( Chen et al. 2020 ; Lucieri et al. 2020 ) , relate a decision to one of a number of predefined disentangled concepts ( Chen et al. 2020 ) or building simplified models over the decision logic ( Elshawi, Sherif, and Sakr 2021 ; Rabold, Schwalbe, and Schmid 2020 ) .",
+      "src": "kb",
+      "title": "Mapping Knowledge Representations to Concepts: A Review and New Perspectives",
+      "year": 2022
+     },
+     {
+      "arxiv": "2301.00189",
+      "eid": "E7",
+      "kind": "domain_snapshot",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00189",
+      "record_id": "svy_9b0608bd0a62",
+      "sections": [
+       0
+      ],
+      "snippet": "Related to popular explainability methods: six of the nine papers mention CAV ( Kim et al. 2018 ) , five mentions Grad-CAM ( Selvaraju et al. 2017 ) , one LIME ( Ribeiro, Singh, and Guestrin 2016 ) and not any mentions SHAP ( Lundberg and Lee 2016 ) .",
+      "src": "kb",
+      "title": "Mapping Knowledge Representations to Concepts: A Review and New Perspectives",
+      "year": 2022
+     },
+     {
+      "arxiv": "2012.13490",
+      "eid": "E8",
+      "kind": "lineage",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.13490",
+      "record_id": "svy_b5d3a185518d",
+      "sections": [
+       0
+      ],
+      "snippet": "Domain randomization is a related approach that deals with a transfer type of setting. The goal here is to be able to generalize learning from source domains to target domains.",
+      "src": "kb",
+      "title": "Towards Continual Reinforcement Learning: A Review and Perspectives",
+      "year": 2020
+     },
+     {
+      "arxiv": "2012.15442",
+      "eid": "E9",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.15442",
+      "record_id": "svy_087e7209c898",
+      "sections": [
+       0
+      ],
+      "snippet": "A 3D CNN and its related methods inherit the advantages of CNNs and can be used to easily extract the characteristics of images and the algorithms introduced by serial information.",
+      "src": "kb",
+      "title": "Survey of the Detection and Classification of Pulmonary Lesions via CT and X-Ray",
+      "year": 2020
+     },
+     {
+      "arxiv": "2012.09823",
+      "eid": "E10",
+      "kind": "domain_snapshot",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.09823",
+      "record_id": "svy_69bf77436baf",
+      "sections": [
+       0
+      ],
+      "snippet": "Multi-task learning | Learning multiple related tasks jointly, using parameter sharing, to improve the generalization of all the tasks. | + positive transfer – negative transfer – task boundaries – off-line learning | ( Caruana, 1997 ) ( Zhang and Yang, 2017 ) ( Ruder, 2017 ) ( McCann et al., 2018 ) ( Stickland and Murray, 2019 ) ( Phang et al., 2020 )",
+      "src": "kb",
+      "title": "Continual Lifelong Learning in Natural Language Processing: A Survey",
+      "year": 2020
+     },
+     {
+      "doi": null,
+      "eid": "E11",
+      "paper_key": "ext:53f9277d60c7",
+      "sections": [
+       0
+      ],
+      "snippet": "We study related and related problems. We study related and related problems. We study related and related problems.",
+      "src": "ext",
+      "title": "Paper 47 on related",
+      "year": 2022
+     },
+     {
+      "doi": null,
+      "eid": "E12",
+      "paper_key": "ext:5b93d88c35ee",
+      "sections": [
+       0
+      ],
+      "snippet": "We study related and related problems. We study related and related problems. We study related and related problems.",
+      "src": "ext",
+      "title": "Paper 9 on related",
+      "year": 2022
+     },
+     {
+      "doi": null,
+      "eid": "E13",
+      "paper_key": "ext:36e91a84d07f",
+      "sections": [
+       0
+      ],
+      "snippet": "We study work and related problems. We study work and related problems. We study work and related problems.",
+      "src": "ext",
+      "title": "Paper 2 on work",
+      "year": 2020
+     },
+     {
+      "arxiv": "2101.02729",
+      "eid": "E14",
+      "kind": "method",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2101.02729",
+      "record_id": "coarse:0d96006fa3d6",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "In this paper, we introduce Neural Storage (NS), a brain-inspired learning memory paradigm that organizes the memory as a flexible neural memory network.",
+      "src": "kb",
+      "title": "Neural Storage: A New Paradigm of Elastic Memory",
+      "year": 2021
+     },
+     {
+      "arxiv": "2301.00188",
+      "eid": "E15",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00188",
+      "record_id": "svy_35ce455444eb",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "Another survey paper [ 14 ] conducted a literature review on securing IoT devices using reinforcement learning.",
+      "src": "kb",
+      "title": "New Challenges in Reinforcement Learning: A Survey of Security and Privacy",
+      "year": 2022
+     },
+     {
+      "arxiv": "2301.00767",
+      "eid": "E16",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.00767",
+      "record_id": "svy_b57357ead1de",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "Therefore, combining federated learning with recommendation systems becomes a promising solution for privacy-preserving recommendation systems. In this paper, we term it federated recommendation system (FedRS).",
+      "src": "kb",
+      "title": "A Survey on Federated Recommendation Systems",
+      "year": 2022
+     },
+     {
+      "arxiv": "2012.15685",
+      "eid": "E17",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.15685",
+      "record_id": "svy_7f8875c83c2c",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "This survey discusses the challenges faced by crowd counting systems and focuses on developing a more robust crowd counting methodology. However, this survey is a short paper. The network design discussion misses some important recent approaches such as DM-Count, SASNet. It also lacks unsupervised learning counting approaches.",
+      "src": "kb",
+      "title": "A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal",
+      "year": 2020
+     },
+     {
+      "arxiv": "2202.00245",
+      "eid": "E18",
+      "kind": "method",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2202.00245",
+      "record_id": "coarse:120cc08ee47b",
+      "sections": [
+       0
+      ],
+      "snippet": "To this end, we propose a highly scalable hybrid learning model that consists of an RNN learning framework leveraging all features in short-term user-item interactions, and an attention model utilizing selected item-only features from long-term interactions.",
+      "src": "kb",
+      "title": "Sequential Search with Off-Policy Reinforcement Learning",
+      "year": 2022
+     },
+     {
+      "arxiv": "2301.06082",
+      "eid": "E19",
+      "kind": "domain_snapshot",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2301.06082",
+      "record_id": "svy_3bb0d4288eaf",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "This paper mainly focuses on the two mainstream single modality behavior recognition, which are based on RGB data and 3D skeleton data, respectively.",
+      "src": "kb",
+      "title": "A Survey on Human Action Recognition",
+      "year": 2022
+     },
+     {
+      "arxiv": "2201.02732",
+      "eid": "E20",
+      "kind": "method",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2201.02732",
+      "record_id": "coarse:1623f6207d74",
+      "sections": [
+       0
+      ],
+      "snippet": "To effectively leverage multi-type external data, we propose a novel coarse-to-fine contrastive learning framework to improve data semantic fusion for CRS.",
+      "src": "kb",
+      "title": "C2-CRS: Coarse-to-Fine Contrastive Learning for Conversational Recommender System",
+      "year": 2022
+     },
+     {
+      "arxiv": "2101.01533",
+      "eid": "E21",
+      "kind": "finding",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2101.01533",
+      "record_id": "coarse:ece0160a2669",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "The key conclusions of this paper are that an executive controller is necessary for human attentional function in vision, and that there is a 'first principles' computational approach to its understanding that is complementary to the previous approaches that focus on modelling or learning from experimental observations directly.",
+      "src": "kb",
+      "title": "On the Control of Attentional Processes in Vision",
+      "year": 2021
+     },
+     {
+      "arxiv": "2101.11769",
+      "eid": "E22",
+      "kind": "method",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2101.11769",
+      "record_id": "coarse:a13aaf546a87",
+      "sections": [
+       0,
+       1
+      ],
+      "snippet": "To address these problems, we propose a model based on representation learning to predict donor-recipient compatibility; our model learns representations that cluster donor features, and applies donor-invariant transformations to recipient features to predict outcomes for a given donor-recipient feature instance.",
+      "src": "kb",
+      "title": "Learning Matching Representations for Individualized Organ Transplantation Allocation",
+      "year": 2021
+     },
+     {
+      "doi": null,
+      "eid": "E23",
+      "paper_key": "ext:7e528fc54b05",
+      "sections": [
+       0
+      ],
+      "snippet": "We study for and related problems. We study for and related problems. We study for and related problems.",
+      "src": "ext",
+      "title": "Paper 85 on for",
+      "year": 2020
+     },
+     {
+      "doi": null,
+      "eid": "E24",
+      "paper_key": "ext:fb3dc70308ab",
+      "sections": [
+       0
+      ],
+      "snippet": "We study a and related problems. We study a and related problems. We study a and related problems.",
+      "src": "ext",
+      "title": "Paper 45 on a",
+      "year": 2019
+     },
+     {
+      "doi": null,
+      "eid": "E25",
+      "paper_key": "ext:81e295415b6d",
+      "sections": [
+       0
+      ],
+      "snippet": "We study paper and related problems. We study paper and related problems. We study paper and related problems.",
+      "src": "ext",
+      "title": "Paper 11 on paper",
+      "year": 2018
+     },
+     {
+      "doi": null,
+      "eid": "E26",
+      "paper_key": "ext:464735a48486",
+      "sections": [
+       0
+      ],
+      "snippet": "We study for and related problems. We study for and related problems. We study for and related problems.",
+      "src": "ext",
+      "title": "Paper 27 on for",
+      "year": 2022
+     },
+     {
+      "doi": null,
+      "eid": "E27",
+      "paper_key": "ext:1f9a9f569e26",
+      "sections": [
+       0
+      ],
+      "snippet": "We study a and related problems. We study a and related problems. We study a and related problems.",
+      "src": "ext",
+      "title": "Paper 6 on a",
+      "year": 2020
+     },
+     {
+      "doi": null,
+      "eid": "E28",
+      "paper_key": "ext:d1a8f9f652b0",
+      "sections": [
+       0
+      ],
+      "snippet": "We study for and related problems. We study for and related problems. We study for and related problems.",
+      "src": "ext",
+      "title": "Paper 49 on for",
+      "year": 2020
+     },
+     {
+      "doi": null,
+      "eid": "E29",
+      "paper_key": "ext:d57fcf0debb0",
+      "sections": [
+       0
+      ],
+      "snippet": "We study a and related problems. We study a and related problems. We study a and related problems.",
+      "src": "ext",
+      "title": "Paper 85 on a",
+      "year": 2019
+     },
+     {
+      "doi": null,
+      "eid": "E30",
+      "paper_key": "ext:38fde9e4bde0",
+      "sections": [
+       0
+      ],
+      "snippet": "We study paper and related problems. We study paper and related problems. We study paper and related problems.",
+      "src": "ext",
+      "title": "Paper 21 on paper",
+      "year": 2018
+     },
+     {
+      "arxiv": "2012.15685",
+      "eid": "E31",
+      "kind": "survey_claim",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2012.15685",
+      "record_id": "svy_862694442e4d",
+      "sections": [
+       1
+      ],
+      "snippet": "This paper focus on elaborating deep learning-based counting methods, which is board-based and mainly focus on the network design considerations without discussing loss functions and supervisory signals.",
+      "src": "kb",
+      "title": "A Survey on Deep Learning-based Single Image Crowd Counting: Network Design, Loss Function and Supervisory Signal",
+      "year": 2020
+     },
+     {
+      "arxiv": "2102.02240",
+      "eid": "E32",
+      "kind": "method",
+      "match": "strong",
+      "paper_key": "kb:arxiv_2102.02240",
+      "record_id": "coarse:8d8b6ad266da",
+      "sections": [
+       1
+      ],
+      "snippet": "This paper, therefore, presents a method that determines the XPath of forum posts, eliminating incorrect mergers and splits of the extracted posts that were common in systems from the previous generation.",
+      "src": "kb",
+      "title": "Harvest -- An Open Source Toolkit for Extracting Posts and Post Metadata from Web Forums",
+      "year": 2021
+     },
+     {
+      "doi": null,
+      "eid": "E33",
+      "paper_key": "ext:2351a25c84c1",
+      "sections": [
+       1
+      ],
+      "snippet": "We study paper and related problems. We study paper and related problems. We study paper and related problems.",
+      "src": "ext",
+      "title": "Paper 59 on paper",
+      "year": 2021
+     },
+     {
+      "doi": null,
+      "eid": "E34",
+      "paper_key": "ext:3e76847d96b4",
+      "sections": [
+       1
+      ],
+      "snippet": "We study on and related problems. We study on and related problems. We study on and related problems.",
+      "src": "ext",
+      "title": "Paper 63 on on",
+      "year": 2019
+     },
+     {
+      "doi": null,
+      "eid": "E35",
+      "paper_key": "ext:582fae7d9f67",
+      "sections": [
+       1
+      ],
+      "snippet": "We study a and related problems. We study a and related problems. We study a and related problems.",
+      "src": "ext",
+      "title": "Paper 88 on a",
+      "year": 2018
+     },
+     {
+      "doi": null,
+      "eid": "E36",
+      "paper_key": "ext:d0b0af976ef0",
+      "sections": [
+       1
+      ],
+      "snippet": "We study paper and related problems. We study paper and related problems. We study paper and related problems.",
+      "src": "ext",
+      "title": "Paper 70 on paper",
+      "year": 2018
+     },
+     {
+      "doi": null,
+      "eid": "E37",
+      "paper_key": "ext:9ebb05dfb34f",
+      "sections": [
+       1
+      ],
+      "snippet": "We study a and related problems. We study a and related problems. We study a and related problems.",
+      "src": "ext",
+      "title": "Paper 28 on a",
+      "year": 2022
+     },
+     {
+      "doi": null,
+      "eid": "E38",
+      "paper_key": "ext:a1bc8ffa8a0e",
+      "sections": [
+       1
+      ],
+      "snippet": "We study paper and related problems. We study paper and related problems. We study paper and related problems.",
+      "src": "ext",
+      "title": "Paper 48 on paper",
+      "year": 2021
+     }
+    ],
+    "n_evidence": 38,
+    "plan": [
+     {
+      "goal": "establish the main methods",
+      "queries": [
+       "related work for",
+       "for a paper"
+      ],
+      "title": "Methods for related work"
+     },
+     {
+      "goal": "establish limitations",
+      "queries": [
+       "a paper on"
+      ],
+      "title": "Limitations of work for"
+     }
+    ],
+    "probe": [
+     "Paper 91 on related",
+     "Paper 71 on work",
+     "Paper 77 on a",
+     "Paper 93 on related",
+     "Hierarchical principles of embodied reinforcement learning: A review",
+     "New Challenges in Reinforcement Learning: A Survey of Security and Privacy",
+     "Sequential Search with Off-Policy Reinforcement Learning",
+     "Towards Continual Reinforcement Learning: A Review and Perspectives",
+     "Deep Unified Representation for Heterogeneous Recommendation",
+     "A Survey on Human Action Recognition",
+     "Learning to Emphasize: Dataset and Shared Task Models for Selecting Emphasis in Presentation Slides",
+     "A Review of Hidden Markov Models and Recurrent Neural Networks for Event Detection and Localization in Biomedical Signals",
+     "Mapping Knowledge Representations to Concepts: A Review and New Perspectives"
+    ],
+    "used_eids": [
+     "E0",
+     "E11",
+     "E22",
+     "E32",
+     "E33",
+     "E9999"
+    ],
+    "words": 54
+   }
+  }
+ }
+}

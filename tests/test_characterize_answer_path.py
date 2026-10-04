@@ -42,9 +42,28 @@ GOLD = json.load(open(FIXDIR / "goldens.json", encoding="utf-8"))
 GOLD_SCORING = json.load(open(FIXDIR / "goldens_scoring.json", encoding="utf-8"))
 
 
+INTENDED = json.load(open(FIXDIR / "goldens_intended.json", encoding="utf-8"))
+
+
 @pytest.mark.parametrize("key", sorted(GOLD))
 def test_answer_path_matches_golden(answer_path, key):
+    """Pre-move goldens, except entries changed on purpose (tests/fixtures/characterize/intended_changes.py)."""
+    if key == "answer":
+        for name, v in GOLD["answer"].items():
+            want = INTENDED.get(f"answer.{name}", v)
+            assert C.canon(answer_path["answer"][name]) == C.canon(want), name
+        return
     assert C.canon(answer_path[key]) == C.canon(GOLD[key])
+
+
+def test_intended_change_w1_12_only_drops_post_cutoff_kb_evidence():
+    old = GOLD["answer"]["task_context_cutoff"]["result"]["trace"]["evidence"]
+    new = INTENDED["answer.task_context_cutoff"]["result"]["trace"]["evidence"]
+    assert all((e.get("year") or 0) <= 2023 for e in new if e["src"] == "kb")
+    assert any(e["src"] == "kb" and (e.get("year") or 0) >= 2024 for e in old)
+    # external evidence is unaffected by the change (ids may shift because KB rows are fewer)
+    strip = lambda rows: sorted((e["src"], e["paper_key"], e["snippet"]) for e in rows if e["src"] != "kb")  # noqa: E731
+    assert strip(old) == strip(new)
 
 
 @pytest.mark.parametrize("key", sorted(GOLD_SCORING))

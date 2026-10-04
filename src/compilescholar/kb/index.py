@@ -93,10 +93,14 @@ class HybridIndex:
             self._norm_docs()
 
     def search(self, query: str, k: int = 30, kind=None, claim_type=None, paper_id=None,
-               per_paper: int = 3, pool: int = 300, rrf_k: int = 60) -> dict:
+               per_paper: int = 3, pool: int = 300, rrf_k: int = 60, pid_filter=None) -> dict:
+        """pid_filter(paper_id) -> bool: drop records of papers it rejects before ranking (knowledge cutoff, W1-12).
+        None keeps the original behaviour."""
         def ok(i):
             pid, r, _ = self.items[i]
             if paper_id and pid != paper_id:
+                return False
+            if pid_filter is not None and not pid_filter(pid):
                 return False
             if kind and r.get("kind") not in (kind if isinstance(kind, (list, tuple, set)) else (kind,)):
                 return False

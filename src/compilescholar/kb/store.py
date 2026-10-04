@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 
+from ..core import cutoff as _cutoff
 from .index import HybridIndex
 
 _DEFAULT = object()
@@ -32,6 +34,8 @@ class KB:
         self.index = HybridIndex(records, self.papers, embed_fn=embed, doc_vecs=vecs)
         if vecs is not None and len(self.index.items) != vecs.shape[0]:
             raise RuntimeError("record_vecs and records.json differ in order/size — re-embed the KB")
+        self.filtered_by_cutoff = 0
+        self._lock = threading.Lock()
         # field-state view (method families + family-level properties / limitations / comparisons)
         self.families, self._fam_vecs, self._embed = [], None, embed
         sp = os.path.join(kb_dir, "state_merged.json")
@@ -65,6 +69,8 @@ class KB:
                 key = (x["paper_id"], (x.get("quote") or str(x.get("text") or ""))[:120])
                 if key in seen:
                     continue
+                if not self._allowed(x["paper_id"]):
+                    continue
                 seen.add(key)
                 snip = (x.get("quote") or x.get("text") or "").strip()
                 if not snip:
@@ -78,8 +84,23 @@ class KB:
                     break
         return out
 
+    def _allowed(self, pid: str) -> bool:
+        """Knowledge cutoff for KB evidence (W1-12): the paper's year under the same rule as external retrieval.
+        No cutoff set -> everything allowed (identical to the pre-W1-12 behaviour)."""
+        if _cutoff.cutoff() is None:
+            return True
+        m = self.papers.get(pid) or {}
+        ok = _cutoff.allowed(m.get("year"), m.get("date"))
+        if not ok:
+            with self._lock:
+                self.filtered_by_cutoff += 1
+        return ok
+
     def search(self, q: str, k: int = 12) -> list[dict]:
-        res = self.index.search(q, k=k, per_paper=2)
+        if _cutoff.cutoff() is None:
+            res = self.index.search(q, k=k, per_paper=2)
+        else:
+            res = self.index.search(q, k=k, per_paper=2, pid_filter=self._allowed)
         out = []
         for h in res["hits"]:
             r, pid = h["record"], h["paper_id"]
