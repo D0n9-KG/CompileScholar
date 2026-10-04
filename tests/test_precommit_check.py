@@ -17,7 +17,7 @@ spec.loader.exec_module(PC)
 FAKE_SECRET = "abcdefghij" + "klmnopqrstuvwx"
 LITERAL_LINE = ("MINERU" + "_TOKEN = \"sk-" + "TrHhrfvplebi4Tgkyn00\"\n").encode()
 ABS_LINE = ("sys.path.insert(0, r\"" + "C:" + "\\Users\\someone\\proj\\src\")\n").encode()
-ALLOWED_LINE = ("API" + "_KEY = \"" + FAKE_SECRET + "z0\"  # " + "precommit: allow\n").encode()
+ALLOWED_LINE = ("API" + "_KEY = \"" + "zyxwvutsrqponmlkji0" + "\"  # " + "precommit: allow\n").encode()
 
 
 @pytest.fixture()
