@@ -1,50 +1,45 @@
 # CompileScholar
 
-> **命名**：2026-09-20 由 LogicKG 更名而来——系统既不做知识图谱也无 logic 关系，旧名名不副实；新名陈述范式主张（**编译 vs 检索**：把论文理解前置到建库时，与 OpenScholar 的运行时检索路线形成正面对话）。历史档案与旧文档中的 LogicKG 字样均指本仓库。
+Compile a research field into a **field state** — method families with their members, family-level properties and
+limitations, and cross-paper open problems, each backed by verbatim support from several papers — and answer
+literature questions from that state plus open retrieval, citing evidence sentence by sentence.
 
-面向科研智能体的科学文献知识层：LLM 从论文全文抽取**类型化记录**（冻结 schema v1.4，逐字引文锚 + epistemic 标记），编译为四视图（对比矩阵/方法谱系/覆盖地图/方法卡），agent 经 typed tools 访问。当前形态自 2026-09-03 方向定稿（需求驱动知识模型，不做图）；旧形态（Neo4j 图谱工作台/超图 granular_agent/比赛检索系统）全部归档于 `archive/`（磁盘保留，可逆）。
+**Status (2026-10-04):** frozen pre-upgrade system evaluated on CS2 test (ours 0.829 vs SciSpace 0.837, Elicit 0.798,
+same-model Claude Code harness 0.744; `results/`). Upgrade in progress: cross-paper skeleton (citations resolved to
+papers, proposer extraction), the field-state compiler in the answer KB, consensus/contested states, and a
+field-level QA benchmark. Plan: `.research_tmp/docs_decisions/upgrade-1004/UPGRADE-PLAN.md`; pre-registration:
+`.research_tmp/docs_decisions/upgrade-1004/PREREG.md`.
 
-## 导航（三个入口文档）
-
-| 文档 | 回答什么问题 |
-|---|---|
-| [ASSET-STATE.md](ASSET-STATE.md) | 现在有什么：活代码/三套 KB/答题栈/五条工作线状态 |
-| [DIRECTION.md](DIRECTION.md) | 往哪打：现行方向+监控阈值+执行队列（完整推导见 `ccfa-workfiles/idea/logickg-idea-plan-2026-09-17/`） |
-| `.research_tmp/paper_drafts/RESULTS-LEDGER.md` | 权威数字：各考场成绩（唯一可引用口径） |
-
-## 仓库布局
-
-```
-src/kb_compiler/     活管线：records（抽取链+表格/语义/识图通道+注册表）
-                     + views（四视图编译+typed tools）+ verification
-src/kb_infra/        LLM provider 网关（Paratera/CST/LOCAL-vLLM）+ embedding
-src/claim_coverage.py  独立工具
-tests/               65 个活测试（含 import-gate 机器闸：禁触旧栈+schema 冻结守卫）
-archive/             历史形态归档（gitignored，磁盘保留可逆；见 MANIFEST）
-.research_tmp/       全部实验工作区/调研/预注册/判决档（gitignored；见其中 INDEX.md）
-```
-
-## 运行
+## Quick start
 
 ```bash
-python -m pip install -e . --no-deps   # 一次性：让 kb_compiler/kb_infra 全局可导入
-python build.py --list                 # 管线站表 + 新鲜度
-python build.py                        # 跑全管线（产物在即跳过；LLM 站重跑须 --force）
-python build.py postcheck --force      # 单站强制重跑
-python -m pytest tests/ -q             # 需 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 若本地 logfire 插件损坏
+python -m pip install -e ".[eval,dev]"        # Python >= 3.13
+cp .env.example .env                           # fill in endpoints and keys (never committed)
+python -m pytest -q                            # characterization + unit tests, no network
+
+# answer CS2 questions with a config, judge, compare
+compilescholar answer --config configs/bench/cs2_dev_confirm.yaml --run-id cs2-dev-<tag>
+compilescholar judge  --run-id cs2-dev-<tag>            # add --official for the official judge model
+compilescholar verify --run-id cs2-dev-<tag>            # recompute code / input hashes from the run manifest
 ```
 
-- **配置**：`conf/base.yaml`（参数单一事实源，git 追踪）+ `conf/local.yaml`（本机覆盖，gitignored）；LLM 凭据在 `.env`
-- **每次完整跑**落盘 `runs/manifest-*.json`（git sha + config + 每站 hash + check 结果）
+Every run writes `runs/<run_id>/` (config, manifest with code / prompt / input hashes, answers, judge input, scores).
 
-### 历史代号 → 现名（2026-09-22 起，代码表面已退役）
+## Repository map
 
-| 旧代号 | 现名（模块=stage=产物） |
+| Path | What |
 |---|---|
-| slot / 深抽 | `deep_extract` |
-| skeleton / 建卡 | `cards` |
-| F24 表格通道 | `table_extract` phase 1（确定性解析） |
-| F35 表格语义 | `table_extract` phase 2（LLM 语义化） |
-| round2 | `registry_growth` |
+| `src/compilescholar/` | the package: `answer/` (pipeline + prompts), `kb/` (KB + hybrid index), `compile/state/` (field-state compiler), `sources/` (Sciverse, multi-source reference graph), `eval/` (CS2 judge adapter + scoring, DSB, field test, stats), `baselines/` (harness, archived systems, GPT-Researcher adapter), `core/` (config, paths, secrets, cutoff, manifests), `cli.py` |
+| `src/kb_compiler/`, `src/kb_infra/` | KB build pipeline (records, registry, views) used to build the existing KBs; to be folded into `compilescholar.compile` |
+| `configs/` | run configurations (`base.yaml` < `local.yaml` < experiment config < `--set`) |
+| `tests/` | characterization tests (goldens from the pre-move code) and unit tests |
+| `results/` | frozen runs behind reported numbers (compressed, hash-pinned) |
+| `artifacts/MANIFEST.tsv` | sha256 of large data the code depends on (answer KB, untracked intermediates) |
+| `third_party/` | pinned upstream evaluators (asta-bench, deepscholar-bench) and local patches |
+| `legacy/` | superseded code, kept with history; `legacy/INDEX.md` maps every reported number to a tag + entry point |
+| `docs/` | `ARCHITECTURE.md`, `EXPERIMENTS.md`, `RESULTS.md`, `DECISIONS.md` |
+| `.research_tmp/` | working area: experiment data, KBs, decision records, paper drafts (mostly untracked data) |
 
-旧文档/判决档中的代号按此表阅读。
+## Reproducing reported numbers
+
+See `docs/RESULTS.md`: every number lists the run, the tag that produced it and how to recompute it.

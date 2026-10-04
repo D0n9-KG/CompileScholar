@@ -29,25 +29,7 @@ progress.md
 findings.md
 .superpowers/
 
-# Docs (track formal docs only, ignore ad-hoc notes by default)
-docs/*
-!docs/
-!docs/neo4j-setup.md
-!docs/dataset-design/
-!docs/paper/
-!PROGRESS.md
-!docs/superpowers/
-!docs/superpowers/**
-!docs/plans/
-!docs/plans/**
-!docs/migrations/
-!docs/migrations/**
-!docs/benchmarks/
-!docs/benchmarks/**
-!docs/runbooks/
-!docs/runbooks/**
-!docs/releases/
-!docs/releases/**
+# Docs: everything under docs/ is tracked (10-04: the old docs/* + whitelist rule silently ignored new docs)
 
 # Node / Frontend
 node_modules/
@@ -131,7 +113,7 @@ _spar_tmp/
 _pasa_tmp/
 
 # Contest archive (deliverables kept on disk, out of active version control)
-archive/
+/archive/
 
 # Local agent/skill configs (machine-local, not project code)
 .agents/
