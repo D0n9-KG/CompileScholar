@@ -17,8 +17,10 @@ PLAN = _load("plan")
 PROBE_BLOCK = _load("probe_block")
 WRITE = _load("write")
 SCREEN = _load("screen")
+FIELD_BLOCK = _load("field_block")   # literature-layer mode only; the legacy path never reads it
 
 
 def hashes() -> dict[str, str]:
     return {n: hashlib.sha256(s.encode("utf-8")).hexdigest() for n, s in
-            (("plan", PLAN), ("probe_block", PROBE_BLOCK), ("write", WRITE), ("screen", SCREEN))}
+            (("plan", PLAN), ("probe_block", PROBE_BLOCK), ("write", WRITE), ("screen", SCREEN),
+             ("field_block", FIELD_BLOCK))}

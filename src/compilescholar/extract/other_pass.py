@@ -9,9 +9,13 @@ up to BATCH pairs per LLM call. One output per (sentence, cited entry) pair:
   facet      what kind of content `about` carries (schema.FACETS)
   category   the class / family the sentence puts the cited work in (None if none)
   limitation the cited work's weakness the sentence states (None if none)
+  name       the name the sentence uses for the cited work (alias evidence for method identity)
+  outcome    for comparison sentences: citing_better | cited_better | mixed (qualitative comparison graph; no numbers)
+  builds_on  another work in the same sentence the cited work extends / improves / ... (third-party lineage claim)
 Validation is deterministic: closed vocabularies; `about`, `category`, `limitation` must be lexically supported by
-the sentence (>= SUPPORT of their content words occur in it); otherwise the field is dropped (the pair is kept with
-its function/relation). The quote of every statement is the citation sentence itself, verbatim from L1."""
+the sentence (>= SUPPORT of their content words occur in it); `name` and `builds_on` must occur literally in it;
+`outcome` needs comparative wording in it; otherwise the field is dropped (the pair is kept with its
+function/relation). The quote of every statement is the citation sentence itself, verbatim from L1."""
 from __future__ import annotations
 
 import hashlib
@@ -19,7 +23,7 @@ import re
 
 from ..llm.client import call_local
 from ..llm.jsonparse import parse_json_response
-from .schema import FACETS, FUNCTIONS, OTHER_RELATIONS, Statement
+from .schema import FACETS, FUNCTIONS, LINEAGE, OTHER_RELATIONS, Statement
 
 BATCH = 24
 SUPPORT = 0.6
@@ -41,9 +45,17 @@ For every pair return an object with:
 - "category": the class or family of methods the sentence puts the cited work in, in the sentence's words (e.g.
   "parameter-efficient fine-tuning methods"); null if none
 - "limitation": the weakness or shortcoming of the cited work that the sentence states; null if none
+- "name": the name the sentence uses for the cited work's method, model, dataset or benchmark (e.g. "LoRA"); null if the
+  sentence does not name it
+- "outcome": only when the sentence compares results: "citing_better" (the citing paper's work does better than the
+  cited work), "cited_better", "mixed"; otherwise null
+- "builds_on": the name of ANOTHER work in the same sentence that the sentence says the cited work extends, improves,
+  replaces, adapts or combines (e.g. sentence "FastGF [2] improves GraphFormer [1]" for cited work [2] -> "GraphFormer");
+  null if none
+- "builds_on_relation": extends | improves | replaces | adapts | combines, when builds_on is given; else null
 
 Return JSON only: {{"pairs": [{{"id": 1, "function": "...", "relation": "...", "about": "...", "facet": "...",
-"category": null, "limitation": null}}]}}"""
+"category": null, "limitation": null, "name": null, "outcome": null, "builds_on": null, "builds_on_relation": null}}]}}"""
 
 PROMPT_SHA = hashlib.sha256(PROMPT.encode()).hexdigest()[:16]
 STOP = set("a an the of in on for to and or with by from as is are was were be been this that these those it its "
@@ -69,7 +81,7 @@ def _pairs_block(items: list[dict]) -> str:
 
 def run_batch(citing: str, date: str, items: list[dict], chat=call_local) -> tuple[list[Statement], dict]:
     """items: [{sentence_id, sentence, cited, title, raw, group}] -> statements (one per pair that parsed) + stats."""
-    raw = chat(PROMPT.format(date=date, pairs=_pairs_block(items)), model=MODEL, max_tokens=180 * len(items) + 200,
+    raw = chat(PROMPT.format(date=date, pairs=_pairs_block(items)), model=MODEL, max_tokens=230 * len(items) + 200,
                temperature=0.0, enable_thinking=False)
     obj = parse_json_response(raw or "")
     got = {}
@@ -90,6 +102,12 @@ def run_batch(citing: str, date: str, items: list[dict], chat=call_local) -> tup
             about, st["dropped_about"] = None, st["dropped_about"] + 1
         cat = o.get("category") if isinstance(o.get("category"), str) and supported(o.get("category"), it["sentence"]) else None
         lim = o.get("limitation") if isinstance(o.get("limitation"), str) and supported(o.get("limitation"), it["sentence"]) else None
+        name = _literal(o.get("name"), it["sentence"])
+        outcome = o.get("outcome") if o.get("outcome") in OUTCOMES else None
+        if outcome and not COMPARE_WORDS.search(it["sentence"]):
+            outcome = None  # an outcome needs comparative wording in the sentence itself
+        bo = _literal(o.get("builds_on"), it["sentence"])
+        bo_rel = o.get("builds_on_relation") if bo and o.get("builds_on_relation") in LINEAGE else None
         facet = facet if facet in FACETS else ("limitation" if lim else "categorization" if cat else "contribution")
         if lim and facet != "limitation":
             out.append(Statement(speaker=citing, date=date, kind="other", about=it["cited"], role=rel,
@@ -99,6 +117,20 @@ def run_batch(citing: str, date: str, items: list[dict], chat=call_local) -> tup
                              text=about or lim or cat or "(cited without description)", quote=it["sentence"],
                              group=tuple(it["group"]), function=fn,
                              meta={"sentence_id": it["sentence_id"], "category": cat, "limitation": lim,
-                                   "described": bool(about)}))
+                                   "described": bool(about), "name": name, "outcome": outcome,
+                                   "builds_on": bo if bo_rel else None, "builds_on_relation": bo_rel}))
         st["parsed"] += 1
     return out, st
+
+
+OUTCOMES = ("citing_better", "cited_better", "mixed")
+COMPARE_WORDS = re.compile(r"(?i)\b(outperform\w*|better|worse|superior|inferior|surpass\w*|beat\w*|exceed\w*|"
+                           r"improv\w*|higher|lower|comparable|competitive|on par|gains?|drops?)\b")
+
+
+def _literal(val, sentence: str) -> str | None:
+    """A name field is kept only if it occurs literally (case-insensitive) in the sentence."""
+    if not isinstance(val, str):
+        return None
+    v = " ".join(val.split()).strip(" .,;:")
+    return v if 2 <= len(v) <= 80 and v.lower() in " ".join(sentence.split()).lower() else None

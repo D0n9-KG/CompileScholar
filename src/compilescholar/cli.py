@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """compilescholar command line.
 
+  compilescholar build  status | all | papers | documents | citations | extract | index   (literature layer)
   compilescholar answer --config configs/bench/cs2_dev_confirm.yaml --run-id cs2-dev-vnext-20261005-x [--set k=v ...]
+                        (--set answer.mode=lit answers through the literature-layer tools)
   compilescholar judge  --run-id <id> [--legacy]
   compilescholar score  --split test --ref runs/<a>/scores.json,runs/<b>/scores.json --others harness=<file> ...
   compilescholar verify --run-id <id>
@@ -66,16 +68,27 @@ def cmd_answer(a):
     done = {r["qid"]: r for r in json.load(open(ans_p, encoding="utf-8"))} if ans_p.exists() else {}
     if a.retry_errors:
         done = {k: v for k, v in done.items() if not v.get("error")}
-    kb = AP.KB(str(kbp)) if kbp else None
+    lit = cfg.answer.mode == "lit"
+    if lit:
+        from .dfc import store as _st
+        for s in ("papers", "documents", "citations", "extract", "index"):
+            inputs[f"dfc/{s}.manifest"] = _st.root() / "manifests" / f"{s}.json"
+        _st.require_fresh("papers", "documents", "citations", "extract", "index")
+        M.write(rd, M.build(a.run_id, cfg.to_dict(), inputs))
+    kb = AP.KB(str(kbp)) if kbp and not lit else None
     todo = [q for q in qs if q["qid"] not in done]
-    print(f"[answer] {a.run_id}: {len(todo)} to answer, {len(done)} done", flush=True)
+    print(f"[answer] {a.run_id}: {len(todo)} to answer, {len(done)} done (mode={cfg.answer.mode})", flush=True)
 
     def one(q):
         t = time.time()
         try:
-            r = AP.answer(q["question"], kb, use_ext=cfg.answer.ext, use_cite=cfg.answer.cite,
-                          use_screen=cfg.answer.screen, use_state=cfg.answer.state, use_probe=cfg.answer.probe,
-                          word_budget=cfg.answer.word_budget, cutoff=cfg.answer.cutoff)
+            if lit:
+                r = AP.answer_lit(q["question"], cutoff=cfg.answer.cutoff, use_screen=cfg.answer.screen,
+                                  word_budget=cfg.answer.word_budget)
+            else:
+                r = AP.answer(q["question"], kb, use_ext=cfg.answer.ext, use_cite=cfg.answer.cite,
+                              use_screen=cfg.answer.screen, use_state=cfg.answer.state, use_probe=cfg.answer.probe,
+                              word_budget=cfg.answer.word_budget, cutoff=cfg.answer.cutoff)
             r.update(q)
         except Exception as e:
             r = {**q, "sections": [], "error": f"{type(e).__name__}: {str(e)[:300]}"}
@@ -128,9 +141,50 @@ def cmd_verify(a):
     raise SystemExit(0 if r["ok"] else 1)
 
 
+def cmd_build(a):
+    """Build one stage of the literature layer (or report the status of every stage). Each stage refuses to run on a
+    stale upstream, so stages are built in order; `all` builds every stale stage in order."""
+    from .dfc import store
+    if a.stage == "status":
+        for s in store.STAGES:
+            st = store.status(s) if s != "cognition" else {"built": None, "stale": None, "why": ["computed on read"]}
+            m = store.read_manifest(s) or {}
+            print(f"{s:10s} built={st['built']} stale={st['stale']} counts={m.get('counts')} why={st['why']}")
+        return
+    order = ("papers", "documents", "citations", "extract", "index")
+    todo = [s for s in order if a.stage == "all" and store.status(s)["stale"]] if a.stage == "all" else [a.stage]
+    for s in todo:
+        print(f"[build] {s}", flush=True)
+        if s == "papers":
+            from .corpus import papers
+            print(json.dumps(papers.build()))
+        elif s == "documents":
+            from .documents import build as B
+            print(json.dumps(B.build()))
+        elif s == "citations":
+            from .citations import build as B
+            print(json.dumps(B.build()))
+        elif s == "extract":
+            from .extract import build as B
+            cats = tuple(a.categories.split(","))
+            print(json.dumps(B.build(categories=cats, since=a.since, n_deep=a.n_deep, workers=a.workers)))
+        elif s == "index":
+            from .index import build as B
+            print(json.dumps(B.build(dense=tuple(x for x in a.dense.split(",") if x))))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="compilescholar")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("build", help="build a literature-layer stage: status | all | papers | documents | citations | "
+                                     "extract | index")
+    p.add_argument("stage", choices=["status", "all", "papers", "documents", "citations", "extract", "index"])
+    p.add_argument("--categories", default="cs.LG", help="extract: primary categories in scope, comma-separated")
+    p.add_argument("--since", default="2018-01-01", help="extract: first v1 date in scope")
+    p.add_argument("--n-deep", type=int, default=500, help="extract: number of T2 (full-text) papers")
+    p.add_argument("--workers", type=int, default=48)
+    p.add_argument("--dense", default="papers,statements", help="index: which indexes get dense vectors")
+    p.set_defaults(fn=cmd_build)
     p = sub.add_parser("answer")
     p.add_argument("--config")
     p.add_argument("--run-id", required=True)

@@ -88,10 +88,15 @@ def env(tmp_path, monkeypatch):
         for i, block in zip(blocks[0::2], blocks[1::2]):
             i = int(i)
             comp = "standard component" in block
-            pairs.append({"id": i, "function": "tool" if comp else "background", "relation": "uses" if comp else "background",
+            base = "strong baselines" in block
+            fn = "tool" if comp else "baseline" if base else "background"
+            pairs.append({"id": i, "function": fn, "relation": "uses" if comp else "compares" if base else "background",
                           "about": "applies attention to graphs" if "applies attention" in block else None,
                           "facet": "method", "category": "graph transformers" if "graph transformers" in block else None,
-                          "limitation": "slow on large graphs" if "slow on large graphs" in block else None})
+                          "limitation": "slow on large graphs" if "slow on large graphs" in block else None,
+                          "name": "GraphFormer" if "GraphFormer" in block.split("sentence:")[-1] and
+                                  "Attention is all you need" in block else None,
+                          "outcome": None, "builds_on": None, "builds_on_relation": None})
         return json.dumps({"pairs": pairs})
     monkeypatch.setattr(S, "call_local", fake_self)
     monkeypatch.setattr(O, "call_local", fake_other)
@@ -100,6 +105,12 @@ def env(tmp_path, monkeypatch):
     DB.build()
     CB.build()
     EB.build(categories=("cs.LG",), since="2018-01-01", n_deep=2, workers=2)
+    from compilescholar.index import build as IB
+    importlib.reload(IB)
+    IB.build()
+    from compilescholar.tools import api
+    importlib.reload(api)
+    api.set_index(IB.Index(embed=None))          # BM25-only in tests
     return store
 
 
@@ -130,10 +141,72 @@ def test_as_of_monotone_and_ids(env):
     assert {s["id"] for s in early.statements()} <= {s["id"] for s in late.statements()}
     assert "slow on large graphs" in [x["text"] for x in l["limitations"]]
     assert AsOf("2020-06-30").paper("2101.00002") is None                  # not yet published
-    api._Index._inst = None
     for b in api.closest_prior("graph attention transformers", "2021-06-30"):
         assert b["id"].startswith("stub:") or AsOf("2021-06-30").visible(b["id"])
         assert b["id"] != "paper:2201.00003"
+
+
+def _ids(x):
+    """Every 'paper:...' id anywhere in a tool result."""
+    if isinstance(x, dict):
+        return [i for v in x.values() for i in _ids(v)]
+    if isinstance(x, list):
+        return [i for v in x for i in _ids(v)]
+    return [x] if isinstance(x, str) and x.startswith("paper:") else []
+
+
+def test_every_tool_respects_as_of(env):
+    from compilescholar.cognition.asof import AsOf
+    from compilescholar.tools import api
+    T = "2021-06-30"
+    view = AsOf(T)
+    calls = {
+        "search_papers": ("graph attention",), "paper_card": ("2001.00001",), "read": ("2001.00001",),
+        "find_evidence": ("attention to graphs",), "field_map": ("graph transformers",),
+        "paper_profile": ("2001.00001",), "closest_prior": ("attention graph model",),
+        "baselines_for": ("graph models",), "open_issues": ("graph transformers",), "frontier": ("graph",),
+        "compared_with": ("2001.00001",), "what_is_missing": ("graph",), "citations_of": ("2001.00001",),
+        "references_of": ("2101.00002",),
+    }
+    assert set(calls) == set(api.TOOLS)
+    for name, args in calls.items():
+        out = api.TOOLS[name](*args, T)
+        for i in _ids(out):
+            assert view.visible(i), (name, i)
+    card = api.paper_card("2101.00002", "2022-12-31")
+    assert card["proposes"] and card["proposes"][0]["name"] == "FastGF"
+    assert api.paper_card("2201.00003", T).get("error")                    # published after T
+    assert api.citations_of("2001.00001", T) == [{"id": "paper:2101.00002", "date": "2021-01-12",
+                                                    "title": "Faster graph transformers"}]
+    late = api.compared_with("2001.00001", "2022-12-31")
+    assert late["n_compared_by"] == 0 or all(r["by"] != "paper:2201.00003" or r["date"] <= "2022-12-31"
+                                             for r in late["rows"])
+
+
+def test_answer_lit_mode_uses_tools_and_verbatim_snippets(env, monkeypatch):
+    from compilescholar.answer import pipeline as AP
+    from compilescholar.tools import api
+
+    def fake_chat(prompt, max_tokens=6000, temperature=0.2):
+        if '"sections"' in prompt:
+            return json.dumps({"sections": [{"title": "Graph transformers", "goal": "what exists",
+                                             "queries": ["graph attention model"]}]})
+        if "off_topic" in prompt:
+            return json.dumps({"off_topic": []})
+        ids = re_ids.findall(prompt)
+        return f"GraphFormer applies attention to graph data [{ids[0]}]." if ids else ""
+    import re as _re
+    re_ids = _re.compile(r"\[(E\d+)\]")
+    monkeypatch.setattr(AP, "chat", fake_chat)
+    r = AP.answer_lit("What graph attention models exist?", cutoff="2021-07", tools=api)
+    assert r["trace"]["as_of"] == "2021-06-30" and r["trace"]["mode"] == "lit"
+    secs = r["sections"]
+    assert secs and secs[0]["citations"]
+    corpus = " ".join(a for _, a in ABS.values()) + " ".join(BODY.values())
+    for c in secs[0]["citations"]:
+        for sn in c["snippets"]:
+            assert " ".join(sn.split()) in " ".join(corpus.split())    # verbatim source text, never system text
+        assert c["title"] != "A benchmark of graph models"                # 2022 paper invisible at 2021-06-30
 
 
 def test_stale_upstream_blocks(env):

@@ -19,9 +19,10 @@ from pathlib import Path
 
 from ..core import paths
 
-STAGES = ("papers", "documents", "citations", "extract", "cognition")
+STAGES = ("papers", "documents", "citations", "extract", "index", "cognition")
 UPSTREAM = {"papers": (), "documents": ("papers",), "citations": ("papers", "documents"),
             "extract": ("papers", "documents", "citations"),
+            "index": ("papers", "documents", "citations", "extract"),
             "cognition": ("papers", "documents", "citations", "extract")}
 SRC = Path(__file__).resolve().parents[1]
 CODE = {
@@ -30,6 +31,7 @@ CODE = {
     "citations": ("citations/markdown.py", "citations/html.py", "citations/resolve.py", "citations/build.py",
                   "compile/skeleton/bib.py", "compile/skeleton/resolve.py"),
     "extract": ("extract/",  "documents/tables.py"),
+    "index": ("index/",),
     "cognition": ("cognition/",),
 }
 

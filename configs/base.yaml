@@ -1,6 +1,7 @@
 # Defaults shared by every run (tracked). Machine-specific values go in configs/local.yaml (gitignored); secrets in .env.
 answer:
   model: Qwen3.8-27B
+  mode: legacy
   kb: true
   ext: true
   cite: false

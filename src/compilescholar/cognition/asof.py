@@ -58,6 +58,21 @@ class AsOf:
             out.append(d)
         return out
 
+    def statements_by_id(self, ids) -> list[dict]:
+        ids = list(ids)
+        if not ids:
+            return []
+        cur = self.ext.execute(f"SELECT * FROM statements WHERE date<=? AND id IN ({','.join('?' * len(ids))})",
+                               [self.T, *ids])
+        cols = [c[0] for c in cur.description]
+        out = []
+        for r in cur.fetchall():
+            d = dict(zip(cols, r))
+            d["group"] = json.loads(d.pop("grp") or "[]")
+            d["meta"] = json.loads(d["meta"] or "{}")
+            out.append(d)
+        return out
+
     # ---- citations
     def cited_by(self, obj: str) -> list[tuple[str, str, int]]:
         """(citing, date, sentence_id) for every citation sentence about obj dated <= T."""

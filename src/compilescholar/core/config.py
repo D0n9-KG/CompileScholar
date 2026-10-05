@@ -21,6 +21,7 @@ from . import paths
 @dataclass(frozen=True)
 class AnswerConfig:
     model: str = "Qwen3.8-27B"
+    mode: str = "legacy"                  # legacy = v9b path over KB v2; lit = literature-layer tools (data/dfc)
     kb: bool = True
     ext: bool = True
     cite: bool = False

@@ -26,7 +26,7 @@ from ..llm.client import call_local
 from ..llm.jsonparse import parse_json_response
 from ..sources import refgraph
 from ..sources.sciverse import SciverseClient
-from .prompts import PLAN, PROBE_BLOCK, SCREEN, WRITE
+from .prompts import FIELD_BLOCK, PLAN, PROBE_BLOCK, SCREEN, WRITE
 
 # Sciverse 30 req/min account quota: queue for a token rather than fire, get 429 and lose the whole external channel
 os.environ.setdefault("SCIVERSE_MAX_WAIT_S", "600")
@@ -163,10 +163,14 @@ class Degradation:
             self.counts[key] += n
 
 
-def plan(question: str, probe_rows: list[dict] | None = None, deg: Degradation | None = None) -> list[dict]:
+def plan(question: str, probe_rows: list[dict] | None = None, deg: Degradation | None = None,
+         extra: str = "") -> list[dict]:
+    """extra: an additional context block appended to the probe block (literature-layer mode passes the field map);
+    empty keeps the prompt byte-identical to the legacy path."""
     pb = ""
     if probe_rows:
         pb = PROBE_BLOCK.format(items="\n".join(f"- {r['title'][:150]}: {r['snippet'][:220]}" for r in probe_rows[:16]))
+    pb += extra
     for t in (0.0, 0.3):
         obj = parse_json_response(chat(PLAN.format(question=question, probe=pb), max_tokens=1500, temperature=t))
         secs = (obj or {}).get("sections") if isinstance(obj, dict) else None
@@ -369,6 +373,97 @@ def assemble(sections: list[dict], texts: list[str], evidence: list[dict]) -> tu
         body = re.sub(r"[ \t]+([.,;:])", r"\1", body)
         out.append({"title": s["title"], "text": body.strip(), "citations": cites})
     return out, stats
+
+
+# ---------------------------------------------------------------- literature-layer mode (L6 tools)
+def as_of_date(cutoff: str | None) -> str:
+    """Pipeline cutoff 'YYYY-MM' (exclusive month, CS2 convention) -> tool as_of 'YYYY-MM-DD' (inclusive, the day
+    before). None -> today (no cutoff)."""
+    import datetime as _dt
+    if not cutoff:
+        return _dt.date.today().isoformat()
+    y, m = (int(x) for x in cutoff[:7].split("-"))
+    return (_dt.date(y, m, 1) - _dt.timedelta(days=1)).isoformat()
+
+
+def field_block(question: str, as_of: str, tools) -> str:
+    fm = tools.field_map(question, as_of)
+    lines = []
+    for f in fm["families"][:6]:
+        name = (f["name_candidates"] or ["(unnamed family)"])[0]
+        mem = "; ".join(f"{m['title'][:80]} ({(m['date'] or '')[:4]})" for m in f["members"][:4] if m.get("title"))
+        facts = "; ".join(f"{x['text'][:120]} [{x['status']}, {x['n_independent']} papers]" for x in f["facts"][:3])
+        lines.append(f"- {name}: {mem}" + (f"\n  field says: {facts}" if facts else ""))
+    return FIELD_BLOCK.format(as_of=as_of, items="\n".join(lines)) if lines else ""
+
+
+def lit_gather(question: str, sections: list[dict], as_of: str, tools, k: int = 8) -> tuple[list[dict], dict]:
+    """Evidence from the literature layer only: for each section query, papers (each with its own contribution and how
+    the field describes it) and sentence-level evidence. Snippets are verbatim quotes (sentences), never system text."""
+    evidence, by_text, trace = [], {}, {"calls": []}
+
+    def add(si, src, r):
+        key = (r["paper_key"], r["snippet"][:160])
+        if key in by_text:
+            by_text[key]["sections"].add(si)
+            return
+        e = {**r, "src": src, "eid": f"E{len(evidence) + 1}", "sections": {si}}
+        by_text[key] = e
+        evidence.append(e)
+
+    for si, s in enumerate(sections):
+        for q in s["queries"]:
+            briefs = tools.search_papers(q, as_of, k)
+            ev = tools.find_evidence(q, as_of, k)
+            trace["calls"].append({"section": si, "src": "lit", "query": q, "n": len(briefs) + len(ev), "errors": []})
+            for b in briefs:
+                if not b.get("title"):
+                    continue
+                card = tools.paper_card(b["id"], as_of)
+                # the paper's own words: its contribution sentences (verbatim quotes), else its abstract
+                quotes = [c["quote"] for c in card.get("contributions") or []][:2]
+                for qt in quotes or [((tools.AsOf(as_of).paper(b["id"][6:]) or {}).get("abstract") or "")[:1200]]:
+                    if qt:
+                        add(si, "lit_self", {"paper_key": b["id"], "title": b["title"],
+                                             "year": (b["date"] or "")[:4] or None, "arxiv": b["id"][6:], "snippet": qt})
+            for x in ev:
+                by = x.get("about") if x["kind"] == "other" else x["by"]
+                if not (by or "").startswith("paper:"):
+                    continue
+                p = tools.paper_card(by, as_of)
+                if p.get("error") or not p.get("title"):
+                    continue
+                add(si, "lit_" + x["kind"], {"paper_key": by, "title": p["title"], "year": (p["date"] or "")[:4] or None,
+                                             "arxiv": by[6:], "snippet": x["quote"]})
+    trace["n_evidence"] = len(evidence)
+    trace["by_src"] = {s: sum(1 for e in evidence if e["src"] == s) for s in ("lit_self", "lit_other", "lit_passage")}
+    return evidence, trace
+
+
+def answer_lit(question: str, cutoff: str | None = None, use_screen: bool = True, word_budget: int | None = None,
+               task_context: dict | None = None, tools=None) -> dict:
+    """The built-in consumer of the literature layer: plan with field_map, gather with the L6 tools, then the same
+    screen / write / assemble as the legacy path. tools defaults to compilescholar.tools.api."""
+    if tools is None:
+        from ..tools import api as tools
+    t0 = time.time()
+    as_of = as_of_date(cutoff)
+    deg = Degradation()
+    probe_rows = [{"title": b["title"], "snippet": b["self"]} for b in tools.search_papers(question, as_of, 10)
+                  if b.get("title")]
+    fb = field_block(question, as_of, tools)
+    sections = plan(question, probe_rows, deg=deg, extra=fb)
+    evidence, trace = lit_gather(question, sections, as_of, tools)
+    if task_context and task_context.get("text"):
+        evidence.insert(0, {"src": "target", "paper_key": "target:self", "title": task_context.get("title") or "this paper",
+                            "year": None, "snippet": task_context["text"][:2000], "eid": "E0",
+                            "sections": set(range(len(sections)))})
+    texts = write_sections(question, sections, evidence, use_screen=use_screen, word_budget=word_budget, deg=deg)
+    out_secs, st = assemble(sections, texts, evidence)
+    return {"sections": out_secs,
+            "trace": {"mode": "lit", "as_of": as_of, "plan": sections, "field_block": fb, **trace, "assemble": st,
+                      "words": sum(len(s["text"].split()) for s in out_secs), "degradation": deg.counts,
+                      "elapsed_s": round(time.time() - t0, 1)}}
 
 
 # ---------------------------------------------------------------- entry
