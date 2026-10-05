@@ -22,7 +22,7 @@ import re
 import sqlite3
 from pathlib import Path
 
-from ..core import paths
+from ..dfc import store
 from ..sources import arxiv_oai
 from ..sources.arxiv_snapshot import norm, snapshot_path
 
@@ -30,7 +30,7 @@ SCOPE_CATS = ("cs.", "stat.ML", "eess.AS", "eess.IV", "eess.SP")
 
 
 def db_path() -> Path:
-    return paths.data() / "corpus" / "papers.sqlite"
+    return store.db_path("papers")
 
 
 def in_scope(categories: list[str]) -> bool:
@@ -119,7 +119,13 @@ def build(path: Path | None = None, log=print) -> dict:
     con.commit()
     total = con.execute("SELECT count(*) FROM papers").fetchone()[0]
     con.close()
-    return {"snapshot_rows": n_snap, "oai_rows": n_oai, "papers": total}
+    windows = sorted(p.name for p in arxiv_oai.out_dir().glob("*.jsonl"))
+    counts = {"snapshot_rows": n_snap, "oai_rows": n_oai, "papers": total}
+    if path is None:
+        store.write_manifest("papers", {"scope": list(SCOPE_CATS), "snapshot": str(snapshot_path()),
+                                        "oai_windows": [windows[0], windows[-1], len(windows)] if windows else []},
+                             counts)
+    return counts
 
 
 class Papers:
