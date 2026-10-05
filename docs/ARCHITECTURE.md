@@ -1,50 +1,69 @@
 # Architecture
 
-## Two phases
+CompileScholar is a literature layer for scientific agents: it finds papers, reads them, retrieves verbatim evidence,
+and — its distinctive part — compiles **diachronic field cognition**: how the field has described each work up to any
+date T (families, lineage, what a work is used as, the limitations the field states, how that changed). Every
+capability is exposed as a tool that takes `as_of`.
 
-**Compile (offline, question-blind).** Papers → typed records with verbatim quotes → field-level objects that no
-single paper states. Two state builders exist:
+Design documents: `.research_tmp/docs_decisions/system-vision-1004/` (DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005,
+NARRATIVE-V9-1005, EVAL-PLAN-1005).
 
-- `kb_compiler` + `.research_tmp/.../base_kb_build` (legacy chain; produced `cs2/base_kb_v2`, the KB behind every
-  reported CS2/DSB number). Its "state" is method families merged from survey taxonomies (`state_merged.json`).
-- `compilescholar.compile.state.field_state` (new): per-paper coarse records → family induction (propose in batches,
-  merge) → family-level properties / limitations with support sets and `n_papers` → area-level open problems.
-  Evaluated so far only on the held-out survey test; wiring it into the answer KB is upgrade step W3.
+## Data flow (one store, one identity, one schema)
 
-**Answer (per question, read-only).** `compilescholar.answer.pipeline.answer()`:
+```
+papers      arXiv metadata, first-version date to the day          data/dfc/papers.sqlite
+documents   full texts -> units (section / paragraph / table / caption)
+citations   citation sentences -> bibliography entries -> paper ids  (zero LLM)
+extract     statements: self pass (T1 abstract, T2 full text + method/experiment call), result pass (tables,
+            deterministic), other pass (what citing sentences say about the cited work)
+index       BM25 (FTS5) + optional dense vectors over papers / passages / statements
+cognition   computed on read through AsOf(T): identity, families, lineage, profiles, facts, shifts, comparisons
+tools       14 tools, all with as_of; MCP server fixes the cutoff server-side
+grow        typed gap diagnosis -> acquisition -> back through the same stages (offline, question-blind)
+```
 
-1. probe — search the question itself (external + KB) to fix the field / sense of the terms;
-2. plan — 2–6 sections derived from the question, 2–3 queries each (`prompts/plan.txt`, `probe_block.txt`);
-3. gather — per query in parallel: KB hybrid retrieval (BM25 + dense, RRF, per-paper cap), field-state channel,
-   Sciverse semantic search (server-side cutoff), optional citation expansion (co-citation over seed references via
-   `sources.refgraph`: OpenAlex batch → S2 → Crossref);
-4. screen — drop clearly off-topic excerpts (`prompts/screen.txt`);
-5. write — each section cites evidence ids sentence by sentence, optional word budget (`prompts/write.txt`);
-6. assemble — deterministic id → citation mapping; snippets are the evidence excerpts.
+- **Identity.** A paper is `paper:<arxiv_id>`; a cited work we cannot resolve is `stub:<normalized title>`. Dates are
+  the arXiv v1 date. Every benchmark adapter maps to this identity.
+- **Statement** (`extract/schema.py`) is the atomic unit: speaker, date, kind (self / other), about, role (one relation
+  vocabulary: extends / improves / replaces / adapts / combines / uses / compares / proposes / background / criticizes /
+  describes), facet, text, verbatim quote. Everything from `cognition` on is a function of statements dated <= T.
+- **Stages** (`dfc/store.py`): one SQLite file per stage under `data/dfc/`, each with a manifest (params, upstream
+  digests, code hashes). A stage refuses to run on a stale upstream; changing upstream data or a stage's code makes
+  everything downstream stale. `compilescholar build status` shows the chain.
 
-## Package layout (`src/compilescholar/`)
+## Extraction tiers (kept from the old system's coarse/deep split)
 
-| Module | Role | Notes |
-|---|---|---|
-| `core/config.py` | layered YAML → typed `RunConfig` | unknown keys rejected |
-| `core/paths.py` | every repo-relative location | `CS_ROOT`/`CS_DATA`/`CS_CACHE`/`CS_RUNS` overrides |
-| `core/secrets.py` | the only `.env` reader | process env wins over `.env` |
-| `core/cutoff.py` | knowledge-cutoff rule shared by every arm | per-thread value for per-question cutoffs |
-| `core/manifest.py` | run manifests, `verify()` | LF-normalised hashes |
-| `llm/` | local server + Paratera clients, embeddings, lenient JSON | TLS verification on; lanes created on first call |
-| `sources/sciverse.py` | external semantic search | cross-process token bucket (30 req/min account limit) |
-| `sources/refgraph.py` | multi-source reference graph | per-source pacing in `~/.pace_<src>.json`; OpenAlex credit guard |
-| `kb/` | KB loader, hybrid index, state channel | |
-| `answer/` | pipeline + prompt files | prompt sha256 in every manifest |
-| `compile/state/` | field-state compiler, coarse extraction | |
-| `eval/cs2/` | official scorers driven directly (`JudgeAdapter`), four-facet scoring | each judge deviation switchable and recorded per row |
-| `eval/dsb.py`, `eval/field.py`, `eval/stats.py` | DSB nuggets, held-out survey test, paired statistics | missing answers score 0 everywhere |
-| `baselines/` | Claude Code harness (runner, MCP server, compat proxy), archived-system adapters, GPT-Researcher adapter | harness isolation: project-only settings, strict MCP config, neutral cwd |
-| `cli.py` | `answer` / `judge` / `score` / `verify` | |
+| Tier | Scope | Input | Cost |
+|---|---|---|---|
+| T0 | every paper | metadata | 0 |
+| T1 | papers in scope (primary category + start date) | title + abstract | one call |
+| T2 | top-n in-scope papers with full text, by in-corpus citation count | abstract + introduction, method + experiment sections, tables | two calls + deterministic tables |
+| other | every in-scope paper that is cited | <= 30 citation sentences, spread over citing months | ~24 pairs per call |
+
+Selection uses corpus statistics only, never benchmark annotations.
+
+## Module map (`src/compilescholar/`)
+
+| Module | Role |
+|---|---|
+| `sources/arxiv_oai.py`, `arxiv_snapshot.py`, `arxiv_html.py` | metadata (OAI-PMH arXivRaw for v1 dates), title index, HTML cache (15 s pacing) |
+| `corpus/papers.py` | papers stage; title resolution |
+| `documents/units.py`, `tables.py`, `build.py` | full-text units; deterministic table parsing (moved from the old table channel) |
+| `citations/markdown.py`, `html.py`, `resolve.py`, `build.py` | citation sentences, entry -> paper |
+| `extract/schema.py`, `self_pass.py`, `result_pass.py`, `other_pass.py`, `build.py` | the one schema and three passes |
+| `index/build.py` | multi-granularity search with as_of |
+| `cognition/*` | AsOf view and the compiled objects |
+| `tools/api.py`, `tools/mcp_server.py` | the tool layer |
+| `answer/pipeline.py` | built-in consumer: `answer_lit` (tools) and the frozen v9b path `answer` |
+| `grow/plan.py` | gap diagnosis and acquisition |
+| `eval/*`, `baselines/*` | benchmarks, judges, comparison systems |
+| `kb/`, `compile/state/` | frozen KB v2 path (v9b record; the "flat retrieval" comparison arm) |
 
 ## Invariants (tested)
 
-- The moved answer path, scoring and components reproduce the pre-move code byte for byte
-  (`tests/test_characterize_*.py`, goldens from tag `cs2-test-v9b-final`).
-- Importing the package does not modify `sys.path` and pulls in no legacy module.
-- A run directory refuses to resume under a different resolved configuration; judge-error rows are never scored as 0.
+- every statement's quote is a substring of its source; result units are valid only inside their own paper (no
+  cross-paper numeric alignment);
+- `as_of` monotone: no tool returns anything dated after `as_of`; the MCP server fixes `as_of` itself;
+- every id a tool returns is a paper visible at `as_of` or a flagged stub;
+- a stage never runs on a stale upstream;
+- the frozen v9b answer path reproduces its goldens byte for byte (`tests/test_characterize_*.py`).
