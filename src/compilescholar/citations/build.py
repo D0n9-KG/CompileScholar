@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Stage `citations` (L1): full text -> citation sentences -> cited paper ids, written to data/dfc/citations.sqlite.
+"""Stage `citations` (L1b): full text -> citation sentences -> cited paper ids, written to data/dfc/citations.sqlite.
 
-Inputs (read here and nowhere downstream):
-  - IdeaForecastBench Markdown (data/external/ideaforecast/*.parquet; arxiv_id, text)
-  - arXiv HTML pages cached under cache/arxiv_html/<id>.html (fetched by sources.arxiv_html, 15 s/request)
-Every citing paper must exist in the papers stage (its v1_date dates every sentence it contributes).
+Input: the `documents` stage (every full text we hold, Markdown or arXiv HTML, keyed by arxiv_id); raw files are not
+read here. Runs over ALL documents — no selection (zero LLM, ~0.02 s/paper; a selection would make the citation
+graph depend on whatever the selection was based on, which is how benchmark gold could leak in).
+Every citing paper exists in the papers stage (its v1_date dates every sentence it contributes).
 
 Tables
   docs(arxiv_id PK, source, style, n_entries, n_sentences, n_resolved)
@@ -17,13 +17,10 @@ Params recorded in the manifest: which sources, which papers (selection), resolv
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
-import pyarrow.parquet as pq
-
-from ..core import paths
 from ..corpus.papers import Papers
 from ..dfc import store
+from ..documents.build import Documents
 from . import html as H
 from . import markdown as M
 from .resolve import EntryResolver
@@ -38,15 +35,6 @@ CREATE TABLE IF NOT EXISTS cites(sentence_id INT, citing TEXT, date TEXT, key TE
 CREATE INDEX IF NOT EXISTS ix_cites_cited ON cites(cited, date);
 CREATE INDEX IF NOT EXISTS ix_cites_citing ON cites(citing);
 """
-
-
-def ideaforecast_dir() -> Path:
-    return paths.data() / "external" / "ideaforecast"
-
-
-def html_cache() -> Path:
-    from ..sources.arxiv_html import cache_dir
-    return cache_dir()
 
 
 def _key(k) -> str:
@@ -81,55 +69,34 @@ def _write_doc(con, papers: Papers, resolver: EntryResolver, aid: str, source: s
     return {"sentences": len(seen), "entries": len(used), "resolved": n_res}
 
 
-def build(selection: set[str] | None = None, sources=("ideaforecast", "html"), log=print) -> dict:
-    """Process every paper in `selection` (None = everything available) from the configured sources; a paper already
-    in `docs` is skipped (resumable). Markdown first; HTML only for papers without usable Markdown."""
-    store.require_fresh("papers")
+def build(log=print, report_every: int = 5000) -> dict:
+    """Every document in the documents stage; a paper already in `docs` is skipped (resumable)."""
+    store.require_fresh("papers", "documents")
     papers = Papers()
     resolver = EntryResolver(papers)
+    documents = Documents()
     con = store.connect("citations")
     con.executescript(DDL)
     done = {r[0] for r in con.execute("SELECT arxiv_id FROM docs")}
-    n = {"docs": 0, "no_bib": 0, "not_in_papers": 0}
-    if "ideaforecast" in sources:
-        for f in sorted(ideaforecast_dir().glob("*.parquet")):
-            for r in pq.read_table(f, columns=["arxiv_id", "text"]).to_pylist():
-                aid = r["arxiv_id"]
-                if aid in done or (selection is not None and aid not in selection):
-                    continue
-                bib, cs = M.citation_sentences(r["text"])
-                if bib is None or not cs:
-                    n["no_bib"] += 1
-                    continue
-                res = _write_doc(con, papers, resolver, aid, "ideaforecast_md", bib, cs)
-                if "skipped" in res:
-                    n["not_in_papers"] += 1
-                    continue
-                done.add(aid)
-                n["docs"] += 1
+    n = {"docs": 0, "no_bib": 0}
+    for i, aid in enumerate(documents.ids()):
+        if aid in done:
+            continue
+        d = documents.get(aid)
+        parsed = H.parse(d["raw"]) if d["source"] == "arxiv_html" else M.citation_sentences(d["raw"])
+        if parsed is None or parsed[0] is None or not parsed[1]:
+            n["no_bib"] += 1
+            continue
+        _write_doc(con, papers, resolver, aid, d["source"], *parsed)
+        n["docs"] += 1
+        if (i + 1) % report_every == 0:
             con.commit()
-            log(f"[citations] {f.name}: {n}")
-    if "html" in sources and html_cache().exists():
-        for p in sorted(html_cache().glob("*.html")):
-            aid = p.stem
-            if aid in done or (selection is not None and aid not in selection):
-                continue
-            parsed = H.parse(p.read_text(encoding="utf-8", errors="replace"))
-            if parsed is None or not parsed[1]:
-                n["no_bib"] += 1
-                continue
-            res = _write_doc(con, papers, resolver, aid, "arxiv_html", *parsed)
-            if "skipped" in res:
-                n["not_in_papers"] += 1
-                continue
-            done.add(aid)
-            n["docs"] += 1
-        con.commit()
+            log(f"[citations] {i + 1} documents: {n}")
+    con.commit()
     counts = {k: con.execute(f"SELECT count(*) FROM {k}").fetchone()[0] for k in ("docs", "entries", "sentences",
                                                                                  "cites")}
     counts["cites_resolved"] = con.execute("SELECT count(*) FROM cites WHERE cited LIKE 'paper:%'").fetchone()[0]
+    counts["no_bib"] = n["no_bib"]
     con.close()
-    store.write_manifest("citations", {"sources": list(sources),
-                                       "selection": None if selection is None else sorted(selection)[:5] +
-                                       [f"... {len(selection)} total"]}, counts)
+    store.write_manifest("citations", {"input": "documents stage, all"}, counts)
     return {**n, **counts}

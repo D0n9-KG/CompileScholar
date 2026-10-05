@@ -19,15 +19,17 @@ from pathlib import Path
 
 from ..core import paths
 
-STAGES = ("papers", "citations", "extract", "cognition")
-UPSTREAM = {"papers": (), "citations": ("papers",), "extract": ("papers", "citations"),
-            "cognition": ("papers", "citations", "extract")}
+STAGES = ("papers", "documents", "citations", "extract", "cognition")
+UPSTREAM = {"papers": (), "documents": ("papers",), "citations": ("papers", "documents"),
+            "extract": ("papers", "documents", "citations"),
+            "cognition": ("papers", "documents", "citations", "extract")}
 SRC = Path(__file__).resolve().parents[1]
 CODE = {
     "papers": ("corpus/papers.py", "sources/arxiv_oai.py", "sources/arxiv_snapshot.py"),
+    "documents": ("documents/units.py", "documents/build.py", "citations/markdown.py", "sources/arxiv_html.py"),
     "citations": ("citations/markdown.py", "citations/html.py", "citations/resolve.py", "citations/build.py",
-                  "compile/skeleton/bib.py", "compile/skeleton/resolve.py", "sources/arxiv_html.py"),
-    "extract": ("extract/schema.py", "extract/self_pass.py", "extract/other_pass.py", "extract/build.py"),
+                  "compile/skeleton/bib.py", "compile/skeleton/resolve.py"),
+    "extract": ("extract/",  "documents/tables.py"),
     "cognition": ("cognition/",),
 }
 

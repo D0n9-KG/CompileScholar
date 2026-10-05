@@ -33,6 +33,9 @@ THIRD_PARTY_WHITELIST = {
     "yaml",
 }
 BANNED_ROOTS = {"granular_agent"}
+# 2026-10-05: modules moved from kb_compiler into the compilescholar package leave a re-export shim at the old path
+# (legacy callers keep working); only these shim files may import compilescholar.
+MOVED_SHIMS = {"src/kb_compiler/records/table_channel.py"}
 
 
 def _import_roots(pyfile: Path):
@@ -52,7 +55,10 @@ def _violations(pkg: str, extra_allowed):
     allowed = STDLIB | extra_allowed | {pkg}
     out = []
     for py in sorted((SRC / pkg).rglob("*.py")):
+        shim = str(py.relative_to(REPO)).replace("\\", "/") in MOVED_SHIMS
         for root in _import_roots(py):
+            if shim and root == "compilescholar":
+                continue
             if root in BANNED_ROOTS or root not in allowed:
                 out.append(f"{py.relative_to(REPO)}: import {root}")
     return out

@@ -11,13 +11,15 @@ import json
 
 import pytest
 
+TAIL = (" Experiments on several standard benchmarks show consistent gains over strong baselines in both accuracy and "
+        "training cost.")
 ABS = {
     "2001.00001": ("Attention is all you need for graphs",
-                   "We propose GraphFormer, a new attention model for graph data. It outperforms message passing."),
+                   "We propose GraphFormer, a new attention model for graph data. It outperforms message passing." + TAIL),
     "2101.00002": ("Faster graph transformers",
-                   "We propose FastGF, a new efficient variant that improves GraphFormer on large graphs."),
+                   "We propose FastGF, a new efficient variant that improves GraphFormer on large graphs." + TAIL),
     "2201.00003": ("A benchmark of graph models",
-                   "We introduce GBench, a new benchmark comparing graph neural networks and graph transformers."),
+                   "We introduce GBench, a new benchmark comparing graph neural networks and graph transformers." + TAIL),
 }
 BODY = {
     "2101.00002": "# Introduction\n\nGraphFormer [1] applies attention to graphs but is slow on large graphs. "
@@ -58,20 +60,24 @@ def env(tmp_path, monkeypatch):
     d.mkdir(parents=True)
     pq.write_table(pa.table({"arxiv_id": list(BODY), "month": ["x"] * 2, "title": ["t"] * 2, "text": list(BODY.values())}),
                    d / "2023-01.parquet")
+    from compilescholar.documents import build as DB
     from compilescholar.citations import build as CB
     from compilescholar.extract import build as EB
     from compilescholar.extract import other_pass as O
     from compilescholar.extract import self_pass as S
-    for m in (CB, EB):
+    for m in (DB, CB, EB):
         importlib.reload(m)
 
     def fake_self(prompt, **k):
+        if "method and experiment sections" in prompt:
+            return json.dumps({"method": [], "findings": [], "limitations": [], "setting": {}})
         for aid, (t, a) in ABS.items():
             if a[:40] in prompt:
                 name = a.split("We propose ")[-1].split(",")[0] if "propose" in a else "GBench"
-                return json.dumps({"contributions": [{"text": a.split(".")[0], "quote": a.split(". ")[0] + "."}],
-                                   "proposes": [{"name": name, "aliases": [], "artefact": "method",
-                                                 "quote": a.split(". ")[0] + "."}],
+                first = a.split(". ")[0].rstrip(".") + "."
+                return json.dumps({"contributions": [{"text": first, "quote": first}],
+                                   "proposes": [{"name": name, "aliases": [], "artefact": "method", "quote": first}],
+                                   "findings": [{"text": s, "quote": s} for s in a.split(". ")[1:2]],
                                    "limitations": [], "setting": {}})
         return "{}"
 
@@ -89,10 +95,11 @@ def env(tmp_path, monkeypatch):
         return json.dumps({"pairs": pairs})
     monkeypatch.setattr(S, "call_local", fake_self)
     monkeypatch.setattr(O, "call_local", fake_other)
-    monkeypatch.setattr(S.run, "__defaults__", (None, fake_self))
+    monkeypatch.setattr(S.run, "__defaults__", (None, fake_self, None))
     monkeypatch.setattr(O.run_batch, "__defaults__", (fake_other,))
+    DB.build()
     CB.build()
-    EB.build({f"paper:{a}" for a in ABS}, workers=2)
+    EB.build(categories=("cs.LG",), since="2018-01-01", n_deep=2, workers=2)
     return store
 
 
@@ -100,11 +107,15 @@ def test_quotes_are_substrings(env):
     con = env.connect("extract", readonly=True)
     cit = env.connect("citations", readonly=True)
     sents = {r[0] for r in cit.execute("SELECT sentence FROM sentences")}
-    for kind, quote, speaker in con.execute("SELECT kind, quote, speaker FROM statements"):
+    rows = list(con.execute("SELECT kind, quote, speaker, facet FROM statements"))
+    assert {k for k, *_ in rows} == {"self", "other"}, list(con.execute("SELECT * FROM done_self"))
+    for kind, quote, speaker, facet in rows:
         if kind == "other":
             assert quote in sents
-        else:
+        elif facet != "setting":
             assert " ".join(quote.split()).lower() in " ".join((ABS[speaker][1] + BODY.get(speaker, "")).split()).lower()
+    tiers = dict(con.execute("SELECT arxiv_id, tier FROM done_self"))
+    assert set(tiers.values()) == {"T1", "T2"}                    # deep tier only for papers with a full text
 
 
 def test_as_of_monotone_and_ids(env):
@@ -126,7 +137,10 @@ def test_as_of_monotone_and_ids(env):
 
 
 def test_stale_upstream_blocks(env):
+    from compilescholar.citations import build as CB
     from compilescholar.extract import build as EB
     env.write_manifest("papers", {"test": "changed"}, {"papers": 3})
     with pytest.raises(RuntimeError):
-        EB.build({"paper:2001.00001"})
+        EB.build()
+    with pytest.raises(RuntimeError):
+        CB.build()

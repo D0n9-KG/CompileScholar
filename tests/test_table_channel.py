@@ -10,7 +10,7 @@ plus the preserved PS16 regression guarantees (rowspan mis-quote, fused
 cells -> residue).
 """
 import sys
-from kb_compiler.records.table_channel import (  # noqa: E402
+from compilescholar.documents.tables import (  # noqa: E402
     extract_tables, _group_row_text, _row_quote)
 
 
@@ -376,7 +376,7 @@ def test_f32_same_row_metric_different_subjects_distinct_ids():
 # ---------------- F33: mean±std spaced cells (2026-09-17) ----------------
 
 def test_f33_spaced_mean_std_folds():
-    from kb_compiler.records.table_channel import _fold_num
+    from compilescholar.documents.tables import _fold_num
     # double-spaced mean±std now folds (was rejected as fused pre-F33)
     assert _fold_num("0.046 ± 0.002") == "0.046 ± 0.002"
     # unspaced / single-spaced forms unchanged (consistency)
@@ -385,7 +385,7 @@ def test_f33_spaced_mean_std_folds():
 
 
 def test_f33_true_fusion_still_rejected():
-    from kb_compiler.records.table_channel import _fold_num
+    from compilescholar.documents.tables import _fold_num
     assert _fold_num("1536 85.3") == ""      # mineru colspan artifact
     assert _fold_num("39.7 33.6") == ""
     assert _fold_num("0.046 ± 0.002 ± 0.001") == ""   # two ± = ambiguous
