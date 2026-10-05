@@ -3,21 +3,26 @@
 AsOf(T), which only ever returns rows dated <= T (DESIGN §12a invariant "as_of monotone"). Nothing downstream of L3
 touches the raw tables directly.
 
-T is a 'YYYY-MM-DD' string (inclusive). A paper is visible at T if its v1_date <= T; a statement if its date <= T;
-a citation sentence if its citing paper's date <= T."""
+T is a calendar day (inclusive), validated by core.asof. A paper is visible at T if its v1_date <= T; a statement if
+its date <= T; a citation sentence if its citing paper's date <= T. Every object id a method returns is visible at T
+(a citing paper's reference list can name papers published after the citing paper's v1, because the text came from a
+later version — FITNESS-INFRA §1d; such references are filtered here until documents carry the text version date).
+Stored dates in this store are full ISO days, so the SQL string comparison is exact; mixed-precision dates go through
+core.asof.Date once the registry lands (phase B)."""
 from __future__ import annotations
 
 import json
 import sqlite3
 
+from ..core.asof import AsOf as _T
 from ..dfc import store
 
 
 class AsOf:
     def __init__(self, T: str, papers=None, cit=None, ext=None):
-        if len(T) != 10:
-            raise ValueError(f"as_of must be YYYY-MM-DD, got {T!r}")
-        self.T = T
+        self.T = _T(T).iso
+        if self.T is None:
+            raise ValueError("as_of is required")
         self.papers = papers or store.connect("papers", readonly=True)
         self.cit = cit or store.connect("citations", readonly=True)
         self.ext = ext or store.connect("extract", readonly=True)
@@ -80,14 +85,15 @@ class AsOf:
                                 (obj, self.T)).fetchall()
 
     def references(self, arxiv_id: str) -> list[str]:
-        """Objects cited by a paper (its references), if the paper itself is visible."""
+        """Objects cited by a paper (its references) that are visible at T, if the paper itself is visible."""
         if not self.visible(f"paper:{arxiv_id}"):
             return []
-        return [r[0] for r in self.cit.execute("SELECT DISTINCT cited FROM entries WHERE citing=?", (arxiv_id,))]
+        return [o for (o,) in self.cit.execute("SELECT DISTINCT cited FROM entries WHERE citing=?", (arxiv_id,))
+                if self.visible(o)]
 
     def co_cited(self, sentence_id: int) -> list[str]:
         return [r[0] for r in self.cit.execute("SELECT cited FROM cites WHERE sentence_id=? AND date<=?",
-                                               (sentence_id, self.T))]
+                                               (sentence_id, self.T)) if self.visible(r[0])]
 
 
 def connect_all() -> tuple[sqlite3.Connection, sqlite3.Connection, sqlite3.Connection]:

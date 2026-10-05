@@ -15,10 +15,14 @@ import os
 
 from mcp.server.fastmcp import FastMCP
 
+from ..core.asof import AsOf as _AsOf
 from . import api
 
-AS_OF = os.environ.get("DFC_AS_OF", "")
-if len(AS_OF) != 10:
+try:
+    AS_OF = _AsOf(os.environ.get("DFC_AS_OF") or None).iso
+except ValueError:
+    AS_OF = None
+if not AS_OF:
     raise SystemExit("DFC_AS_OF=YYYY-MM-DD is required (the server fixes the knowledge cutoff)")
 mcp = FastMCP("literature")
 

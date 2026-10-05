@@ -380,10 +380,10 @@ def as_of_date(cutoff: str | None) -> str:
     """Pipeline cutoff 'YYYY-MM' (exclusive month, CS2 convention) -> tool as_of 'YYYY-MM-DD' (inclusive, the day
     before). None -> today (no cutoff)."""
     import datetime as _dt
+    from ..core.asof import AsOf
     if not cutoff:
         return _dt.date.today().isoformat()
-    y, m = (int(x) for x in cutoff[:7].split("-"))
-    return (_dt.date(y, m, 1) - _dt.timedelta(days=1)).isoformat()
+    return AsOf.before_month(cutoff).iso
 
 
 def field_block(question: str, as_of: str, tools) -> str:

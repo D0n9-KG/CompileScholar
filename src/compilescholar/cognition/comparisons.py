@@ -36,6 +36,6 @@ def baselines_in(view: AsOf, papers: list[str]) -> list[tuple[str, int, set[str]
     by = defaultdict(set)
     for p in papers:
         for s in view.statements(speaker=p.removeprefix("paper:"), kind="other"):
-            if s["function"] in ("baseline", "contrast") or s["role"] == "compares":
+            if (s["function"] in ("baseline", "contrast") or s["role"] == "compares") and view.visible(s["about"]):
                 by[s["about"]].add(p)
     return sorted(((o, len(ps), ps) for o, ps in by.items()), key=lambda x: (-x[1], x[0]))

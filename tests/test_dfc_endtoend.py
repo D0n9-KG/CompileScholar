@@ -264,3 +264,24 @@ def test_rebuild_after_no_change_does_nothing_and_llm_failure_is_not_done(env, m
     con = env.connect("extract", readonly=True)
     assert con.execute("SELECT count(*) FROM statements").fetchone()[0] == before
     con.close()
+
+
+def test_reference_newer_than_citing_v1_is_not_returned(env):
+    """FITNESS-INFRA §1d: a citing paper's text came from a later version and cites a paper published after the
+    citing paper's v1. At a T between the two dates the tools must not return the newer paper."""
+    con = env.connect("citations")
+    con.execute("INSERT INTO entries VALUES (?,?,?,?,?,?,?)",
+                ("2101.00002", "9", "C. Author. A benchmark of graph models. 2022.", "paper:2201.00003",
+                 "papers_title", "A benchmark of graph models", 2022))
+    sid = con.execute("INSERT INTO sentences(citing, date, sentence, keys) VALUES (?,?,?,?)",
+                      ("2101.00002", "2021-01-12", "A later benchmark [9] evaluates this.", '["9"]')).lastrowid
+    con.execute("INSERT INTO cites VALUES (?,?,?,?,?,?)", (sid, "2101.00002", "2021-01-12", "9", "paper:2201.00003", 1))
+    con.commit()
+    con.close()
+    from compilescholar.cognition.asof import AsOf
+    from compilescholar.tools import api
+    T = "2021-06-30"
+    assert "paper:2201.00003" not in AsOf(T).references("2101.00002")
+    assert "paper:2201.00003" not in AsOf(T).co_cited(sid)
+    assert all(r["id"] != "paper:2201.00003" for r in api.references_of("2101.00002", T))
+    assert any(r["id"] == "paper:2201.00003" for r in api.references_of("2101.00002", "2022-12-31"))

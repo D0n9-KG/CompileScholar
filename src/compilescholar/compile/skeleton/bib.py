@@ -18,6 +18,8 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
+from ...core import ids
+
 REF_HEADING = re.compile(r"\n#+\s*(?:\d+\.?\s*)?(References|REFERENCES|Bibliography|BIBLIOGRAPHY)\s*\n")
 NUM_ENTRY = re.compile(r"^\s*\[?(\d{1,4})\]?\s*$", re.M)
 BRACKET_NUM_ENTRY = re.compile(r"^\s*\[\d+\]\s*$", re.M)
@@ -27,8 +29,6 @@ BARE_MARK = re.compile(r"(?<=[A-Za-z\)]) (\d{1,3}(?:\s?,\s?\d{1,3})*)(?=\s*[ .,;
 AY_MARK = re.compile(r"([A-Z][A-Za-z'\-]+(?:\s(?:et\s?al\.|and\s[A-Z][A-Za-z'\-]+))?)\s?[\[(]((?:19|20)\d\d[a-z]?)[\])]")
 AY_PAREN_GROUP = re.compile(r"\(([^()]{4,400})\)")
 AY_PAREN = re.compile(r"([A-Z][A-Za-z'\-]+)(?:\s+(?:et\s?al\s?\.?|and\s+(?:et\s?al\.?|[A-Z][A-Za-z'\-]+)))?\s*,\s*((?:19|20)\d\d[a-z]?)")
-ARXIV = re.compile(r"(?:arXiv[:\s]*|arxiv\.org/abs/)(\d{4}\.\d{4,5})", re.I)
-DOI = re.compile(r"\b(10\.\d{4,9}/[^\s,;]+[^\s,;.])")
 MAX_RANGE = 20
 
 
@@ -61,9 +61,10 @@ def _ay_key(name: str, year: str) -> tuple[str, str]:
 
 
 def _ids(raw: str) -> tuple[str | None, str | None]:
-    a = ARXIV.search(raw)
-    d = DOI.search(raw)
-    return (a.group(1) if a else None), (d.group(1).rstrip(".") if d else None)
+    """First arXiv id and first (non-arXiv) DOI in an entry, normalised by core.ids (old-style arXiv ids, DOI URLs,
+    trailing punctuation and SICI DOIs are handled there)."""
+    a, d = ids.find_arxiv(raw), ids.find_dois(raw)
+    return (a[0] if a else None), (d[0] if d else None)
 
 
 def split_body_refs(text: str) -> tuple[str, str] | None:

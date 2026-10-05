@@ -14,10 +14,10 @@ import re
 from dataclasses import dataclass
 
 from ..compile.skeleton.resolve import entry_title_year
+from ..core import ids
 from ..corpus.papers import Papers
 from ..sources.arxiv_snapshot import norm
 
-ARXIV_ID = re.compile(r"(?:arXiv[:\s]*|arxiv\.org/(?:abs|pdf)/)(\d{4}\.\d{4,5})(?:v\d+)?", re.I)
 # APA: "Su, J., Vargas, D. V., & Sakurai, K. (2019). One pixel attack for fooling deep neural networks. IEEE ..."
 APA = re.compile(r"\(((?:19|20)\d\d)[a-z]?\)\.\s+(.+?)(?:\.\s+(?=[A-Z])|\?\s|$)")
 
@@ -51,9 +51,9 @@ class EntryResolver:
             return self._cache[raw]
         title, year = title_year(raw)
         res = None
-        m = ARXIV_ID.search(raw)
-        if m:
-            res = EntryResolution(m.group(1), "explicit_arxiv", title, year, norm(title))
+        ax = ids.find_arxiv(raw)
+        if ax:
+            res = EntryResolution(ax[0], "explicit_arxiv", title, year, norm(title))
         if res is None and title:
             ax = self.papers.resolve_title(title, year, raw)
             if ax:
