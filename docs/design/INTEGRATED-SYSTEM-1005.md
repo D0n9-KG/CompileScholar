@@ -232,7 +232,7 @@
 | 层 | 直接可用 | 需优化 | 需重构 | 替换 | 退役 / 冻结 |
 |---|---|---|---|---|---|
 | 文库 registry | — | 资产与解析产物表（补解析器版本）；查询索引 | 表结构、id 生成、DOI / arXiv / 标题规范化、合并逻辑、日期、批量写入、并发写、资产合并、抽取状态表 | — | 死表和死方法（约 40% 是 UI 辅助）、evidence_units |
-| 来源 | 熔断 circuit | Sci-Hub 查询（去掉一个 `lower()`，从 22.8 s 降到 1.3 ms）、PDF 解包（校验 crc、原子写）、rerank（改用统一 embedding） | OpenAlex / S2 / Crossref / Sciverse / arXiv 各有 2–4 份，合并成统一 http 层；refgraph 失败被当成完成 | MinerU 客户端（三套都调旧接口） | search_service、query_understanding、pdf_resolver、search_resolve、process_workflow |
+| 来源 | 熔断 circuit | Sci-Hub 查询（去掉一个 `lower()`，从 22.8 s 降到 1.3 ms）、PDF 解包（校验 crc、原子写）、rerank（改用统一 embedding）、MinerU `/file_parse` 客户端（9602，v2.1 改判：加限流、重试、版本记录） | OpenAlex / S2 / Crossref / Sciverse / arXiv 各有 2–4 份，合并成统一 http 层；refgraph 失败被当成完成 | 另两套 legacy MinerU 客户端 | search_service、query_understanding、pdf_resolver、search_resolve、process_workflow |
 | 获取 | — | — | acquisition_chain（骨架保留）、身份核对、隔离 | — | acquisition.py 其余部分 |
 | 文档 | — | documents/tables（指数、科学计数法、pipe 表首列序号） | documents/units（剥图、浮动体、句号、页码 bbox、structured_content）、documents/build（从 registry 输入） | — | evidence_units 分块 |
 | 引用 | skeleton/bib（移到 citations/） | — | citations/markdown（上标、无标题参考文献块、DOI 尾标点）、citations/resolve（结构化引文查询，工作量大） | — | skeleton/resolve 的 Resolver |
@@ -472,7 +472,7 @@
 | 阶段 | 内容 | 闸门 |
 |---|---|---|
 | **A 基础** | ① 阶段契约修复（§10.1）；② 唯一的 LLM 客户端加配置与路径（§10.2–10.3）；③ `core/ids.py`、`core/asof.py`（v9b 走兼容适配器）；④ 把隐藏依赖迁出 `.research_tmp`；⑤ 旧包的能力迁出（先迁 salvage），sci-evo 代码作为待重构的代码迁入；⑥ 根目录清理与打包；⑦ `cites(sentence_id)` 索引 | v9b 表征测试逐字节一致；全部测试通过；契约探针测试、路径闸门测试、客户端故障测试通过；干净 clone 上测试能跑 |
-| **B 底座** | ① 先测 MinerU 吞吐（§4），再定全文规模；② 按新 schema 重构 registry，批量导入 104.6 万篇 arXiv 元数据（含各版本日期）；③ 清洗 sci-evo 数据后迁入；④ 合并队列加 LLM 裁定；⑤ sources 统一 http 层，Sci-Hub 修好；⑥ acquire 按通道接入，加身份核对和隔离；⑦ MinerU V1 客户端，documents 改从 structured_content 生成；⑧ 版本感知（v1 加最新版增量） | 身份合并抽查，双模型核对；20 篇跨领域 PDF（Nature、物理、化学、医学、含公式）走通 acquire → MinerU → units；版本泄漏测试（参考文献不晚于文本版本日）；equation 块形态核实 |
+| **B 底座** | ① 9602 加限流和重试后重测 MinerU 吞吐；快速档（PyMuPDF）适配引用切分，与 GROBID 各跑 50 篇对照（v2.1）；② 按新 schema 重构 registry，批量导入 104.6 万篇 arXiv 元数据（含各版本日期），并导入四个固定库基准的语料；③ 清洗 sci-evo 数据后迁入；④ 合并队列加 LLM 裁定；⑤ sources 统一 http 层，Sci-Hub 修好；⑥ acquire 按通道接入，加身份核对和隔离；⑦ MinerU 客户端（9602 file_parse 为主，9605 V1 备选），精读档 documents 从 content_list / structured_content 生成，快速档 documents 从 PDF 文本层生成；⑧ 版本感知（v1 加最新版增量） | 身份合并抽查，双模型核对；20 篇跨领域 PDF（Nature、物理、化学、医学、含公式）走通 acquire → MinerU → units；版本泄漏测试（参考文献不晚于文本版本日）；equation 块形态核实 |
 | **C 引用与抽取** | ① citations 重构加结构化引文查询；② schema v2；③ T1 / T2 / 结果遍 / 他述遍；④ 统一终检；⑤ 哨兵用例；⑥ work 表；⑦ 他述按时间分层抽样；⑧ 自引标记 | 哨兵通过；抽样 200 条双模型核对 ≥ 0.95；50 篇新旧覆盖率对照（旧深抽的信息要被新记录覆盖）；引用解析分 CS 和非 CS 各复测一次 |
 | **D 编译、索引、工具** | ① 物化各表（§8）；② 五类 LLM 裁定，各先做 200 条试点；③ tantivy 加向量；④ 工具改造、外检、对照臂和消融开关、预算记账；⑤ answer_lit 修复 | 端到端不变量（含泄漏和规模冒烟）；裁定一致率达到阈值；工具单次调用 < 200 ms |
 | **F 实测与打磨** | ① 写下题目盲的建库范围规则，并预注册；② 真实构建；③ 基准适配器；④ 真实智能体经 MCP 在 dev 上跑，看轨迹迭代 harness | CS2 dev 非劣（界 −0.02）；主基准 dev 结果 |
@@ -483,9 +483,9 @@
 ## 13. 仍需用户决定或尚未核实
 
 **需要用户决定**（到对应阶段再问，不影响阶段 A 开工）：
-1. 题目盲的建库范围规则（阶段 F 预注册前）。建议：建库范围只由语料统计决定，即领域类别、日期范围和引用闭包。基准自带的候选语料（标题、摘要）可以并入元数据层，因为所有对照臂拿到的是同一份；题面和金标永远不用。
-2. 表述向量做全量，还是只做 self 表述（阶段 D，等 embedding 吞吐实测后再定）。
-3. MinerU 吞吐如果不够，是否给引用句另开一条快速文本层路径（阶段 B 实测后报告）。
+1. ~~题目盲的建库范围规则~~：v2.1 已定为"库 = 基准的候选语料；深抽按库内被引数挑选；题面和金标永远不用"，预注册时写明。
+2. ~~表述向量范围~~：v2.1 已定为全量。
+3. ~~快速文本层~~：v2.1 已定为两档。
 
 **尚未核实**：
 - MinerU 的 equation 块、advanced 档、50 页以上的大文件、并发；
