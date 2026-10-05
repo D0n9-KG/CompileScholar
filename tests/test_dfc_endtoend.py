@@ -119,13 +119,13 @@ def test_quotes_are_substrings(env):
     cit = env.connect("citations", readonly=True)
     sents = {r[0] for r in cit.execute("SELECT sentence FROM sentences")}
     rows = list(con.execute("SELECT kind, quote, speaker, facet FROM statements"))
-    assert {k for k, *_ in rows} == {"self", "other"}, list(con.execute("SELECT * FROM done_self"))
+    assert {k for k, *_ in rows} == {"self", "other"}, list(con.execute("SELECT * FROM tiers"))
     for kind, quote, speaker, facet in rows:
         if kind == "other":
             assert quote in sents
         elif facet != "setting":
             assert " ".join(quote.split()).lower() in " ".join((ABS[speaker][1] + BODY.get(speaker, "")).split()).lower()
-    tiers = dict(con.execute("SELECT arxiv_id, tier FROM done_self"))
+    tiers = dict(con.execute("SELECT arxiv_id, tier FROM tiers"))
     assert set(tiers.values()) == {"T1", "T2"}                    # deep tier only for papers with a full text
 
 
@@ -217,3 +217,50 @@ def test_stale_upstream_blocks(env):
         EB.build()
     with pytest.raises(RuntimeError):
         CB.build()
+
+
+def test_rebuild_after_no_change_does_nothing_and_llm_failure_is_not_done(env, monkeypatch):
+    """Probe P5 on the real stages: a dead LLM leaves the items open (not done, no statements, manifest incomplete),
+    a second build retries them; a build with nothing changed calls no LLM at all."""
+    from compilescholar.extract import build as EB
+    from compilescholar.extract import other_pass as O
+    from compilescholar.extract import self_pass as S
+    con = env.connect("extract", readonly=True)
+    before = con.execute("SELECT count(*) FROM statements").fetchone()[0]
+    before_other = con.execute("SELECT count(*) FROM statements WHERE pass='other'").fetchone()[0]
+    con.close()
+    alive = S.run.__defaults__[1]
+    calls = []
+
+    def dead(prompt, **k):
+        calls.append(1)
+        return None
+
+    monkeypatch.setattr(S.run, "__defaults__", (None, dead, None))
+    monkeypatch.setattr(O.run_batch, "__defaults__", (dead,))
+    EB.build(categories=("cs.LG",), since="2018-01-01", n_deep=2, workers=2)
+    assert calls == []                                    # nothing changed -> no work
+    m = env.read_manifest("extract")
+    assert m["complete"] and m["work"].get("ok")
+
+    # a changed self prompt re-opens the self pass only; with a dead server every item fails, none is done
+    monkeypatch.setattr(S, "PROMPT_SHA", "changed-prompt")
+    EB.build(categories=("cs.LG",), since="2018-01-01", n_deep=2, workers=2)
+    assert len(calls) == 3                                # 3 self items, 0 other items
+    m = env.read_manifest("extract")
+    assert not m["complete"] and m["work"].get("failed") == 3
+    con = env.connect("extract", readonly=True)
+    # a failed item has no output under its current key (same as a clean build): its old-prompt rows are gone,
+    # the other pass is untouched
+    assert con.execute("SELECT count(*) FROM statements WHERE pass='self'").fetchone()[0] == 0
+    assert con.execute("SELECT count(*) FROM statements WHERE pass='other'").fetchone()[0] == before_other
+    assert {r[0] for r in con.execute("SELECT status FROM _work WHERE pass='self'")} == {"failed"}
+    con.close()
+    # the server comes back: the next build redoes exactly the failed items
+    monkeypatch.setattr(S.run, "__defaults__", (None, alive, None))
+    EB.build(categories=("cs.LG",), since="2018-01-01", n_deep=2, workers=2)
+    m = env.read_manifest("extract")
+    assert m["complete"]
+    con = env.connect("extract", readonly=True)
+    assert con.execute("SELECT count(*) FROM statements").fetchone()[0] == before
+    con.close()

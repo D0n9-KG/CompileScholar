@@ -39,7 +39,7 @@ def diagnose(now: str, limit: int = 500) -> dict:
     ext = store.connect("extract", readonly=True)
     have = set(Documents().ids())
     scope = {r[0] for r in ext.execute("SELECT arxiv_id FROM scope")}
-    tiers = dict(ext.execute("SELECT arxiv_id, tier FROM done_self").fetchall())
+    tiers = dict(ext.execute("SELECT arxiv_id, tier FROM tiers").fetchall())
     citers = Counter(dict(cit.execute(
         "SELECT cited, count(DISTINCT citing) FROM cites GROUP BY cited").fetchall()))
     unread = [(o[6:], n) for o, n in citers.most_common() if o.startswith("paper:") and o[6:] not in have

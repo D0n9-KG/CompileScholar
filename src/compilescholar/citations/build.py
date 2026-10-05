@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS sentences(id INTEGER PRIMARY KEY, citing TEXT, date T
 CREATE TABLE IF NOT EXISTS cites(sentence_id INT, citing TEXT, date TEXT, key TEXT, cited TEXT, n_group INT);
 CREATE INDEX IF NOT EXISTS ix_cites_cited ON cites(cited, date);
 CREATE INDEX IF NOT EXISTS ix_cites_citing ON cites(citing);
+CREATE INDEX IF NOT EXISTS ix_cites_sid ON cites(sentence_id);
+CREATE INDEX IF NOT EXISTS ix_sent_citing ON sentences(citing);
 """
 
 
@@ -69,34 +71,51 @@ def _write_doc(con, papers: Papers, resolver: EntryResolver, aid: str, source: s
     return {"sentences": len(seen), "entries": len(used), "resolved": n_res}
 
 
-def build(log=print, report_every: int = 5000) -> dict:
-    """Every document in the documents stage; a paper already in `docs` is skipped (resumable)."""
-    store.require_fresh("papers", "documents")
-    papers = Papers()
-    resolver = EntryResolver(papers)
-    documents = Documents()
-    con = store.connect("citations")
-    con.executescript(DDL)
-    done = {r[0] for r in con.execute("SELECT arxiv_id FROM docs")}
-    n = {"docs": 0, "no_bib": 0}
-    for i, aid in enumerate(documents.ids()):
-        if aid in done:
-            continue
-        d = documents.get(aid)
-        parsed = H.parse(d["raw"]) if d["source"] == "arxiv_html" else M.citation_sentences(d["raw"])
-        if parsed is None or parsed[0] is None or not parsed[1]:
-            n["no_bib"] += 1
-            continue
-        _write_doc(con, papers, resolver, aid, d["source"], *parsed)
-        n["docs"] += 1
-        if (i + 1) % report_every == 0:
-            con.commit()
-            log(f"[citations] {i + 1} documents: {n}")
-    con.commit()
-    counts = {k: con.execute(f"SELECT count(*) FROM {k}").fetchone()[0] for k in ("docs", "entries", "sentences",
-                                                                                 "cites")}
-    counts["cites_resolved"] = con.execute("SELECT count(*) FROM cites WHERE cited LIKE 'paper:%'").fetchone()[0]
-    counts["no_bib"] = n["no_bib"]
-    con.close()
-    store.write_manifest("citations", {"input": "documents stage, all"}, counts)
+def _delete(con, aid: str) -> None:
+    for t, col in (("cites", "citing"), ("sentences", "citing"), ("entries", "citing"), ("docs", "arxiv_id")):
+        con.execute(f"DELETE FROM {t} WHERE {col}=?", (aid,))
+
+
+def build(rebuild: bool = False, log=print, report_every: int = 5000) -> dict:
+    """Every document in the documents stage. Incremental: a citing paper is redone when its document changed or the
+    papers stage has new data (an entry that was a stub may now resolve); papers that left documents are removed."""
+    params = {"input": "documents stage, all"}
+    with store.Run("citations", params, rebuild=rebuild) as run:
+        papers = Papers()
+        resolver = EntryResolver(papers)
+        documents = Documents()
+        con = run.con
+        con.executescript(DDL)
+        doc_keys = store.item_keys("documents", "documents")
+        pfp = run.fingerprint("papers")
+        w = run.work("citations")
+        todo = w.todo((aid, f"{k}|{pfp}") for aid, k in doc_keys.items())
+        n = {"docs": 0, "no_bib": 0}
+        for i, aid in enumerate(todo):
+            _delete(con, aid)
+            d = documents.get(aid)
+            if d is None:            # an ok document item with nothing stored (not in papers)
+                w.ok(aid)
+                continue
+            try:
+                parsed = H.parse(d["raw"]) if d["source"] == "arxiv_html" else M.citation_sentences(d["raw"])
+                if parsed is None or parsed[0] is None or not parsed[1]:
+                    n["no_bib"] += 1
+                else:
+                    _write_doc(con, papers, resolver, aid, d["source"], *parsed)
+                    n["docs"] += 1
+            except Exception as e:
+                _delete(con, aid)
+                w.fail(aid, f"{type(e).__name__}: {e}")
+                continue
+            w.ok(aid)
+            if (i + 1) % report_every == 0:
+                con.commit()
+                log(f"[citations] {i + 1}/{len(todo)} documents: {n}")
+        con.commit()
+        n["removed"] = w.sweep(doc_keys, lambda aid: _delete(con, aid))
+        counts = {k: con.execute(f"SELECT count(*) FROM {k}").fetchone()[0] for k in ("docs", "entries", "sentences",
+                                                                                     "cites")}
+        counts["cites_resolved"] = con.execute("SELECT count(*) FROM cites WHERE cited LIKE 'paper:%'").fetchone()[0]
+        run.finish(counts)
     return {**n, **counts}

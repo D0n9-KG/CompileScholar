@@ -89,9 +89,14 @@ class Statement:
         return d
 
 
+# pass / item: the unit of work that produced the row (dfc.store item bookkeeping); redoing an item replaces exactly
+# its rows. The unique key makes a duplicated write (two writers, a retried batch) an error instead of a silent copy.
 DDL = """CREATE TABLE IF NOT EXISTS statements(
   id INTEGER PRIMARY KEY, speaker TEXT, date TEXT, kind TEXT, about TEXT, role TEXT, facet TEXT, text TEXT,
-  quote TEXT, target TEXT, grp TEXT, function TEXT, meta TEXT, model TEXT, prompt_sha TEXT);
+  quote TEXT, target TEXT, grp TEXT, function TEXT, meta TEXT, model TEXT, prompt_sha TEXT, pass TEXT, item TEXT);
 CREATE INDEX IF NOT EXISTS ix_st_about ON statements(about, date);
 CREATE INDEX IF NOT EXISTS ix_st_speaker ON statements(speaker);
-CREATE INDEX IF NOT EXISTS ix_st_target ON statements(target);"""
+CREATE INDEX IF NOT EXISTS ix_st_target ON statements(target);
+CREATE INDEX IF NOT EXISTS ix_st_item ON statements(pass, item);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_st_natural ON statements(pass, item, speaker, kind, about, role, facet, text,
+  quote);"""

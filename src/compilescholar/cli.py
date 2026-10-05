@@ -147,12 +147,20 @@ def cmd_build(a):
     from .dfc import store
     if a.stage == "status":
         for s in store.STAGES:
-            st = store.status(s) if s != "cognition" else {"built": None, "stale": None, "why": ["computed on read"]}
+            st = store.status(s)
             m = store.read_manifest(s) or {}
-            print(f"{s:10s} built={st['built']} stale={st['stale']} counts={m.get('counts')} why={st['why']}")
+            print(f"{s:10s} built={st['built']} stale={st['stale']} behind={st['behind']} complete={st['complete']} "
+                  f"counts={m.get('counts')} work={m.get('work')} why={st['why']}")
         return
-    order = ("papers", "documents", "citations", "extract", "index")
-    todo = [s for s in order if a.stage == "all" and store.status(s)["stale"]] if a.stage == "all" else [a.stage]
+    order = store.STAGES
+    if a.stage == "all":
+        todo = [s for s in order if (lambda st: not st["built"] or st["stale"] or st["behind"] or not st["complete"])(
+            store.status(s))]
+        # once one stage is rebuilt every stage after it must follow
+        todo = list(order[order.index(todo[0]):]) if todo else []
+    else:
+        todo = [a.stage]
+    rb = a.rebuild
     for s in todo:
         print(f"[build] {s}", flush=True)
         if s == "papers":
@@ -160,14 +168,15 @@ def cmd_build(a):
             print(json.dumps(papers.build()))
         elif s == "documents":
             from .documents import build as B
-            print(json.dumps(B.build()))
+            print(json.dumps(B.build(rebuild=rb)))
         elif s == "citations":
             from .citations import build as B
-            print(json.dumps(B.build()))
+            print(json.dumps(B.build(rebuild=rb)))
         elif s == "extract":
             from .extract import build as B
             cats = tuple(a.categories.split(","))
-            print(json.dumps(B.build(categories=cats, since=a.since, n_deep=a.n_deep, workers=a.workers)))
+            print(json.dumps(B.build(categories=cats, since=a.since, n_deep=a.n_deep, workers=a.workers,
+                                     rebuild=rb)))
         elif s == "index":
             from .index import build as B
             print(json.dumps(B.build(dense=tuple(x for x in a.dense.split(",") if x))))
@@ -184,6 +193,8 @@ def main(argv=None):
     p.add_argument("--n-deep", type=int, default=500, help="extract: number of T2 (full-text) papers")
     p.add_argument("--workers", type=int, default=48)
     p.add_argument("--dense", default="papers,statements", help="index: which indexes get dense vectors")
+    p.add_argument("--rebuild", action="store_true",
+                   help="build into a new file and swap it in (clean slate); default is incremental")
     p.set_defaults(fn=cmd_build)
     p = sub.add_parser("answer")
     p.add_argument("--config")

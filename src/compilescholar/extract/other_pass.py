@@ -84,6 +84,9 @@ def run_batch(citing: str, date: str, items: list[dict], chat=call_local) -> tup
     raw = chat(PROMPT.format(date=date, pairs=_pairs_block(items)), model=MODEL, max_tokens=230 * len(items) + 200,
                temperature=0.0, enable_thinking=False)
     obj = parse_json_response(raw or "")
+    if not isinstance(obj, dict) or not isinstance(obj.get("pairs"), list):
+        # no usable answer (empty generation, timeout, unparseable JSON): a failure of this batch, not "nothing said"
+        return [], {"pairs": len(items), "parsed": 0, "dropped_about": 0, "bad_vocab": 0, "failed": 1}
     got = {}
     for o in (obj or {}).get("pairs") or [] if isinstance(obj, dict) else []:
         if isinstance(o, dict) and str(o.get("id", "")).isdigit():

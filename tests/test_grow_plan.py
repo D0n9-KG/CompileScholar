@@ -31,9 +31,9 @@ def env(tmp_path, monkeypatch):
     store.write_manifest("citations", {}, {})
     e = store.connect("extract")
     e.executescript("CREATE TABLE scope(arxiv_id TEXT PRIMARY KEY, deep INT);"
-                    "CREATE TABLE done_self(arxiv_id TEXT PRIMARY KEY, tier TEXT, stats TEXT);")
+                    "CREATE TABLE tiers(arxiv_id TEXT PRIMARY KEY, tier TEXT, stats TEXT);")
     e.executemany("INSERT INTO scope VALUES (?,?)", [("S1", 0), ("S2", 1)])
-    e.executemany("INSERT INTO done_self VALUES (?,?,?)", [("S1", "T1", "{}"), ("S2", "T2", "{}")])
+    e.executemany("INSERT INTO tiers VALUES (?,?,?)", [("S1", "T1", "{}"), ("S2", "T2", "{}")])
     e.commit()
     store.write_manifest("extract", {}, {})
     from compilescholar.grow import plan

@@ -45,48 +45,69 @@ def _put(con, aid: str, source: str, v1: str, raw: str, units: list) -> None:
                  zlib.compress(json.dumps([asdict(u) for u in units], ensure_ascii=False).encode("utf-8"), 6)))
 
 
-def build(sources=("ideaforecast", "html"), log=print) -> dict:
-    """Store every available full text (no selection: L1 is cheap and question-blind). Resumable."""
-    store.require_fresh("papers")
-    papers = Papers()
-    con = store.connect("documents")
-    con.executescript(DDL)
-    done = {r[0] for r in con.execute("SELECT arxiv_id FROM docs")}
-    n = {"stored": 0, "not_in_papers": 0}
+def _candidates(sources) -> dict[str, tuple]:
+    """{arxiv_id: (source, locator, input_fingerprint)} — Markdown wins over HTML for the same paper."""
+    out = {}
     if "ideaforecast" in sources:
         for f in sorted(ideaforecast_dir().glob("*.parquet")):
-            for r in pq.read_table(f, columns=["arxiv_id", "text"]).to_pylist():
-                aid = r["arxiv_id"]
-                if aid in done:
-                    continue
+            st = f.stat()
+            for aid in pq.read_table(f, columns=["arxiv_id"]).column("arxiv_id").to_pylist():
+                out.setdefault(aid, ("ideaforecast_md", f, f"{f.name}:{st.st_size}:{int(st.st_mtime)}"))
+    if "html" in sources and html_cache().exists():
+        for p in sorted(html_cache().glob("*.html")):
+            st = p.stat()
+            out.setdefault(p.stem, ("arxiv_html", p, f"{p.name}:{st.st_size}:{int(st.st_mtime)}"))
+    return out
+
+
+def build(sources=("ideaforecast", "html"), rebuild: bool = False, log=print) -> dict:
+    """Store every available full text (no selection: L1 is cheap and question-blind). Incremental: a paper is redone
+    when its source file or the stage's code changes; papers whose source disappeared are removed."""
+    params = {"sources": list(sources)}
+    with store.Run("documents", params, rebuild=rebuild) as run:
+        papers = Papers()
+        con = run.con
+        con.executescript(DDL)
+        cand = _candidates(sources)
+        w = run.work("documents")
+        # the item's inputs: its source file and the date the papers stage gives it (a paper that appears in, or
+        # changes date in, the papers stage is redone)
+        todo = set(w.todo((aid, f"{fp}|{papers.v1_date(aid)}") for aid, (_, _, fp) in cand.items()))
+        n = {"stored": 0, "not_in_papers": 0}
+        by_file: dict = {}
+        for aid in todo:
+            src, loc, _ = cand[aid]
+            by_file.setdefault((src, loc), []).append(aid)
+        for (src, loc), aids in sorted(by_file.items(), key=lambda x: str(x[0][1])):
+            want = set(aids)
+            if src == "ideaforecast_md":
+                texts = {r["arxiv_id"]: r["text"] for r in pq.read_table(loc, columns=["arxiv_id", "text"]).to_pylist()
+                         if r["arxiv_id"] in want}
+            else:
+                texts = {aids[0]: loc.read_text(encoding="utf-8", errors="replace")}
+            for aid in aids:
                 v1 = papers.v1_date(aid)
                 if not v1:
                     n["not_in_papers"] += 1
+                    con.execute("DELETE FROM docs WHERE arxiv_id=?", (aid,))
+                    w.ok(aid)           # nothing to store is a valid outcome (re-checked when papers changes)
                     continue
-                _put(con, aid, "ideaforecast_md", v1, r["text"], U.from_markdown(aid, r["text"]))
-                done.add(aid)
+                raw = texts[aid]
+                try:
+                    units = U.from_markdown(aid, raw) if src == "ideaforecast_md" else U.from_html(aid, raw)
+                except Exception as e:  # a malformed source is this paper's failure, not the stage's
+                    w.fail(aid, f"{type(e).__name__}: {e}")
+                    continue
+                _put(con, aid, src, v1, raw, units)
+                w.ok(aid)
                 n["stored"] += 1
             con.commit()
-            log(f"[documents] {f.name}: {n}")
-    if "html" in sources and html_cache().exists():
-        for p in sorted(html_cache().glob("*.html")):
-            aid = p.stem
-            if aid in done:
-                continue
-            v1 = papers.v1_date(aid)
-            if not v1:
-                n["not_in_papers"] += 1
-                continue
-            page = p.read_text(encoding="utf-8", errors="replace")
-            _put(con, aid, "arxiv_html", v1, page, U.from_html(aid, page))
-            done.add(aid)
-            n["stored"] += 1
-        con.commit()
-    counts = {"docs": con.execute("SELECT count(*) FROM docs").fetchone()[0],
-              "units": con.execute("SELECT sum(n_units) FROM docs").fetchone()[0] or 0,
-              "tables": con.execute("SELECT sum(n_tables) FROM docs").fetchone()[0] or 0}
-    con.close()
-    store.write_manifest("documents", {"sources": list(sources)}, counts)
+            log(f"[documents] {getattr(loc, 'name', loc)}: {n}")
+        n["removed"] = w.sweep(cand, lambda aid: con.execute("DELETE FROM docs WHERE arxiv_id=?", (aid,)))
+        counts = {"docs": con.execute("SELECT count(*) FROM docs").fetchone()[0],
+                  "units": con.execute("SELECT sum(n_units) FROM docs").fetchone()[0] or 0,
+                  "tables": con.execute("SELECT sum(n_tables) FROM docs").fetchone()[0] or 0}
+        run.finish(counts)
     return {**n, **counts}
 
 

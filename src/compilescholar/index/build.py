@@ -48,14 +48,21 @@ def _scope_ids(pap, cit, ext) -> set[str]:
     return ids
 
 
-def build(dense: tuple[str, ...] = (), embed=None, log=print) -> dict:
-    store.require_fresh("papers", "documents", "citations", "extract")
+def build(dense: tuple[str, ...] = (), embed=None, rebuild: bool = False, log=print) -> dict:
+    """Full rebuild every time (the index is a pure function of its upstream tables); the embedding model is part of
+    the params, so switching it makes the index stale. FTS5 is replaced by tantivy in phase D (design v2 §9.1)."""
+    from ..core import secrets
+    params = {"dense": list(dense),
+              "embed_model": (secrets.get("EMBEDDING_MODEL") or "qwen3-embedding-8b-local") if dense else None}
+    with store.Run("index", params, rebuild=True) as run:
+        return _build(run, dense, embed, log)
+
+
+def _build(run, dense, embed, log) -> dict:
     pap = store.connect("papers", readonly=True)
     cit = store.connect("citations", readonly=True)
     ext = store.connect("extract", readonly=True)
-    con = store.connect("index")
-    for t in ("papers_fts", "passages_fts", "statements_fts", "dense"):
-        con.execute(f"DROP TABLE IF EXISTS {t}")
+    con = run.con
     con.executescript(DDL)
     ids = _scope_ids(pap, cit, ext)
     rows = []
@@ -99,8 +106,7 @@ def build(dense: tuple[str, ...] = (), embed=None, log=print) -> dict:
                 con.commit()
             counts[f"dense_{name}"] = len(items)
             log(f"[index] dense {name} {len(items)}")
-    con.close()
-    store.write_manifest("index", {"dense": list(dense)}, counts)
+    run.finish(counts, fingerprint=store.sha(run.digest, counts))
     return counts
 
 

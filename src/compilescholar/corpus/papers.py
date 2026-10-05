@@ -87,8 +87,24 @@ ON CONFLICT(arxiv_id) DO UPDATE SET
 
 
 def build(path: Path | None = None, log=print) -> dict:
-    """(Re)build the table from the snapshot + every harvested OAI-PMH window. Idempotent."""
-    con = connect(path)
+    """(Re)build the table from the snapshot + every harvested OAI-PMH window. Idempotent: the whole table is the
+    item; its data fingerprint is the set of inputs (snapshot size/mtime, harvested windows), so a new OAI window makes
+    every downstream stage `behind`. With `path` (tests / scratch) no manifest is written."""
+    if path is not None:
+        return _fill(connect(path), log)
+    windows = sorted(p.name for p in arxiv_oai.out_dir().glob("*.jsonl"))
+    params = {"scope": list(SCOPE_CATS)}
+    with store.Run("papers", params) as run:
+        counts = _fill(connect(store.db_path("papers")), log)
+        snap = snapshot_path()
+        st = snap.stat() if snap.exists() else None
+        inputs = {"snapshot": [str(snap), st.st_size if st else None, int(st.st_mtime) if st else None],
+                  "oai_windows": windows}
+        run.finish(counts, fingerprint=store.sha(params, inputs, counts))
+    return counts
+
+
+def _fill(con: sqlite3.Connection, log=print) -> dict:
     n_snap = n_oai = 0
     batch = []
     with open(snapshot_path(), "rb") as f:
@@ -119,13 +135,7 @@ def build(path: Path | None = None, log=print) -> dict:
     con.commit()
     total = con.execute("SELECT count(*) FROM papers").fetchone()[0]
     con.close()
-    windows = sorted(p.name for p in arxiv_oai.out_dir().glob("*.jsonl"))
-    counts = {"snapshot_rows": n_snap, "oai_rows": n_oai, "papers": total}
-    if path is None:
-        store.write_manifest("papers", {"scope": list(SCOPE_CATS), "snapshot": str(snapshot_path()),
-                                        "oai_windows": [windows[0], windows[-1], len(windows)] if windows else []},
-                             counts)
-    return counts
+    return {"snapshot_rows": n_snap, "oai_rows": n_oai, "papers": total}
 
 
 class Papers:
