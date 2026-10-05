@@ -49,10 +49,22 @@ class BenchConfig:
 
 
 @dataclass(frozen=True)
+class BuildConfig:
+    """Literature-layer build (compilescholar build). Stage parameters that change outputs go into the stage digest."""
+    workers: int = 48                     # concurrent items per stage (LLM lanes are set under llm.providers)
+    categories: tuple = ("cs.LG",)        # extract scope (question-blind; v2.1: benchmark corpora define the library)
+    since: str = "2018-01-01"
+    n_deep: int = 500
+    dense: tuple = ("papers", "statements")
+
+
+@dataclass(frozen=True)
 class RunConfig:
     answer: AnswerConfig = field(default_factory=AnswerConfig)
     runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
     bench: BenchConfig = field(default_factory=BenchConfig)
+    build: BuildConfig = field(default_factory=BuildConfig)
+    llm: dict = field(default_factory=dict)   # llm.client.configure(): providers.<name>.{lanes,...}, allow, seed, cache
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -107,8 +119,14 @@ def _build(cls, d: dict):
         if name not in d:
             continue
         v = d[name]
-        sub = {"answer": AnswerConfig, "runtime": RuntimeConfig, "bench": BenchConfig}.get(name) if cls is RunConfig else None
-        kw[name] = _build(sub, v or {}) if sub else v
+        sub = ({"answer": AnswerConfig, "runtime": RuntimeConfig, "bench": BenchConfig, "build": BuildConfig}.get(name)
+               if cls is RunConfig else None)
+        if sub:
+            kw[name] = _build(sub, v or {})
+        elif isinstance(f.default, tuple) and isinstance(v, list):
+            kw[name] = tuple(v)
+        else:
+            kw[name] = v
     return cls(**kw)
 
 

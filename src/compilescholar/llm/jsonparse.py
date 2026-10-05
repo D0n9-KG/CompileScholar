@@ -117,3 +117,43 @@ def _extract_first_json(text: str) -> str | None:
                     open_ch = ""
                     close_ch = ""
     return None
+
+
+def salvage_json_records(raw: str | None, item_key: str = "kind", wrapper_key: str = "records"):
+    """Truncation salvage (moved from kb_compiler.records.common): complete brace-balanced objects containing
+    `item_key`, found at the top level or one level inside a wrapper, from an unparseable or truncated reply.
+    Returns {wrapper_key: [objects]} or None. Measured need: a 37k-char reply truncated mid-JSON lost a whole chunk."""
+    if not raw:
+        return None
+    objs, depth, in_str, esc = [], 0, False, False
+    stack = []
+    for i, ch in enumerate(raw):
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            stack.append((i, depth))
+            depth += 1
+        elif ch == "}":
+            if depth > 0 and stack:
+                start, open_depth = stack.pop()
+                depth -= 1
+                if open_depth > 1:
+                    continue
+                blob = raw[start:i + 1]
+                if f'"{item_key}"' not in blob:
+                    continue
+                try:
+                    o = json.loads(blob)
+                except ValueError:
+                    continue
+                if isinstance(o, dict) and o.get(item_key) is not None:
+                    objs.append(o)
+    return {wrapper_key: objs} if objs else None

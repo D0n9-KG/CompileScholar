@@ -18,7 +18,7 @@ def call_json(prompt: str, model_spec: str, max_tokens: int = 8000, retries: int
               salvage_key: str = "kind", salvage_wrapper: str = "records"):
     """LLM call -> parsed JSON or None (same retry/salvage behaviour as kb_compiler.records.common.call_json for the
     local and paratera providers). Never raises."""
-    from kb_compiler.records.common import salvage_json_records
+    from ...llm.jsonparse import salvage_json_records
     prov, model = _route(model_spec)
     fn = call_local if prov == "local" else call_paratera
     for _ in range(retries):

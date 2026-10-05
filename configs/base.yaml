@@ -20,3 +20,18 @@ bench:
   split: dev
   offset: 0
   limit: 100
+build:
+  workers: 48
+  categories: [cs.LG]
+  since: "2018-01-01"
+  n_deep: 500
+  dense: [papers, statements]
+# The one LLM client (llm.client.configure). Lane widths are the measured sweet spots (local 27B: throughput still rising
+# at 96 lanes, latency flat up to 48 — 10-03 load test). Machine-specific overrides go in configs/local.yaml.
+llm:
+  providers:
+    local: {lanes: 48, large_lanes: 48, read_timeout: 600, wall: 1800, attempts: 4}
+    paratera: {lanes: 16, large_lanes: 8, read_timeout: 120, wall: 600, attempts: 5}
+  allow: []
+  seed: null
+  cache: true

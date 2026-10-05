@@ -50,8 +50,11 @@ def cmd_answer(a):
         raise SystemExit(f"{rd} exists with a different configuration; use a new --run-id")
     rd.mkdir(parents=True, exist_ok=True)
     cp.write_text(resolved, encoding="utf-8")
-    # behaviour-relevant environment comes from the config (set before the first LLM call creates the lanes)
-    os.environ["LOCAL_MAX_CONCURRENT"] = str(cfg.runtime.local_max_concurrent)
+    # the LLM client is configured from the resolved config (runtime.local_max_concurrent is the answer path's lane
+    # width, kept for the recorded v9b configs); its ledger goes into the run directory
+    from .llm import client as LC
+    LC.configure(_llm_settings(cfg, local_lanes=cfg.runtime.local_max_concurrent), run_id=a.run_id,
+                 ledger_path=rd / "llm_calls.jsonl", caller="answer")
     os.environ["SCIVERSE_MAX_WAIT_S"] = str(cfg.runtime.sciverse_max_wait_s)
     if cfg.answer.cutoff:
         os.environ["KNOWLEDGE_CUTOFF"] = str(cfg.answer.cutoff)
@@ -141,6 +144,13 @@ def cmd_verify(a):
     raise SystemExit(0 if r["ok"] else 1)
 
 
+def _llm_settings(cfg, local_lanes: int | None = None) -> dict:
+    llm = json.loads(json.dumps(cfg.llm or {}))
+    if local_lanes:
+        llm.setdefault("providers", {}).setdefault("local", {})["lanes"] = int(local_lanes)
+    return llm
+
+
 def cmd_build(a):
     """Build one stage of the literature layer (or report the status of every stage). Each stage refuses to run on a
     stale upstream, so stages are built in order; `all` builds every stale stage in order."""
@@ -161,6 +171,11 @@ def cmd_build(a):
     else:
         todo = [a.stage]
     rb = a.rebuild
+    cfg = C.load(a.config, a.set)
+    from .llm import client as LC
+    run_id = f"build-{'-'.join(todo) or 'none'}-{time.strftime('%Y%m%dT%H%M%S')}"
+    LC.configure(_llm_settings(cfg), run_id=run_id, caller="build")
+    print(f"[build] stages {todo}; LLM ledger {LC.call_log_summary()['ledger']}", flush=True)
     for s in todo:
         print(f"[build] {s}", flush=True)
         if s == "papers":
@@ -174,12 +189,15 @@ def cmd_build(a):
             print(json.dumps(B.build(rebuild=rb)))
         elif s == "extract":
             from .extract import build as B
-            cats = tuple(a.categories.split(","))
-            print(json.dumps(B.build(categories=cats, since=a.since, n_deep=a.n_deep, workers=a.workers,
-                                     rebuild=rb)))
+            bc = cfg.build
+            cats = tuple(a.categories.split(",")) if a.categories else tuple(bc.categories)
+            print(json.dumps(B.build(categories=cats, since=a.since or bc.since,
+                                     n_deep=a.n_deep if a.n_deep is not None else bc.n_deep,
+                                     workers=a.workers or bc.workers, rebuild=rb)))
         elif s == "index":
             from .index import build as B
-            print(json.dumps(B.build(dense=tuple(x for x in a.dense.split(",") if x))))
+            dense = tuple(x for x in a.dense.split(",") if x) if a.dense is not None else tuple(cfg.build.dense)
+            print(json.dumps(B.build(dense=dense)))
 
 
 def main(argv=None):
@@ -188,11 +206,13 @@ def main(argv=None):
     p = sub.add_parser("build", help="build a literature-layer stage: status | all | papers | documents | citations | "
                                      "extract | index")
     p.add_argument("stage", choices=["status", "all", "papers", "documents", "citations", "extract", "index"])
-    p.add_argument("--categories", default="cs.LG", help="extract: primary categories in scope, comma-separated")
-    p.add_argument("--since", default="2018-01-01", help="extract: first v1 date in scope")
-    p.add_argument("--n-deep", type=int, default=500, help="extract: number of T2 (full-text) papers")
-    p.add_argument("--workers", type=int, default=48)
-    p.add_argument("--dense", default="papers,statements", help="index: which indexes get dense vectors")
+    p.add_argument("--config", help="experiment config (default: configs/base.yaml [+ local.yaml]); build: and llm:")
+    p.add_argument("--set", action="append", default=[], help="override, e.g. build.n_deep=200")
+    p.add_argument("--categories", default=None, help="extract: primary categories in scope (default build.categories)")
+    p.add_argument("--since", default=None, help="extract: first v1 date in scope (default build.since)")
+    p.add_argument("--n-deep", type=int, default=None, help="extract: number of T2 papers (default build.n_deep)")
+    p.add_argument("--workers", type=int, default=None, help="default build.workers")
+    p.add_argument("--dense", default=None, help="index: which indexes get dense vectors (default build.dense)")
     p.add_argument("--rebuild", action="store_true",
                    help="build into a new file and swap it in (clean slate); default is incremental")
     p.set_defaults(fn=cmd_build)
