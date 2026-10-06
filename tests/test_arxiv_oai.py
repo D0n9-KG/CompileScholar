@@ -25,6 +25,8 @@ def test_parse_record_uses_v1_date_not_latest():
     r = A.parse_record(ET.fromstring(RECORD))
     assert r["arxiv_id"] == "1601.04794"
     assert r["v1_date"] == "2016-01-19" and r["versions"] == 2
+    assert r["version_dates"] == {"v1": "2016-01-19", "v2": "2026-08-25"}
+    assert r["authors_raw"] == "Changqing Liu and Bo Zhang (Some University)"
     assert r["title"] == "Concentration Inequalities for Branching Random Walks"
     assert r["authors"] == ["Liu", "Zhang"]
     assert r["categories"] == ["cs.CC", "math.PR"] and r["abstract"] == "A new framework."

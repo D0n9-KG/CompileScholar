@@ -9,8 +9,10 @@ Why arXivRaw and not arXiv: the `arXiv` format's <created> is not the first-vers
 created=2026-08-30, while its v1 is 2016-01-19; measured 10-05). arXivRaw lists every version with its date, so
 v1_date is exact.
 
-Per record we keep: arxiv_id, v1_date (YYYY-MM-DD), versions (count), title, abstract, authors (surname list, first
-author first), categories (list, primary first), doi.
+Per record we keep: arxiv_id, v1_date (YYYY-MM-DD), versions (count), version_dates ({"v1": "YYYY-MM-DD", ...}),
+title, abstract (both of the latest version), authors (surname list, first author first), authors_raw (the arXivRaw
+string), categories (list, primary first), doi. Format 2 (version_dates, authors_raw) lives in its own cache directory;
+format-1 windows lack the per-version dates the library needs (INTEGRATED-SYSTEM-1005 §2.3).
 OAI-PMH asks for no more than one request every few seconds; we pause PAUSE seconds between requests and back off on
 503 with the server's Retry-After."""
 from __future__ import annotations
@@ -34,8 +36,11 @@ PAUSE = 3.0
 UA = "CompileScholar-harvester (research; respects OAI-PMH flow control)"
 
 
+FORMAT = 2
+
+
 def out_dir(set_spec: str = "cs") -> Path:
-    return paths.cache() / "arxiv_oai" / set_spec
+    return paths.cache() / "arxiv_oai" / f"{set_spec}.v{FORMAT}"
 
 
 def _text(el, path: str) -> str:
@@ -43,7 +48,7 @@ def _text(el, path: str) -> str:
     return re.sub(r"\s+", " ", x.text).strip() if x is not None and x.text else ""
 
 
-def _rfc2822_day(s: str) -> str:
+def rfc2822_day(s: str) -> str:
     """'Tue, 19 Jan 2016 04:10:52 GMT' -> '2016-01-19' ('' when unparseable)."""
     try:
         return email.utils.parsedate_to_datetime(s).date().isoformat()
@@ -51,16 +56,21 @@ def _rfc2822_day(s: str) -> str:
         return ""
 
 
+def author_names(authors: str) -> list[dict]:
+    """arXivRaw author string ('A. Smith, B. Jones and C. Lee (MIT)') -> [{'name': 'A. Smith', 'surname': 'Smith'},
+    ...]; affiliations in parentheses dropped."""
+    s = re.sub(r"\([^()]*\)", " ", authors or "")
+    out = []
+    for p in re.split(r",\s*|\s+and\s+", s):
+        w = [x for x in p.strip().split() if x]
+        if w and w[-1].strip(".,;"):
+            out.append({"name": " ".join(w), "surname": w[-1].strip(".,;")})
+    return out
+
+
 def surnames(authors: str) -> list[str]:
     """arXivRaw author string ('A. Smith, B. Jones and C. Lee (MIT)') -> ['Smith', 'Jones', 'Lee']."""
-    s = re.sub(r"\([^()]*\)", " ", authors or "")
-    parts = re.split(r",\s*|\s+and\s+", s)
-    out = []
-    for p in parts:
-        w = [x for x in p.strip().split() if x]
-        if w:
-            out.append(w[-1].strip(".,;"))
-    return [x for x in out if x]
+    return [a["surname"] for a in author_names(authors)]
 
 
 def parse_record(rec: ET.Element) -> dict | None:
@@ -72,12 +82,14 @@ def parse_record(rec: ET.Element) -> dict | None:
     if md is None:
         return None
     versions = md.findall("raw:version", NS)
+    vdates = {v.get("version"): rfc2822_day(_text(v, "raw:date")) for v in versions if v.get("version")}
     v1 = next((v for v in versions if v.get("version") == "v1"), versions[0] if versions else None)
-    v1_date = _rfc2822_day(_text(v1, "raw:date")) if v1 is not None else ""
+    v1_date = rfc2822_day(_text(v1, "raw:date")) if v1 is not None else ""
+    authors_raw = _text(md, "raw:authors")
     return {"arxiv_id": _text(md, "raw:id"), "v1_date": v1_date, "versions": len(versions),
-            "title": _text(md, "raw:title"), "abstract": _text(md, "raw:abstract"),
-            "authors": surnames(_text(md, "raw:authors")), "categories": _text(md, "raw:categories").split(),
-            "doi": _text(md, "raw:doi") or None}
+            "version_dates": vdates, "title": _text(md, "raw:title"), "abstract": _text(md, "raw:abstract"),
+            "authors": surnames(authors_raw), "authors_raw": authors_raw,
+            "categories": _text(md, "raw:categories").split(), "doi": _text(md, "raw:doi") or None}
 
 
 def _get(url: str, tries: int = 8) -> bytes:

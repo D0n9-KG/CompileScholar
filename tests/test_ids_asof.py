@@ -111,3 +111,11 @@ def test_legacy_month_rule_matches_v9b():
                        (None, "2025"), (None, None)]:
         assert allowed(year, date) == C.allowed(year, date, cut=(2025, 5))
     assert A.legacy_month_rule(None)(None, None) is True
+
+
+def test_title_key_joins_latex_and_plain_spellings():
+    from compilescholar.core.ids import title_key
+    assert title_key("$L_2$ Attacks on Nets") == title_key("L2 attacks on nets") == title_key("L-2 Attacks on Nets")
+    assert title_key(r"$\alpha$-Synuclein Folding") == title_key("α-synuclein folding")
+    assert title_key(r"\textbf{Deep} Nets") == title_key("Deep Nets")
+    assert title_key("") == ""

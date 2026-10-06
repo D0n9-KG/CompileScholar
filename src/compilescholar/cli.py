@@ -200,9 +200,66 @@ def cmd_build(a):
             print(json.dumps(B.build(dense=dense)))
 
 
+def cmd_library(a):
+    """The registry (data/library/registry.sqlite): bulk imports, title-match proposals, counts."""
+    from .library import identity, import_arxiv, import_benchmarks, import_scievo, store
+    if a.action == "import-arxiv":
+        print(json.dumps(import_arxiv.run(scope=a.scope, fill_members=a.fill_members)))
+    elif a.action == "import-scievo":
+        print(json.dumps(import_scievo.run()))
+    elif a.action == "adjudicate":
+        from .library import adjudicate
+        from .llm import client as LC
+        cfg = C.load(a.config, a.set)
+        LC.configure(_llm_settings(cfg), run_id=f"library-adjudicate-{time.strftime('%Y%m%dT%H%M%S')}",
+                     caller="library")
+        kinds = tuple(a.kinds.split(",")) if a.kinds else ("shared_doi", "identifier_conflict", "title_match")
+        only = [int(x) for x in open(a.ids).read().split()] if a.ids else None
+        print(json.dumps(adjudicate.run(kinds=kinds, limit=a.limit, apply=not a.dry_run, only_ids=only,
+                                        workers=a.workers or 32)))
+    elif a.action == "import-benchmarks":
+        names = tuple(a.benchmarks.split(",")) if a.benchmarks else tuple(import_benchmarks.BENCHMARKS)
+        print(json.dumps(import_benchmarks.run(names)))
+    elif a.action == "propose-titles":
+        with store.lock():
+            con = store.connect()
+            print(json.dumps(identity.propose_title_matches(con)))
+            con.close()
+    elif a.action == "status":
+        con = store.connect()
+        q = lambda s: con.execute(s).fetchall()
+        print(json.dumps({
+            "papers": dict(q("SELECT status, count(*) FROM papers GROUP BY status")),
+            "id_prefix": dict(q("SELECT substr(paper_id, 1, instr(paper_id, ':') - 1), count(*) FROM papers "
+                                "WHERE status='active' GROUP BY 1")),
+            "identifiers": dict(q("SELECT scheme, count(*) FROM identifiers GROUP BY scheme")),
+            "members": dict(q("SELECT benchmark, count(*) FROM members GROUP BY benchmark")),
+            "first_public": dict(q("SELECT coalesce(first_kind, 'none'), count(*) FROM papers WHERE status='active' "
+                                   "GROUP BY 1")),
+            "merge_queue": [list(r) for r in q("SELECT kind, status, count(*) FROM merge_queue GROUP BY 1, 2")]},
+            indent=1))
+        con.close()
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="compilescholar")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("library", help="the registry: import-arxiv | import-benchmarks | import-scievo | "
+                                       "propose-titles | status")
+    p.add_argument("action", choices=["import-arxiv", "import-benchmarks", "import-scievo", "propose-titles",
+                                      "adjudicate", "status"])
+    p.add_argument("--kinds", default=None, help="adjudicate: queue kinds (default all)")
+    p.add_argument("--limit", type=int, default=None, help="adjudicate: at most this many pairs")
+    p.add_argument("--dry-run", action="store_true", help="adjudicate: store verdicts, merge nothing")
+    p.add_argument("--ids", default=None, help="adjudicate: file of merge_queue ids (an audit sample)")
+    p.add_argument("--workers", type=int, default=None)
+    p.add_argument("--config")
+    p.add_argument("--set", action="append", default=[])
+    p.add_argument("--fill-members", action="store_true",
+                   help="import-arxiv: only the snapshot records of registry arXiv ids that lack version dates")
+    p.add_argument("--scope", default="cs", choices=["cs", "all"], help="import-arxiv: cs (default) or every record")
+    p.add_argument("--benchmarks", default=None, help="import-benchmarks: comma list (default all four)")
+    p.set_defaults(fn=cmd_library)
     p = sub.add_parser("build", help="build a literature-layer stage: status | all | papers | documents | citations | "
                                      "extract | index")
     p.add_argument("stage", choices=["status", "all", "papers", "documents", "citations", "extract", "index"])

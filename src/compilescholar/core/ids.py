@@ -139,6 +139,22 @@ def norm_title(s: str | None, greek: bool = False) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
+_LATEX_CMD = re.compile(r"\\([A-Za-z]+)")
+_LATEX_MARK = re.compile(r"[${}^_~\\]")
+_LATEX_FORMAT = {"mathrm", "mathbf", "mathcal", "mathbb", "mathit", "mathsf", "mathtt", "mathfrak", "textbf",
+                 "textit", "textrm", "textsc", "texttt", "text", "emph", "it", "bf", "rm", "sc", "boldsymbol",
+                 "operatorname", "left", "right"}
+
+
+def title_key(s: str | None) -> str:
+    """Exact-match key for one title written by different sources: LaTeX formatting commands dropped and other
+    commands kept by name ($\\alpha$ -> alpha), $ { } ^ _ dropped, Greek letters spelled out, then norm_title with the
+    spaces removed — '$L_2$ Attacks', 'L2 attacks' and 'L-2 Attacks' share one key, so do '$\\alpha$-Synuclein' and
+    'α-synuclein'. A shared key only proposes a match; identity is decided elsewhere. Empty input -> ''."""
+    t = _LATEX_CMD.sub(lambda m: " " if m.group(1) in _LATEX_FORMAT else m.group(1), s or "")
+    return norm_title(_LATEX_MARK.sub("", t), greek=True).replace(" ", "")
+
+
 GENERIC_TITLES = {"editorial", "reply", "erratum", "corrigendum", "correction", "comment", "introduction",
                   "preface", "foreword", "index", "contents", "obituary", "book review", "letter to the editor",
                   "response", "retraction", "addendum", "news", "in this issue", "front matter", "back matter"}
