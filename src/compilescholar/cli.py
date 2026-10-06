@@ -183,7 +183,7 @@ def cmd_build(a):
             print(json.dumps(B.build(workers=a.workers, rebuild=rb)))
         elif s == "citations":
             from .citations import build as B
-            print(json.dumps(B.build(rebuild=rb)))
+            print(json.dumps(B.build(workers=a.workers, rebuild=rb)))
         elif s == "extract":
             from .extract import build as B
             bc = cfg.build
