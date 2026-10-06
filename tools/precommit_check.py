@@ -62,7 +62,7 @@ def check(paths: list[str]) -> list[str]:
             continue
         data = staged_blob(p)
         if len(data) > LIMIT and not (p.startswith("results/") and p.endswith(".gz")):
-            problems.append(f"{p}: {len(data) / 1048576:.1f} MB > 5 MB (put it in artifacts/MANIFEST.tsv, not git)")
+            problems.append(f"{p}: {len(data) / 1048576:.1f} MB > 5 MB (put it under data/ and pin it in data/MANIFEST.tsv, not git)")
         if any(v in data for v in secrets):
             problems.append(f"{p}: contains the value of a credential from .env")
         body = _unmarked(data)

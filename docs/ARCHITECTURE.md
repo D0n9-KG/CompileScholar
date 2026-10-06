@@ -5,8 +5,9 @@ and — its distinctive part — compiles **diachronic field cognition**: how th
 date T (families, lineage, what a work is used as, the limitations the field states, how that changed). Every
 capability is exposed as a tool that takes `as_of`.
 
-Design documents: `.research_tmp/docs_decisions/system-vision-1004/` (DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005,
-NARRATIVE-V9-1005, EVAL-PLAN-1005).
+Design documents: `docs/design/INTEGRATED-SYSTEM-1005.md` (the current system design; module verdicts in
+`docs/design/review/FITNESS-*.md`) and `docs/design/system-vision-1004/` (NARRATIVE-V9-1005, EVAL-PLAN-1005,
+DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005 and the research reports behind them).
 
 ## Data flow (one store, one identity, one schema)
 

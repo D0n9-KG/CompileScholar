@@ -26,8 +26,10 @@ build:
   since: "2018-01-01"
   n_deep: 500
   dense: [papers, statements]
-# The one LLM client (llm.client.configure). Lane widths are the measured sweet spots (local 27B: throughput still rising
-# at 96 lanes, latency flat up to 48 — 10-03 load test). Machine-specific overrides go in configs/local.yaml.
+# The one LLM client (llm.client.configure). Lane widths are the measured sweet spots. Local 27B (GPUStack, 3 replicas):
+# 64 lanes 568k tok/min, 96 lanes 671k, 128 lanes 684k (p50 latency doubles 10->21 s: the knee) — 09-22 load test,
+# formerly conf/capacity.yaml; 48 lanes 791 tok/s with 96/96 calls ok — 10-06 smoke test of this client.
+# Machine-specific overrides go in configs/local.yaml.
 llm:
   providers:
     local: {lanes: 48, large_lanes: 48, read_timeout: 600, wall: 1800, attempts: 4}
