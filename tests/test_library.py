@@ -189,3 +189,11 @@ def test_crossref_assertion_dates():
     assert str(assertion_date("July 2015")) == "2015-07" and assertion_date("July 2015").precision == "month"
     assert str(assertion_date("2015-07-01")) == "2015-07-01"
     assert assertion_date("soon") is None
+
+
+def test_crossref_titles_lose_markup():
+    from compilescholar.library.import_crossref import strip_markup
+    t = ('Elastic properties of a paramagnet: Application to NdV<mml:math xmlns:mml="x"><mml:msub><mml:mrow>'
+         '<mml:mi>O</mml:mi></mml:mrow><mml:mrow><mml:mn>4</mml:mn></mml:mrow></mml:msub></mml:math>')
+    assert strip_markup(t) == "Elastic properties of a paramagnet: Application to NdVO4"
+    assert strip_markup("<jats:p>A &amp; B</jats:p>") == "A & B"

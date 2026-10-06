@@ -32,6 +32,16 @@ def assertion_date(v: str) -> Date | None:
     return Date.parse(f"{m.group(3)}-{mo:02d}" + (f"-{int(m.group(1)):02d}" if m.group(1) else ""))
 
 
+_TAG = re.compile(r"<[^>]+>")
+
+
+def strip_markup(s: str) -> str:
+    """Crossref titles and abstracts carry JATS / MathML / HTML tags ('NdV<mml:math>...<mml:mn>4</mml:mn>...'): keep the
+    text content ('NdVO4'), decode entities, collapse whitespace."""
+    import html
+    return re.sub(r"\s+", " ", html.unescape(_TAG.sub("", s or ""))).strip()
+
+
 def _date(parts) -> Date | None:
     p = ((parts or {}).get("date-parts") or [[None]])[0]
     if not p or p[0] is None:
@@ -47,7 +57,7 @@ def record(doi: str) -> identity.Incoming | None:
     if r.status == 404 or not r.ok:
         return None
     m = r.json().get("message") or {}
-    title = " ".join(m.get("title") or [])
+    title = strip_markup(" ".join(m.get("title") or []))
     authors = [{"name": " ".join(x for x in (a.get("given"), a.get("family")) if x), "surname": a.get("family") or ""}
                for a in m.get("author") or [] if a.get("family")]
     dates = [("online", 0, _date(m.get("published-online"))), ("issued", 0, _date(m.get("issued")))]
@@ -58,7 +68,8 @@ def record(doi: str) -> identity.Incoming | None:
         if a.get("name") == "received" and a.get("value"):
             dates.append(("received", 0, assertion_date(a["value"])))
     return identity.Incoming(source="crossref", ids=[("doi", d, "self")], title=title,
-                             abstract=m.get("abstract") or "", venue=" ".join(m.get("container-title") or []),
+                             abstract=strip_markup(m.get("abstract") or ""),
+                             venue=" ".join(m.get("container-title") or []),
                              dates=[x for x in dates if x[2] is not None], authors=authors)
 
 

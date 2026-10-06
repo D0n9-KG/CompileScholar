@@ -1,4 +1,31 @@
-# 一体化系统与工作区设计（INTEGRATED-SYSTEM-1005，v2.2）
+# 一体化系统与工作区设计（INTEGRATED-SYSTEM-1005，v2.3）
+
+> **v2.3（10-06 晚，阶段 B 实现与闸门）**
+>
+> 1. **文库建成**：`data/library/registry.sqlite`，约 119 万篇。
+>    - arXiv cs 104.8 万篇，每个版本的日期都存；
+>    - 四个基准语料：只入成员和元数据，不入题目和标签；
+>    - sci-evo 480 篇，清洗后迁入。
+>    - 写入时一律不合并：共享 DOI、标识冲突、标题相同都进合并队列（54,416 条），由两个模型裁定；两边都说"是同一篇"才合并。
+>    - 两个不同的 arXiv 号永不自动合并。200 对审计里的错误合并全是这一类：同一作者的后续研究用了新号。
+> 2. **取全文**：
+>    - 按通道依次尝试：arXiv 分版本 NAS 镜像 → GCS 公开桶；只有 DOI 的走 OpenAlex OA → Sci-Hub 本地库。
+>    - 身份核对先走确定性规则，拿不准的再交给 LLM。
+>    - 资产只存指针；核对不一致的进 quarantine，不删除。
+> 3. **文档两档**：
+>    - 解析产物存进权威库 `parses` 表，按 PDF 的 sha256 存；
+>    - 快速档 `documents/tei` 在 61 篇金标上召回 0.930、精度 0.930，表格行不算引用句；
+>    - 精读档 `documents/mineru` 产出表格 HTML、公式、图注和参考文献表。
+> 4. **版本感知** `documents/versions`：
+>    - v1 全读，最新版只取增量，用模糊匹配比对。
+>    - 74 篇双版本论文里，逐字不同的句子占 48%，真正新增的只有 13%。
+>    - 190 篇实测：v1 的引用没有一条晚于 v1 的日期；最新版里晚于 v1 的 41 条参考文献，全部落在增量里。
+> 5. **跨领域闸门**（`experiments/library/gate_b_crossdomain.py`）：从 Sci-Hub 索引按出版社前缀随机抽 24 个 DOI，覆盖 Nature、Nat Commun、Science、PRL、PRB、JACS、Angew、NEJM、Lancet、Cell Signal、JGR、Acta Mater。
+>    - 22 篇走通了全流程：registry → acquire → 两档解析 → 文本单元。
+>    - 2 篇如实判为不一致：一篇是 Nature 新闻页"无 PDF"的提示页；另一篇是 PRB 1979，原因是 Crossref 标题里带 MathML，已修。
+>    - 较新的期刊论文（2002 年以后）引用句都正常。
+>    - **1990 年以前的扫描件**（PRB 1979、JACS 1988/1991、Angew 1960s，以及 NEJM/Lancet 19 世纪档案）文本层有，但用的是上标数字引用，或者没有成形的参考文献表。GROBID 能拿到条目，连接却是 0。非 CS 领域纳入构建时，要补"上标引用识别"（PyMuPDF 的 span flags），或者对这类老论文只做他述，不做引用句。当前 CS 主线不受影响。
+>    - Crossref 投稿日（received）的覆盖：Springer、Nature、ACM、Wiley 有；Elsevier、APS、CUP、IEEE 没有（256 篇里 39 篇有）。
 
 > **v2.2 修订（10-06，阶段 B 第一件事的实测结果；改写 v2.1 第 2、3 条）**
 >
@@ -496,7 +523,7 @@
 | 阶段 | 内容 | 闸门 |
 |---|---|---|
 | **A 基础** | ① 阶段契约修复（§10.1）；② 唯一的 LLM 客户端加配置与路径（§10.2–10.3）；③ `core/ids.py`、`core/asof.py`（v9b 走兼容适配器）；④ 把隐藏依赖迁出 `.research_tmp`；⑤ 旧包的能力迁出（先迁 salvage），sci-evo 代码作为待重构的代码迁入；⑥ 根目录清理与打包；⑦ `cites(sentence_id)` 索引 | v9b 表征测试逐字节一致；全部测试通过；契约探针测试、路径闸门测试、客户端故障测试通过；干净 clone 上测试能跑 |
-| **B 底座** | ① ~~9602 加限流和重试后重测 MinerU 吞吐；快速档与 GROBID 对照~~（v2.2 已完成：快速档 = GROBID full + PDF 引用链接，MinerU 9602 最多 6 路）；② 按新 schema 重构 registry，批量导入 104.6 万篇 arXiv 元数据（含各版本日期），并导入四个固定库基准的语料；③ 清洗 sci-evo 数据后迁入；④ 合并队列加 LLM 裁定；⑤ sources 统一 http 层，Sci-Hub 修好；⑥ acquire 按通道接入，加身份核对和隔离；⑦ MinerU 客户端（9602 file_parse 为主，9605 V1 备选），精读档 documents 从 content_list / structured_content 生成，快速档 documents 从 GROBID TEI 生成（句、引用、条目带坐标，PDF 引用链接补连接，剔除表格和图里的文字，PyMuPDF 只用于读链接和上标）；⑧ 版本感知（v1 加最新版增量） | 身份合并抽查，双模型核对；20 篇跨领域 PDF（Nature、物理、化学、医学、含公式）走通 acquire → MinerU → units；版本泄漏测试（参考文献不晚于文本版本日）；equation 块形态核实 |
+| **B 底座**（v2.3：已建成，闸门见 v2.3 第 5 条） | ① ~~9602 加限流和重试后重测 MinerU 吞吐；快速档与 GROBID 对照~~（v2.2 已完成：快速档 = GROBID full + PDF 引用链接，MinerU 9602 最多 6 路）；② 按新 schema 重构 registry，批量导入 104.6 万篇 arXiv 元数据（含各版本日期），并导入四个固定库基准的语料；③ 清洗 sci-evo 数据后迁入；④ 合并队列加 LLM 裁定；⑤ sources 统一 http 层，Sci-Hub 修好；⑥ acquire 按通道接入，加身份核对和隔离；⑦ MinerU 客户端（9602 file_parse 为主，9605 V1 备选），精读档 documents 从 content_list / structured_content 生成，快速档 documents 从 GROBID TEI 生成（句、引用、条目带坐标，PDF 引用链接补连接，剔除表格和图里的文字，PyMuPDF 只用于读链接和上标）；⑧ 版本感知（v1 加最新版增量） | 身份合并抽查，双模型核对；20 篇跨领域 PDF（Nature、物理、化学、医学、含公式）走通 acquire → MinerU → units；版本泄漏测试（参考文献不晚于文本版本日）；equation 块形态核实 |
 | **C 引用与抽取** | ① citations 重构加结构化引文查询；② schema v2；③ T1 / T2 / 结果遍 / 他述遍；④ 统一终检；⑤ 哨兵用例；⑥ work 表；⑦ 他述按时间分层抽样；⑧ 自引标记 | 哨兵通过；抽样 200 条双模型核对 ≥ 0.95；50 篇新旧覆盖率对照（旧深抽的信息要被新记录覆盖）；引用解析分 CS 和非 CS 各复测一次 |
 | **D 编译、索引、工具** | ① 物化各表（§8）；② 五类 LLM 裁定，各先做 200 条试点；③ tantivy 加向量；④ 工具改造、外检、对照臂和消融开关、预算记账；⑤ answer_lit 修复 | 端到端不变量（含泄漏和规模冒烟）；裁定一致率达到阈值；工具单次调用 < 200 ms |
 | **F 实测与打磨** | ① 写下题目盲的建库范围规则，并预注册；② 真实构建；③ 基准适配器；④ 真实智能体经 MCP 在 dev 上跑，看轨迹迭代 harness | CS2 dev 非劣（界 −0.02）；主基准 dev 结果 |

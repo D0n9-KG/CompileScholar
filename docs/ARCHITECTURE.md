@@ -9,10 +9,32 @@ Design documents: `docs/design/INTEGRATED-SYSTEM-1005.md` (the current system de
 `docs/design/review/FITNESS-*.md`) and `docs/design/system-vision-1004/` (NARRATIVE-V9-1005, EVAL-PLAN-1005,
 DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005 and the research reports behind them).
 
-**State (2026-10-06).** Phase A of the integrated design (foundations) is done: the stage contract, the one LLM client,
-identifiers and time, configuration and paths, a single package and a clean workspace. Phases B–D (library with
-DOI-first identity, two-tier documents, extraction schema v2, materialised cognition, tantivy index) are next; the
-data flow below marks what each stage is today and what it becomes.
+**State (2026-10-06).** Phase A (foundations) is done: the stage contract, the one LLM client, identifiers and time,
+configuration and paths, a single package and a clean workspace. Phase B (the base) is built: the library with
+DOI-first identity and a merge queue judged by two models, acquisition with identity checks, the two document tiers
+(GROBID + PDF links for every paper, MinerU for the deep subset) and version awareness. The derived stages (documents,
+citations, extract, index) still key on arXiv ids; phase C moves them onto the library (paper_id, text version and
+its date). The data flow below marks what each stage is today and what it becomes.
+
+## The library (phase B)
+
+```
+sources/   http (paced per source across processes, Retry-After, circuit, transient failures never cached),
+           arxiv_oai (format 2: every version's date), arxiv_snapshot, scihub (local archive, internal use only)
+library/   registry.sqlite — papers (paper_id: doi:/arxiv:/title:, never reassigned), identifiers (one value names
+           one paper), dates (per source, kind, version; interval + precision), records, authors, members (a
+           benchmark's candidate corpus: membership only, never questions or labels), aliases, merge_queue,
+           assets, attempts, parses, imports
+           import_arxiv · import_benchmarks · import_scievo · import_crossref: bulk, idempotent
+           identity: resolve-then-write, nothing merged at write time; adjudicate: two models (local + Paratera)
+           must both say "same work"; two different arXiv ids never merge automatically
+acquire/   channels (arXiv per-version NAS mirror -> GCS bucket; OpenAlex OA -> Sci-Hub), identity check (own id
+           stamp, title + surnames, LLM for the unsure), assets as pointers, mismatches to quarantine/
+documents/ parse (fast: GROBID 0.9.1-full + hyperref links, every asset; careful: MinerU task router, the deep
+           subset), tei (units, sentences, entries, citation pairs with page + bbox), mineru (sections, paragraphs,
+           table HTML, formulas, captions, footnotes, references), assemble (one paper version + its text date),
+           versions (v1 in full, the latest version's delta)
+```
 
 ## Data flow
 
@@ -73,9 +95,11 @@ grow        typed gap diagnosis -> acquisition -> the same stages (offline, ques
 | `core/` | config, paths, secrets, ids, asof, run manifests, frozen v9b cutoff |
 | `llm/` | the one LLM client, embedding, JSON parsing |
 | `dfc/store.py` | the stage contract |
-| `sources/` | arXiv (OAI-PMH, snapshot, HTML), Sciverse, refgraph, circuit breaker |
-| `corpus/papers.py` | papers stage; title resolution |
-| `documents/` | full-text units; deterministic table parsing |
+| `sources/` | the http layer; arXiv (OAI-PMH, snapshot, HTML), Sci-Hub local archive, Sciverse, refgraph, circuit breaker |
+| `library/` | the registry (identity, identifiers, dates, assets, parses), imports, merge queue and its LLM verdicts |
+| `acquire/` | full-text channels, identity check, quarantine |
+| `corpus/papers.py` | papers stage (arXiv-keyed, until phase C moves the derived stages onto the library); title resolution |
+| `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; deterministic table parsing |
 | `citations/` | citation sentences, entry -> paper |
 | `extract/` | the schema and the passes |
 | `index/` | multi-granularity search with as_of |
