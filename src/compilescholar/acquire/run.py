@@ -45,6 +45,20 @@ def _write(p, data: bytes) -> None:
     tmp.replace(p)
 
 
+def read_asset(pointer: dict) -> bytes:
+    """The PDF bytes behind an assets.pointer (NAS mirror path, Sci-Hub member, or a stored download)."""
+    from ..sources import scihub
+    if pointer.get("file"):
+        return (paths.library() / pointer["file"]).read_bytes()
+    ch = pointer["channel"]
+    if ch == "arxiv_nas":
+        return (paths.resource("arxiv_pdf_mirror") / pointer["path"]).read_bytes()
+    if ch == "scihub_local":
+        return scihub.read(scihub.Hit(pointer.get("doi", ""), pointer["archive"], pointer["inner_path"],
+                                      pointer["size"], pointer["crc"]))
+    raise ValueError(f"asset pointer without bytes: {pointer}")
+
+
 def plan(con, pid: str) -> list[tuple[CH.Want, tuple]]:
     """[(want, channel order)] for one paper."""
     pid = identity.canonical(con, pid)

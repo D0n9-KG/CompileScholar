@@ -207,6 +207,10 @@ def cmd_library(a):
         print(json.dumps(import_arxiv.run(scope=a.scope, fill_members=a.fill_members)))
     elif a.action == "import-scievo":
         print(json.dumps(import_scievo.run()))
+    elif a.action == "import-crossref":
+        from .library import import_crossref
+        dois = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()]
+        print(json.dumps(import_crossref.run(dois)))
     elif a.action == "adjudicate":
         from .library import adjudicate
         from .llm import client as LC
@@ -261,9 +265,21 @@ def cmd_acquire(a):
     print(json.dumps(R.acquire(pids, workers=a.workers, exclude=exclude, llm=not a.no_llm)))
 
 
+def cmd_parse(a):
+    """Parse acquired PDFs: tier fast (GROBID + PDF links, every asset) or careful (MinerU, the given papers)."""
+    from .documents import parse as P
+    pids = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()] if a.ids else None
+    print(json.dumps(P.run(a.tier, paper_ids=pids, workers=a.workers)))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="compilescholar")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("parse", help="parse acquired PDFs: fast (GROBID) | careful (MinerU)")
+    p.add_argument("tier", choices=["fast", "careful"])
+    p.add_argument("--ids", default=None, help="file of paper_ids (default: every asset)")
+    p.add_argument("--workers", type=int, default=None)
+    p.set_defaults(fn=cmd_parse)
     p = sub.add_parser("acquire", help="fetch + identity-check full texts (library assets)")
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--benchmark", help="every member of this benchmark")
@@ -278,12 +294,13 @@ def main(argv=None):
     p.set_defaults(fn=cmd_acquire)
     p = sub.add_parser("library", help="the registry: import-arxiv | import-benchmarks | import-scievo | "
                                        "propose-titles | status")
-    p.add_argument("action", choices=["import-arxiv", "import-benchmarks", "import-scievo", "propose-titles",
-                                      "adjudicate", "status"])
+    p.add_argument("action", choices=["import-arxiv", "import-benchmarks", "import-scievo", "import-crossref",
+                                      "propose-titles", "adjudicate", "status"])
     p.add_argument("--kinds", default=None, help="adjudicate: queue kinds (default all)")
     p.add_argument("--limit", type=int, default=None, help="adjudicate: at most this many pairs")
     p.add_argument("--dry-run", action="store_true", help="adjudicate: store verdicts, merge nothing")
-    p.add_argument("--ids", default=None, help="adjudicate: file of merge_queue ids (an audit sample)")
+    p.add_argument("--ids", default=None, help="adjudicate: file of merge_queue ids (an audit sample); "
+                                               "import-crossref: file of DOIs")
     p.add_argument("--workers", type=int, default=None)
     p.add_argument("--config")
     p.add_argument("--set", action="append", default=[])

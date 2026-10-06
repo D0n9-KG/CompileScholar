@@ -59,5 +59,5 @@ def read(hit: Hit) -> bytes:
 
 def pointer(hit: Hit) -> dict:
     """The asset pointer stored in the library (PDFs are not copied, §4 存储)."""
-    return {"channel": "scihub_local", "archive": hit.archive, "inner_path": hit.inner_path, "size": hit.size,
-            "crc": hit.crc}
+    return {"channel": "scihub_local", "doi": hit.doi, "archive": hit.archive, "inner_path": hit.inner_path,
+            "size": hit.size, "crc": hit.crc}

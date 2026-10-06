@@ -30,6 +30,10 @@ Tables
       version of record (journal), N = arXiv vN. identity: ok (deterministic) | ok_llm | (mismatches never land here)
   attempts(id PK, paper_id, version, channel, status, detail, sha256, at)   every acquisition try: ok | missing |
       mismatch (the PDF went to data/library/quarantine/<sha>.pdf) | error
+  parses(sha256, parser, parser_version, tier, status, path, detail, attempts, created_at)  PK(sha256, parser): the
+      parse products of one PDF (by content hash, so a PDF shared by two assets is parsed once). parser grobid (tier
+      fast) | mineru (tier careful); status ok | failed (retried up to 3 attempts) ; path under data/library/parsed/.
+      Parse products are authoritative (re-parsing 10^5 PDFs costs days); documents derive units from them.
 """
 from __future__ import annotations
 
@@ -75,6 +79,9 @@ CREATE INDEX IF NOT EXISTS ix_assets_sha ON assets(sha256);
 CREATE TABLE IF NOT EXISTS attempts(id INTEGER PRIMARY KEY AUTOINCREMENT, paper_id TEXT NOT NULL, version INT,
   channel TEXT NOT NULL, status TEXT NOT NULL, detail TEXT, sha256 TEXT, at TEXT);
 CREATE INDEX IF NOT EXISTS ix_attempts_paper ON attempts(paper_id, channel);
+CREATE TABLE IF NOT EXISTS parses(sha256 TEXT NOT NULL, parser TEXT NOT NULL, parser_version TEXT, tier TEXT,
+  status TEXT NOT NULL, path TEXT, detail TEXT, attempts INT NOT NULL DEFAULT 0, created_at TEXT,
+  PRIMARY KEY(sha256, parser));
 """
 
 

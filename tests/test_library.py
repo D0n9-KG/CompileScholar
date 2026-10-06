@@ -181,3 +181,11 @@ def test_describe_shows_evidence_not_benchmark(con):
     d = describe(con, a)
     assert "2021-01-04" in d and "doi:10.1000/j" in d and "Smith" in d and "prescience" not in d.split("[arxiv]")[0]
     assert "member" not in d and "benchmark" not in d
+
+
+def test_crossref_assertion_dates():
+    from compilescholar.library.import_crossref import assertion_date
+    assert str(assertion_date("1 July 2015")) == "2015-07-01"
+    assert str(assertion_date("July 2015")) == "2015-07" and assertion_date("July 2015").precision == "month"
+    assert str(assertion_date("2015-07-01")) == "2015-07-01"
+    assert assertion_date("soon") is None

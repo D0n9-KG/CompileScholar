@@ -98,38 +98,39 @@ def _two_arxiv_ids(con: sqlite3.Connection, a: str, b: str) -> bool:
 def run(kinds=("shared_doi", "identifier_conflict", "title_match"), limit: int | None = None, workers: int = 32,
         apply: bool = True, only_ids: list[int] | None = None, log=print, path=None) -> dict:
     """Adjudicate open queue rows of `kinds` (or exactly the rows `only_ids`); verdicts already stored are reused.
-    apply=False stores verdicts only (an audit run); apply=True also rejects and merges."""
-    with store.lock(path):
-        con = store.connect(path)
-        rows = con.execute("SELECT id, a, b, kind, verdict FROM merge_queue WHERE status='open' AND kind IN (%s) "
-                           "ORDER BY id" % ",".join("?" * len(kinds)), kinds).fetchall()
-        if only_ids is not None:
-            keep = set(only_ids)
-            rows = [r for r in rows if r[0] in keep]
-        rows = rows[:limit]
-        log(f"[adjudicate] {len(rows):,} open pairs")
-        n = {"merged": 0, "rejected": 0, "open": 0}
-        merges = []
-        # verdicts are written chunk by chunk, so an interrupted run resumes from the stored ones; merges are applied
-        # at the end, after every verdict is in
-        for c0 in range(0, len(rows), CHUNK):
-            chunk = rows[c0:c0 + CHUNK]
-            descs = {p: describe(con, identity.canonical(con, p)) for _, a, b, _, _ in chunk for p in (a, b)}
-            lock, results = threading.Lock(), {}
+    apply=False stores verdicts only (an audit run); apply=True also rejects and merges. The registry lock is held
+    only while a chunk's verdicts and the final merges are written, so imports can run alongside."""
+    con = store.connect(path)
+    rows = con.execute("SELECT id, a, b, kind, verdict FROM merge_queue WHERE status='open' AND kind IN (%s) "
+                       "ORDER BY id" % ",".join("?" * len(kinds)), kinds).fetchall()
+    if only_ids is not None:
+        keep = set(only_ids)
+        rows = [r for r in rows if r[0] in keep]
+    rows = rows[:limit]
+    log(f"[adjudicate] {len(rows):,} open pairs")
+    n = {"merged": 0, "rejected": 0, "open": 0}
+    merges = []
+    # verdicts are written chunk by chunk, so an interrupted run resumes from the stored ones; merges are applied at
+    # the end, after every verdict is in
+    for c0 in range(0, len(rows), CHUNK):
+        chunk = rows[c0:c0 + CHUNK]
+        descs = {p: describe(con, identity.canonical(con, p)) for _, a, b, _, _ in chunk for p in (a, b)}
+        lock, results = threading.Lock(), {}
 
-            def one(row):
-                qid, a, b, _, verdict = row
-                got = json.loads(verdict) if verdict else {}
-                if got.get("template") != TEMPLATE:          # verdicts of another prompt version are not reused
-                    got = {"template": TEMPLATE}
-                for prov in MODELS:
-                    if got.get(prov) is None:
-                        got[prov] = LC.call_json(PROMPT.format(a=descs[a], b=descs[b]), provider=prov,
-                                                 max_tokens=300, validate=_valid, template=TEMPLATE, item=str(qid))
-                with lock:
-                    results[qid] = got
-            parallel(one, chunk, workers)
-            now = time.strftime("%Y-%m-%dT%H:%M:%S")
+        def one(row):
+            qid, a, b, _, verdict = row
+            got = json.loads(verdict) if verdict else {}
+            if got.get("template") != TEMPLATE:          # verdicts of another prompt version are not reused
+                got = {"template": TEMPLATE}
+            for prov in MODELS:
+                if got.get(prov) is None:
+                    got[prov] = LC.call_json(PROMPT.format(a=descs[a], b=descs[b]), provider=prov,
+                                             max_tokens=300, validate=_valid, template=TEMPLATE, item=str(qid))
+            with lock:
+                results[qid] = got
+        parallel(one, chunk, workers)
+        now = time.strftime("%Y-%m-%dT%H:%M:%S")
+        with store.lock(path):
             for qid, a, b, kind, _ in chunk:
                 got = results[qid]
                 d = decide(got, _two_arxiv_ids(con, a, b))
@@ -141,12 +142,13 @@ def run(kinds=("shared_doi", "identifier_conflict", "title_match"), limit: int |
                 elif apply and d == "merged":
                     merges.append((a, b, kind))
             con.commit()
-            log(f"[adjudicate] {min(c0 + CHUNK, len(rows)):,}/{len(rows):,} {n}")
-        for a, b, kind in merges:
-            identity.merge(con, a, b, reason=f"{kind}: two-model verdict", decided_by="+".join(MODELS),
-                           recompute=False)
-        if merges:
+        log(f"[adjudicate] {min(c0 + CHUNK, len(rows)):,}/{len(rows):,} {n}")
+    if merges:
+        with store.lock(path):
+            for a, b, kind in merges:
+                identity.merge(con, a, b, reason=f"{kind}: two-model verdict", decided_by="+".join(MODELS),
+                               recompute=False)
             identity.recompute_first_public(con)
-        con.close()
+    con.close()
     log(f"[adjudicate] {n}")
     return n

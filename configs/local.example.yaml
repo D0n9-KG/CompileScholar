@@ -6,6 +6,7 @@ paths:
   scihub_index: C:/doi_index_scihub/doi_index.sqlite                            # DOI -> archive index (internal use only)
   scihub_archive: //nas/share/JournalPapers/scihub-mag/sci-mag
   harness_cwd: C:/cs2_harness_cwd                                               # Claude Code harness working directory
+  grobid: http://127.0.0.1:8071                                           # GROBID 0.9.1-full (docker, localhost only)
   scievo_registry: C:/path/to/sci-evo-extract/data/library/scievo_registry.sqlite     # sci-evo registry (one-off migration source)
   # astabench: third_party/asta-bench (default checkout location; override only if elsewhere)
   # deepscholar_bench: third_party/deepscholar-bench
