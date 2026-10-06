@@ -4,6 +4,27 @@ All notable changes to CompileScholar. Format loosely follows Keep a
 Changelog; dates are local. Historical era (LogicKG, granular-agent,
 contest) lives in `archive/` and git history — not repeated here.
 
+## 2026-10-06 — integrated system, phase A (foundations)
+
+Design: `docs/design/INTEGRATED-SYSTEM-1005.md` v2.1 (rewritten after four module fitness reviews,
+`docs/design/review/`). Tag `pre-integration-20261005` marks the state before.
+
+### Changed
+- Stage contract (`dfc/store.py`) rewritten: import-closure code hashes, config-level `stale` vs data-level `behind`,
+  item-level `_work` bookkeeping (only ok is done; retries; sweep), atomic manifests, stage locks, `--rebuild`,
+  breaker; per-thread read connections. All stages ported; the eight contract probes are regression tests.
+- One LLM client (`llm/client.py`): streamed and cancellable, lanes / rate limits from config, ledger always on,
+  response cache, purity audit, vision, `call_json`. Measured 791 tok/s at 48 lanes.
+- `core/ids.py` and `core/asof.py`: one identifier normalisation and one visibility rule (dates with precision);
+  tools filter cited objects by visibility (version leak found in the real store).
+- Paths: `data/{library,derived,benchmarks,external}`, `cache/`, `results/`, `third_party/`; machine resources only in
+  `configs/local.yaml`; `data/MANIFEST.tsv` pins the benchmark inputs (`tools/data_manifest.py`).
+
+### Removed
+- `src/kb_compiler`, `src/kb_infra`, `src/retrieval`, `src/sci_evo_extract.py` (capabilities moved; `legacy/INDEX.md`),
+  root `build.py` / `build_manifest.json` / `conf/` / `artifacts/`, tracking of `.research_tmp/` (kept on disk);
+  workspace clutter cold-stored on the NAS (`CompileScholar-cold-20261006`, every file sha256-verified).
+
 ## 2026-09-22 — pipeline engineering day (A/B series)
 
 ### Added
