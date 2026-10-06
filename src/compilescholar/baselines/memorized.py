@@ -21,14 +21,14 @@ from pathlib import Path
 
 from ..core import paths
 
-CS2 = paths.legacy_bench() / "cs2"
-MEM = CS2 / "arm_memorized"
-RUBRICS = CS2.parent / "scholarqa_multi" / "sqa2_rubrics_v1_recomputed.json"
+CS2 = paths.benchmarks("cs2")
+MEM = CS2 / "arms" / "memorized"
+RUBRICS = CS2 / "rubrics" / "sqa2_rubrics_v1_recomputed.json"
 
 
 def load_rubrics(split="dev"):
     version = "v1" if split == "dev" else "v2"
-    p = CS2.parent / "scholarqa_multi" / f"sqa2_rubrics_{version}_recomputed.json"
+    p = CS2 / "rubrics" / f"sqa2_rubrics_{version}_recomputed.json"
     return json.load(open(p, encoding="utf-8"))
 
 

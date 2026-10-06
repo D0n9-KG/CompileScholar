@@ -15,8 +15,8 @@ from compilescholar.compile.skeleton import bib as B
 from compilescholar.core import paths
 from compilescholar.sources.arxiv_snapshot import index_path
 
-KB = paths.legacy_bench() / "cs2" / "base_kb_v2"
-TEXTS = paths.legacy_bench() / "cs2" / "base_kb" / "survey_texts"
+KB = paths.benchmarks("cs2") / "kb_v2"
+TEXTS = paths.benchmarks("cs2") / "survey_texts"
 STATE = paths.data() / "state"
 OUT = paths.REPO / "results" / "e1"
 SEED, PER = 1004, 100

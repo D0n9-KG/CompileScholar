@@ -137,4 +137,5 @@ def load(config: str | Path | None = None, overrides: list[str] | None = None) -
         merged = _deep_merge(merged, _read(Path(config)))
     merged = _deep_merge(merged, _parse_set(overrides or []))
     merged.pop("description", None)
+    merged.pop("paths", None)            # machine resources (core.paths.resource), not part of a run's configuration
     return _build(RunConfig, merged)

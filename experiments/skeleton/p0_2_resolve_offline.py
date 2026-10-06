@@ -12,8 +12,8 @@ from compilescholar.compile.skeleton.resolve import Resolver
 from compilescholar.core import paths
 from compilescholar.sources.arxiv_snapshot import TitleIndex
 
-KB = paths.legacy_bench() / "cs2" / "base_kb_v2"
-TEXTS = paths.legacy_bench() / "cs2" / "base_kb" / "survey_texts"
+KB = paths.benchmarks("cs2") / "kb_v2"
+TEXTS = paths.benchmarks("cs2") / "survey_texts"
 OUT = paths.data() / "state"
 
 

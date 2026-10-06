@@ -94,7 +94,7 @@ def run_q(prompt: str, mcp_cfg: Path, timeout_s: int = 3600, max_turns: int = 40
     cmd = [str(claude_exe()), "-p", prompt, "--model", MODEL, "--output-format", "json", "--max-turns", str(max_turns),
            "--mcp-config", str(mcp_cfg), "--setting-sources", "project", "--strict-mcp-config",
            "--allowedTools", ALLOWED_TOOLS]
-    cwd = Path(os.environ.get("HARNESS_CWD", r"C:\cs2_harness_cwd"))
+    cwd = paths.resource("harness_cwd")
     cwd.mkdir(exist_ok=True)
     try:
         p = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace",
@@ -127,4 +127,4 @@ def to_cs2_sections(result: str) -> list[dict]:
 
 
 def default_arm_dir() -> Path:
-    return paths.legacy_bench() / "cs2" / "arm_harness"
+    return paths.runs() / "harness"

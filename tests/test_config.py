@@ -8,8 +8,8 @@ import pytest
 
 from compilescholar.core import config, paths
 
-V9B_RUN_CONFIG = paths.legacy_bench() / "cs2" / "arm_vnext" / "config_test100_r1.json"
-FREEZE = paths.legacy_bench() / "cs2" / "FREEZE_CS2_TEST_1003_v9b.json"
+V9B_RUN_CONFIG = paths.results("cs2-test100-v9b-20261004") / "ours_r1" / "config.json"
+FREEZE = paths.results("cs2-test100-v9b-20261004") / "FREEZE.json"
 
 
 def test_v9b_config_matches_recorded_run():
@@ -21,7 +21,7 @@ def test_v9b_config_matches_recorded_run():
             "cutoff": c.answer.cutoff}
     assert mine == rec
     assert c.runtime.workers == 4
-    assert c.kb_path() == paths.legacy_bench() / "cs2" / "base_kb_v2"
+    assert c.kb_path() == paths.benchmarks("cs2") / "kb_v2"
 
 
 def test_v9b_config_matches_freeze_record():

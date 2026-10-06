@@ -25,7 +25,7 @@ MODEL = "DeepSeek-V4.1-Flash"
 
 
 def dsb_root() -> Path:
-    return Path(os.environ.get("CS_DSB") or paths.legacy_bench() / "deepscholar" / "dsb")
+    return Path(os.environ.get("CS_DSB") or paths.third_party("deepscholar-bench"))
 
 
 _lock = threading.Lock()
@@ -102,7 +102,7 @@ def judge_dir(texts_dir: str, out_path: str, ids: list[str] | None = None, worke
 
 def question_set() -> list[str]:
     """The 48 unique DSB questions (smallest gt_dir per qid), as used by every arm."""
-    rows = json.load(open(paths.REPO / ".research_tmp" / "review_1002" / "p6" / "oracle_inputs.json", encoding="utf-8"))
+    rows = json.load(open(paths.benchmarks("dsb") / "oracle_inputs.json", encoding="utf-8"))
     return [r["gt_dir"] for r in rows]
 
 

@@ -13,8 +13,8 @@ import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-HR = REPO / ".research_tmp" / "experiments" / "benchmarks" / "cs2" / "base_kb_v2" / "heldout_refs"
-GOLD = REPO / ".research_tmp" / "experiments" / "benchmarks" / "cs2" / "base_kb_v2" / "survey_gold.json"
+HR = REPO / "data" / "benchmarks" / "cs2" / "kb_v2" / "heldout_refs"
+GOLD = REPO / "data" / "benchmarks" / "cs2" / "kb_v2" / "survey_gold.json"
 OUT = REPO / "runs" / "pilot-p2-probe-20261005"
 SURVEYS = ["arxiv_2404.01039", "arxiv_2212.05667", "arxiv_2404.02062"]
 API = "https://api.semanticscholar.org/graph/v1/paper/{pid}/citations?fields=contexts,intents,year,externalIds&limit=1000"

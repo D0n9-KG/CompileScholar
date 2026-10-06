@@ -42,7 +42,7 @@ RUBRIC_FILES = {"dev": "sqa2_rubrics_v1_recomputed.json", "test": "sqa2_rubrics_
 
 def rubric_path(split: str) -> str:
     """Official split -> rubric file: dev = rubrics v1, test = rubrics v2 (astabench task.py:444-451)."""
-    return str(paths.legacy_bench() / "scholarqa_multi" / RUBRIC_FILES[split])
+    return str(paths.benchmarks("cs2") / "rubrics" / RUBRIC_FILES[split])
 
 
 def split_qids(split: str = "dev") -> list[str]:

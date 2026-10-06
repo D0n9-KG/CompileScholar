@@ -24,7 +24,7 @@ from ..core import paths
 from ..llm.client import call_paratera
 from ..llm.jsonparse import parse_json_response
 
-V2 = os.environ.get("CS_FIELD_KB") or str(paths.legacy_bench() / "cs2" / "base_kb_v2")
+V2 = os.environ.get("CS_FIELD_KB") or str(paths.benchmarks("cs2") / "kb_v2")
 REFS = os.path.join(V2, "heldout_refs")
 OUT = os.path.join(V2, "heldout_eval")
 

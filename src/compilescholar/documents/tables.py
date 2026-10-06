@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """F24: deterministic table-parsing channel (PSFIX/PSV3 queue; brief at
-.research_tmp/docs_decisions/F24-TABLE-CHANNEL-BRIEF.md).
+the F24 table-channel brief, docs/archive/).
 
 Rationale (measured, COACH2/PSV3 archives): LLM extraction of benchmark
 tables fails in four reproducible forms — row sampling (only representative

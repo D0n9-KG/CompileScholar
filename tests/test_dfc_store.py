@@ -212,3 +212,33 @@ def test_old_store_without_bookkeeping_needs_rebuild(store):
             pass
     with store.Run("papers", {}, rebuild=True) as run:
         run.finish({})
+
+
+def test_read_connection_is_thread_safe(store, tmp_path):
+    """One read-only sqlite3 connection shared by worker threads returns wrong rows (measured: 2,659 misses and 1,758
+    errors in 48,000 reads); store read connections are per thread."""
+    import sqlite3
+    p = tmp_path / "t.sqlite"
+    c = sqlite3.connect(p)
+    c.execute("CREATE TABLE t(k TEXT PRIMARY KEY, v INT)")
+    c.executemany("INSERT INTO t VALUES (?,?)", [(f"k{i}", i) for i in range(500)])
+    c.commit()
+    c.close()
+    ro = store.read_only(p)
+    bad = []
+
+    def work(j):
+        for i in range(1500):
+            k = (i * 7 + j) % 500
+            try:
+                r = ro.execute("SELECT v FROM t WHERE k=?", (f"k{k}",)).fetchone()
+                if r is None or r[0] != k:
+                    bad.append((k, r))
+            except Exception as e:      # noqa: BLE001
+                bad.append(e)
+
+    ts = [threading.Thread(target=work, args=(j,)) for j in range(12)]
+    [t.start() for t in ts]
+    [t.join() for t in ts]
+    ro.close()
+    assert not bad, bad[:5]

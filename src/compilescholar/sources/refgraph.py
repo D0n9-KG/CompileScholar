@@ -27,7 +27,7 @@ import urllib.request
 
 from ..core import paths, secrets
 
-_CACHE = os.environ.get("CS_REFGRAPH_CACHE") or str(paths.legacy_bench() / "_shared" / "refgraph_cache")
+_CACHE = os.environ.get("CS_REFGRAPH_CACHE") or str(paths.cache() / "refgraph")
 os.makedirs(_CACHE, exist_ok=True)
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 _UA = "compilescholar-eval/0.1 (mailto:compilescholar-eval@example.org)"

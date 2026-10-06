@@ -57,8 +57,7 @@ class JudgeAdapter:
 
 def astabench_path() -> str:
     """astabench is a pinned third-party checkout (editable install); CS_ASTABENCH overrides the location."""
-    return os.environ.get("CS_ASTABENCH") or str(paths.REPO / ".research_tmp" / "scratch" / "ai2_baseline_2026-09-08" /
-                                                 "asta" / "asta-bench-main")
+    return os.environ.get("CS_ASTABENCH") or str(paths.third_party("asta-bench"))
 
 
 def _provider_env():

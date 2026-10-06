@@ -17,11 +17,9 @@ from pathlib import Path
 
 from ..core import paths
 
-DEFAULT = r"\\192.168.199.138\Share400T\pub\LLM_Data\data\JournalPapers\arXiv_Dataset\arxiv-metadata-oai-snapshot.json"
-
-
 def snapshot_path() -> Path:
-    return Path(os.environ.get("CS_ARXIV_SNAPSHOT") or DEFAULT)
+    """The arXiv OAI metadata snapshot (configs/local.yaml paths.arxiv_snapshot, or CS_ARXIV_SNAPSHOT)."""
+    return paths.resource("arxiv_snapshot")
 
 
 def index_path() -> Path:

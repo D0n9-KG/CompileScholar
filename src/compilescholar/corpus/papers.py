@@ -142,7 +142,7 @@ class Papers:
     """Read-only view: lookups by id and title resolution (exact-prefix + year ±1 + first-author surname)."""
 
     def __init__(self, path: Path | None = None):
-        self.con = sqlite3.connect(f"file:{path or db_path()}?mode=ro", uri=True, check_same_thread=False)
+        self.con = store.read_only(path or db_path())
 
     def get(self, arxiv_id: str) -> dict | None:
         r = self.con.execute("SELECT * FROM papers WHERE arxiv_id=?", (arxiv_id,)).fetchone()

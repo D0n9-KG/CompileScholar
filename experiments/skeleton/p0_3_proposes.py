@@ -11,7 +11,7 @@ import threading
 from compilescholar.compile.skeleton import proposes as P
 from compilescholar.core import paths
 
-KB = paths.legacy_bench() / "cs2" / "base_kb_v2"
+KB = paths.benchmarks("cs2") / "kb_v2"
 STATE = paths.data() / "state"
 
 

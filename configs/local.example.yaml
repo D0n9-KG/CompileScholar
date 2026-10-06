@@ -1,5 +1,16 @@
-# Copy to configs/local.yaml (gitignored) for machine-specific overrides, e.g.:
+# Copy to configs/local.yaml (gitignored). Machine resources outside the repository are named here and read with
+# compilescholar.core.paths.resource(key); a missing key is an error (there are no hardcoded defaults).
+paths:
+  arxiv_snapshot: //nas/share/arXiv_Dataset/arxiv-metadata-oai-snapshot.json   # arXiv OAI metadata snapshot
+  arxiv_pdf_mirror: //nas/share/JournalPapers/arxiv/arxiv/pdf                   # per-version PDFs <yymm>/<id>vN.pdf
+  scihub_index: C:/doi_index_scihub/doi_index.sqlite                            # DOI -> archive index (internal use only)
+  scihub_archive: //nas/share/JournalPapers/scihub-mag/sci-mag
+  harness_cwd: C:/cs2_harness_cwd                                               # Claude Code harness working directory
+  # astabench: third_party/asta-bench (default checkout location; override only if elsewhere)
+  # deepscholar_bench: third_party/deepscholar-bench
+# Machine-specific overrides of any config section, e.g.:
 # runtime:
 #   local_max_concurrent: 96
-# answer:
-#   kb_dir: D:/data/compilescholar/kb/cs2_v2
+# llm:
+#   providers:
+#     local: {lanes: 96}

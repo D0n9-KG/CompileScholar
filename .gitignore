@@ -200,4 +200,11 @@ runs/*
 
 # rebuildable caches and local data (W6 layout); only MANIFEST files are tracked
 /cache/
-/data/
+
+# pinned third-party checkouts (README + patches tracked; checkouts reproduced from the pinned commits)
+/third_party/*/
+!/third_party/patches/
+
+# data/ contents are pinned by data/MANIFEST.tsv (tools/data_manifest.py)
+/data/*
+!/data/MANIFEST.tsv
