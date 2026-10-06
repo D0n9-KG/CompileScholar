@@ -268,9 +268,10 @@ def merge(con: sqlite3.Connection, a: str, b: str, reason: str, decided_by: str 
     try:
         con.execute("UPDATE identifiers SET paper_id=? WHERE paper_id=?", (keep, drop))
         con.execute("UPDATE members SET paper_id=? WHERE paper_id=?", (keep, drop))
-        for t in ("dates", "records", "authors"):
+        for t in ("dates", "records", "authors", "assets"):
             con.execute(f"UPDATE OR IGNORE {t} SET paper_id=? WHERE paper_id=?", (keep, drop))
             con.execute(f"DELETE FROM {t} WHERE paper_id=?", (drop,))
+        con.execute("UPDATE attempts SET paper_id=? WHERE paper_id=?", (keep, drop))
         con.execute("UPDATE papers SET canonical_doi = COALESCE(canonical_doi, (SELECT canonical_doi FROM papers "
                     "WHERE paper_id=?)) WHERE paper_id=?", (drop, keep))
         con.execute("UPDATE papers SET status='merged' WHERE paper_id=?", (drop,))

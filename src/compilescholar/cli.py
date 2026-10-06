@@ -241,9 +241,41 @@ def cmd_library(a):
         con.close()
 
 
+def cmd_acquire(a):
+    """Fetch and identity-check full texts for registry papers: a benchmark's members, or ids from a file."""
+    import random
+    from .acquire import run as R
+    from .library import store
+    from .llm import client as LC
+    cfg = C.load(a.config, a.set)
+    LC.configure(_llm_settings(cfg), run_id=f"acquire-{time.strftime('%Y%m%dT%H%M%S')}", caller="acquire")
+    con = store.connect()
+    if a.ids:
+        pids = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()]
+    else:
+        pids = [p for (p,) in con.execute("SELECT DISTINCT paper_id FROM members WHERE benchmark=?", (a.benchmark,))]
+    con.close()
+    if a.sample:
+        pids = random.Random(a.seed).sample(sorted(pids), min(a.sample, len(pids)))
+    exclude = tuple(x for x in (a.exclude or "").split(",") if x)
+    print(json.dumps(R.acquire(pids, workers=a.workers, exclude=exclude, llm=not a.no_llm)))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="compilescholar")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("acquire", help="fetch + identity-check full texts (library assets)")
+    g = p.add_mutually_exclusive_group(required=True)
+    g.add_argument("--benchmark", help="every member of this benchmark")
+    g.add_argument("--ids", help="file of paper_ids, one per line")
+    p.add_argument("--sample", type=int, default=None, help="a random sample of this size (seed --seed)")
+    p.add_argument("--seed", type=int, default=20261006)
+    p.add_argument("--exclude", default="", help="channels not to use, e.g. scihub_local (CS main experiments)")
+    p.add_argument("--workers", type=int, default=16)
+    p.add_argument("--no-llm", action="store_true", help="unsure identity checks become mismatches")
+    p.add_argument("--config")
+    p.add_argument("--set", action="append", default=[])
+    p.set_defaults(fn=cmd_acquire)
     p = sub.add_parser("library", help="the registry: import-arxiv | import-benchmarks | import-scievo | "
                                        "propose-titles | status")
     p.add_argument("action", choices=["import-arxiv", "import-benchmarks", "import-scievo", "propose-titles",

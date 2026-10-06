@@ -24,6 +24,12 @@ Tables
   merge_queue(id PK, a, b, kind, evidence, status, verdict, decided_by, decided_at, created_at)  UNIQUE(a, b, kind)
       kind: shared_doi | identifier_conflict | title_match; status open | merged | rejected
   imports(id PK, source, inputs, counts, started_at, finished_at)
+  assets(paper_id, version, channel, pointer, sha256, size, identity, identity_detail, created_at)
+      PK(paper_id, version, channel): a full text we can read, by pointer — PDFs on the NAS mirror, GCS or the
+      Sci-Hub archive are not copied; downloads live under data/library/pdf/<sha[:2]>/<sha>.pdf. version 0 = the
+      version of record (journal), N = arXiv vN. identity: ok (deterministic) | ok_llm | (mismatches never land here)
+  attempts(id PK, paper_id, version, channel, status, detail, sha256, at)   every acquisition try: ok | missing |
+      mismatch (the PDF went to data/library/quarantine/<sha>.pdf) | error
 """
 from __future__ import annotations
 
@@ -62,6 +68,13 @@ CREATE TABLE IF NOT EXISTS merge_queue(id INTEGER PRIMARY KEY AUTOINCREMENT, a T
 CREATE INDEX IF NOT EXISTS ix_queue_status ON merge_queue(status);
 CREATE TABLE IF NOT EXISTS imports(id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT, inputs TEXT, counts TEXT,
   started_at TEXT, finished_at TEXT);
+CREATE TABLE IF NOT EXISTS assets(paper_id TEXT NOT NULL, version INT NOT NULL DEFAULT 0, channel TEXT NOT NULL,
+  pointer TEXT NOT NULL, sha256 TEXT NOT NULL, size INT, identity TEXT NOT NULL, identity_detail TEXT,
+  created_at TEXT, PRIMARY KEY(paper_id, version, channel));
+CREATE INDEX IF NOT EXISTS ix_assets_sha ON assets(sha256);
+CREATE TABLE IF NOT EXISTS attempts(id INTEGER PRIMARY KEY AUTOINCREMENT, paper_id TEXT NOT NULL, version INT,
+  channel TEXT NOT NULL, status TEXT NOT NULL, detail TEXT, sha256 TEXT, at TEXT);
+CREATE INDEX IF NOT EXISTS ix_attempts_paper ON attempts(paper_id, channel);
 """
 
 
@@ -76,12 +89,14 @@ def lock(path: Path | None = None) -> FileLock:
     return FileLock(str(p / "registry.lock"))
 
 
-def connect(path: Path | None = None) -> sqlite3.Connection:
+def connect(path: Path | None = None, threads: bool = False) -> sqlite3.Connection:
+    """threads=True: the connection may be handed to one other thread (acquire's writer); it is still used by one
+    thread at a time."""
     p = path or db_path()
     if str(p).startswith(("\\\\", "//")):
         raise RuntimeError(f"the registry must be on a local disk (SQLite WAL), got {p}")
     p.parent.mkdir(parents=True, exist_ok=True)
-    con = sqlite3.connect(p)
+    con = sqlite3.connect(p, check_same_thread=not threads)
     con.execute("PRAGMA journal_mode=WAL")
     con.execute("PRAGMA synchronous=NORMAL")
     con.execute(f"PRAGMA busy_timeout={BUSY_MS}")
