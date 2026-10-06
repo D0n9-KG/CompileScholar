@@ -20,7 +20,6 @@ import time
 from ..core import paths
 from ..dfc.store import parallel
 from ..library import identity, store
-from ..sources import http
 from . import channels as CH
 from . import verify as V
 
@@ -103,16 +102,16 @@ def acquire(paper_ids, workers: int = 16, exclude=(), llm: bool = True, log=prin
         for ch in order:
             try:
                 f = CH.CHANNELS[ch](w)
-            except (http.Transient, OSError, ValueError) as e:
+                if f is None:
+                    out_q.put(("attempt", w, ch, "missing", "", None))
+                    continue
+                sha = CH.sha256(f.data)
+                res = V.check(f.data, title, sur, w.arxiv, w.doi)
+                if res["verdict"] == "unsure" and llm:
+                    res = V.llm_verdict(res, title, sur, idents)
+            except Exception as e:    # one broken job must not kill the marathon (a MemoryError did, at 221k/274k)
                 out_q.put(("attempt", w, ch, "error", f"{type(e).__name__}: {e}"[:300], None))
                 continue
-            if f is None:
-                out_q.put(("attempt", w, ch, "missing", "", None))
-                continue
-            sha = CH.sha256(f.data)
-            res = V.check(f.data, title, sur, w.arxiv, w.doi)
-            if res["verdict"] == "unsure" and llm:
-                res = V.llm_verdict(res, title, sur, idents)
             if res["verdict"] in ("ok", "ok_llm"):
                 if ch not in ("arxiv_nas", "scihub_local"):
                     _write(pdf_path(sha), f.data)
