@@ -12,9 +12,11 @@ DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005 and the research reports behin
 **State (2026-10-06).** Phase A (foundations) is done: the stage contract, the one LLM client, identifiers and time,
 configuration and paths, a single package and a clean workspace. Phase B (the base) is built: the library with
 DOI-first identity and a merge queue judged by two models, acquisition with identity checks, the two document tiers
-(GROBID + PDF links for every paper, MinerU for the deep subset) and version awareness. The derived stages (documents,
-citations, extract, index) still key on arXiv ids; phase C moves them onto the library (paper_id, text version and
-its date). The data flow below marks what each stage is today and what it becomes.
+(GROBID + PDF links for every paper, MinerU for the deep subset) and version awareness. Phase C has started: the
+derived `documents` stage now builds from the registry (C-1, 2026-10-06) — keyed on `paper_id@vN`, every row dated
+by its text version, version deltas stored; the old `papers` stage is retired (the registry replaces it). Citations,
+extract and index still key on arXiv ids and are being rebuilt onto the same contract (C②–C⑤). The data flow below
+marks what each stage is today and what it becomes.
 
 ## The library (phase B)
 
@@ -39,11 +41,12 @@ documents/ parse (fast: GROBID 0.9.1-full + hyperref links, every asset; careful
 ## Data flow
 
 ```
-papers      arXiv metadata, v1 date to the day                    -> phase B: library/ registry, DOI-first identity,
-                                                                     dates with precision per version and source
-documents   full texts -> units (section / paragraph / table)     -> phase B: fast tier (PDF text layer, every paper)
-                                                                     + careful tier (MinerU, deep-extraction subset)
-citations   citation sentences -> bibliography entries -> paper   (zero LLM)
+papers      retired (C-1): the library/ registry replaces it — DOI-first identity, dates with precision per
+            version and source
+documents   built (C-1): registry parses -> per-version docs (paper_id@vN, GROBID fast tier + MinerU careful
+            tier, text_date per version) + stored version deltas; zero LLM
+citations   citation sentences -> bibliography entries -> paper   -> phase C②: rebuilt on tei cites, entries
+            (zero LLM; pre-C legacy code, dark)                     resolved to paper_id, self-citation flags
 extract     statements: self pass (T1 / T2), result pass, other   -> phase C: schema v2, T2 over the full text,
             pass (what citing sentences say about the cited work)    unified final check, time-stratified sampling
 index       BM25 (FTS5) + optional dense vectors                  -> phase D: tantivy + binary-code vectors
@@ -98,7 +101,7 @@ grow        typed gap diagnosis -> acquisition -> the same stages (offline, ques
 | `sources/` | the http layer; arXiv (OAI-PMH, snapshot, HTML), Sci-Hub local archive, Sciverse, refgraph, circuit breaker |
 | `library/` | the registry (identity, identifiers, dates, assets, parses), imports, merge queue and its LLM verdicts |
 | `acquire/` | full-text channels, identity check, quarantine |
-| `corpus/papers.py` | papers stage (arXiv-keyed, until phase C moves the derived stages onto the library); title resolution |
+| `corpus/papers.py` | legacy papers stage (retired from the pipeline in C-1; kept until the legacy citations/extract importers are replaced in C②–C④) |
 | `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; deterministic table parsing |
 | `citations/` | citation sentences, entry -> paper |
 | `extract/` | the schema and the passes |

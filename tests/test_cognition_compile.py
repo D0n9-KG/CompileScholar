@@ -51,12 +51,15 @@ def view(tmp_path, monkeypatch):
     importlib.reload(store)
     from compilescholar.corpus import papers as PP
     importlib.reload(PP)
-    con = PP.connect()
+    # the derived "papers" stage is retired (phase C-1: the registry replaces it); this legacy fixture keeps its
+    # arXiv-keyed fake store at an explicit path and injects it into AsOf until cognition is re-wired in phase D
+    con = PP.connect(tmp_path / "papers.sqlite")
     for pid, (d, au) in PAPERS.items():
         con.execute("INSERT INTO papers VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                     (pid, d, f"Paper {pid}", f"paper {pid}", "abs", json.dumps(au), au[0].lower(), "cs.LG", "cs.LG",
                      None, "t"))
     con.commit()
+    con.close()
     from compilescholar.extract.schema import DDL
     ext = store.connect("extract")
     ext.executescript(DDL)
@@ -70,7 +73,8 @@ def view(tmp_path, monkeypatch):
                       "CREATE TABLE entries(citing TEXT, key TEXT, raw TEXT, cited TEXT, method TEXT, title TEXT, year INT);")
     cit.commit()
     from compilescholar.cognition.asof import AsOf
-    return AsOf
+    papers_ro = store.read_only(tmp_path / "papers.sqlite")
+    return lambda T: AsOf(T, papers=papers_ro)
 
 
 def test_identity_anchors_method_to_proposer(view):

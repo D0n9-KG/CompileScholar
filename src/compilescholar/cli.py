@@ -74,9 +74,9 @@ def cmd_answer(a):
     lit = cfg.answer.mode == "lit"
     if lit:
         from .dfc import store as _st
-        for s in ("papers", "documents", "citations", "extract", "index"):
+        for s in _st.STAGES:
             inputs[f"dfc/{s}.manifest"] = _st.root() / "manifests" / f"{s}.json"
-        _st.require_fresh("papers", "documents", "citations", "extract", "index")
+        _st.require_fresh(*_st.STAGES)
         M.write(rd, M.build(a.run_id, cfg.to_dict(), inputs))
     kb = AP.KB(str(kbp)) if kbp and not lit else None
     todo = [q for q in qs if q["qid"] not in done]
@@ -178,12 +178,9 @@ def cmd_build(a):
     print(f"[build] stages {todo}; LLM ledger {LC.call_log_summary()['ledger']}", flush=True)
     for s in todo:
         print(f"[build] {s}", flush=True)
-        if s == "papers":
-            from .corpus import papers
-            print(json.dumps(papers.build()))
-        elif s == "documents":
+        if s == "documents":
             from .documents import build as B
-            print(json.dumps(B.build(rebuild=rb)))
+            print(json.dumps(B.build(workers=a.workers, rebuild=rb)))
         elif s == "citations":
             from .citations import build as B
             print(json.dumps(B.build(rebuild=rb)))
@@ -309,9 +306,9 @@ def main(argv=None):
     p.add_argument("--scope", default="cs", choices=["cs", "all"], help="import-arxiv: cs (default) or every record")
     p.add_argument("--benchmarks", default=None, help="import-benchmarks: comma list (default all four)")
     p.set_defaults(fn=cmd_library)
-    p = sub.add_parser("build", help="build a literature-layer stage: status | all | papers | documents | citations | "
+    p = sub.add_parser("build", help="build a literature-layer stage: status | all | documents | citations | "
                                      "extract | index")
-    p.add_argument("stage", choices=["status", "all", "papers", "documents", "citations", "extract", "index"])
+    p.add_argument("stage", choices=["status", "all", "documents", "citations", "extract", "index"])
     p.add_argument("--config", help="experiment config (default: configs/base.yaml [+ local.yaml]); build: and llm:")
     p.add_argument("--set", action="append", default=[], help="override, e.g. build.n_deep=200")
     p.add_argument("--categories", default=None, help="extract: primary categories in scope (default build.categories)")

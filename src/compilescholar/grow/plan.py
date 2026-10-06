@@ -34,7 +34,7 @@ def _months_between(a: str, b: str) -> int:
 
 
 def diagnose(now: str, limit: int = 500) -> dict:
-    store.require_fresh("papers", "documents", "citations", "extract")
+    store.require_fresh("documents", "citations", "extract")
     cit = store.connect("citations", readonly=True)
     ext = store.connect("extract", readonly=True)
     have = set(Documents().ids())
