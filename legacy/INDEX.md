@@ -58,3 +58,29 @@ The new package reproduces the answer path, scoring and the moved components byt
   be used.
 - `tests/`: `test_backref_and_cite_repair.py`, `test_external_tools_backflow.py` — tests of the ReAct harness and
   external_tools above.
+
+## 10-06: the old packages left `src/` (tag `pre-integration-20261005`)
+
+`src/kb_compiler/`, `src/kb_infra/`, `src/retrieval/` (the sci-evo library copy) and `src/sci_evo_extract.py` were removed
+from `src/` after their capabilities moved (INTEGRATED-SYSTEM-1005 v2 §5–§6; module verdicts in
+`docs/design/review/FITNESS-*.md`). They are not copied here: `git checkout pre-integration-20261005 -- src/<pkg>`
+restores any of them. The sci-evo project itself is untouched at its original location.
+
+| Old capability | Now | Notes |
+|---|---|---|
+| `kb_infra.llm` (call_local / call_paratera / call_cst / vision / purity / ledger / backoff) | `llm/client.py` | rewritten: streamed httpx, cancellable wall, lanes from config, response cache |
+| `kb_infra.embedding` | `llm/embedding.py` | local model only, model label returned; no cross-model fallback |
+| `kb_compiler.records.common.salvage_json_records`, `cards._repair_json_escapes` | `llm/jsonparse.py` | byte-identical on the old tests |
+| `kb_compiler.records.table_channel` | `documents/tables.py` | |
+| `kb_compiler.records.coarse_extract` | `compile/state/coarse.py` (field_state's input) → superseded by `extract/self_pass.py` T1 | |
+| `kb_compiler.views.field_state` | `compile/state/field_state.py` | evaluation comparison arm (design v2 §6) |
+| `kb_compiler.retrieve.hybrid` | `kb/index.py` (frozen v9b) | |
+| `kb_compiler.records.deep_extract` v1.4, `postcheck`, `canary`, `table_semantic`, `notation_harvest` | to be rebuilt in phase C (T2 full-text, unified final check, canary on schema v2) | concepts kept; FITNESS-EXTRACTION §3 |
+| `kb_compiler` registry / registry_growth / embed_block / backflow / views / arbitration / chunk_retry / figure_channel / survey_extract | retired | FITNESS-EXTRACTION §3, INTERNAL-AUDIT |
+| `retrieval.circuit` | `sources/circuit.py` | directly usable |
+| `retrieval.registry` | to be rebuilt in phase B as `library/` (DOI-first identity, merge queue, dates with precision, bulk import) | FITNESS-LIBRARY-ACQUIRE §1 |
+| `retrieval.sources` (OpenAlex / S2 / Crossref / Sciverse / arXiv / Sci-Hub) | `sources/` (one client each, phase B); Sciverse already in `sources/sciverse.py` | |
+| `retrieval.acquisition_chain`, `_see_upstream` MinerU `/file_parse` client | `acquire/`, `sources/mineru.py` (phase B) | the file_parse client is reused (9602, 18 lanes) |
+| `retrieval.evidence_units`, `search_service`, `query_understanding`, `pdf_resolver`, `search_resolve`, `process_workflow`, `_see_*` | retired | |
+| sci-evo `api/` + `frontend/` | `service/` + `web/` (phase E) | |
+| Tests of retired code (`test_backflow`, `test_card_redirect`, `test_coarse_extract`, `test_compare_vocab_hint`, `test_deep_extract_*`, `test_embed_block`, `test_inline_pipeline`, `test_notation_harvest`, `test_postcheck_lenient`, `test_registry_*`, `test_table_semantic`, `test_views_derived`, `test_kb_compiler_import_gate`, `test_llm_ledger_fields`) | removed with the code | at the tag |

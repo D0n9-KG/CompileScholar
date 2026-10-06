@@ -28,7 +28,7 @@ v0 scope (brief §2):
 Zero-LLM, corpus-generic (no benchmark-specific logic).
 
 CLI:
-  python -m kb_compiler.records.table_channel \
+  python -m compilescholar.documents.tables \
       --texts DIR --checked records_checked.json --cards cards.json \
       --out table_records.json [--merge-out merged.json]
 """

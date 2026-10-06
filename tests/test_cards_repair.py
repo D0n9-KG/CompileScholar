@@ -3,7 +3,7 @@
 LaTeX-in-caption invalid \\escape killed a whole card at temp 0)."""
 import json
 import sys
-from kb_compiler.records.cards import _repair_json_escapes  # noqa: E402
+from compilescholar.llm.jsonparse import repair_json_escapes as _repair_json_escapes  # noqa: E402
 
 
 def test_invalid_latex_escape_repaired():

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for kb_compiler.records.table_channel (F24) — covers the three
+"""Unit tests for compilescholar.documents.tables (the former kb_compiler.records.table_channel, F24) — covers the three
 AirQA-tablecheck fixes (2026-09-13):
   A: cell-level inline citation -> epistemic=cited
   B: full-width group-banner rows (header zone + mid-table) tracked as group

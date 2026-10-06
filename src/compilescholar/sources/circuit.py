@@ -1,22 +1,10 @@
-"""Source circuit breaker + tiered degradation (P4-A A1, 2026-09-24).
+"""Per-source circuit breaker (moved from sci-evo retrieval.circuit; FITNESS-LIBRARY-ACQUIRE: directly usable).
 
-The gap this closes (RETRIEVAL-MODULE-DESIGN.md §一.2): the existing
-clients retry a 429'd source with backoff but never DEGRADE to the next
-source — the Multi corpus campaign hand-patched this in outer scripts.
-Design:
-
-  SourceCircuit  — per-source sliding-window failure tracker with
-    CLOSED / OPEN / HALF_OPEN states. >= failure_threshold errors inside
-    window_s trips the source OPEN for cooldown_s; one probe request is
-    allowed after cooldown (HALF_OPEN), success closes it again.
-
-  discover_tiered — ordered source preference (domain-routed by the
-    caller, e.g. CS: arxiv->s2->openalex). For each tier: circuit-open
-    sources are skipped; a tier that errors or returns nothing degrades
-    to the next tier. Errors trip the circuit; honest empty results do
-    not (they degrade but don't poison the source).
-
-All deterministic, no LLM. Thread-safe.
+SourceCircuit: sliding-window failure tracker per source with CLOSED / OPEN / HALF_OPEN states. >= failure_threshold
+errors inside window_s trips the source OPEN for cooldown_s; one probe request is allowed after the cooldown
+(HALF_OPEN) and its success closes the circuit again. Only network errors and 5xx should be recorded as failures —
+quota waits (429) belong to the rate limiter, and an honest empty result is not a failure. State is per process.
+Deterministic, no LLM, thread-safe. (The tiered-discovery caller of the old package is retired.)
 """
 
 from __future__ import annotations

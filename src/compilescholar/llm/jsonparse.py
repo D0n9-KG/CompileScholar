@@ -40,6 +40,37 @@ def _repair_control_chars_in_strings(obj_text: str) -> str:
     return "".join(out)
 
 
+_VALID_ESC = set('"\\/bfnrt')
+
+
+def repair_json_escapes(s: str) -> tuple[str, int]:
+    r"""Double every invalid backslash escape (moved from kb_compiler.records.cards). LaTeX copied verbatim into a JSON
+    string ('n^{\gg}', '\underbrace') makes the whole object unparseable; valid pairs (including an escaped
+    backslash followed by a letter) are consumed untouched — a regex lookahead breaks those. Returns (fixed, n)."""
+    out, i, n, nfix = [], 0, len(s), 0
+    while i < n:
+        c = s[i]
+        if c == "\\":
+            if i + 1 < n:
+                nx = s[i + 1]
+                if nx in _VALID_ESC:
+                    out.append(c)
+                    out.append(nx)
+                    i += 2
+                    continue
+                if nx == "u" and re.fullmatch(r"[0-9a-fA-F]{4}", s[i + 2:i + 6] or ""):
+                    out.append(s[i:i + 6])
+                    i += 6
+                    continue
+            out.append("\\\\")
+            nfix += 1
+            i += 1
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out), nfix
+
+
 def parse_json_response(text: str | None) -> Any:
     r"""Parse JSON from LLM response, handling markdown fences and extra text.
 
@@ -63,6 +94,11 @@ def parse_json_response(text: str | None) -> Any:
         # invalid JSON — balanced but with control chars)
         try:
             return json.loads(_repair_control_chars_in_strings(obj))
+        except Exception:
+            pass
+        # repair tier 2: invalid backslash escapes (LaTeX copied verbatim into a string)
+        try:
+            return json.loads(_repair_control_chars_in_strings(repair_json_escapes(obj)[0]))
         except Exception:
             pass
     # fallback: old greedy regex (last resort, may fail on long prose)
