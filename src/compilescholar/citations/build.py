@@ -7,13 +7,12 @@ multi-version, the stored delta — the citation pairs only the latest version h
 dated by the version whose text it was read from: v1 cites carry the v1 date, delta cites the latest version's date
 (phase B gate: references newer than v1 land only in the delta, so nothing is visible before its time).
 
-Entry -> paper resolution, deterministic cascade:
+Entry -> paper resolution, deterministic cascade (offline; the network stage is the `citations.external` batch):
   1. the entry's own DOI or arXiv id -> registry identifiers (point lookup);
-  2. structured bibliographic query (Crossref / OpenAlex) — for entries without a usable title (APS / ACS / Nature
-     style) and for non-CS corpora generally; NOT YET WIRED: the CS-first build measures stages 1/3/4 first, and
-     this stage also wants "a DOI-only entry creates a metadata-only registry paper" (a registry write under the
-     library lock) — both land together when the measured CS resolution rate says they are needed (§7.2 asks for
-     the rates to be reported per domain anyway);
+  2. registry ref_resolutions: raw entry text -> paper_id, validated and remembered by citations.external
+     (Crossref query.bibliographic / OpenAlex). That pass also creates the metadata-only papers for DOI-only
+     entries (which stage 1 then finds by the entry's own DOI) and for titled stubs (which stage 3 finds by
+     title_key) — method = "external_ref";
   3. title_key exact match in the registry records, year window |Δyear| <= 1 (<= 4 when a surname of the candidate
      appears in the raw entry), candidates restricted to status='active', unique hit only — two papers sharing a
      title_key stay a stub until the merge queue decides they are one work (same philosophy as the registry);
@@ -43,6 +42,7 @@ from ..compile.skeleton.resolve import entry_title_year
 from ..core import ids, paths
 from ..dfc import store
 from ..documents.build import Documents
+from .external import raw_sha
 
 DDL = """CREATE TABLE IF NOT EXISTS docs(key TEXT PRIMARY KEY, paper_id TEXT, version INT, date TEXT,
   n_entries INT, n_sentences INT, n_cites INT, n_resolved INT);
@@ -71,6 +71,9 @@ class Resolver:
         self.reg = reg
         self._cands: dict[str, list] = {}
         self._auth: dict[str, set] = {}
+        # registries created before stage 2 was wired have no ref_resolutions table (store.connect adds it)
+        self._has_ref = reg.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ref_resolutions'").fetchone() is not None
 
     def surnames(self, pid: str) -> set:
         s = self._auth.get(pid)
@@ -118,9 +121,14 @@ class Resolver:
             r = self.reg.execute("SELECT paper_id FROM identifiers WHERE scheme='arxiv' AND value=?", (ax,)).fetchone()
             if r:
                 return r[0], "entry_arxiv"
+        raw = entry.get("raw") or ""
+        if raw and self._has_ref:
+            r = self.reg.execute("SELECT paper_id FROM ref_resolutions WHERE raw_sha=?", (raw_sha(raw),)).fetchone()
+            if r:
+                return r[0], "external_ref"
         title, year = entry.get("title") or "", str(entry.get("year") or "")
         if not title:
-            t2, y2 = entry_title_year(entry.get("raw") or "")
+            t2, y2 = entry_title_year(raw)
             title, year = t2, year or (str(y2) if y2 else "")
         tk = ids.title_key(title)
         if tk:
@@ -147,11 +155,14 @@ class Resolver:
 
 
 def _generation(reg) -> str:
-    """One digest of the registry's resolution-relevant state: any import or merge changes it."""
+    """One digest of the registry's resolution-relevant state: any import, merge or external resolution changes
+    it."""
+    has_ref = reg.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ref_resolutions'").fetchone()
     return store.sha(sorted(reg.execute("SELECT status, count(*) FROM papers GROUP BY status").fetchall()),
                      reg.execute("SELECT count(*) FROM identifiers").fetchone()[0],
                      reg.execute("SELECT count(*) FROM records").fetchone()[0],
-                     reg.execute("SELECT count(*) FROM authors").fetchone()[0])
+                     reg.execute("SELECT count(*) FROM authors").fetchone()[0],
+                     reg.execute("SELECT count(*) FROM ref_resolutions").fetchone()[0] if has_ref else 0)
 
 
 def _items(D: Documents) -> list[tuple]:

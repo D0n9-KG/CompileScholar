@@ -34,6 +34,10 @@ Tables
       parse products of one PDF (by content hash, so a PDF shared by two assets is parsed once). parser grobid (tier
       fast) | mineru (tier careful); status ok | failed (retried up to 3 attempts) ; path under data/library/parsed/.
       Parse products are authoritative (re-parsing 10^5 PDFs costs days); documents derive units from them.
+  ref_resolutions(raw_sha PK, paper_id, method, doi, created_at)  stage 2 of the citation cascade (§7.2): one raw
+      bibliography text -> one paper, validated externally by citations.external (Crossref query.bibliographic).
+      Needed for entries whose title slot holds a venue abbreviation (APS / ACS / Nature style) — the created paper
+      is not findable from the mangled entry, so the mapping lives here; identity.merge moves the pointer.
 """
 from __future__ import annotations
 
@@ -82,6 +86,9 @@ CREATE INDEX IF NOT EXISTS ix_attempts_paper ON attempts(paper_id, channel);
 CREATE TABLE IF NOT EXISTS parses(sha256 TEXT NOT NULL, parser TEXT NOT NULL, parser_version TEXT, tier TEXT,
   status TEXT NOT NULL, path TEXT, detail TEXT, attempts INT NOT NULL DEFAULT 0, created_at TEXT,
   PRIMARY KEY(sha256, parser));
+CREATE TABLE IF NOT EXISTS ref_resolutions(raw_sha TEXT PRIMARY KEY, paper_id TEXT NOT NULL, method TEXT,
+  doi TEXT, created_at TEXT);
+CREATE INDEX IF NOT EXISTS ix_refres_paper ON ref_resolutions(paper_id);
 """
 
 

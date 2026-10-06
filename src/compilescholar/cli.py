@@ -208,6 +208,9 @@ def cmd_library(a):
         from .library import import_crossref
         dois = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()]
         print(json.dumps(import_crossref.run(dois)))
+    elif a.action == "resolve-stubs":
+        from .citations import external
+        print(json.dumps(external.run(limit=a.limit)))
     elif a.action == "adjudicate":
         from .library import adjudicate
         from .llm import client as LC
@@ -290,11 +293,12 @@ def main(argv=None):
     p.add_argument("--set", action="append", default=[])
     p.set_defaults(fn=cmd_acquire)
     p = sub.add_parser("library", help="the registry: import-arxiv | import-benchmarks | import-scievo | "
-                                       "propose-titles | status")
+                                       "propose-titles | resolve-stubs | status")
     p.add_argument("action", choices=["import-arxiv", "import-benchmarks", "import-scievo", "import-crossref",
-                                      "propose-titles", "adjudicate", "status"])
+                                      "propose-titles", "resolve-stubs", "adjudicate", "status"])
     p.add_argument("--kinds", default=None, help="adjudicate: queue kinds (default all)")
-    p.add_argument("--limit", type=int, default=None, help="adjudicate: at most this many pairs")
+    p.add_argument("--limit", type=int, default=None,
+                   help="adjudicate: at most this many pairs; resolve-stubs: at most this many stub groups")
     p.add_argument("--dry-run", action="store_true", help="adjudicate: store verdicts, merge nothing")
     p.add_argument("--ids", default=None, help="adjudicate: file of merge_queue ids (an audit sample); "
                                                "import-crossref: file of DOIs")
