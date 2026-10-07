@@ -73,10 +73,11 @@ Return JSON only:
 
 Rules: cite the sentence number each item comes from; the sentence itself is the evidence. Facet=result items
 keep the exact number and its condition as the sentence writes them. Facet=absence only for explicitly written
-absences. "own_methods" lists proper names only, never descriptions — and never datasets, benchmarks, test
-sets, tools, libraries, metrics or prior work the paper builds on (measured contamination: "UCF101",
-"Scikit-learn", "bag of words approach", "test set" all showed up and skew the results pass). Up to 25 items
-per chunk; empty lists are fine. No outside knowledge."""
+absences — including what the paper explicitly writes that it does NOT do, cover or evaluate ("we do not
+evaluate on X"); never inferred from silence. "own_methods" lists proper names only, never descriptions — and
+never datasets, benchmarks, test sets, tools, libraries, metrics or prior work the paper builds on (measured
+contamination: "UCF101", "Scikit-learn", "bag of words approach", "test set" all showed up and skew the
+results pass). Up to 25 items per chunk; empty lists are fine. No outside knowledge."""
 
 RESULTS_AXES = """You read ONE numeric table of a research paper, already repaired into a grid (rows of cells,
 spans expanded), with its caption and the sentences around it. Propose the ROLE of each axis. Do not extract any

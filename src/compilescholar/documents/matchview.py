@@ -9,6 +9,7 @@ Every view character remembers its origin index, so locate() maps a found quote 
 text (loc.char_start / char_end in schema v2)."""
 from __future__ import annotations
 
+import html as _html
 import re
 import unicodedata
 
@@ -26,6 +27,11 @@ _HTML = re.compile(
     r"iframe|video|details|summary|label|abbr|cite|dfn|q|var|kbd|mark|ruby|rt|rp|wbr|nobr)(?:\s[^<>]*)?/?>",
     re.I)
 _CITE = re.compile(r"\[\s*\d+(?:\s*,\s*\d+)*[a-z]?\s*\]")
+# HTML entities are decoded AFTER tag stripping (an escaped "&lt;table&gt;" is content, not markup — decoding
+# first would turn it into a strippable tag). Cell-text extractors decode entities, the raw HTML keeps them:
+# without this step a row quote "Frey & Hinton" never matches its source "Frey &amp; Hinton" (measured on the
+# 260-paper smoke: 2.1% of the results pass's deterministic row quotes falsely discarded).
+_ENTITY = re.compile(r"&(?:#[0-9]+|#[xX][0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]*);")
 # ids._GREEK is the registry's title_key map and must not drift (stored keys); the view spells out the full
 # alphabet so a LaTeX fold ("\zeta" -> "zeta") and the Unicode glyph meet
 _GREEK_FULL = {**_GREEK, "ζ": "zeta", "η": "eta", "θ": "theta", "ϑ": "theta", "ι": "iota", "ν": "nu",
@@ -73,6 +79,7 @@ def view_map(text: str) -> tuple[str, list[int]]:
         chars, orig = out_c, out_i
 
     rewrite(_HTML, lambda m: "")                                   # HTML tags out
+    rewrite(_ENTITY, lambda m: _html.unescape(m.group(0)))         # entities decoded (&amp; -> &, &#x27; -> ')
     rewrite(_CITE, lambda m: "")                                   # citation markers out
     rewrite(_LATEX_CMD, lambda m: "" if m.group(1) in _LATEX_FORMAT else m.group(1))   # LaTeX folded
 

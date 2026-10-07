@@ -15,6 +15,7 @@ Fuzzy matching is used for REPORTING only ("how far off" — the best sentence a
 it never passes a statement."""
 from __future__ import annotations
 
+import html
 import json
 import re
 import unicodedata
@@ -35,11 +36,12 @@ _NUM = re.compile(r"\d+(?:[.,]\d+)*(?:\s*[×x]\s*10\s*[-−–]?\s*\d+)?%?")
 
 
 def _num_frame(text: str) -> str:
-    """The frame for the verbatim-number rule: NFKC + whitespace out + casefold — lighter than the match view on
-    purpose. The view strips citation markers and HTML, which would hide legitimate numbers ("[25]", a header
-    cell's "T5") from the check; numbers must be findable in the RAW text (digits render the same in every tier,
-    NFKC folds superscripts)."""
-    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", text or "")).casefold()
+    """The frame for the verbatim-number rule: entities decoded + NFKC + whitespace out + casefold — lighter than
+    the match view on purpose. The view strips citation markers and HTML, which would hide legitimate numbers
+    ("[25]", a header cell's "T5") from the check; numbers must be findable in the RAW text (digits render the
+    same in every tier, NFKC folds superscripts). The decode mirrors the match view so both sides of the
+    comparison agree (and "&#x27;" stops contributing a phantom "27" to the frame)."""
+    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", html.unescape(text or ""))).casefold()
 
 
 def violations(stmt: Statement, source_view: str, source_raw: str = "") -> list[str]:

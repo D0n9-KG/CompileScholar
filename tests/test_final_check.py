@@ -48,6 +48,30 @@ def test_view_does_not_eat_math_angle_brackets():
     assert MV.view("<mml:math>x</mml:math>") == MV.view("x")
 
 
+def test_view_decodes_html_entities_after_tag_stripping():
+    """Regression (260-paper smoke, results pass): cell-text extractors decode entities but the raw table HTML
+    keeps them — "Frey &amp; Hinton" falsely discarded 2.1% of the deterministic row quotes."""
+    assert MV.view("Frey & Hinton, 1999") == MV.view("Frey &amp; Hinton, 1999")
+    assert MV.view("qu' ainsi") == MV.view("qu&#x27; ainsi") == MV.view("qu&#39; ainsi")
+    assert MV.view("a &le; b") == MV.view("a ≤ b") == MV.view("a \\leq b")   # entity -> glyph -> fold chain
+    # escaped markup is CONTENT (decoded after stripping); a real tag is markup (stripped) — they must differ
+    assert MV.view("use &lt;table&gt; tags") == "use<table>tags"
+    assert MV.view("use <table> tags") == "usetags"
+    sent = "Score of FastGF&apos;s run is 91.2"
+    span = MV.locate("FastGF's run", sent)
+    assert sent[span[0]:span[1]] == "FastGF&apos;s run"      # the span covers the entity in the ORIGINAL
+    assert FC._num_frame("it&#x27;s 5.2") == FC._num_frame("it's 5.2")
+    assert "27" not in FC._num_frame("it&#x27;s")            # no phantom digits from entity text
+
+
+def test_results_row_quote_with_entity_passes():
+    src = "<table><tr><td>NLGBN (Frey &amp; Hinton, 1999)</td><td>95.80</td></tr></table>"
+    s = _st("NLGBN: 95.80", "NLGBN (Frey & Hinton, 1999) 95.80", sent_id="r1", pass_name="results")
+    kept, disc, st = FC.run([s], src, {"r1": "NLGBN (Frey & Hinton, 1999) 95.80"},
+                            chat=lambda *a, **k: None, item=PID)
+    assert len(kept) == 1 and not disc
+
+
 def test_locate_maps_back_to_original_span():
     sent = "We use <b>FastGF</b> on graphs."
     span = MV.locate("FastGF", sent)
