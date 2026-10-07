@@ -21,9 +21,15 @@ in citations/extract/registry re-opens the affected aggregate (they are cheap fu
 from __future__ import annotations
 
 import json
+import re
+from collections import Counter, defaultdict
 
+import ahocorasick
+
+from ..compile.skeleton.proposes import GENERIC
 from ..core import paths
 from ..dfc import store
+from ..extract.schema import LINEAGE
 
 DDL = """CREATE TABLE IF NOT EXISTS cocite(a TEXT NOT NULL, b TEXT NOT NULL, day TEXT NOT NULL, n INT NOT NULL,
   PRIMARY KEY(a, b, day));
@@ -41,8 +47,8 @@ CREATE TABLE IF NOT EXISTS mention_link(id INTEGER PRIMARY KEY, name TEXT, sid T
   candidates TEXT, paper_id TEXT, status TEXT);
 CREATE TABLE IF NOT EXISTS lineage_edge(stmt_id INT, child TEXT, parent TEXT, relation TEXT, speaker TEXT,
   date TEXT, valid_from TEXT, kind TEXT);
-CREATE TABLE IF NOT EXISTS lineage_hyper(stmt_id INT, member TEXT, relation TEXT, speaker TEXT, date TEXT,
-  valid_from TEXT);
+CREATE TABLE IF NOT EXISTS lineage_hyper(stmt_id INT, child TEXT, member TEXT, relation TEXT, speaker TEXT,
+  date TEXT, valid_from TEXT);
 CREATE TABLE IF NOT EXISTS category_canon(phrase TEXT PRIMARY KEY, canonical TEXT, umbrella INT, decided_by TEXT);
 CREATE TABLE IF NOT EXISTS category_daily(category TEXT NOT NULL, day TEXT NOT NULL, n INT,
   PRIMARY KEY(category, day));
@@ -57,6 +63,68 @@ CREATE TABLE IF NOT EXISTS family_snapshot(snapshot TEXT, family_id TEXT, name T
 def _manifest_fp(stage: str) -> str | None:
     m = store.read_manifest(stage) or {}
     return m.get("fingerprint")
+
+
+# ---------------------------------------------------------------- method-name vocabulary (identity evidence)
+_MODIFIER = re.compile(r"\b(the|a|an|model|method|framework|approach|algorithm|network)s?\b")
+
+
+def norm_name(s: str) -> str:
+    """Surface name -> comparison key (the old cognition.identity rule, kept: dash folds, parentheticals out,
+    genre modifiers out)."""
+    s = re.sub(r"[‐-―]", "-", (s or "").lower())
+    s = re.sub(r"\s*\(.*?\)\s*", " ", s)
+    s = re.sub(r"[^a-z0-9+\-. ]+", " ", s)
+    s = _MODIFIER.sub(" ", s)
+    return " ".join(s.split()).strip(" .-")
+
+
+def name_vocab(ext) -> dict:
+    """norm_name -> {"papers": Counter(paper_id -> evidence weight), "surface": str}. Evidence weights keep the
+    old Identity discipline: a self-reported proposal (3) outweighs its aliases (2) outweigh a third party's
+    naming (1); generic names are never in the vocabulary."""
+    vocab: dict[str, dict] = defaultdict(lambda: {"papers": Counter(), "surface": ""})
+
+    def note(name, pid, w):
+        n = norm_name(name)
+        if not n or n in GENERIC or len(n) < 3:
+            return
+        v = vocab[n]
+        v["papers"][pid] += w
+        if len(name) > len(v["surface"]):
+            v["surface"] = name
+
+    for meta, about in ext.execute("SELECT meta, about FROM statements WHERE kind='self' AND role='proposes'"):
+        try:
+            m = json.loads(meta or "{}")
+        except (TypeError, ValueError):
+            continue
+        if m.get("name") and not m.get("generic"):
+            note(m["name"], about, 3)
+            for a in m.get("aliases") or []:
+                note(a, about, 2)
+    for meta, about in ext.execute("SELECT meta, about FROM statements WHERE kind='other'"):
+        try:
+            m = json.loads(meta or "{}")
+        except (TypeError, ValueError):
+            continue
+        if m.get("name") and not about.startswith("stub:"):
+            note(m["name"], about, 1)
+    return dict(vocab)
+
+
+def resolve_name(cand: Counter) -> tuple[str | None, str]:
+    """Deterministic identity: one candidate resolves; several resolve only on clear evidence dominance
+    (>= 2 and >= 2x the runner-up — the old rule); otherwise 'ambiguous', which is the LLM adjudication's queue
+    (D② method identity)."""
+    if not cand:
+        return None, "empty"
+    if len(cand) == 1:
+        return next(iter(cand)), "ok"
+    (best, w), *rest = cand.most_common()
+    if w >= 2 and w >= 2 * rest[0][1]:
+        return best, "ok"
+    return None, "ambiguous"
 
 
 def _author_key(surname: str, name: str) -> str | None:
@@ -169,11 +237,164 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 w.ok("all")
                 log(f"[cognition] comparison_edge: {n:,} rows")
 
+            # ---- method-name vocabulary (shared by the mentions and lineage passes)
+            vocab = name_vocab(ext)
+            resolved = {n: resolve_name(v["papers"]) for n, v in vocab.items()}
+            vocab_fp = store.sha(sorted((k, sorted(v["papers"].items())) for k, v in vocab.items()))
+
+            # ---- mentions: every known method name in every sentence, including ones without a citation mark
+            from ..documents.build import Documents
+            from ..extract import reading as RD
+            D = Documents()
+            try:
+                w = run.work("mentions")
+                doc_keys = store.item_keys("documents", "docs")
+                delta_keys = store.item_keys("documents", "delta")
+                sv_keys = store.item_keys("documents", "sv")
+                vers: dict[str, list] = {}
+                for p_, v_ in D.con.execute("SELECT paper_id, version FROM docs"):
+                    vers.setdefault(p_, []).append(v_)
+                m_items = []
+                for pid, vs in sorted(vers.items()):
+                    bv = 1 if 1 in vs else (0 if 0 in vs else max(vs))
+                    lv = max(vs)
+                    bk, lk = f"{pid}@v{bv}", (f"{pid}@v{lv}" if lv != bv else None)
+                    m_items.append((pid, bk, lk))
+                auto = ahocorasick.Automaton()
+                for n in vocab:
+                    auto.add_word(n, n)
+                if vocab:
+                    auto.make_automaton()
+                todo_m = set(w.todo([(pid, store.sha(vocab_fp, doc_keys.get(bk),
+                                                      (doc_keys.get(lk), delta_keys.get(pid)) if lk else None,
+                                                      sv_keys.get(pid))) for pid, bk, lk in m_items]))
+
+                def one_mentions(triple):
+                    pid = triple[0]
+                    if pid not in todo_m:
+                        return
+                    try:
+                        full = RD.full_text(D, pid)
+                        rows = []
+                        if full and vocab:
+                            for s in full["sentences"]:
+                                t = norm_name(s["text"])       # the vocabulary's normalisation on both sides
+                                if len(t) < 3:
+                                    continue
+                                for end, name in auto.iter(t):
+                                    start = end - len(name) + 1
+                                    if (start > 0 and t[start - 1] != " ") or (end + 1 < len(t) and t[end + 1] != " "):
+                                        continue                      # inside a longer token: not a mention
+                                    p_res, status = resolved.get(name, (None, "empty"))
+                                    rows.append((name, s["sid"], pid, s.get("date"),
+                                                 json.dumps(sorted(vocab[name]["papers"].items())), p_res, status))
+                        with run.lock:
+                            con.execute("DELETE FROM mention_link WHERE citing=?", (pid,))
+                            con.executemany("INSERT INTO mention_link(name, sid, citing, date, candidates, "
+                                            "paper_id, status) VALUES (?,?,?,?,?,?,?)", rows)
+                            mcounter["n"] += 1
+                            if mcounter["n"] % 200 == 0:
+                                con.commit()
+                            w.ok(pid)
+                    except Exception as e:
+                        w.fail(pid, f"{type(e).__name__}: {e}")
+
+                mcounter = {"n": 0}
+                store.parallel(one_mentions, [t for t in m_items if t[0] in todo_m], workers or 8, log=log,
+                               every=5000, label="cognition:mentions")
+                with run.lock:
+                    con.commit()
+                w.sweep([p for p, _, _ in m_items],
+                        lambda p: con.execute("DELETE FROM mention_link WHERE citing=?", (p,)))
+            finally:
+                D.close()
+
+            # ---- lineage: paper -> paper edges with the §2.4 effective date (deterministic half; ambiguous
+            #      parent identities wait for the D② method-identity adjudication)
+            w = run.work("lineage")
+            if w.todo([("all", store.sha(ext_fp, vocab_fp))]):
+                first_hi = dict(reg.execute("SELECT paper_id, first_hi FROM papers "
+                                            "WHERE status='active' AND first_hi IS NOT NULL"))
+                edges, hyper, dropped = [], [], {"time": 0, "stub": 0, "unknown": 0}
+
+                def add_edge(sid, child, parent, rel, kind, speaker, date):
+                    if child == parent:
+                        return
+                    if child.startswith("stub:") or parent.startswith("stub:"):
+                        dropped["stub"] += 1
+                        return
+                    fc, fp2 = first_hi.get(child), first_hi.get(parent)
+                    if not fc or not fp2:
+                        dropped["unknown"] += 1
+                        return
+                    if fc < fp2:                       # cannot extend a work that did not exist yet
+                        dropped["time"] += 1
+                        return
+                    edges.append((sid, child, parent, rel, speaker, date, max(date, fc, fp2), kind))
+
+                def add_hyper(sid, child, members, rel, speaker, date):
+                    members = [m for m in dict.fromkeys(members) if m != child and not m.startswith("stub:")
+                               and m in first_hi]
+                    if len(members) < 2 or child.startswith("stub:") or child not in first_hi:
+                        return
+                    vf = max([date, first_hi[child]] + [first_hi[m] for m in members])
+                    for m in members:
+                        hyper.append((sid, child, m, rel, speaker, date, vf))
+
+                lin = ",".join("?" * len(LINEAGE))
+                for sid, speaker, about, role, date, meta, kind, grp in ext.execute(
+                        f"SELECT id, speaker, about, role, date, meta, kind, grp FROM statements "
+                        f"WHERE date IS NOT NULL AND (role IN ({lin}) "
+                        f"OR json_extract(meta, '$.builds_on') IS NOT NULL)", tuple(LINEAGE)):
+                    try:
+                        m = json.loads(meta or "{}")
+                    except (TypeError, ValueError):
+                        m = {}
+                    group = json.loads(grp or "[]")
+                    if kind == "self" and role in LINEAGE:
+                        parents = []
+                        for mn in m.get("mentions") or []:
+                            rel = mn.get("relation") if mn.get("relation") in LINEAGE else role
+                            p = resolved.get(norm_name(mn.get("name") or ""), (None,))[0]
+                            if p:
+                                add_edge(sid, speaker, p, rel, "self", speaker, date)
+                                parents.append(p)
+                        if role == "combines" and len(parents) >= 2:
+                            add_hyper(sid, speaker, parents, "combines", speaker, date)
+                    elif kind == "other":
+                        if role in LINEAGE:
+                            add_edge(sid, speaker, about, role, "self", speaker, date)
+                            if role == "combines":
+                                add_hyper(sid, speaker, group, "combines", speaker, date)
+                        bo, bor = m.get("builds_on"), m.get("builds_on_relation")
+                        if bo and bor in LINEAGE:
+                            bn = norm_name(bo)
+                            p = resolved.get(bn, (None,))[0]
+                            if p is None and bn in vocab:
+                                # a globally ambiguous name is disambiguated by the sentence: a co-cited work
+                                # that claims the name is the parent (the old Identity fallback, kept)
+                                cand = vocab[bn]["papers"]
+                                p = next((g for g in group if g != about and g in cand), None)
+                            if p:
+                                add_edge(sid, about, p, bor, "third", speaker, date)
+                con.execute("DELETE FROM lineage_edge")
+                con.executemany("INSERT INTO lineage_edge VALUES (?,?,?,?,?,?,?,?)", edges)
+                con.execute("DELETE FROM lineage_hyper")
+                con.executemany("INSERT INTO lineage_hyper VALUES (?,?,?,?,?,?,?)", hyper)
+                con.commit()
+                w.ok("all")
+                log(f"[cognition] lineage: {len(edges):,} edges, {len(hyper):,} hyper rows, dropped {dropped}")
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
                       "author_link": q("SELECT count(*) FROM author_link"),
-                      "comparison_edge": q("SELECT count(*) FROM comparison_edge")}
+                      "comparison_edge": q("SELECT count(*) FROM comparison_edge"),
+                      "mention_link": q("SELECT count(*) FROM mention_link"),
+                      "mentions_ambiguous": q("SELECT count(*) FROM mention_link WHERE status='ambiguous'"),
+                      "names": len(vocab),
+                      "lineage_edge": q("SELECT count(*) FROM lineage_edge"),
+                      "lineage_hyper": q("SELECT count(*) FROM lineage_hyper")}
             run.finish(counts)
         finally:
             for c in mine:

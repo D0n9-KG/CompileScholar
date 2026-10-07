@@ -61,16 +61,55 @@ def env(tmp_path, monkeypatch):
     cit.commit()
     cit.close()
 
+    import zlib
+    from compilescholar.documents.build import DDL as DOC_DDL
+    docs = store.connect("documents")
+    docs.executescript(DOC_DDL)
+
+    def _fastz(sents):
+        d = {"title": "t", "abstract": "",
+             "units": [{"uid": "u1", "kind": "para", "section": "", "text": " ".join(s[1] for s in sents)}],
+             "sentences": [{"sid": s[0], "unit": "u1", "text": s[1]} for s in sents], "entries": {}, "cites": []}
+        return zlib.compress(json.dumps(d).encode())
+
+    def _doc(key, pid, ver, date, sents):
+        docs.execute("INSERT INTO docs(key,paper_id,version,sha256,source,text_date,date_precision,n_units,"
+                     "n_sentences,n_entries,n_cites,n_tables,fast_z,careful_z) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                     (key, pid, ver, "sha-" + key, "arxiv_nas", date, "day", 1, len(sents), 0, 0, 0,
+                      _fastz(sents), None))
+
+    _doc(f"{PA}@v1", PA, 1, "2019-06-01",
+         [(f"{PA}@v1#s1", "We propose FastGF, an efficient graph transformer."),
+          (f"{PA}@v1#s2", "GraphNet improves the state of the art."),
+          (f"{PA}@v1#s3", "BiAttn is compared as a baseline."),
+          (f"{PA}@v1#s4", "The FastGFnet variant is also tested.")])
+    _doc(f"{PB}@v1", PB, 1, "2020-06-01", [(f"{PB}@v1#s1", "GraphNet is our proposed method.")])
+    docs.commit()
+    docs.close()
+
     ext = store.connect("extract")
     ext.executescript(EXT_DDL)
-    ext.execute("INSERT INTO statements(id, speaker, date, kind, about, role, facet, text, quote, epistemic, "
-                "condition, loc, meta, pass, item) VALUES (1,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (PB, "2020-06-01", "other", PA, "compares", "result", "B beats A on graphs", "quote", "stated", "",
-                 json.dumps({"unit_id": "u", "sent_id": "s"}), json.dumps({"outcome": "citing_better"}), "other", PB))
-    ext.execute("INSERT INTO statements(id, speaker, date, kind, about, role, facet, text, quote, epistemic, "
-                "condition, loc, meta, pass, item) VALUES (2,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (PA, "2019-06-01", "self", PA, "proposes", "contribution", "proposes M", "quote", "stated", "",
-                 json.dumps({"unit_id": "u", "sent_id": "s2"}), json.dumps({}), "t1", PA))
+
+    def _stmt(i, speaker, date, kind, about, role, facet, text, meta):
+        ext.execute("INSERT INTO statements(id, speaker, date, kind, about, role, facet, text, quote, epistemic, "
+                    "condition, loc, meta, pass, item) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (i, speaker, date, kind, about, role, facet, text, "quote", "stated", "",
+                     json.dumps({"unit_id": "u", "sent_id": f"s{i}"}), json.dumps(meta), "t", speaker))
+
+    _stmt(1, PB, "2020-06-01", "other", PA, "compares", "result", "B beats A on graphs",
+          {"outcome": "citing_better"})
+    _stmt(2, PA, "2019-06-01", "self", PA, "proposes", "contribution", "proposes M", {})
+    _stmt(3, PA, "2019-06-01", "self", PA, "proposes", "contribution", "proposes FastGF",
+          {"name": "FastGF", "aliases": ["BiAttn"]})
+    _stmt(4, PB, "2020-06-01", "self", PB, "proposes", "contribution", "proposes GraphNet", {"name": "GraphNet"})
+    _stmt(5, PA, "2019-06-01", "self", PA, "extends", "method", "extends GraphNet",
+          {"mentions": [{"name": "GraphNet", "relation": "extends"}]})          # time-inconsistent (PA<PB)
+    _stmt(6, PD, "2022-01-01", "self", PD, "extends", "method", "extends GraphNet",
+          {"mentions": [{"name": "GraphNet", "relation": "extends"}]})          # valid self edge
+    _stmt(7, PB, "2022-06-01", "other", PD, "uses", "method", "PD improves GraphNet",
+          {"builds_on": "GraphNet", "builds_on_relation": "improves"})           # third-party edge
+    _stmt(8, PB, "2020-06-01", "self", PB, "proposes", "contribution", "proposes AttnNet",
+          {"name": "BiAttn"})                                                   # makes attnet ambiguous
     ext.commit()
     ext.close()
 
@@ -83,7 +122,11 @@ def env(tmp_path, monkeypatch):
 def test_cognition_build_materialises(env):
     from compilescholar.cognition import build as CB
     counts = CB.build(log=lambda *a: None)
-    assert counts == {"cocite": 1, "reception": 3, "author_link": 3, "comparison_edge": 1}
+    assert counts["cocite"] == 1 and counts["reception"] == 3
+    assert counts["author_link"] == 3 and counts["comparison_edge"] == 1
+    assert counts["names"] == 3                              # fastgf, graphnet, biattn
+    assert counts["mention_link"] == 4 and counts["mentions_ambiguous"] == 1
+    assert counts["lineage_edge"] == 2 and counts["lineage_hyper"] == 0
     con = env.connect("cognition", readonly=True)
     a, b, day, n = con.execute("SELECT * FROM cocite").fetchone()
     assert {a, b} == {PB, "stub:xray"} and day == "2019-06-01" and n == 1     # ordered pair, one co-citation
@@ -95,6 +138,20 @@ def test_cognition_build_materialises(env):
     assert con.execute("SELECT count(*) FROM author_link WHERE author_key='smith|j'").fetchone()[0] == 2  # A and B
     row = con.execute("SELECT a, b, outcome, date FROM comparison_edge").fetchone()
     assert row == (PB, PA, "citing_better", "2020-06-01")
+    # mentions: own/trivial uses resolved, ambiguous kept with candidates, substring "FastGFnet" not a mention
+    ment = {(r[0], r[2]): r for r in con.execute(
+        "SELECT name, sid, citing, date, candidates, paper_id, status FROM mention_link")}
+    assert ("fastgf", PA) in ment and ment[("fastgf", PA)][5] == PA and ment[("fastgf", PA)][6] == "ok"
+    assert ("graphnet", PA) in ment and ment[("graphnet", PA)][5] == PB       # mention in PA cites PB's method
+    assert ("graphnet", PB) in ment                                            # self-mention kept
+    assert ment[("biattn", PA)][5] is None and ment[("biattn", PA)][6] == "ambiguous"
+    assert json.loads(ment[("biattn", PA)][4]) == [[PA, 2], [PB, 3]]           # alias(2) vs proposal(3)
+    assert not any(sid == f"{PA}@v1#s4" for (_, sid, *_ ) in
+                   con.execute("SELECT name, sid FROM mention_link"))           # word-boundary discipline
+    # lineage: the time-inconsistent edge is dropped, the valid ones carry §2.4 effective dates
+    edges = sorted(con.execute("SELECT child, parent, relation, kind, date, valid_from FROM lineage_edge"))
+    assert edges == [(PD, PB, "extends", "self", "2022-01-01", "2022-01-01"),          # id6 self claim
+                     (PD, PB, "improves", "third", "2022-06-01", "2022-06-01")]        # id7 builds_on (child=about)
     con.close()
 
 
@@ -137,11 +194,11 @@ def test_asof_statements_and_citations(env):
     from compilescholar.cognition.asof import AsOf
     v = AsOf("2020-12-31")
     ss = v.statements()
-    assert len(ss) == 2                                    # both statements dated <= T
+    assert len(ss) == 6                                    # ids 1-5 and 8 are dated <= T (6 and 7 are 2022)
     assert all(isinstance(s["loc"], dict) and isinstance(s["meta"], dict) for s in ss)
     assert v.statements(about=PA, kind="other")[0]["text"] == "B beats A on graphs"
     v19 = AsOf("2019-12-31")
-    assert len(v19.statements()) == 1                      # the 2020 statement is not visible in 2019
+    assert len(v19.statements()) == 3                      # the 2019 statements only
     assert v.cited_by(PA) == [(PB, "2020-06-01", 2)]       # sentence 2 only
     assert v19.cited_by(PB) == [(PA, "2019-06-01", 1)]
     refs = v.references(PA)

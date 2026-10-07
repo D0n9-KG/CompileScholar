@@ -13,6 +13,11 @@ dependencies = [
     "httpx==0.28.1",          # the one LLM client (streamed, cancellable)
     "pyarrow==25.0.1",        # IdeaForecastBench parquet (documents)
     "mcp==1.29.0",            # literature tools as an MCP server (tools.mcp_server; harness arm)
+    "lxml==6.1.1",            # GROBID TEI parsing (documents.tei)
+    "pymupdf==1.28.2",        # PDF hyperref links, quarantine checks (documents.parse, acquire)
+    "rapidfuzz==3.14.6",      # version deltas, sv sentence dating (documents.versions/sciverse)
+    "pyahocorasick==2.3.1",   # mention_link: multi-pattern method-name scan over every sentence (cognition)
+    "tantivy==0.26.0",        # the D③ full-text index (design pins 0.26)
 ]
 
 [project.optional-dependencies]
