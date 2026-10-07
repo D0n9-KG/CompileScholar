@@ -38,6 +38,10 @@ Return JSON only:
 Rules:
 - "names"/relation=proposes ONLY for artefacts this paper introduces as new; artefacts it builds on get
   relation=uses. Do not confuse the two.
+- A "name" is the PROPER identifier the paper gives the artefact ("DAgger", "Hogwild!", "ResNet"). If the
+  artefact is only referred to descriptively ("a new iterative algorithm", "recognition model"), output NO
+  names entry for it — a description is not a name (measured contamination: 12.5% of names were descriptive
+  phrases, which poison the method-identity vocabulary downstream).
 - facet=absence ONLY where the paper EXPLICITLY writes that something is missing, unavailable, unexplored or
   not addressed — never inferred from silence.
 - epistemic: demonstrated = backed by the paper's own experiments/proofs; stated = asserted without evidence in
