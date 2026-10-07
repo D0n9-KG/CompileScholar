@@ -243,14 +243,16 @@ def _manifest_path(stage: str) -> Path:
 
 def read_manifest(stage: str) -> dict | None:
     p = _manifest_path(stage)
-    for attempt in range(3):
+    # the retry mirrors the writer's (20 x 50ms): on Windows a replace can hold the target open, and under
+    # heavy disk load (parse marathons) the old 3-attempt window was measurably too tight (flaky p6)
+    for attempt in range(20):
         if not p.exists():
             return None
         try:
             with open(p, encoding="utf-8") as f:
                 return json.load(f)
         except (json.JSONDecodeError, PermissionError):
-            if attempt == 2:
+            if attempt == 19:
                 raise
             time.sleep(0.05)
     return None

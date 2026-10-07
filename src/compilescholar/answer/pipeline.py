@@ -239,7 +239,15 @@ def _fmt_ev(items: list[dict]) -> str:
     lines = []
     for e in items:
         yr = f", {e['year']}" if e.get("year") else ""
-        lines.append(f"[{e['eid']}] ({e['title'][:150]}{yr}) {e['snippet']}")
+        if e.get("about"):
+            # lit mode, other-statement evidence (§9.3): hung under the SPEAKER's name, phrased "Y says …",
+            # the described work named in the line — legacy evidence never carries "about", so this branch
+            # cannot change a pinned prompt
+            ab = e["about"].get("title") or e["about"].get("id") or "another work"
+            lines.append(f"[{e['eid']}] ({e['title'][:150]}{yr} — describing \"{ab[:100]}\") "
+                         f"{e['title'][:60]} says: {e['snippet']}")
+        else:
+            lines.append(f"[{e['eid']}] ({e['title'][:150]}{yr}) {e['snippet']}")
     return "\n".join(lines)
 
 
@@ -321,7 +329,10 @@ def _identity(e: dict) -> str:
     """One paper, one citation (W1-13): the same paper reached through KB / external search / citation expansion
     carried different paper_keys and got two numbers (v9b test r1: 11/355 sections). Identity = arXiv id (version
     stripped) if known, else the normalized title when it is specific enough (>= 4 words or >= 25 characters),
-    else the channel's own paper_key."""
+    else the channel's own paper_key. Lit-mode evidence carries the registry paper_id, which IS the identity
+    (§9.3); legacy evidence never has the key, so the golden path is untouched."""
+    if e.get("paper_id"):
+        return e["paper_id"]
     ax = (e.get("arxiv") or "").strip().lower()
     if ax:
         return "arxiv:" + re.sub(r"v\d+$", "", ax.split("arxiv:")[-1])
@@ -351,13 +362,21 @@ def assemble(sections: list[dict], texts: list[str], evidence: list[dict]) -> tu
             if ident not in n_map:
                 n_map[ident] = len(n_map) + 1
                 keys_by_id[ident] = {e["paper_key"]}
-                cites.append({"id": f"[{n_map[ident]}]", "snippets": [], "title": e["title"],
-                              "metadata": {"year": e.get("year"), "arxiv": e.get("arxiv"), "doi": e.get("doi"),
-                                           "source": e["src"], "paper_key": e["paper_key"]}})
+                meta = {"year": e.get("year"), "arxiv": e.get("arxiv"), "doi": e.get("doi"),
+                        "source": e["src"], "paper_key": e["paper_key"]}
+                if e.get("ids"):                 # lit mode: display identifiers from the registry (§9.3);
+                    meta["ids"] = e["ids"]       # legacy evidence never has the key — goldens untouched
+                cites.append({"id": f"[{n_map[ident]}]", "snippets": [], "title": e["title"], "metadata": meta})
             elif e["paper_key"] not in keys_by_id[ident]:
                 keys_by_id[ident].add(e["paper_key"])
                 stats["merged_identities"] += 1
             c = cites[n_map[ident] - 1]
+            if e.get("about"):
+                # lit mode (§9.3 user ruling): the described work of an other-statement rides in the citation's
+                # metadata (a speaker describing several works collects them all); legacy has no "about"
+                describes = c["metadata"].setdefault("describes", [])
+                if e["about"] not in describes:
+                    describes.append(e["about"])
             if e["snippet"] not in c["snippets"] and len(c["snippets"]) < 4:
                 c["snippets"].append(e["snippet"])
             stats["cited"] += 1
@@ -387,22 +406,49 @@ def as_of_date(cutoff: str | None) -> str:
 
 
 def field_block(question: str, as_of: str, tools) -> str:
+    """The field-map context block for the plan prompt (materialised families + facts, §9.2)."""
     fm = tools.field_map(question, as_of)
     lines = []
-    for f in fm["families"][:6]:
-        name = (f["name_candidates"] or ["(unnamed family)"])[0]
-        mem = "; ".join(f"{m['title'][:80]} ({(m['date'] or '')[:4]})" for m in f["members"][:4] if m.get("title"))
-        facts = "; ".join(f"{x['text'][:120]} [{x['status']}, {x['n_independent']} papers]" for x in f["facts"][:3])
+    for f in (fm.get("families") or [])[:6]:
+        name = f.get("name") or "(unnamed family)"
+        mem = "; ".join(f"{m['title'][:80]} ({(m['date'] or '')[:4]})" for m in f.get("members", [])[:4]
+                        if m.get("title"))
+        facts = "; ".join(f"{x['display'][:120]} [{x['status']}, {x['n_independent']} papers]"
+                          for x in f.get("facts", [])[:3])
         lines.append(f"- {name}: {mem}" + (f"\n  field says: {facts}" if facts else ""))
+    if fm.get("before_grid"):
+        lines.append("- (the family snapshot grid starts after this cutoff — no family structure is known)")
     return FIELD_BLOCK.format(as_of=as_of, items="\n".join(lines)) if lines else ""
 
 
-def lit_gather(question: str, sections: list[dict], as_of: str, tools, k: int = 8) -> tuple[list[dict], dict]:
-    """Evidence from the literature layer only: for each section query, papers (each with its own contribution and how
-    the field describes it) and sentence-level evidence. Snippets are verbatim quotes (sentences), never system text."""
+class _Cards:
+    """Per-question paper_card memo (lit_gather hits the same papers from many queries)."""
+
+    def __init__(self, tools, as_of: str):
+        self.tools, self.as_of, self._c = tools, as_of, {}
+
+    def get(self, pid: str) -> dict:
+        if pid not in self._c:
+            try:
+                self._c[pid] = self.tools.paper_card(pid, self.as_of)
+            except Exception:                        # noqa: BLE001 — a broken card must not kill the gather
+                self._c[pid] = {"error": "card_failed"}
+        return self._c[pid]
+
+
+def lit_gather(question: str, sections: list[dict], as_of: str, tools, k: int = 8,
+               use_ext: bool = True) -> tuple[list[dict], dict]:
+    """Evidence from the literature layer (§9.3): every sub-query runs the LOCAL channels (papers + sentence
+    evidence) and the EXTERNAL channel (Sciverse) IN PARALLEL, plus one citation expansion per section.
+    Snippets are verbatim quotes, never system text. Other-statement evidence hangs under the SPEAKER (Y says X
+    — the snippet is Y's own sentence); the described work X rides in `about` metadata. Identity is the registry
+    paper_id; display identifiers come from its card."""
     evidence, by_text, trace = [], {}, {"calls": []}
+    cards = _Cards(tools, as_of)
 
     def add(si, src, r):
+        if not r.get("snippet"):
+            return
         key = (r["paper_key"], r["snippet"][:160])
         if key in by_text:
             by_text[key]["sections"].add(si)
@@ -411,51 +457,148 @@ def lit_gather(question: str, sections: list[dict], as_of: str, tools, k: int = 
         by_text[key] = e
         evidence.append(e)
 
-    for si, s in enumerate(sections):
-        for q in s["queries"]:
-            briefs = tools.search_papers(q, as_of, k)
-            ev = tools.find_evidence(q, as_of, k)
-            trace["calls"].append({"section": si, "src": "lit", "query": q, "n": len(briefs) + len(ev), "errors": []})
-            for b in briefs:
+    def paper_ev(pid: str) -> dict | None:
+        """The citation skeleton of a local paper: title/year/display-ids from its card."""
+        c = cards.get(pid)
+        if c.get("error") or not c.get("title"):
+            return None
+        return {"paper_key": pid, "paper_id": pid, "title": c["title"], "ids": c.get("ids") or {},
+                "year": (c.get("date") or "")[:4] or None}
+
+    jobs = []
+    with cf.ThreadPoolExecutor(6) as ex:
+        for si, s in enumerate(sections):
+            for q in s["queries"]:
+                jobs.append((si, "papers", q, ex.submit(tools.search_papers, q, as_of, k)))
+                jobs.append((si, "evidence", q, ex.submit(tools.find_evidence, q, as_of, k)))
+                if use_ext:
+                    jobs.append((si, "external", q, ex.submit(tools.search_external, q, as_of, 6)))
+        raw = [(si, src, q, f.result()) for si, src, q, f in jobs]
+    local_seeds: dict[int, list] = {}
+    for si, src, q, res in raw:
+        if src == "papers":
+            for b in res:
+                if b.get("id") and not b["id"].startswith("stub:"):
+                    local_seeds.setdefault(si, []).append(b["id"])
                 if not b.get("title"):
                     continue
-                card = tools.paper_card(b["id"], as_of)
-                # the paper's own words: its contribution sentences (verbatim quotes), else its abstract
-                quotes = [c["quote"] for c in card.get("contributions") or []][:2]
-                for qt in quotes or [((tools.AsOf(as_of).paper(b["id"][6:]) or {}).get("abstract") or "")[:1200]]:
+                base = paper_ev(b["id"])
+                if base is None:
+                    continue
+                # the paper's own words: its contribution quotes, else its self description
+                c = cards.get(b["id"])
+                quotes = [x["quote"] for x in c.get("contributions") or [] if x.get("quote")][:2]
+                for qt in quotes or [ (b.get("self") or {}).get("quote") ]:
                     if qt:
-                        add(si, "lit_self", {"paper_key": b["id"], "title": b["title"],
-                                             "year": (b["date"] or "")[:4] or None, "arxiv": b["id"][6:], "snippet": qt})
-            for x in ev:
-                by = x.get("about") if x["kind"] == "other" else x["by"]
-                if not (by or "").startswith("paper:"):
+                        add(si, "lit_self", {**base, "snippet": qt})
+            trace["calls"].append({"section": si, "src": src, "query": q, "n": len(res), "errors": []})
+        elif src == "evidence":
+            for x in res:
+                if x["kind"] == "passage":
+                    base = paper_ev(x["by"])
+                    if base:
+                        add(si, "lit_passage", {**base, "snippet": x["quote"], "date": x["date"]})
                     continue
-                p = tools.paper_card(by, as_of)
-                if p.get("error") or not p.get("title"):
+                if x["kind"] == "other":
+                    # §9.3 user ruling: hung under the SPEAKER, "Y says X…", X in metadata
+                    base = paper_ev(x["by"])
+                    if base is None:
+                        continue
+                    ab = x.get("about") or ""
+                    ab_card = cards.get(ab) if ab and not ab.startswith("stub:") else {}
+                    add(si, "lit_other", {**base, "snippet": x["quote"], "date": x["date"],
+                                          "about": {"id": ab, "title": (ab_card or {}).get("title")
+                                                    or (ab[5:] if ab.startswith("stub:") else None)}})
+                else:
+                    base = paper_ev(x["by"])
+                    if base:
+                        add(si, "lit_self", {**base, "snippet": x["quote"], "date": x["date"]})
+            trace["calls"].append({"section": si, "src": src, "query": q, "n": len(res), "errors": []})
+        else:                                        # external
+            errors = res.get("errors") or []
+            n = 0
+            for x in (res.get("local") or []):
+                base = paper_ev(x["id"])
+                if base is None:
                     continue
-                add(si, "lit_" + x["kind"], {"paper_key": by, "title": p["title"], "year": (p["date"] or "")[:4] or None,
-                                             "arxiv": by[6:], "snippet": x["quote"]})
+                chunk = (x.get("chunk") or {}).get("quote")
+                c = cards.get(x["id"])
+                quotes = [y["quote"] for y in c.get("contributions") or [] if y.get("quote")][:1]
+                for qt in quotes or ([chunk] if chunk else []):
+                    if qt:
+                        add(si, "lit_self", {**base, "snippet": qt})
+                        n += 1
+            for x in (res.get("external") or []):
+                if not x.get("title"):
+                    continue
+                pk = "ext:" + hashlib.md5(x["title"].lower().encode()).hexdigest()[:12]
+                add(si, "lit_external", {"paper_key": pk, "title": x["title"],
+                                         "year": (x.get("date") or str(x.get("year") or ""))[:4] or None,
+                                         "snippet": (x.get("quote") or "")[:1200]})
+                n += 1
+            trace["calls"].append({"section": si, "src": src, "query": q, "n": n, "errors": errors})
+    # citation expansion, one bounded call per section, seeded by that section's local hits
+    for si, seeds in local_seeds.items():
+        try:
+            got = tools.expand_citations(sorted(dict.fromkeys(seeds))[:4], as_of, 8)
+        except Exception as e:                        # noqa: BLE001 — the channel degrades, the answer goes on
+            trace["calls"].append({"section": si, "src": "expand", "query": "-", "n": 0, "errors": [str(e)[:120]]})
+            continue
+        n = 0
+        for x in (got.get("local") or []):
+            if x.get("stub"):
+                continue
+            base = paper_ev(x["id"])
+            if base is None:
+                continue
+            c = cards.get(x["id"])
+            for qt in [y["quote"] for y in c.get("contributions") or [] if y.get("quote")][:1]:
+                add(si, "lit_expand", {**base, "snippet": qt})
+                n += 1
+        # external expand rows carry no quotable text (a bare title is not evidence — the old cite_expand's
+        # abstract-resolution rule); they stay out of the evidence table
+        trace["calls"].append({"section": si, "src": "expand", "query": "-", "n": n, "errors": []})
     trace["n_evidence"] = len(evidence)
-    trace["by_src"] = {s: sum(1 for e in evidence if e["src"] == s) for s in ("lit_self", "lit_other", "lit_passage")}
+    trace["by_src"] = {s: sum(1 for e in evidence if e["src"] == s)
+                       for s in ("lit_self", "lit_other", "lit_passage", "lit_external", "lit_expand")}
     return evidence, trace
 
 
 def answer_lit(question: str, cutoff: str | None = None, use_screen: bool = True, word_budget: int | None = None,
-               task_context: dict | None = None, tools=None) -> dict:
-    """The built-in consumer of the literature layer: plan with field_map, gather with the L6 tools, then the same
-    screen / write / assemble as the legacy path. tools defaults to compilescholar.tools.api."""
+               task_context: dict | None = None, tools=None, use_ext: bool = True) -> dict:
+    """The built-in consumer of the literature layer: probe (local + external in parallel), plan with the field
+    map, gather through the L6 tools, then the same screen / write / assemble as the legacy path. tools defaults
+    to compilescholar.tools.api. The trace writes the evidence table and used_eids (§9.3)."""
     if tools is None:
         from ..tools import api as tools
     t0 = time.time()
     as_of = as_of_date(cutoff)
     deg = Degradation()
-    probe_rows = [{"title": b["title"], "snippet": b["self"]} for b in tools.search_papers(question, as_of, 10)
-                  if b.get("title")]
+    with cf.ThreadPoolExecutor(2) as ex:             # the probe runs local + external in parallel too
+        f_loc = ex.submit(tools.search_papers, question, as_of, 10)
+        f_ext = ex.submit(tools.search_external, question, as_of, 6) if use_ext else None
+        briefs = f_loc.result()
+        ext_res = f_ext.result() if f_ext else {"local": [], "external": []}
+    probe_rows, seen = [], set()
+    for b in briefs + (ext_res.get("local") or []):
+        t = b.get("title")
+        if not t or t.lower() in seen:
+            continue
+        seen.add(t.lower())
+        sn = (b.get("self") or {}).get("display") or ""
+        probe_rows.append({"title": t, "snippet": sn})
+    for x in (ext_res.get("external") or []):
+        if x.get("title") and x["title"].lower() not in seen:
+            seen.add(x["title"].lower())
+            probe_rows.append({"title": x["title"], "snippet": (x.get("display") or "")[:300],
+                               "external": True})
+    deg.add("ext_query_failed", 1 if ext_res.get("errors") else 0)
     fb = field_block(question, as_of, tools)
     sections = plan(question, probe_rows, deg=deg, extra=fb)
-    evidence, trace = lit_gather(question, sections, as_of, tools)
+    evidence, trace = lit_gather(question, sections, as_of, tools, use_ext=use_ext)
     if task_context and task_context.get("text"):
-        evidence.insert(0, {"src": "target", "paper_key": "target:self", "title": task_context.get("title") or "this paper",
+        evidence.insert(0, {"src": "target", "paper_key": "target:self",
+                            "title": task_context.get("title") or "this paper",
                             "year": None, "snippet": task_context["text"][:2000], "eid": "E0",
                             "sections": set(range(len(sections)))})
     texts = write_sections(question, sections, evidence, use_screen=use_screen, word_budget=word_budget, deg=deg)
@@ -463,6 +606,9 @@ def answer_lit(question: str, cutoff: str | None = None, use_screen: bool = True
     return {"sections": out_secs,
             "trace": {"mode": "lit", "as_of": as_of, "plan": sections, "field_block": fb, **trace, "assemble": st,
                       "words": sum(len(s["text"].split()) for s in out_secs), "degradation": deg.counts,
+                      "used_eids": sorted({m for t in texts for m in _EID.findall(t)}, key=lambda x: int(x[1:])),
+                      "evidence": [{k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items()}
+                                   for e in evidence],
                       "elapsed_s": round(time.time() - t0, 1)}}
 
 
