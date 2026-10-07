@@ -53,7 +53,7 @@ def test_upstream_reconfigured_makes_downstream_stale(store):
 def test_transitive_staleness_from_code(store):
     _stand_up(store, "documents", "citations", "extract")
     m = store.read_manifest("documents")
-    m["code"] = {"documents/units.py": "old"}
+    m["code"] = {"documents/tei.py": "old"}
     json.dump(m, open(store.root() / "manifests" / "documents.json", "w"))
     assert store.status("documents")["stale"]
     assert store.status("citations")["stale"] and store.status("extract")["stale"]

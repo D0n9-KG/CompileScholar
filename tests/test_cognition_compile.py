@@ -49,11 +49,15 @@ def view(tmp_path, monkeypatch):
     monkeypatch.setenv("CS_DATA", str(tmp_path))
     from compilescholar.dfc import store
     importlib.reload(store)
-    from compilescholar.corpus import papers as PP
-    importlib.reload(PP)
-    # the derived "papers" stage is retired (phase C-1: the registry replaces it); this legacy fixture keeps its
-    # arXiv-keyed fake store at an explicit path and injects it into AsOf until cognition is re-wired in phase D
-    con = PP.connect(tmp_path / "papers.sqlite")
+    import sqlite3
+    # the derived "papers" stage is retired (phase C-1: the registry replaces it) and so is its legacy reader
+    # (corpus/papers.py, deleted at the end of phase C); this fixture creates the arXiv-keyed fake store inline
+    # and injects it into AsOf until cognition is re-wired in phase D
+    con = sqlite3.connect(tmp_path / "papers.sqlite")
+    con.execute("""CREATE TABLE papers(arxiv_id TEXT PRIMARY KEY, v1_date TEXT, title TEXT, norm_title TEXT,
+                   abstract TEXT, authors TEXT, first_surname TEXT, categories TEXT, primary_cat TEXT,
+                   doi TEXT, source TEXT)""")
+    con.execute("CREATE TABLE title_prefix(prefix40 TEXT, arxiv_id TEXT)")
     for pid, (d, au) in PAPERS.items():
         con.execute("INSERT INTO papers VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                     (pid, d, f"Paper {pid}", f"paper {pid}", "abs", json.dumps(au), au[0].lower(), "cs.LG", "cs.LG",
