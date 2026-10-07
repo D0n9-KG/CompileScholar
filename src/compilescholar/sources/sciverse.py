@@ -135,19 +135,34 @@ class _FileTokenBucket:
             time.sleep(min(need_s, remaining) + 0.05)
 
 
-_BUCKET = None
+_BUCKETS: dict = {}
 _BUCKET_LOCK = threading.Lock()
 
+# the account limit (30 req/min) is per key; with several keys the caller rotates them and each key keeps its
+# own bucket (and its own shared-bucket state file, so cross-process pacing stays per account)
+TOKEN_ENVS = ("SCIVERSE_API_TOKEN", "SCIVERSE_KRY_2", "SCIVERSE_KRY_3")
 
-def _bucket():
-    global _BUCKET
+
+def all_tokens() -> list[str]:
+    out = []
+    for k in TOKEN_ENVS:
+        v = secrets.get(k)
+        if v and v not in out:
+            out.append(v)
+    return out
+
+
+def _bucket(token: str):
+    import hashlib
+    key = hashlib.sha1(token.encode()).hexdigest()[:10]
     with _BUCKET_LOCK:
-        if _BUCKET is None:
+        b = _BUCKETS.get(key)
+        if b is None:
             rate = float(os.environ.get("SCIVERSE_RATE_PER_MIN", "30"))
             shared = os.environ.get("SCIVERSE_SHARED_BUCKET")
-            _BUCKET = (_FileTokenBucket(shared, rate, max(1, int(rate))) if shared
-                       else _TokenBucket(rate, max(1, int(rate))))
-        return _BUCKET
+            b = _BUCKETS[key] = (_FileTokenBucket(f"{shared}.{key}", rate, max(1, int(rate))) if shared
+                                 else _TokenBucket(rate, max(1, int(rate))))
+        return b
 
 
 def request_json(method: str, path: str, *, payload: object | None = None, query: dict[str, object] | None = None,
@@ -157,7 +172,7 @@ def request_json(method: str, path: str, *, payload: object | None = None, query
         raise SourceAdapterError("SCIVERSE_API_TOKEN missing")
     # Wait for a token before firing (SCIVERSE_MAX_WAIT_S; the answer path uses 600 — rate limiting is a queueing
     # problem, not a source failure).
-    _bucket().acquire(max_wait_s=float(os.environ.get("SCIVERSE_MAX_WAIT_S", "10")))
+    _bucket(token).acquire(max_wait_s=float(os.environ.get("SCIVERSE_MAX_WAIT_S", "10")))
     url = base_url.rstrip("/") + path
     if query:
         url += "?" + urlencode(query)

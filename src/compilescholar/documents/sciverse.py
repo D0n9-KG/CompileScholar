@@ -63,9 +63,26 @@ def _connect(path=None) -> sqlite3.Connection:
 
 
 # ---------------------------------------------------------------- fetch (network marathon)
+_TOK_LOCK = threading.Lock()
+_TOK_I = [0]
+
+
+def _next_token() -> str | None:
+    """Round-robin over every configured Sciverse key — the 30 req/min limit is per account, so three keys
+    triple the marathon's throughput; sources.sciverse keeps one token bucket per key."""
+    toks = S.all_tokens()
+    if not toks:
+        return None
+    with _TOK_LOCK:
+        t = toks[_TOK_I[0] % len(toks)]
+        _TOK_I[0] += 1
+    return t
+
+
 def _search(title: str) -> dict | None:
     """The hit whose title_key equals the queried title's (the coverage experiment's rule)."""
-    r = S.request_json("POST", "/agentic-search", payload={"query": title, "page_size": 10}, timeout_seconds=60)
+    r = S.request_json("POST", "/agentic-search", payload={"query": title, "page_size": 10}, timeout_seconds=60,
+                       token=_next_token())
     key = ids.title_key(title)
     return next((h for h in (r or {}).get("hits") or []
                  if ids.title_key(re.sub(r"^title:", "", h.get("title") or "")) == key), None)
@@ -76,7 +93,7 @@ def _content(doc_id: str) -> str:
     out, off = "", 0
     for _ in range(40):
         c = S.request_json("GET", "/content", query={"doc_id": doc_id, "offset": off, "limit": 200000},
-                           timeout_seconds=120)
+                           timeout_seconds=120, token=_next_token())
         out += (c or {}).get("text") or ""
         if str((c or {}).get("more")) != "True":
             return out

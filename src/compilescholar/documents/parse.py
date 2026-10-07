@@ -43,6 +43,12 @@ def _url(key: str) -> str:
     return str(paths._local_paths()[key]).rstrip("/")
 
 
+def _urls(key: str) -> list[str]:
+    """A config value may hold several comma-separated endpoints (e.g. the local GROBID plus one on the P40
+    box over an SSH tunnel); items are spread over them deterministically by content hash."""
+    return [u.strip().rstrip("/") for u in str(paths._local_paths()[key]).split(",") if u.strip()]
+
+
 def _atomic(p, data: bytes) -> None:
     p.parent.mkdir(parents=True, exist_ok=True)
     tmp = p.with_suffix(p.suffix + ".part")
@@ -157,14 +163,15 @@ def run(tier: str, paper_ids=None, workers: int | None = None, log=print, path=N
     todo = [(s, json.loads(p)) for s, p in {sha: ptr for _, sha, ptr in rows}.items() if s not in skip]
     log(f"[parse:{tier}] {len(todo):,} PDFs to parse")
     lock, n = threading.Lock(), {"ok": 0, "failed": 0}
-    url = _url("grobid" if tier == "fast" else "mineru_file_parse")
+    urls = _urls("grobid") if tier == "fast" else [_url("mineru_file_parse")]
     client = httpx.Client(timeout=httpx.Timeout(60, read=900), trust_env=False) if tier == "careful" else None
 
     def one(item):
         sha, ptr = item
         try:
             data = read_asset(ptr)
-            rel = _fast(sha, data, url) if tier == "fast" else _careful(sha, data, url, client)
+            rel = (_fast(sha, data, urls[int(sha[:8], 16) % len(urls)]) if tier == "fast"
+                   else _careful(sha, data, urls[0], client))
             status, detail = "ok", ""
         except Exception as e:
             rel, status, detail = None, "failed", f"{type(e).__name__}: {e}"[:400]
