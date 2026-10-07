@@ -120,10 +120,12 @@ def select_pairs(cit, targets, cap: int = N_OTHER) -> dict:
 
 
 def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",), since: str = "2018-01-01",
-          n_deep: int = 500, workers: int | None = None, rebuild: bool = False, log=print) -> dict:
+          n_deep: int = 500, sample: int | None = None, seed: int = 20261007, ids: list | None = None,
+          workers: int | None = None, rebuild: bool = False, log=print) -> dict:
     workers = workers or 48                        # LLM lanes (the client paces per backend)
     params = {"benchmark": benchmark, "categories": list(categories), "since": since,
-              "n_deep": n_deep, "n_other": N_OTHER}
+              "n_deep": n_deep, "n_other": N_OTHER, "sample": sample, "seed": seed,
+              "ids": sorted(ids) if ids else None}
     run_id = f"extract-{time.strftime('%Y%m%dT%H%M%S')}"
     with store.Run("extract", params, rebuild=rebuild) as run:
         con = run.con
@@ -137,7 +139,9 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
         rconn = store.read_only(run.path)          # per-thread reads of this run's file (rebuild writes a .new)
         try:
             # ---- scope + deep (question-blind)
-            if benchmark:
+            if ids:
+                scope = sorted(set(ids))           # an explicit corpus subset (smoke runs, the C⑥ coverage gate)
+            elif benchmark:
                 scope = [p for (p,) in reg.execute(
                     "SELECT DISTINCT paper_id FROM members WHERE benchmark=? ORDER BY paper_id", (benchmark,))]
             else:
@@ -146,6 +150,9 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                     "SELECT DISTINCT paper_id FROM records r JOIN papers p ON p.paper_id = r.paper_id "
                     f"WHERE p.status='active' AND p.first_hi >= ? AND r.source='arxiv' AND ({likes}) "
                     "ORDER BY paper_id", (since, *[f"{c}%" for c in categories]))]
+            if sample:                             # a seeded random sample of the scope: question-blind by
+                import random                      # construction (smoke runs; the full build leaves it None)
+                scope = random.Random(seed).sample(sorted(scope), min(sample, len(scope)))
             recs: dict[str, tuple] = {}
             scope_set = set(scope)
             for p, t, ab in reg.execute("SELECT paper_id, title, abstract FROM records "
