@@ -111,12 +111,24 @@ def set_index(index) -> None:
 
 
 def _documents():
+    """The shared Documents reader + its papers set, memoised for the process. An MCP session is short-lived
+    (§9.2: one process per harness session), so the memo never outlives a rebuild in practice; a long-lived
+    consumer must call reset_caches() after a documents rebuild (the stage swaps its file atomically — an open
+    reader would keep serving the old one)."""
     with _lock:
         if _docs[0] is None:
             from ..documents.build import Documents
             d = Documents()
             _docs[0] = (d, set(d.papers()))
         return _docs[0]
+
+
+def reset_caches() -> None:
+    """Drop the memoised readers (tests; a consumer that outlives a stage rebuild)."""
+    with _lock:
+        if _docs[0] is not None:
+            _docs[0][0].close()
+        _docs[0] = None
 
 
 def _view(T) -> AsOf:

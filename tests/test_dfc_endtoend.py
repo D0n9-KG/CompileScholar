@@ -636,3 +636,115 @@ def test_extract_stage_endtoend(env, tmp_path, monkeypatch):
     calls.clear()
     counts2 = EB.build(benchmark="testbench", n_deep=5, workers=2, log=lambda *a: None)
     assert calls == [] and counts2["statements"] == n_first
+
+
+# ---------------------------------------------------------------- cognition -> index -> tools (phase D full chain)
+
+def _fake_embed(texts):
+    """Deterministic bag-of-words vectors (dim 16) for the index stage — no embedding service in tests."""
+    import re as _re
+    import numpy as _np
+    out = []
+    for t in texts:
+        v = _np.zeros(16, dtype="float32")
+        for w in _re.findall(r"[a-z]+", t.lower()):
+            v[int(hashlib.md5(w.encode()).hexdigest(), 16) % 16] += 1.0
+        n = float(_np.linalg.norm(v))
+        out.append((v / n).tolist() if n else v.tolist())
+    return out
+
+
+class _CountingEmbed:
+    def __init__(self):
+        self.n = 0
+
+    def __call__(self, texts):
+        self.n += len(texts)
+        return _fake_embed(texts)
+
+
+def test_full_chain_cognition_index_tools(env, tmp_path, monkeypatch):
+    """The whole derived pipeline on one library: documents -> citations -> extract -> cognition -> index ->
+    tools, with the leak invariants at every layer (a paper invisible before its first public date; a later
+    version's sentence invisible before that version) and the index's incremental discipline."""
+    from compilescholar.citations import build as CB
+    from compilescholar.cognition import build as COG
+    from compilescholar.documents import build as DB
+    from compilescholar.extract import build as EB
+    from compilescholar.extract import passes as PS
+    from compilescholar.index import build as IB
+    from compilescholar.index.search import Index
+    from compilescholar.tools import api
+
+    con = _reg()
+    for i, (pid, t, ab) in enumerate([
+            (P0, "Neural message passing for quantum chemistry", None),
+            (P1, "GraphFormer: attention for graphs", "We propose GraphFormer, an attention model for graphs."),
+            (P2, "Faster graph transformers", "We propose FastGF, an efficient graph transformer.")]):
+        con.execute("INSERT OR REPLACE INTO members VALUES (?,?,?)", ("testbench", f"k{i}", pid))
+        if pid != P0:
+            con.execute("INSERT OR REPLACE INTO records(paper_id, source, version, date_hi, title, title_key, "
+                        "abstract, categories, venue) VALUES (?,?,?,?,?,?,?,?,?)",
+                        (pid, "arxiv", 1, None, t, ids.title_key(t), ab, "cs.LG", None))
+    con.commit()
+    con.close()
+    _texts(tmp_path, P2, SV_MD_EXT)
+    DB.build(workers=2, log=lambda *a: None)
+    CB.build(workers=2, log=lambda *a: None)
+    monkeypatch.setattr(PS, "call_local", _stub_llm([]))
+    EB.build(benchmark="testbench", n_deep=5, workers=2, log=lambda *a: None)
+
+    # cognition on this fixture is fully deterministic: unambiguous method names, no co-citation pairs,
+    # no shift candidate reaches MIN_N votes, no families -> zero LLM adjudications
+    def no_chat(prompt, **kw):
+        raise AssertionError(f"cognition wanted the LLM on a deterministic fixture: {prompt[:80]}")
+    COG.build(workers=2, log=lambda *a: None, chat=no_chat)
+
+    emb = _CountingEmbed()
+    counts = IB.build(dense=("papers", "statements"), embed=emb, model_label="fake", log=lambda *a: None)
+    assert counts["papers"] >= 3 and counts["statements"] >= 8 and counts["passages"] >= 4
+    assert counts["vec_papers"] >= 2 and counts["vec_statements"] >= 2
+    for s in env.STAGES:                                    # the whole chain is fresh end to end
+        st = env.status(s)
+        assert st["built"] and not st["stale"] and not st["behind"], (s, st["why"])
+
+    idx = Index(embed=_fake_embed, model_label="fake")
+    api.reset_caches()
+    api.set_index(idx)
+    api.configure(api.ToolConfig(arm="full", external=False))
+    try:
+        late = "2022-01-01"
+        got = api.search_papers("graph attention transformer", late, 5)
+        assert {x["id"] for x in got} >= {P1, P2}
+        card = api.paper_card(P2, late)
+        assert any(u["value"] == "91.2" and u["own"] for u in card["result_units"])
+        ev = api.find_evidence("efficient attention mechanism", late, 8)
+        assert ev and all(e.get("quote") for e in ev)
+
+        # ---- leak invariants
+        early = "2020-12-31"                                  # before P2's first public date (2021-01-12)
+        assert api.paper_card(P2, early)["error"] == "not visible at as_of"
+        assert all(x["id"] != P2 for x in api.search_papers("faster graph transformers", early, 10))
+        assert api.read(P2, early, k=10) == []
+        mid = "2021-03-01"                                    # v1 visible, v2 (2021-06-01) not
+        mid_hits = api.read(P2, mid, k=50)
+        assert mid_hits and all(h["date"] <= mid for h in mid_hits)
+        assert not any("convergence bound" in h["quote"] for h in mid_hits)
+        late_hits = api.read(P2, late, k=50)
+        assert any("convergence bound" in h["quote"] and h["date"] == "2021-06-01" for h in late_hits)
+        q_mid = api.read(P2, mid, query="convergence bound attention", k=5)
+        assert not any("convergence bound" in h["quote"] for h in q_mid)   # the passages index agrees
+
+        # ---- the index is incremental: an unchanged chain re-embeds and re-indexes nothing
+        # (a reader must close its memmaps before a rebuild replaces the vector files — Windows locks
+        # mapped files; Index.close's docstring is the operational contract)
+        idx.close()
+        api.set_index(None)
+        emb.n = 0
+        counts2 = IB.build(dense=("papers", "statements"), embed=emb, model_label="fake", log=lambda *a: None)
+        assert emb.n == 0 and counts2 == counts
+    finally:
+        idx.close()
+        api.set_index(None)
+        api.reset_caches()
+        api.configure(api.ToolConfig())

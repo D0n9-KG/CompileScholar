@@ -37,11 +37,13 @@ def tenv(idx_env, tmp_path, monkeypatch):
     IB.build(dense=("papers", "statements"), embed=fake_embed, model_label="fake")
 
     from compilescholar.tools import api
+    api.reset_caches()                                    # a previous test's memo must not leak across stores
     api.set_index(IS.Index(embed=fake_embed, model_label="fake"))
     budget = tmp_path / "budget.jsonl"
     api.configure(api.ToolConfig(arm="full", budget_log=str(budget), external=False))
     yield type("Env", (), {"store": store, "api": api, "IS": IS, "budget": budget})()
     api.set_index(None)
+    api.reset_caches()
     api.configure(api.ToolConfig())
 
 
