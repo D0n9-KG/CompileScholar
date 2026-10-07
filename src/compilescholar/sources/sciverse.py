@@ -188,7 +188,7 @@ def request_json(method: str, path: str, *, payload: object | None = None, query
         except HTTPError as exc:
             if exc.code == 429 and attempt < 4:
                 time.sleep(3.0 * (attempt + 1))
-                _bucket().acquire(max_wait_s=120.0)
+                _bucket(token).acquire(max_wait_s=120.0)
                 continue
             raise SourceAdapterError(f"HTTP {exc.code} {exc.reason} for {method} {url}") from exc
         except URLError as exc:
