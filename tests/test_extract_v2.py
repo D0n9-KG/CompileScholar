@@ -208,6 +208,16 @@ def test_t1_parse_failure_is_item_failure():
     assert stmts is None and st["parse_failed"] == 1
 
 
+def test_items_channel_config_facet_downgrades_to_setting():
+    """facet=config requires the structured meta.config shape, which only the prompt's config array carries;
+    an item claiming config without it keeps its content as a setting description."""
+    reply = json.dumps({"items": [{"n": 3, "facet": "config", "role": "describes", "epistemic": "stated",
+                                   "condition": "", "text": "uses Adam with learning rate 3e-4"}], "names": []})
+    stmts, names, st = PS.t1(_t1_input(), chat=StubChat([reply]))
+    assert st["config_downgraded"] == 1
+    assert stmts[0].facet == "setting" and stmts[0].validate() == []
+
+
 def _full():
     units = [{"uid": "u1", "kind": "para", "section": "1 Intro", "text": "x"},
              {"uid": "u2", "kind": "para", "section": "3 Experiments", "text": "y"}]

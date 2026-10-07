@@ -35,6 +35,19 @@ def test_view_folds_renderings_together():
     assert MV.view("a ± b ≤ c") == MV.view("a \\pm b \\leq c")
 
 
+def test_view_does_not_eat_math_angle_brackets():
+    """Regression: a generic <[^>]+> paired a math '<' in one sentence with a '>' in the next and swallowed
+    everything between — 15% of a real math paper's statements were falsely discarded as QUOTE_NOT_IN_SOURCE."""
+    s1 = "We may recover f with n < N samples."
+    s2 = "This extends over previous works that have been limited to infinite width networks."
+    s3 = "For d > 1 the rows stay orthogonal."
+    source = " ".join([s1, s2, s3])
+    assert MV.view(s2) in MV.view(source)          # compositionality across the join
+    assert MV.view("n < N") in MV.view(source)     # the inequality survives
+    assert MV.view("<td>87.5</td>") == MV.view("87.5")          # real tags are still stripped
+    assert MV.view("<mml:math>x</mml:math>") == MV.view("x")
+
+
 def test_locate_maps_back_to_original_span():
     sent = "We use <b>FastGF</b> on graphs."
     span = MV.locate("FastGF", sent)
@@ -66,6 +79,16 @@ def test_rewritten_number_discarded():
     assert not kept and disc[0][1][0].startswith("NUMBER_REWRITTEN")
     ok = _st("accuracy reaches 91.2% on BenchX", SENTS["s3"], sent_id="s3")
     kept, disc, st = FC.run([ok], SRC, SENTS, chat=lambda *a, **k: None, item=PID)
+    assert len(kept) == 1 and not disc
+
+
+def test_number_in_citation_marker_is_not_a_rewrite():
+    """The match view strips "[25]" (correct for quote location), but the number check reads the RAW quote —
+    a text mentioning the citation's number is verbatim-sourced, not rewritten."""
+    src = "We extend the results of [25] to the finite case."
+    sents = {"s1": src}
+    ok = _st("extends the results of reference 25 to the finite case", src)
+    kept, disc, st = FC.run([ok], src, sents, chat=lambda *a, **k: None, item=PID)
     assert len(kept) == 1 and not disc
 
 

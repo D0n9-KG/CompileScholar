@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from collections import Counter
 
 from rapidfuzz import fuzz, process
@@ -33,20 +34,28 @@ SCHEMA = "SCHEMA"
 _NUM = re.compile(r"\d+(?:[.,]\d+)*(?:\s*[×x]\s*10\s*[-−–]?\s*\d+)?%?")
 
 
-def violations(stmt: Statement, source_view: str) -> list[str]:
+def _num_frame(text: str) -> str:
+    """The frame for the verbatim-number rule: NFKC + whitespace out + casefold — lighter than the match view on
+    purpose. The view strips citation markers and HTML, which would hide legitimate numbers ("[25]", a header
+    cell's "T5") from the check; numbers must be findable in the RAW text (digits render the same in every tier,
+    NFKC folds superscripts)."""
+    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", text or "")).casefold()
+
+
+def violations(stmt: Statement, source_view: str, source_raw: str = "") -> list[str]:
     errs = stmt.validate()
     if errs:
         return [f"{SCHEMA}: {'; '.join(errs)[:180]}"]
     vq = MV.view(stmt.quote)
     if not vq or vq not in source_view:
         return [QUOTE_NOT_IN_SOURCE]
-    # numbers verbatim (§7.3 rule 2, 原文里逐字出现): for sentence-anchored statements the frame is the quote
-    # itself; for results statements it is the whole table source — their labels come from header cells ("T5-B")
-    # which are source text but not part of the row quote, and the value-to-object binding is structural there
-    frame = source_view if stmt.pass_name == "results" else vq
-    bad = [n for n in set(_NUM.findall(stmt.text)) if MV.view(n) not in frame]
+    # numbers verbatim (§7.3 rule 2): for sentence-anchored statements the frame is the raw quote; for results
+    # statements the raw table source — their labels come from header cells ("T5-B"), source text that is not
+    # part of the row quote, and the value-to-object binding there is structural
+    frame = _num_frame(source_raw if stmt.pass_name == "results" else stmt.quote)
+    bad = [n for n in set(_NUM.findall(stmt.text)) if _num_frame(n) not in frame]
     cfg = (stmt.meta or {}).get("config")
-    if isinstance(cfg, dict) and cfg.get("value") and MV.view(str(cfg["value"])) not in frame:
+    if isinstance(cfg, dict) and cfg.get("value") and _num_frame(str(cfg["value"])) not in frame:
         bad.append(str(cfg["value"]))
     if bad:
         return [f"{NUMBER_REWRITTEN}: {', '.join(sorted(bad)[:5])}"]
@@ -103,7 +112,7 @@ def run(stmts: list[Statement], source_text: str, sent_texts: dict, chat=None, i
     sv = MV.view(source_text)
     kept, bad = [], []
     for s in stmts:
-        v = violations(s, sv)
+        v = violations(s, sv, source_text)
         if v:
             bad.append((s, v))
         else:
@@ -113,7 +122,7 @@ def run(stmts: list[Statement], source_text: str, sent_texts: dict, chat=None, i
     discarded = []
     if bad:
         for s2, (s, v) in zip(_repair(bad, sent_texts, chat, item), bad):
-            v2 = violations(s2, sv)
+            v2 = violations(s2, sv, source_text)
             if v2:
                 discarded.append((s2, v2))
                 st["discarded"] += 1

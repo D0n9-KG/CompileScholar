@@ -14,7 +14,17 @@ import unicodedata
 
 from ..core.ids import _GREEK, _LATEX_CMD, _LATEX_FORMAT
 
-_HTML = re.compile(r"<[^>]+>")
+# A WHITELIST of real markup tags — NOT <[^>]+>: a generic pattern pairs a math '<' in one sentence with a '>'
+# in another and swallows everything between (measured on a real math paper: 15% of its statements were falsely
+# discarded as QUOTE_NOT_IN_SOURCE because the joined source view ate whole sentences). Math like "n < N" or
+# "<x>" must survive the view untouched.
+_HTML = re.compile(
+    r"</?(?:table|thead|tbody|tfoot|tr|td|th|caption|colgroup|col|span|div|p|br|hr|sup|sub|b|i|u|s|em|strong|a|"
+    r"img|figure|figcaption|math|mi|mn|mo|msup|msub|msubsup|mrow|mtext|mfrac|msqrt|mroot|annotation|semantics|"
+    r"mml:math|mml:mi|mml:mn|mml:mo|mml:mrow|mml:msup|mml:msub|mml:mtext|mml:annotation|mml:msubsup|"
+    r"h[1-6]|ul|ol|li|dl|dt|dd|section|header|footer|code|pre|blockquote|font|center|small|tt|big|svg|path|"
+    r"iframe|video|details|summary|label|abbr|cite|dfn|q|var|kbd|mark|ruby|rt|rp|wbr|nobr)(?:\s[^<>]*)?/?>",
+    re.I)
 _CITE = re.compile(r"\[\s*\d+(?:\s*,\s*\d+)*[a-z]?\s*\]")
 # ids._GREEK is the registry's title_key map and must not drift (stored keys); the view spells out the full
 # alphabet so a LaTeX fold ("\zeta" -> "zeta") and the Unicode glyph meet

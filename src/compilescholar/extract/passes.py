@@ -56,6 +56,11 @@ def _item_common(it: dict, sent: dict, pid: str, date: str, st: Counter):
     if facet not in FACETS or role not in RELATIONS or epi not in EPISTEMIC:
         st["bad_vocab"] += 1
         return None
+    if facet == "config":
+        # the structured config channel is the prompt's "config" array (meta.config enforced there); a plain
+        # item claiming config without the shape is a setting description — keep the content, fix the facet
+        facet = "setting"
+        st["config_downgraded"] += 1
     text = _n(it.get("text"))
     if not text:
         st["empty_text"] += 1
