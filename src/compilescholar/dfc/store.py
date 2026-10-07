@@ -37,11 +37,13 @@ from filelock import FileLock, Timeout
 
 from ..core import paths
 
-STAGES = ("documents", "citations", "extract", "index")
+STAGES = ("documents", "citations", "extract", "cognition", "index")
 UPSTREAM = {"documents": (), "citations": ("documents",), "extract": ("documents", "citations"),
-            "index": ("documents", "citations", "extract")}
+            "cognition": ("documents", "citations", "extract"),
+            "index": ("documents", "citations", "extract", "cognition")}
 ENTRY = {"documents": ("documents/build.py",),
-         "citations": ("citations/build.py",), "extract": ("extract/build.py",), "index": ("index/build.py",)}
+         "citations": ("citations/build.py",), "extract": ("extract/build.py",),
+         "cognition": ("cognition/build.py",), "index": ("index/build.py",)}
 SRC = Path(__file__).resolve().parents[1]
 _EXCLUDE = {SRC / "__init__.py", SRC / "dfc" / "store.py", SRC / "dfc" / "__init__.py"}
 MAX_ATTEMPTS = 3

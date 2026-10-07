@@ -194,6 +194,9 @@ def cmd_build(a):
                                      n_deep=a.n_deep if a.n_deep is not None else bc.n_deep,
                                      sample=a.sample, seed=a.seed, ids=ids,
                                      workers=a.workers or bc.workers, rebuild=rb)))
+        elif s == "cognition":
+            from .cognition import build as B
+            print(json.dumps(B.build(workers=a.workers, rebuild=rb)))
         elif s == "index":
             from .index import build as B
             dense = tuple(x for x in a.dense.split(",") if x) if a.dense is not None else tuple(cfg.build.dense)
@@ -369,8 +372,8 @@ def main(argv=None):
     p.add_argument("--benchmarks", default=None, help="import-benchmarks: comma list (default all four)")
     p.set_defaults(fn=cmd_library)
     p = sub.add_parser("build", help="build a literature-layer stage: status | all | documents | citations | "
-                                     "extract | index")
-    p.add_argument("stage", choices=["status", "all", "documents", "citations", "extract", "index"])
+                                     "extract | cognition | index")
+    p.add_argument("stage", choices=["status", "all", "documents", "citations", "extract", "cognition", "index"])
     p.add_argument("--config", help="experiment config (default: configs/base.yaml [+ local.yaml]); build: and llm:")
     p.add_argument("--set", action="append", default=[], help="override, e.g. build.n_deep=200")
     p.add_argument("--categories", default=None, help="extract: primary categories in scope (default build.categories)")
