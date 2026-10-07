@@ -68,12 +68,15 @@ Return JSON only:
                            "relation": "extends | improves | replaces | adapts | combines | uses | compares"}}]}}],
  "config": [{{"item": "<what is configured, e.g. learning rate>", "value": "<as written>", "unit": "<or empty>",
               "applies_to": "<the part of the setup it applies to, or empty>", "n": <int>}}],
- "own_methods": ["<every name this paper gives its own method(s)/model(s)/system(s), as written>"]}}
+ "own_methods": ["<every proper name this paper gives to the method(s)/model(s)/architecture(s)/system(s) it
+                  PROPOSES as its own, as written>"]}}
 
 Rules: cite the sentence number each item comes from; the sentence itself is the evidence. Facet=result items
 keep the exact number and its condition as the sentence writes them. Facet=absence only for explicitly written
-absences. "own_methods" lists names only, no descriptions. Up to 25 items per chunk; empty lists are fine.
-No outside knowledge."""
+absences. "own_methods" lists proper names only, never descriptions — and never datasets, benchmarks, test
+sets, tools, libraries, metrics or prior work the paper builds on (measured contamination: "UCF101",
+"Scikit-learn", "bag of words approach", "test set" all showed up and skew the results pass). Up to 25 items
+per chunk; empty lists are fine. No outside knowledge."""
 
 RESULTS_AXES = """You read ONE numeric table of a research paper, already repaired into a grid (rows of cells,
 spans expanded), with its caption and the sentences around it. Propose the ROLE of each axis. Do not extract any

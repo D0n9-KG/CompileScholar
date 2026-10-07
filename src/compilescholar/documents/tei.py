@@ -85,6 +85,16 @@ def _text(el) -> str:
     return re.sub(r"\s+", " ", "".join(el.itertext())).strip()
 
 
+def _prose(el) -> str:
+    """Prose text with a space at every sentence boundary: GROBID writes no whitespace between <s> elements,
+    so the bare itertext join fuses them ("...learning.This...") — measured on the 260-paper smoke: abstracts
+    arrived as one unbreakable blob and 98.4% of T1 quotes degenerated to the whole abstract. Used for the
+    abstract and prose units; per-sentence records and bibliography entries keep _text (their content is one
+    <s>/one bibl, no boundary to miss)."""
+    ss = el.findall(f".//{T}s")
+    return re.sub(r"\s+", " ", " ".join(_text(s) for s in ss)).strip() if ss else _text(el)
+
+
 def _entry(b) -> dict:
     raw = b.find(f"{T}note[@type='raw_reference']")
     raw = _text(raw) if raw is not None else _text(b)
@@ -137,7 +147,7 @@ def parse(tei: bytes, links: list | None = None, doc_id: str = "doc") -> Doc:
         t = h.find(f".//{T}titleStmt/{T}title")
         doc.title = _text(t) if t is not None else ""
         a = h.find(f".//{T}profileDesc/{T}abstract")
-        doc.abstract = _text(a) if a is not None else ""
+        doc.abstract = _prose(a) if a is not None else ""
     starts = []
     for b in root.iter(f"{T}biblStruct"):
         key = b.get(XML_ID)
@@ -177,7 +187,7 @@ def parse(tei: bytes, links: list | None = None, doc_id: str = "doc") -> Doc:
                 unit("section", sec, sec, head)
             for el in div:
                 if el.tag == f"{T}p":
-                    u = unit("para", sec, _text(el), el)
+                    u = unit("para", sec, _prose(el), el)
                     for s in el.iter(f"{T}s"):
                         n["s"] += 1
                         pg, bb = _bbox(boxes(s.get("coords")))
@@ -191,7 +201,7 @@ def parse(tei: bytes, links: list | None = None, doc_id: str = "doc") -> Doc:
         d = fig.find(f"{T}figDesc")
         if d is not None and _text(d):
             lab = fig.find(f"{T}head")
-            unit("caption", "", ((_text(lab) + " ") if lab is not None else "") + _text(d), fig)
+            unit("caption", "", ((_text(lab) + " ") if lab is not None else "") + _prose(d), fig)
     per = {}
     for sid, k, _ in doc.cites:
         per.setdefault(sid, []).append(k)

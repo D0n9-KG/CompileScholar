@@ -107,6 +107,21 @@ def _open_writer(tantivy, d: Path, schema, threads: int = 1):
     return ix, ix.writer(heap_size=512_000_000, num_threads=threads)
 
 
+def _commit(w, tries: int = 40) -> None:
+    """A tantivy commit ends in a meta.json rename, which on Windows fails with access-denied while a scanner
+    (Defender / the indexer, busy under heavy disk load) holds a transient handle. Measured 10-07: the failed
+    commit keeps the writer's queue intact and a retry after the handle is released lands without loss — so
+    access-denied retries, any other IO error propagates."""
+    for i in range(tries):
+        try:
+            w.commit()
+            return
+        except ValueError as e:
+            if "os error 5" not in str(e) or i == tries - 1:
+                raise
+            time.sleep(0.05)
+
+
 # ---- papers: streaming diff against papers_fp (1.19M items must not materialise)
 
 def _papers_pass(run, idir, reg, t2_set, ft_set, log) -> int:
@@ -156,7 +171,7 @@ def _papers_pass(run, idir, reg, t2_set, ft_set, log) -> int:
         w.delete_documents("pid", o[0])
         deleted.append(o[0])
         o = old.fetchone()
-    w.commit()                                            # deletes land before any add of the same pid
+    _commit(w)                                            # deletes land before any add of the same pid
     n_add = 0
     for pid, hi, title, abstract, tg, fp in new_rows():
         if pid not in add_fp:
@@ -167,9 +182,9 @@ def _papers_pass(run, idir, reg, t2_set, ft_set, log) -> int:
                                         day_hi=day_int(hi)))
         n_add += 1
         if n_add % 100_000 == 0:
-            w.commit()
+            _commit(w)
             log(f"[index] papers added {n_add:,}/{len(add_fp):,}")
-    w.commit()
+    _commit(w)
     gone = [p for p in deleted if p not in add_fp]
     con.executemany("INSERT OR REPLACE INTO papers_fp VALUES (?,?)", list(add_fp.items()))
     con.executemany("DELETE FROM papers_fp WHERE paper_id=?", [(p,) for p in gone])
@@ -209,7 +224,7 @@ def _passages_pass(run, idir, D, log) -> int:
         nonlocal skipped_undated
         for pid in items:
             w.delete_documents("pid", pid)
-        w.commit()
+        _commit(w)
         ok = []
         for pid in items:
             try:
@@ -230,14 +245,14 @@ def _passages_pass(run, idir, D, log) -> int:
                 ok.append(pid)
             except Exception as e:
                 wp.fail(pid, f"{type(e).__name__}: {e}")
-        w.commit()
+        _commit(w)
         wp.ok_many(ok)
 
     for i in range(0, len(todo), CHUNK):
         process(todo[i:i + CHUNK])
-    w.commit()
+    _commit(w)
     wp.sweep(sorted(fps), lambda pid: w.delete_documents("pid", pid))
-    w.commit()
+    _commit(w)
     ix.reload()
     n = ix.searcher().num_docs
     log(f"[index] passages: {n:,} sentences ({skipped_undated} undated skipped)")
@@ -263,13 +278,13 @@ def _statements_pass(run, idir, ext, log) -> int:
     def process(chunk_rows, chunk_items):
         for it in chunk_items:
             w.delete_documents("item", it)
-        w.commit()
+        _commit(w)
         for it, sid, speaker, date, kind, about, role, facet, ep, text, quote in chunk_rows:
             w.add_document(tantivy.Document(
                 sid=int(sid), item=it, speaker=speaker or "", about=about or "", kind=kind or "",
                 facet=facet or "", role=role or "", epistemic=ep or "", body=f"{text} {quote}",
                 day_hi=day_int(date)))
-        w.commit()
+        _commit(w)
         ws.ok_many(chunk_items)
 
     cur = ext.execute(q)
@@ -288,7 +303,7 @@ def _statements_pass(run, idir, ext, log) -> int:
     if buf_items:
         process(buf_rows, buf_items)
     ws.sweep(items, lambda it: w.delete_documents("item", it))
-    w.commit()
+    _commit(w)
     ix.reload()
     n = ix.searcher().num_docs
     log(f"[index] statements: {n:,} docs")
