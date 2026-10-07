@@ -20,8 +20,10 @@ v1/delta dates; stage 2 (external resolution) runs as the `library resolve-stubs
 query.bibliographic / OpenAlex create metadata-only registry papers and remember raw-text -> paper_id mappings in
 `ref_resolutions` (smoke: cite-level resolution 48.8% -> 88.5%, CS and non-CS alike). The Sciverse content layer
 (②′) caches Sciverse's pre-parsed full texts (`sciverse fetch`) and dates their sentences per v2.5 in the
-documents stage's sv pass. Extract and index still key on arXiv ids and are being rebuilt onto the same contract
-(C③–C⑤). The data flow below marks what each stage is today and what it becomes.
+documents stage's sv pass. `extract` is rebuilt (C③–C⑤): schema v2, the four passes as per-paper functions shared
+with the runtime deep_read, the unified final check (match view + verbatim numbers + one repair then discard) and
+the sentinel cases (`cli sentinel`, passing on the real LLM: canary 7/7 facts, chem 3/3, 0 traps). Only `index`
+still keys on arXiv ids (phase D). The data flow below marks what each stage is today and what it becomes.
 
 ## The library (phase B)
 
@@ -55,8 +57,10 @@ documents   built (C-1): registry parses -> per-version docs (paper_id@vN, GROBI
             held version, per-sentence dates); zero LLM
 citations   built (C②): tei citation pairs -> entries -> paper_id (four-stage cascade + ref_resolutions from
             `library resolve-stubs`), self-citation flags, v1 cites dated v1 / delta cites dated latest; zero LLM
-extract     statements: self pass (T1 / T2), result pass, other   -> phase C: schema v2, T2 over the full text,
-            pass (what citing sentences say about the cited work)    unified final check, time-stratified sampling
+extract     built (C③–C⑤): schema v2 statements; t1 (abstract, per-sentence), t2 (full-text chunks over the sv ->
+            mineru -> grobid tier priority, per-sentence version dates), results (LLM axis roles + structural
+            gate, values from cells only), other (time-stratified quotas per cited paper, self-cite flags),
+            figures + full cite_counts; every LLM pass ends in the unified final check
 index       BM25 (FTS5) + optional dense vectors                  -> phase D: tantivy + binary-code vectors
 cognition   computed on read through AsOf(T)                      -> phase D: materialised (event-time tables,
                                                                      family snapshots, LLM verdicts with effective dates)
@@ -110,9 +114,9 @@ grow        typed gap diagnosis -> acquisition -> the same stages (offline, ques
 | `library/` | the registry (identity, identifiers, dates, assets, parses), imports, merge queue and its LLM verdicts |
 | `acquire/` | full-text channels, identity check, quarantine |
 | `corpus/papers.py` | legacy papers stage (retired from the pipeline in C-1; kept until the legacy citations/extract importers are replaced in C②–C④) |
-| `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; the Sciverse content tier (fetch marathon + adapter + version/date rules); deterministic table parsing |
+| `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; the Sciverse content tier (fetch marathon + adapter + version/date rules); the match view (final-check locating); deterministic table parsing |
 | `citations/` | citation sentences, entry -> paper; `external.py` = the stage-2 batch (Crossref/OpenAlex -> metadata-only papers + ref_resolutions) |
-| `extract/` | the schema and the passes |
+| `extract/` | schema v2; the four passes as per-paper functions (+ deep_read composition); reading (tier priority, chunks, dates); prompts; the unified final check; sentinels |
 | `index/` | multi-granularity search with as_of |
 | `cognition/` | AsOf view and the compiled objects |
 | `tools/` | the tool layer and its MCP server |
