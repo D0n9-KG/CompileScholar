@@ -112,6 +112,13 @@ def env(tmp_path, monkeypatch):
           {"name": "BiAttn"})                                                   # makes biattn ambiguous
     _stmt(9, PD, "2022-02-01", "self", PD, "extends", "method", "extends BiAttn",
           {"mentions": [{"name": "BiAttn", "relation": "extends"}]})            # edge needs the adjudication
+    # fact material: two independent papers state the same limitation, a third contradicts it
+    _stmt(10, PA, "2021-01-01", "other", PB, "criticizes", "limitation",
+          "GraphNet is slow on very large graphs", {})
+    _stmt(11, PD, "2021-06-01", "other", PB, "criticizes", "limitation",
+          "GraphNet is slow on large graphs", {})
+    _stmt(12, PD, "2022-01-01", "other", PB, "background", "limitation",
+          "GraphNet is not slow on large graphs at all", {})
     ext.commit()
     ext.close()
 
@@ -131,6 +138,12 @@ def _chat(prompt, **kw):
         return _json.dumps({"canonical": "graph attention models", "umbrella": False})
     if "research FAMILY" in prompt:                          # family naming
         return _json.dumps({"name": "Graph Transformer Family", "keep": []})
+    if "same underlying fact" in prompt:                     # fact relation
+        if "not slow" in prompt:
+            return _json.dumps({"relation": "opposite"})
+        if "slow on" in prompt:
+            return _json.dumps({"relation": "same"})
+        return _json.dumps({"relation": "unrelated"})
     raise AssertionError(f"unrouted prompt: {prompt[:80]}")
 
 
@@ -148,6 +161,7 @@ def test_cognition_build_materialises(env):
     # families: the lineage edges (valid_from 2022-01-01+) form one family {PB, PD}; the cocite pair
     # (PB, stub:xray) never does — stubs are boundary nodes, not family members; PA stays isolated
     assert counts["family_snapshots"] == 6 and counts["families"] == 6     # 2022-01 .. 2022-06, one family each
+    assert counts["facts_contested"] >= 1
     con = env.connect("cognition", readonly=True)
     fams = con.execute("SELECT snapshot, members, name, named_by FROM family_snapshot ORDER BY snapshot").fetchall()
     assert min(s for s, *_ in fams) >= "2022-01-01"
@@ -179,6 +193,18 @@ def test_cognition_build_materialises(env):
     # lineage: the time-inconsistent edge is dropped, the valid ones carry §2.4 effective dates
     assert con.execute("SELECT canonical, umbrella FROM category_canon WHERE phrase='Graph Attention Models'"
                        ).fetchone() == ("graph attention models", 0)
+    # facts: statements 10 and 11 form one fact (same), 12 contradicts it (opposite -> contested)
+    f10 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=10").fetchone()[0]
+    f11 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=11").fetchone()[0]
+    f12 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=12").fetchone()[0]
+    assert f10 == f11 and f12 != f10
+    ev = con.execute("SELECT date, status FROM fact_status_event WHERE fact_id=? ORDER BY date, rowid",
+                     (f10,)).fetchall()
+    assert ("2021-01-01", "single-source") in ev                 # PA states it first
+    assert ("2021-06-01", "established") in ev                   # PD (independent author) joins
+    assert ("2022-01-01", "contested") in ev                     # the contradiction
+    assert con.execute("SELECT count(*) FROM fact_member WHERE fact_id=? AND role='representative'",
+                       (f10,)).fetchone()[0] == 1
     assert con.execute("SELECT * FROM category_daily").fetchall() == [("graph attention models", "2020-06-01", 1)]
     edges = sorted(con.execute("SELECT child, parent, relation, kind, date, valid_from FROM lineage_edge"))
     assert edges == [(PD, PB, "extends", "self", "2022-01-01", "2022-01-01"),          # id6 self claim

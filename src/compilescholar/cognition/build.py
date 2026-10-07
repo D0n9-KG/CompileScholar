@@ -59,8 +59,12 @@ CREATE TABLE IF NOT EXISTS lineage_hyper(stmt_id INT, child TEXT, member TEXT, r
 CREATE TABLE IF NOT EXISTS category_canon(phrase TEXT PRIMARY KEY, canonical TEXT, umbrella INT, decided_by TEXT);
 CREATE TABLE IF NOT EXISTS category_daily(category TEXT NOT NULL, day TEXT NOT NULL, n INT,
   PRIMARY KEY(category, day));
+CREATE TABLE IF NOT EXISTS fact_pair(stmt_a INT NOT NULL, stmt_b INT NOT NULL, relation TEXT, decided_by TEXT,
+  PRIMARY KEY(stmt_a, stmt_b));
 CREATE TABLE IF NOT EXISTS fact_member(fact_id TEXT, statement_id INT, role TEXT, PRIMARY KEY(fact_id, statement_id));
+CREATE INDEX IF NOT EXISTS ix_fact_member_stmt ON fact_member(statement_id);
 CREATE TABLE IF NOT EXISTS fact_status_event(fact_id TEXT, date TEXT, status TEXT, evidence TEXT);
+CREATE INDEX IF NOT EXISTS ix_fact_event ON fact_status_event(fact_id, date);
 CREATE TABLE IF NOT EXISTS shift_event(id INTEGER PRIMARY KEY, subject TEXT, facet TEXT, window_start TEXT,
   window_end TEXT, direction TEXT, evidence TEXT, decided_by TEXT, status TEXT,
   UNIQUE(subject, facet, window_start, window_end, direction));
@@ -298,6 +302,35 @@ def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list
         d = dt.date(d.year + (d.month == 12), (d.month % 12) + 1, 1)
     out.update(x[:10] for x in extra)
     return sorted(out)
+
+
+# Family-level facts (§8): deterministic recall + LLM relation adjudication (the old Jaccard-only clustering
+# with a negation regex is what the design replaces — "not slow" and "slow" landed in one class)
+FACT_FACETS = ("limitation", "method", "result", "categorization", "contribution")
+FACT_RECALL_SIM = 0.3
+FACT_MAX_FAMILY_STMTS = 900
+_FACT_STOP = set("a an the of in on for to and or with by from as is are was were be been this that these those "
+                 "it its their they we our which such via using use used based into than also can may method "
+                 "methods model models approach approaches work works paper papers all".split())
+
+
+def _content_words(s: str) -> set:
+    return {w for w in re.findall(r"[a-z0-9]+", (s or "").lower()) if w not in _FACT_STOP and len(w) > 2}
+
+
+def _independent(speakers, author_of: dict) -> int:
+    """Greedy merge of speakers sharing >= half of the smaller author-key set (one group counts once) — the old
+    facts.independent rule, on author_link keys."""
+    groups: list[set] = []
+    for s in sorted(speakers):
+        a = author_of.get(s) or {s}
+        for g in groups:
+            if a and g and len(a & g) * 2 >= min(len(a), len(g)):
+                g |= a
+                break
+        else:
+            groups.append(set(a))
+    return len(groups)
 
 
 def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None, ext=None, reg=None,
@@ -953,6 +986,153 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             finally:
                 nconn.close()
 
+            # ---- facts: family-level fact groups (§8). Recall is deterministic (same-facet content-word
+            #      Jaccard inside one family), the relation verdict is the LLM's, the assembly and the status
+            #      timeline are deterministic again.
+            latest_snap2 = con.execute("SELECT max(snapshot) FROM family_snapshot").fetchone()[0]
+            fam_members = {f: json.loads(m) for f, m in con.execute(
+                "SELECT family_id, members FROM family_snapshot WHERE snapshot=?",
+                (latest_snap2,))} if latest_snap2 else {}
+            stmt_rows: dict[int, dict] = {}
+            by_about: dict[str, list] = defaultdict(list)
+            for i_, about, facet, text, quote, date, speaker, kind in ext.execute(
+                    f"SELECT id, about, facet, text, quote, date, speaker, kind FROM statements "
+                    f"WHERE facet IN ({','.join('?' * len(FACT_FACETS))}) AND date IS NOT NULL "
+                    f"AND text IS NOT NULL", FACT_FACETS):
+                stmt_rows[i_] = {"about": about, "facet": facet, "text": text, "quote": quote or "",
+                                 "date": date, "speaker": speaker, "kind": kind}
+                by_about[about].append(i_)
+            cand_pairs: set = set()
+            too_large = 0
+            for f_, members in fam_members.items():
+                ids_ = [i_ for m_ in members for i_ in by_about.get(m_, [])]
+                if len(ids_) > FACT_MAX_FAMILY_STMTS:
+                    too_large += 1
+                    continue
+                per_facet: dict[str, list] = defaultdict(list)
+                for i_ in ids_:
+                    per_facet[stmt_rows[i_]["facet"]].append(i_)
+                for fct, fids in per_facet.items():
+                    words = {i_: _content_words(stmt_rows[i_]["text"]) for i_ in fids}
+                    for xi, a_ in enumerate(fids):
+                        for b_ in fids[xi + 1:]:
+                            wa, wb = words[a_], words[b_]
+                            if wa and wb and len(wa & wb) / len(wa | wb) >= FACT_RECALL_SIM:
+                                cand_pairs.add((min(a_, b_), max(a_, b_)))
+
+            w = run.work("fact_pairs")
+            todo_p = set(w.todo([(f"{a_}:{b_}", store.sha(PR.FACT_REL_SHA, PR.MODEL,
+                                                          stmt_rows[a_]["text"], stmt_rows[b_]["text"]))
+                                 for a_, b_ in sorted(cand_pairs) if a_ in stmt_rows and b_ in stmt_rows]))
+            if todo_p:
+                log(f"[cognition] facts: {len(todo_p):,} of {len(cand_pairs):,} candidate pairs to adjudicate")
+
+            def one_pair(item):
+                if item not in todo_p:
+                    return
+                a_, b_ = (int(x) for x in item.split(":"))
+                sa, sb = stmt_rows.get(a_), stmt_rows.get(b_)
+                if sa is None or sb is None:
+                    w.ok(item)
+                    return
+                try:
+                    raw = chat(PR.FACT_REL.format(about_a=sa["about"], date_a=sa["date"], text_a=sa["text"][:300],
+                                                  about_b=sb["about"], date_b=sb["date"], text_b=sb["text"][:300]),
+                               model=PR.MODEL, max_tokens=80, temperature=0.0, enable_thinking=False,
+                               item=f"factpair:{item}")
+                    obj = parse_json_response(raw or "")
+                    rel = (obj or {}).get("relation") if isinstance(obj, dict) else None
+                    if rel not in ("same", "opposite", "narrower", "broader", "unrelated"):
+                        w.fail(item, "fact pair: no usable relation")
+                        return
+                    with run.lock:
+                        con.execute("INSERT OR REPLACE INTO fact_pair VALUES (?,?,?,?)", (a_, b_, rel, PR.MODEL))
+                        pcounter["n"] += 1
+                        if pcounter["n"] % 200 == 0:
+                            con.commit()
+                        w.ok(item)
+                except Exception as e:
+                    w.fail(item, f"{type(e).__name__}: {e}")
+
+            pcounter = {"n": 0}
+            store.parallel(one_pair, sorted(todo_p), workers or 8, log=log, every=1000,
+                           label="cognition:fact_pairs")
+            with run.lock:
+                con.commit()
+
+            w = run.work("facts")
+            pair_digest = store.sha(list(con.execute("SELECT stmt_a, stmt_b, relation FROM fact_pair "
+                                                     "ORDER BY stmt_a, stmt_b")))
+            if w.todo([("all", store.sha(ext_fp, pair_digest, store.sha(sorted(fam_members))))]):
+                parent: dict[int, int] = {}
+
+                def find(x):
+                    while parent.get(x, x) != x:
+                        parent[x] = parent.get(parent[x], parent[x])
+                        x = parent[x]
+                    return x
+
+                def union(x, y):
+                    rx, ry = find(x), find(y)
+                    if rx != ry:
+                        parent[max(rx, ry)] = min(rx, ry)
+
+                for a_, b_ in con.execute("SELECT stmt_a, stmt_b FROM fact_pair WHERE relation='same'"):
+                    if a_ in stmt_rows and b_ in stmt_rows:
+                        union(a_, b_)
+                group_of: dict[int, int] = {}
+                for f_, members in fam_members.items():
+                    for m_ in members:
+                        for i_ in by_about.get(m_, []):
+                            if i_ in stmt_rows:
+                                group_of[i_] = find(i_)
+                groups: dict[int, list] = defaultdict(list)
+                for i_, root in group_of.items():
+                    groups[root].append(i_)
+                fid_of = {root: "fact:" + store.sha(sorted(ids_))[:12] for root, ids_ in groups.items()}
+                author_of: dict[str, set] = {}
+                for k_, p_ in con.execute("SELECT author_key, paper_id FROM author_link"):
+                    author_of.setdefault(p_, set()).add(k_)
+                member_rows, event_rows = [], []
+                for root, ids_ in groups.items():
+                    ids_ = sorted(ids_)
+                    fid = fid_of[root]
+                    rep = max(ids_, key=lambda i_: (stmt_rows[i_]["kind"] == "other", len(stmt_rows[i_]["text"])))
+                    for i_ in ids_:
+                        member_rows.append((fid, i_, "representative" if i_ == rep else "support"))
+                    seen_sp: set = set()
+                    seen_ab: set = set()
+                    status = None
+                    for i_ in sorted(ids_, key=lambda x: stmt_rows[x]["date"]):
+                        r_ = stmt_rows[i_]
+                        seen_sp.add(r_["speaker"])
+                        seen_ab.add(r_["about"])
+                        n_ind = _independent(seen_sp, author_of)
+                        new = ("consensus" if n_ind >= 3 and len(seen_ab) >= 2
+                               else "established" if n_ind >= 2 else "single-source")
+                        if new != status:
+                            event_rows.append((fid, r_["date"], new,
+                                               json.dumps({"n_independent": n_ind, "n_subjects": len(seen_ab)})))
+                            status = new
+                for a_, b_ in con.execute("SELECT stmt_a, stmt_b FROM fact_pair WHERE relation='opposite'"):
+                    fa = fid_of.get(group_of.get(a_)) if a_ in group_of else None
+                    fb = fid_of.get(group_of.get(b_)) if b_ in group_of else None
+                    if not fa and not fb:
+                        continue
+                    d_ = max(stmt_rows[x]["date"] for x in (a_, b_) if x in stmt_rows)
+                    ev = json.dumps([stmt_rows[x]["quote"][:200] for x in (a_, b_) if x in stmt_rows],
+                                    ensure_ascii=False)
+                    for fid in {fa, fb} - {None}:
+                        event_rows.append((fid, d_, "contested", ev))
+                con.execute("DELETE FROM fact_member")
+                con.execute("DELETE FROM fact_status_event")
+                con.executemany("INSERT OR REPLACE INTO fact_member VALUES (?,?,?)", member_rows)
+                con.executemany("INSERT INTO fact_status_event VALUES (?,?,?,?)", sorted(event_rows))
+                con.commit()
+                w.ok("all")
+                log(f"[cognition] facts: {len(groups):,} facts over {len(member_rows):,} statements "
+                    f"({too_large} families skipped as too large)")
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
@@ -970,6 +1150,9 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "family_snapshots": q("SELECT count(DISTINCT snapshot) FROM family_snapshot"),
                       "families": q("SELECT count(*) FROM family_snapshot"),
                       "families_named": q("SELECT count(*) FROM family_snapshot WHERE name IS NOT NULL"),
+                      "facts": q("SELECT count(DISTINCT fact_id) FROM fact_member"),
+                      "facts_contested": q("SELECT count(DISTINCT fact_id) FROM fact_status_event "
+                                           "WHERE status='contested'"),
                       "shifts": dict(con.execute("SELECT status, count(*) FROM shift_event GROUP BY status"))}
             run.finish(counts)
         finally:

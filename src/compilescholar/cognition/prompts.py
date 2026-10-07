@@ -76,6 +76,23 @@ Answer with JSON only:
   "keep": [<numbers of the weak-link members that belong; omit if none were flagged>]}}"""
 
 
+FACT_REL = """Two statements extracted from research papers may describe the same underlying fact about a family
+of related works. Judge their relation from what the statements say — no outside knowledge.
+
+Statement A (about {about_a}, dated {date_a}): "{text_a}"
+Statement B (about {about_b}, dated {date_b}): "{text_b}"
+
+Answer with JSON only:
+{{"relation": "same" | "opposite" | "narrower" | "broader" | "unrelated"}}
+
+Definitions:
+- same: they assert the same thing (wording and detail may differ)
+- opposite: they contradict — one affirms what the other denies about the same subject and condition
+- narrower: A states a more specific case of what B states
+- broader: A states a more general claim than B
+- unrelated: different facts, even if the topics are similar"""
+
+
 def sha(prompt: str) -> str:
     return hashlib.sha256(prompt.encode()).hexdigest()[:16]
 
@@ -84,3 +101,4 @@ METHOD_ID_SHA = sha(METHOD_ID)
 CATEGORY_CANON_SHA = sha(CATEGORY_CANON)
 SHIFT_VERIFY_SHA = sha(SHIFT_VERIFY)
 FAMILY_NAME_SHA = sha(FAMILY_NAME)
+FACT_REL_SHA = sha(FACT_REL)
