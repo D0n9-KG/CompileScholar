@@ -21,13 +21,18 @@ from ..dfc import store
 
 
 class AsOf:
-    def __init__(self, T: str, reg=None, cit=None, ext=None):
+    def __init__(self, T: str, reg=None, cit=None, ext=None, cog=None):
         self.T = _T(T).iso
         if self.T is None:
             raise ValueError("as_of is required")
         self.reg = reg if reg is not None else store.read_only(paths.library() / "registry.sqlite")
         self.cit = cit if cit is not None else store.connect("citations", readonly=True)
         self.ext = ext if ext is not None else store.connect("extract", readonly=True)
+        # the materialised cognition tables (phase D readers); None until the stage has been built — readers
+        # degrade to empty results rather than raising
+        if cog is None:
+            cog = store.connect("cognition", readonly=True) if store.db_path("cognition").exists() else None
+        self.cog = cog
 
     # ---- papers (the registry)
     def canonical(self, paper_id: str) -> str:

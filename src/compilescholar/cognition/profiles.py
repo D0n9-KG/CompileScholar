@@ -1,86 +1,88 @@
 # -*- coding: utf-8 -*-
-"""Paper profile at T (L4): what a work says about itself vs. how the field has described it up to T.
+"""Paper profile at T (phase D): what a work says about itself vs. how the field has treated it up to T.
 
-Pure function of AsOf(T) — no LLM, no raw text. Fields:
-  self          the paper's own contributions / proposals / stated limitations (kind=self, about=paper)
-  reception     aggregated other-statements about the paper with date <= T:
-                  n_statements, n_citing (distinct citing papers), first/last citing date,
-                  function_share  {basis, baseline, background, tool, data, metric, contrast} shares,
-                  relation_share  {extends, improves, replaces, adapts, combines, uses, compares, criticizes, ...},
-                  categories      most frequent categories the field puts it in (with counts),
-                  limitations     limitations other papers state about it (deduplicated, with citing ids),
-                  descriptions    up to K described statements, spread over time (newest last)
-  shift         reception split at the midpoint of the citing period: early vs late function/relation shares
-                (the P1 signal: lineage -> component/baseline); None when < MIN_SHIFT statements
-  evidence      counts that tell a consumer how much this profile rests on (n_citing, months covered)
-A paper with no reception yet (common for work under a year old) still gets its self part and evidence=0, so a
-consumer can fall back on the self description and the paper's references (DESIGN §1 principle 5)."""
+§9.2 splits the sources: the heavy field-level cognition is READ FROM THE MATERIALISED TABLES (reception
+daily counts, canonical categories, approved shift events, lineage edges, family facts), while the bounded
+per-paper part — the self description and the selection of representative other-statements — stays computed
+online from the extract store through AsOf. One vote per (citing paper, sentence): a sentence that produced
+both a limitation and a categorization statement must not count twice in the shares.
+
+A paper with no reception yet (common for work under a year old) still gets its self part and zeros, so a
+consumer can fall back on the self description and the paper's references."""
 from __future__ import annotations
 
 from collections import Counter
 
+from . import shifts as SH
 from .asof import AsOf
 
 K_DESC = 8
-MIN_SHIFT = 8
 LINEAGE = {"extends", "improves", "replaces", "adapts", "combines"}
 
 
-def _shares(vals: list[str]) -> dict[str, float]:
+def _shares(vals: list) -> dict:
     c = Counter(v for v in vals if v)
     n = sum(c.values())
     return {k: round(v / n, 3) for k, v in c.most_common()} if n else {}
 
 
-def _norm_cat(s: str) -> str:
-    return " ".join((s or "").lower().replace("-", " ").split())
+def reception_counts(view: AsOf, pid: str) -> dict:
+    """The materialised daily citation counts (reception_daily, full counts — never truncated by the other
+    pass's sampled subset): total, first/last day, and the latest 24 months as a series."""
+    if view.cog is None:
+        return {"n_cites": 0, "first": None, "last": None, "monthly": []}
+    rows = view.cog.execute("SELECT day, n FROM reception_daily WHERE cited=? AND day<=? ORDER BY day",
+                            (pid, view.T)).fetchall()
+    monthly: dict = {}
+    for d, n in rows:
+        monthly[d[:7]] = monthly.get(d[:7], 0) + n
+    months = sorted(monthly)[-24:]
+    return {"n_cites": sum(n for _, n in rows), "first": rows[0][0] if rows else None,
+            "last": rows[-1][0] if rows else None,
+            "monthly": [{"month": m, "n": monthly[m]} for m in months]}
 
 
-def profile(view: AsOf, obj: str) -> dict:
-    selfs = view.statements(about=obj, kind="self") if obj.startswith("paper:") else []
-    others = sorted(view.statements(about=obj, kind="other"), key=lambda s: s["date"])
-    # one vote per (citing paper, sentence) for shares — a sentence that spawned a limitation statement and a
-    # description statement must not count twice
-    per_sentence = {}
+def profile(view: AsOf, pid: str) -> dict:
+    paper = view.paper(pid)
+    selfs = view.statements(about=pid, kind="self")
+    others = sorted(view.statements(about=pid, kind="other"), key=lambda s: s["date"])
+    per_sentence: dict = {}
     for s in others:
-        per_sentence.setdefault((s["speaker"], s["meta"].get("sentence_id")), s)
+        per_sentence.setdefault((s["speaker"], (s.get("loc") or {}).get("sent_id")), s)
     votes = sorted(per_sentence.values(), key=lambda s: s["date"])
-    cats = Counter(_norm_cat(s["meta"].get("category")) for s in votes if s["meta"].get("category"))
-    lims = {}
+    canon = dict(view.cog.execute("SELECT phrase, canonical FROM category_canon")) if view.cog is not None else {}
+    cats = Counter()
+    for s in votes:
+        c = (s.get("meta") or {}).get("category")
+        if c and c.strip():
+            cats[canon.get(c.strip(), c.strip().lower())] += 1
+    lims: dict = {}
     for s in others:
-        if s["facet"] == "limitation":
+        if s["facet"] == "limitation" and s["text"].strip():
             lims.setdefault(s["text"].strip(), []).append(s["speaker"])
-    described = [s for s in votes if s["meta"].get("described")]
-    if len(described) > K_DESC:  # spread over time
+    described = [s for s in votes if s["text"] and not s["text"].startswith("(")]
+    if len(described) > K_DESC:            # spread over the reception period, oldest first
         step = len(described) / K_DESC
         described = [described[int(i * step)] for i in range(K_DESC)]
+    rec = reception_counts(view, pid)
     reception = {
+        **rec,
         "n_statements": len(votes),
         "n_citing": len({s["speaker"] for s in votes}),
-        "first": votes[0]["date"] if votes else None,
-        "last": votes[-1]["date"] if votes else None,
         "function_share": _shares([s["function"] for s in votes]),
         "relation_share": _shares([s["role"] for s in votes]),
         "lineage_share": round(sum(s["role"] in LINEAGE for s in votes) / len(votes), 3) if votes else None,
         "categories": cats.most_common(5),
         "limitations": [{"text": t, "citing": sorted(set(c))[:5], "n": len(set(c))}
                         for t, c in sorted(lims.items(), key=lambda kv: -len(set(kv[1])))[:6]],
-        "descriptions": [{"date": s["date"], "citing": s["speaker"], "text": s["text"], "function": s["function"],
-                          "quote": s["quote"]} for s in described],
+        "descriptions": [{"date": s["date"], "citing": s["speaker"], "text": s["text"],
+                          "function": s["function"], "quote": s["quote"]} for s in described],
     }
-    shift = None
-    if len(votes) >= MIN_SHIFT:
-        mid = len(votes) // 2
-        early, late = votes[:mid], votes[mid:]
-        shift = {"split_date": late[0]["date"],
-                 "early": {"function": _shares([s["function"] for s in early]),
-                           "lineage": round(sum(s["role"] in LINEAGE for s in early) / len(early), 3)},
-                 "late": {"function": _shares([s["function"] for s in late]),
-                          "lineage": round(sum(s["role"] in LINEAGE for s in late) / len(late), 3)}}
-    months = {s["date"][:7] for s in votes}
-    return {"object": obj, "as_of": view.T,
-            "paper": view.paper(obj[6:]) if obj.startswith("paper:") else None,
-            "self": [{"facet": s["facet"], "text": s["text"], "quote": s["quote"], "name": s["meta"].get("name")}
-                     for s in selfs],
-            "reception": reception, "shift": shift,
-            "evidence": {"n_citing": reception["n_citing"], "months": len(months), "has_self": bool(selfs)}}
+    return {"object": pid, "as_of": view.T, "paper": paper,
+            "self": [{"facet": s["facet"], "text": s["text"], "quote": s["quote"], "date": s["date"],
+                      "epistemic": s["epistemic"], "condition": s["condition"],
+                      "name": (s.get("meta") or {}).get("name")} for s in selfs],
+            "reception": reception,
+            "shifts": SH.events(view, pid),
+            "evidence": {"n_cites": rec["n_cites"], "n_citing": reception["n_citing"],
+                         "months": len({s["date"][:7] for s in votes}), "has_self": bool(selfs)}}

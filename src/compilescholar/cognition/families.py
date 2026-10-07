@@ -1,104 +1,66 @@
 # -*- coding: utf-8 -*-
-"""Method families at T (L4): groups of works the field treats as one kind of approach, with member evidence.
+"""Method families at T (phase D reader): reads the materialised Leiden time-sliced snapshots
+(cognition.build — cumulative co-citation + lineage + shared-category edge weights, fixed seed, weighted
+RBConfigurationVertexPartition = modularity's built-in hub de-weighting; stubs are boundary nodes, never
+members).
 
-Member evidence comes from statements and citations only (pure function of AsOf(T)), three sources:
-  co-citation groups  works cited together in one sentence ("[3,7,12] adopt contrastive learning") — the citing
-                      author's own grouping; weight 1 per sentence (sentences citing > MAX_GROUP works are ignored as
-                      bulk lists)
-  shared category     two works the field puts in the same category phrase (other-statements' meta.category, normalized)
-  lineage             a self or other statement saying one extends / improves / adapts / combines the other
-Edges are weighted by the number of distinct citing papers that support them (independence: one citing paper counts
-once per pair). Families = connected components of the graph after dropping edges with fewer than MIN_SUPPORT
-supporting citing papers, refined by label propagation (deterministic order) so a hub does not chain everything.
-Each family reports its members, the supporting citing papers per member, and its most common category phrases as a
-name candidate. The former LLM family induction (compile.state.field_state) is not used here; it remains one way to
-NAME a family (tools may call it), never to decide membership."""
+A query at T reads the newest snapshot whose date is <= T. The grid is monthly over the last 3 years of the
+data, quarterly before that, capped at 15 years, plus explicit benchmark cut-offs; a T before the earliest
+snapshot gets NO families and the answer says so — it is never clamped up to the earliest snapshot, which
+would leak future grouping structure into the past.
+
+Names: the LLM names the families of the latest snapshot (and benchmark cut-offs) and prunes weak boundary
+members; older snapshots inherit a name by member overlap (Jaccard >= 0.3, named_by='inherit'). Membership
+in an older snapshot is exactly what the field's evidence supported by that date — a member's visibility at
+T >= snapshot date follows from the build's own visibility filter (first_hi <= snapshot)."""
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+import json
 
 from .asof import AsOf
 
-MAX_GROUP = 8
-MIN_SUPPORT = 2
-LINEAGE = {"extends", "improves", "adapts", "combines", "replaces"}
+
+def snapshot_at(view: AsOf) -> tuple[str | None, str | None]:
+    """(the snapshot to read at T, the earliest snapshot that exists). snapshot is None when T precedes the
+    grid or the stage has no snapshots yet."""
+    if view.cog is None:
+        return None, None
+    lo = view.cog.execute("SELECT min(snapshot) FROM family_snapshot").fetchone()[0]
+    s = view.cog.execute("SELECT max(snapshot) FROM family_snapshot WHERE snapshot<=?", (view.T,)).fetchone()[0]
+    return s, lo
 
 
-def edges(view: AsOf, scope: set[str]) -> dict[tuple[str, str], set[str]]:
-    """(a, b) with a < b -> set of citing papers that put a and b together (any source), within scope.
-    Co-citation groups come from the citations stage (every co-cited object, extracted or not); categories and
-    lineage come from extracted statements."""
-    sup: dict[tuple[str, str], set[str]] = defaultdict(set)
-    seen_sent = set()
-    by_cat: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
-    for obj in scope:
-        for citing, _date, sid in view.cited_by(obj):
-            if sid in seen_sent:
-                continue
-            seen_sent.add(sid)
-            grp_all = list(dict.fromkeys(view.co_cited(sid)))
-            if not 2 <= len(grp_all) <= MAX_GROUP:
-                continue
-            grp = [g for g in grp_all if g in scope]
-            for i, a in enumerate(grp):
-                for b in grp[i + 1:]:
-                    sup[tuple(sorted((a, b)))].add(citing)
-        for s in view.statements(about=obj, kind="other"):
-            cat = " ".join((s["meta"].get("category") or "").lower().replace("-", " ").split())
-            if cat:
-                by_cat[cat][obj].add(s["speaker"])
-            if s["role"] in LINEAGE and f"paper:{s['speaker']}" in scope:
-                sup[tuple(sorted((obj, f"paper:{s['speaker']}")))].add(s["speaker"])
-    for cat, members in by_cat.items():
-        objs = sorted(members)
-        if len(objs) > 50:  # umbrella phrases ("deep learning methods") carry no family information
-            continue
-        for i, a in enumerate(objs):
-            for b in objs[i + 1:]:
-                sup[(a, b)] |= members[a] | members[b]
-    return sup
-
-
-def families(view: AsOf, scope: set[str], min_support: int = MIN_SUPPORT) -> list[dict]:
-    sup = edges(view, scope)
-    adj: dict[str, Counter] = defaultdict(Counter)
-    for (a, b), cits in sup.items():
-        if len(cits) >= min_support:
-            adj[a][b] = len(cits)
-            adj[b][a] = len(cits)
-    # label propagation, deterministic: nodes in sorted order, ties broken by smallest label
-    label = {n: n for n in adj}
-    for _ in range(20):
-        changed = False
-        for n in sorted(adj):
-            score = Counter()
-            for m, w in adj[n].items():
-                score[label[m]] += w
-            if not score:
-                continue
-            best = min(score.items(), key=lambda kv: (-kv[1], kv[0]))[0]
-            if best != label[n]:
-                label[n], changed = best, True
-        if not changed:
-            break
-    groups = defaultdict(list)
-    for n, l in label.items():
-        groups[l].append(n)
+def families(view: AsOf, scope: set | None = None, min_size: int = 2, k: int | None = None) -> dict:
+    """Families of the snapshot at T. `scope` restricts members (a topic's seed set); families whose visible
+    members drop below min_size are omitted. Families come in the build's size-descending order."""
+    snap, lo = snapshot_at(view)
     out = []
-    for members in groups.values():
-        if len(members) < 2:
-            continue
-        ms = set(members)
-        cats = Counter()
-        for m in members:
-            for s in view.statements(about=m, kind="other"):
-                c = " ".join((s["meta"].get("category") or "").lower().replace("-", " ").split())
-                if c:
-                    cats[c] += 1
-        support = {m: sorted({c for (a, b), cs in sup.items() if m in (a, b) and (a in ms and b in ms) for c in cs})
-                   for m in members}
-        out.append({"members": sorted(members, key=lambda m: -len(support[m])),
-                    "name_candidates": cats.most_common(3),
-                    "support": {m: len(v) for m, v in support.items()},
-                    "n_citing": len({c for v in support.values() for c in v})})
-    return sorted(out, key=lambda f: -f["n_citing"])
+    if snap:
+        for fid, name, members, named_by in view.cog.execute(
+                "SELECT family_id, name, members, named_by FROM family_snapshot WHERE snapshot=? "
+                "ORDER BY family_id", (snap,)):
+            mm = json.loads(members)
+            if scope is not None:
+                mm = [m for m in mm if m in scope]
+            if len(mm) < min_size:
+                continue
+            out.append({"family_id": fid, "name": name, "named_by": named_by,
+                        "members": mm, "n_members": len(mm)})
+    if k:
+        out = out[:k]
+    return {"as_of": view.T, "snapshot": snap, "earliest_snapshot": lo,
+            "before_grid": bool(lo and snap is None and view.T < lo), "families": out}
+
+
+def family_of(view: AsOf, pid: str) -> dict | None:
+    """The family a paper belongs to at T (None when it is in no family of that snapshot)."""
+    snap, _ = snapshot_at(view)
+    if not snap:
+        return None
+    for fid, name, members, named_by in view.cog.execute(
+            "SELECT family_id, name, members, named_by FROM family_snapshot WHERE snapshot=? ORDER BY family_id",
+            (snap,)):
+        mm = json.loads(members)
+        if pid in mm:
+            return {"family_id": fid, "name": name, "named_by": named_by, "members": mm, "snapshot": snap}
+    return None

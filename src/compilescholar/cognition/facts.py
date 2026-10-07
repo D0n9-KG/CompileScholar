@@ -1,97 +1,99 @@
 # -*- coding: utf-8 -*-
-"""Family-level facts at T (L4, N5): what the field says about a family of works, with its support set.
+"""Family-level facts at T (phase D reader): reads the materialised fact groups (cognition.build —
+deterministic recall by same-facet content-word Jaccard >= 0.3 inside one family, the LLM FACT_REL relation
+verdict on candidate pairs, union-find over 'same', and the status timeline single-source -> established
+(n_independent >= 2) -> consensus (n_independent >= 3 and >= 2 subjects), with a 'contested' event at the
+date an 'opposite' verdict's statements become visible).
 
-A fact groups statements about members of one family (cognition.families) that state the same thing. Grouping is
-deterministic: statements are clustered by content-word overlap of their text (Jaccard >= SIM) within one facet;
-the LLM is not used to decide what agrees with what. For each fact:
-  support       statements (speaker, about, date, quote) behind it
-  n_papers      distinct speaking papers
-  n_independent speaking papers after merging papers that share >= half of their author surnames (same group)
-  members       distinct family members the fact is stated about
-  status        computed from the support set (DESIGN-CROSSPAPER §2.3, pre-registered rules):
-                  consensus     n_independent >= 3 and stated about >= 2 members
-                  established   n_independent >= 2
-                  single-source otherwise
-                and "contested" when a statement about the same member states the opposite (negation / criticizes)
-                — only for facets where a contradiction is meaningful (limitation vs. a contribution claim is not one)
-  first_seen    date of the earliest support statement (re-running at earlier T shows when the fact formed)
-Pure function of AsOf(T)."""
+A fact at T is its member statements dated <= T (the extract store applies the cutoff); its status is the
+last timeline event dated <= T, and `contested_since` is the first contradiction dated <= T (None when no
+contradiction is visible yet). Independence counts come from the timeline events' evidence (author_key
+greedy merge, computed at build time) — the reader never recomputes them."""
 from __future__ import annotations
 
 import json
-import re
-from collections import defaultdict
 
 from .asof import AsOf
 
-SIM = 0.5
-STOP = set("a an the of in on for to and or with by from as is are was were be been this that these those it its "
-           "their they we our which such via using use used based into than also can may method methods model models "
-           "approach approaches work works paper papers".split())
-NEG = re.compile(r"(?i)\b(not|no|fails?|cannot|unable|without|lack\w*|struggl\w*|poor\w*|limited)\b")
+FACT_FACETS = ("limitation", "method", "result", "categorization", "contribution")
+_IN_CHUNK = 900          # sqlite variable limit headroom for the IN clauses
 
 
-def _w(s: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z0-9]+", (s or "").lower()) if w not in STOP and len(w) > 2}
+def _chunked(lst, n=_IN_CHUNK):
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 
-def _jac(a: set, b: set) -> float:
-    return len(a & b) / len(a | b) if a and b else 0.0
-
-
-def _authors(view: AsOf, speaker: str) -> set[str]:
-    p = view.paper(speaker)
-    return {a.lower() for a in (p or {}).get("authors") or []}
-
-
-def independent(view: AsOf, speakers: set[str]) -> int:
-    """Greedy merge of speakers sharing >= half of the smaller author list (same group counts once)."""
-    groups: list[set[str]] = []
-    for s in sorted(speakers):
-        a = _authors(view, s)
-        for g in groups:
-            if a and g and len(a & g) * 2 >= min(len(a), len(g)):
-                g |= a
-                break
-        else:
-            groups.append(set(a) or {s})
-    return len(groups)
-
-
-def facts(view: AsOf, members: list[str], facets=("limitation", "method", "result", "categorization")) -> list[dict]:
-    stmts = []
-    for m in members:
-        for s in view.statements(about=m):
-            if s["facet"] in facets and s["text"] and not s["text"].startswith("("):
-                stmts.append(s)
-    clusters: list[dict] = []
-    for s in sorted(stmts, key=lambda s: s["date"]):
-        w = _w(s["text"])
-        best = max((c for c in clusters if c["facet"] == s["facet"]), key=lambda c: _jac(w, c["words"]), default=None)
-        if best is not None and _jac(w, best["words"]) >= SIM:
-            best["support"].append(s)
-            best["words"] |= w
-        else:
-            clusters.append({"facet": s["facet"], "words": set(w), "support": [s]})
+def facts(view: AsOf, members: list | None = None, family_id: str | None = None, facets=FACT_FACETS,
+          k: int | None = None) -> list[dict]:
+    """The facts stated about `members` (or one family's members), visible at T, strongest first."""
+    if view.cog is None:
+        return []
+    if family_id is not None and members is None:
+        row = view.cog.execute("SELECT members FROM family_snapshot WHERE family_id=? ORDER BY snapshot DESC "
+                               "LIMIT 1", (family_id,)).fetchone()
+        members = json.loads(row[0]) if row else []
+    if members is None:
+        return []
+    facets = tuple(facets)
+    sids: list[int] = []
+    for part in _chunked(sorted(members)):
+        ph = ",".join("?" * len(part))
+        sids += [r[0] for r in view.ext.execute(
+            f"SELECT id FROM statements WHERE about IN ({ph}) AND date<=? "
+            f"AND facet IN ({','.join('?' * len(facets))})", (*part, view.T, *facets))]
+    if not sids:
+        return []
+    fids: list[str] = []
+    for part in _chunked(sids):
+        ph = ",".join("?" * len(part))
+        fids += [r[0] for r in view.cog.execute(
+            f"SELECT DISTINCT fact_id FROM fact_member WHERE statement_id IN ({ph})", tuple(part))]
+    if not fids:
+        return []
+    fids = sorted(set(fids))
+    member_rows: dict[str, list] = {}
+    for part in _chunked(fids):
+        ph = ",".join("?" * len(part))
+        for fid, sid, role in view.cog.execute(
+                f"SELECT fact_id, statement_id, role FROM fact_member WHERE fact_id IN ({ph})", tuple(part)):
+            member_rows.setdefault(fid, []).append((sid, role))
+    status: dict[str, str] = {}
+    counts: dict[str, dict] = {}
+    contested: dict[str, str] = {}
+    for part in _chunked(fids):
+        ph = ",".join("?" * len(part))
+        for fid, date, st, ev in view.cog.execute(
+                f"SELECT fact_id, date, status, evidence FROM fact_status_event WHERE fact_id IN ({ph}) "
+                "AND date<=? ORDER BY date, rowid", (*part, view.T)):
+            if st == "contested":
+                contested.setdefault(fid, date)
+                continue
+            status[fid] = st
+            try:
+                j = json.loads(ev) if ev else {}
+            except (TypeError, ValueError):
+                j = {}
+            if isinstance(j, dict) and "n_independent" in j:
+                counts[fid] = j
+    all_ids = sorted({sid for rows in member_rows.values() for sid, _ in rows})
+    stmts = {s["id"]: s for s in view.statements_by_id(all_ids)}       # date <= T applied by the view
     out = []
-    for c in clusters:
-        sup = c["support"]
-        speakers = {s["speaker"] for s in sup}
-        mem = {s["about"] for s in sup}
-        n_ind = independent(view, speakers)
-        status = "consensus" if n_ind >= 3 and len(mem) >= 2 else "established" if n_ind >= 2 else "single-source"
-        if c["facet"] in ("method", "result"):
-            neg = {s["about"] for s in sup if NEG.search(s["text"])}
-            pos = {s["about"] for s in sup if not NEG.search(s["text"])}
-            if neg & pos:
-                status = "contested"
-        rep = max(sup, key=lambda s: (s["kind"] == "other", len(s["text"])))
-        out.append({"facet": c["facet"], "text": rep["text"], "status": status, "n_papers": len(speakers),
-                    "n_independent": n_ind, "members": sorted(mem), "first_seen": sup[0]["date"],
-                    "support": [{"by": f"paper:{s['speaker']}", "about": s["about"], "date": s["date"],
-                                 "kind": s["kind"], "quote": s["quote"]} for s in sup[:8]]})
-    return sorted(out, key=lambda f: (-f["n_independent"], f["first_seen"]))
-
-
-def dump(f: dict) -> str:
-    return json.dumps(f, ensure_ascii=False)
+    for fid in fids:
+        rows = member_rows.get(fid) or []
+        sup = sorted((stmts[sid] for sid, _ in rows if sid in stmts), key=lambda s: (s["date"], s["id"]))
+        if not sup or sup[0]["facet"] not in facets:
+            continue                                  # nothing visible at T (or the facet was filtered out)
+        rep = next((stmts[sid] for sid, role in rows if role == "representative" and sid in stmts), sup[0])
+        ev = counts.get(fid) or {}
+        about = sorted({s["about"] for s in sup})
+        out.append({"fact_id": fid, "facet": rep["facet"], "text": rep["text"], "quote": rep["quote"],
+                    "status": status.get(fid, "single-source"),
+                    "contested_since": contested.get(fid),
+                    "n_independent": ev.get("n_independent"), "n_subjects": len(about),
+                    "members": about, "first_seen": sup[0]["date"],
+                    "support": [{"by": s["speaker"], "about": s["about"], "date": s["date"],
+                                 "kind": s["kind"], "epistemic": s["epistemic"], "quote": s["quote"]}
+                                for s in sup[:8]]})
+    out.sort(key=lambda f: (-(f["n_independent"] or 0), f["first_seen"], f["fact_id"]))
+    return out[:k] if k else out
