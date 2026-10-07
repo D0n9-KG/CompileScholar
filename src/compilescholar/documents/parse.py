@@ -60,12 +60,17 @@ def _atomic(p, data: bytes) -> None:
 
 def grobid(data: bytes, url: str, timeout: float = 600) -> bytes:
     for att in range(8):
-        r = httpx.post(f"{url}/api/processFulltextDocument", files={"input": ("paper.pdf", data, "application/pdf")},
-                       data={"segmentSentences": "1", "includeRawCitations": "1", "consolidateHeader": "0",
-                             "consolidateCitations": "0", "consolidateFunders": "0",
-                             "teiCoordinates": ["s", "ref", "biblStruct", "head", "figure", "formula"]},
-                       timeout=timeout, trust_env=False)
-        if r.status_code == 503:                       # GROBID's pool is full
+        try:
+            r = httpx.post(f"{url}/api/processFulltextDocument",
+                           files={"input": ("paper.pdf", data, "application/pdf")},
+                           data={"segmentSentences": "1", "includeRawCitations": "1", "consolidateHeader": "0",
+                                 "consolidateCitations": "0", "consolidateFunders": "0",
+                                 "teiCoordinates": ["s", "ref", "biblStruct", "head", "figure", "formula"]},
+                           timeout=timeout, trust_env=False)
+        except httpx.TransportError:
+            time.sleep(2 * (1 + att))                  # a remote endpoint over a tunnel may blip; transport
+            continue                                   # errors retry like a full pool — they must not burn
+        if r.status_code == 503:                       # the item's 3 attempts (a gave_up item is skipped forever)
             time.sleep(1 + att)
             continue
         r.raise_for_status()
