@@ -5,8 +5,9 @@ content_list (one JSON list of blocks, reading order): type text (text_level = h
 ref_text = the bibliography), table (table_body HTML, table_caption, table_footnote), equation (LaTeX), image / chart
 (captions), page_number / header / footer / aside_text / page_footnote (layout furniture: dropped); bbox is on a
 0-1000 grid of the page, page_idx 0-based. Units: section, para, table (HTML kept for documents.tables), caption,
-formula, footnote — each with page and bbox; the reference list becomes `references` (one string per entry) for the
-citation stage. Sentences and citation pairs come from the fast tier of the same PDF; the careful tier adds structure,
+formula, footnote, figure (v2.4 item 5: number/caption/page/bbox, the image itself is never stored — tools crop
+it from the PDF by bbox on demand) — each with page and bbox; the reference list becomes `references` (one string
+per entry) for the citation stage. Sentences and citation pairs come from the fast tier of the same PDF; the careful tier adds structure,
 not a second citation reading (INTEGRATED-SYSTEM-1005 v2.2)."""
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ DROP = {"page_number", "header", "footer", "aside_text", "page_header", "page_fo
 @dataclass
 class Unit:
     uid: str
-    kind: str              # section | para | table | caption | formula | footnote
+    kind: str              # section | para | table | caption | formula | footnote | figure
     section: str
     text: str
     page: int | None = None
@@ -83,6 +84,7 @@ def units(blocks: list[dict], doc_id: str = "doc") -> tuple[list[Unit], list[str
             add("formula", _txt(b.get("text")), b)
         elif t in ("image", "chart"):
             cap = _txt(" ".join(b.get("image_caption") or b.get("chart_caption") or []))
+            add("figure", cap, b)          # v2.4 item 5: the figure unit (number, caption, page, bbox; no image)
             if cap:
                 add("caption", cap, b)
         elif t == "page_footnote":

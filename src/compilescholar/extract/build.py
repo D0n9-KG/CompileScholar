@@ -1,228 +1,468 @@
 # -*- coding: utf-8 -*-
-"""Stage `extract` (L2): tiered extraction over a question-blind scope, written to data/dfc/extract.sqlite.
+"""Stage `extract` (phase C④): the four passes of INTEGRATED-SYSTEM-1005 §7.3 over a question-blind scope, on
+registry keys. The per-paper logic lives in extract/passes.py (shared verbatim with the runtime deep_read —
+v2.4 item 1); this file is the stage wiring: scope, work items, persistence, sweeps.
 
-Tiers (DESIGN-LITERATURE-LAYER §3.5; the old system's coarse-for-breadth / deep-for-important split, kept):
-  T1  self pass on title + abstract          every paper in scope (papers stage)
-  T2  self pass on abstract + introduction    deep papers (selected below) that have a full text (documents stage),
-      + deep call on method/experiment text   same papers
-      + result pass (deterministic tables)    same papers
-  R   other pass on citation sentences        every cited object in scope, <= N_OTHER pairs each, stratified over
-                                              citing months (round-robin, oldest first) and distinct citing papers
-Scope and deep selection are question-blind: they use only corpus statistics (categories, citation counts from the
-citations stage), never benchmark annotations:
-  scope = papers whose primary category is in `categories` and v1_date >= since
-  deep  = scope papers with a full text, ranked by in-corpus citation count, top `n_deep`
-Incremental and exact through dfc.store item bookkeeping (passes `self` and `other`); every statement row carries the
-(pass, item) that produced it. Every statement passes schema validation and its quote check."""
+Work passes (every statement row carries pass+item; redoing an item replaces exactly its rows):
+  t1       item = a scope paper: title + numbered v1-abstract sentences (registry abstract as marked fallback;
+           a paper with neither is a valid empty item)
+  t2       item = a deep paper with a full text: chunks <= 8k chars over the tier priority sciverse -> mineru
+           -> grobid, sentences dated by their earliest version; seeded with t1's proposed names, returns
+           own_methods for the results pass
+  results  item = a deep paper with MinerU-family tables (sv/careful tiers): LLM axis roles, structural gate,
+           every value from a cell
+  other    item = a citing paper: its sampled citation sentences — per cited paper a time-stratified quota
+           (§7.3 他述抽样: year buckets, sqrt-of-count allocation, distinct citing papers first within a year)
+  figures  item = a paper with a careful parse: deterministic figure units (number, caption, page, bbox — the
+           image itself is never stored, tools crop it from the PDF on demand)
+Deterministic tail (no work items): cite_counts(cited, month, n) — FULL monthly cited counts (v2.4: the count
+is no longer truncated by the sampled subset).
+
+Scope and deep selection are question-blind (the 10-03 user ruling; §13.1): scope = the benchmark's members
+(--benchmark) or the registry papers whose primary category is in `categories` with first_hi >= `since`; deep =
+scope papers with a materialised full text, ranked by in-corpus cited count, top n_deep. Only corpus statistics
+enter — never questions, never gold.
+
+Fingerprints: (prompt sha, model, the documents/citations work keys of everything the pass reads) — a re-parsed
+PDF, a new Sciverse fetch, a re-resolved citation or a changed prompt re-opens exactly the items that read it.
+A pass whose LLM answer did not parse fails the item (dfc retries, breaker at 3) — never an empty success."""
 from __future__ import annotations
 
 import json
+import re
+import time
 from collections import defaultdict
 
-from ..corpus.papers import Papers
+from ..core import paths
 from ..dfc import store
-from ..documents import units as U
 from ..documents.build import Documents
-from . import other_pass as O
-from . import result_pass as R
-from . import self_pass as S
+from . import passes as PS
+from . import prompts as PR
+from . import reading as RD
 from .schema import DDL
 
 N_OTHER = 30
-EXTRA_DDL = """CREATE TABLE IF NOT EXISTS tiers(arxiv_id TEXT PRIMARY KEY, tier TEXT, stats TEXT);
-CREATE TABLE IF NOT EXISTS scope(arxiv_id TEXT PRIMARY KEY, deep INT);"""
-INSERT = ("INSERT OR IGNORE INTO statements(speaker,date,kind,about,role,facet,text,quote,target,grp,function,meta,"
-          "model,prompt_sha,pass,item) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+BATCH_PAIRS = 24
+EXTRA_DDL = """CREATE TABLE IF NOT EXISTS scope(paper_id TEXT PRIMARY KEY, deep INT);
+CREATE TABLE IF NOT EXISTS pass_stats(paper_id TEXT NOT NULL, pass TEXT NOT NULL, stats TEXT,
+  PRIMARY KEY(paper_id, pass));
+CREATE TABLE IF NOT EXISTS figure_units(paper_id TEXT NOT NULL, uid TEXT NOT NULL, fig_no INT, caption TEXT,
+  page INT, bbox TEXT, PRIMARY KEY(paper_id, uid));
+CREATE TABLE IF NOT EXISTS cite_counts(cited TEXT NOT NULL, month TEXT NOT NULL, n INT, PRIMARY KEY(cited, month));
+CREATE INDEX IF NOT EXISTS ix_cc_month ON cite_counts(month);"""
+INSERT = ("INSERT OR IGNORE INTO statements(speaker,date,kind,about,role,facet,text,quote,epistemic,condition,loc,target,"
+          "grp,function,meta,schema_version,pass,item,run_id,model,prompt_sha) "
+          "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+_FIG_NO = re.compile(r"(?i)^\s*(?:figure|fig\.?)\s*(\d+)")
 
 
-def select_scope(categories: tuple[str, ...], since: str, n_deep: int) -> tuple[list[str], set[str]]:
-    """Question-blind scope + deep set (corpus statistics only)."""
-    pap = store.connect("papers", readonly=True)
-    cit = store.connect("citations", readonly=True)
-    docs = set(Documents().ids())
-    q = f"SELECT arxiv_id FROM papers WHERE primary_cat IN ({','.join('?' * len(categories))}) AND v1_date >= ?"
-    scope = [r[0] for r in pap.execute(q, (*categories, since))]
-    counts = dict(cit.execute("SELECT substr(cited, 7), count(DISTINCT citing) FROM cites "
-                              "WHERE cited LIKE 'paper:%' GROUP BY cited").fetchall())
-    ranked = sorted((a for a in scope if a in docs), key=lambda a: (-counts.get(a, 0), a))
-    return scope, set(ranked[:n_deep])
-
-
-def select_pairs(cit, targets, n: int = N_OTHER) -> dict[str, list[tuple]]:
-    """{target: [(sentence_id, citing, date, n_group), ...]} capped at n, spread over citing months (round-robin,
-    oldest first) and, within a month, over distinct citing papers first."""
-    out = {}
-    q = "SELECT sentence_id, citing, date, n_group FROM cites WHERE cited = ? ORDER BY date, citing, sentence_id"
-    for t in targets:
-        months: dict[str, list] = defaultdict(list)
-        extra: dict[str, list] = defaultdict(list)
-        seen = set()
-        for sid, citing, date, ng in cit.execute(q, (t,)):
-            (extra if (citing, date[:7]) in seen else months)[date[:7]].append((sid, citing, date, ng))
-            seen.add((citing, date[:7]))
-        picked = []
-        for pool in (months, extra):
-            queues = [list(pool[m]) for m in sorted(pool)]
-            while len(picked) < n and any(queues):
-                for qq in queues:
-                    if qq and len(picked) < n:
-                        picked.append(qq.pop(0))
-        if picked:
-            out[t] = picked
+def _rows(stmts, run_id: str, tot: dict) -> list[tuple]:
+    out = []
+    for s in stmts:
+        errs = s.validate()
+        if errs:
+            tot["schema_rejected"] += 1
+            continue
+        r = s.row()
+        out.append((r["speaker"], r["date"], r["kind"], r["about"], r["role"], r["facet"], r["text"], r["quote"],
+                    r["epistemic"], r["condition"], json.dumps(r["loc"], ensure_ascii=False), r["target"],
+                    json.dumps(r["group"]), r["function"], json.dumps(r["meta"], ensure_ascii=False),
+                    r["schema_version"], r["pass"], r["item"], run_id, r["model"], r["prompt_sha"]))
     return out
 
 
-def build(categories: tuple[str, ...] = ("cs.LG",), since: str = "2018-01-01", n_deep: int = 500,
-          workers: int = 48, rebuild: bool = False, log=print) -> dict:
-    """Two passes, each with its own item bookkeeping (dfc.store.Work):
-      self   item = paper; key = (self prompts, model, the stage's code) + (paper record, tier, document key)
-      other  item = "<citing>|<cited>" (the sentences one citing paper wrote about one cited object); key = (other
-             prompt, model, code) + (the citations item of the citing paper, the selected sentence ids)
-    A changed prompt re-opens its own pass only; a failed LLM call is retried on the next build and never counted as
-    done; items that left the scope are removed with their statements."""
-    params = {"categories": list(categories), "since": since, "n_deep": n_deep, "n_other": N_OTHER}
+def select_pairs(cit, targets, cap: int = N_OTHER) -> dict:
+    """{cited paper_id: [(sentence_id, citing, date, version, key, self_cite), ...]} — per cited paper a
+    time-stratified quota over its citation lifetime (§7.3): year buckets, allocation proportional to
+    sqrt(bucket size) with at least one per non-empty year while the cap allows, within a year distinct citing
+    papers first and earlier dates first. Deterministic given the store."""
+    out = {}
+    q = ("SELECT sentence_id, citing, date, version, key, self_cite FROM cites WHERE cited = ? "
+         "ORDER BY date, citing, sentence_id")
+    for t in targets:
+        rows = cit.execute(q, (t,)).fetchall()
+        if not rows:
+            continue
+        years: dict[str, list] = defaultdict(list)
+        for r in rows:
+            years[(r[2] or "")[:4]].append(r)
+        ks = sorted(years)
+        if len(rows) <= cap:
+            picked = rows
+        else:
+            weights = {k: len(years[k]) ** 0.5 for k in ks}
+            tot_w = sum(weights.values())
+            quota = {k: max(1, int(round(cap * weights[k] / tot_w))) for k in ks}
+            while sum(quota.values()) > cap:                     # trim from the largest quota
+                k = max(quota, key=lambda x: (quota[x], x))
+                if quota[k] <= 1:
+                    break
+                quota[k] -= 1
+            picked = []
+            for k in ks:
+                by_citing: dict[str, list] = defaultdict(list)
+                for r in years[k]:
+                    by_citing[r[1]].append(r)
+                queues = [v for _, v in sorted(by_citing.items())]
+                got = 0
+                while got < quota[k]:
+                    progressed = False
+                    for qq in queues:      # distinct citing papers first; each queue is date-ordered (the query)
+                        if qq and got < quota[k]:
+                            picked.append(qq.pop(0))
+                            got += 1
+                            progressed = True
+                    if not progressed:
+                        break
+        out[t] = picked[:cap]
+    return out
+
+
+def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",), since: str = "2018-01-01",
+          n_deep: int = 500, workers: int | None = None, rebuild: bool = False, log=print) -> dict:
+    workers = workers or 48                        # LLM lanes (the client paces per backend)
+    params = {"benchmark": benchmark, "categories": list(categories), "since": since,
+              "n_deep": n_deep, "n_other": N_OTHER}
+    run_id = f"extract-{time.strftime('%Y%m%dT%H%M%S')}"
     with store.Run("extract", params, rebuild=rebuild) as run:
-        papers, docs = Papers(), Documents()
-        cit = store.connect("citations", readonly=True)
         con = run.con
         con.executescript(DDL + EXTRA_DDL)
-        scope, deep = select_scope(categories, since, n_deep)
-        con.execute("DELETE FROM scope")
-        con.executemany("INSERT INTO scope VALUES (?,?)", [(a, int(a in deep)) for a in scope])
-        con.commit()
-        log(f"[extract] scope {len(scope)} papers ({categories}, since {since}); deep {len(deep)}")
-        lock = run.lock
-        tot = defaultdict(int)
+        if "schema_version" not in {r[1] for r in con.execute("PRAGMA table_info(statements)")}:
+            raise RuntimeError("extract.sqlite has the pre-C (v1) schema; build it with --rebuild")
+        reg = store.read_only(paths.library() / "registry.sqlite")
+        cit_path = store.db_path("citations")
+        cit = store.read_only(cit_path) if cit_path.exists() else None
+        D = Documents()
+        rconn = store.read_only(run.path)          # per-thread reads of this run's file (rebuild writes a .new)
+        try:
+            # ---- scope + deep (question-blind)
+            if benchmark:
+                scope = [p for (p,) in reg.execute(
+                    "SELECT DISTINCT paper_id FROM members WHERE benchmark=? ORDER BY paper_id", (benchmark,))]
+            else:
+                likes = " OR ".join("categories LIKE ?" for _ in categories)
+                scope = [p for (p,) in reg.execute(
+                    "SELECT DISTINCT paper_id FROM records r JOIN papers p ON p.paper_id = r.paper_id "
+                    f"WHERE p.status='active' AND p.first_hi >= ? AND r.source='arxiv' AND ({likes}) "
+                    "ORDER BY paper_id", (since, *[f"{c}%" for c in categories]))]
+            recs: dict[str, tuple] = {}
+            scope_set = set(scope)
+            for p, t, ab in reg.execute("SELECT paper_id, title, abstract FROM records "
+                                        "ORDER BY paper_id, source = 'arxiv'"):
+                if p in scope_set:
+                    recs[p] = (t or "", ab or "")      # the arxiv row comes last and wins
+            cited_counts = dict(cit.execute(
+                "SELECT cited, count(DISTINCT citing) FROM cites WHERE cited NOT LIKE 'stub:%' "
+                "GROUP BY cited")) if cit is not None else {}
+            with_text = set(D.papers())
+            deep = set(sorted((p for p in scope if p in with_text),
+                              key=lambda p: (-cited_counts.get(p, 0), p))[:n_deep])
+            con.execute("DELETE FROM scope")
+            con.executemany("INSERT INTO scope VALUES (?,?)", [(p, int(p in deep)) for p in scope])
+            con.commit()
+            log(f"[extract] scope {len(scope):,} papers; deep {len(deep):,}")
 
-        def rows(stmts, prompt_sha, pass_name, item):
-            out = []
-            for s_ in stmts:
-                if s_.validate():
-                    tot["schema_rejected"] += 1
-                    continue
-                r = s_.row()
-                out.append((r["speaker"], r["date"], r["kind"], r["about"], r["role"], r["facet"], r["text"],
-                            r["quote"], r["target"], json.dumps(r["group"]), r["function"],
-                            json.dumps(r["meta"], ensure_ascii=False), S.MODEL, prompt_sha, pass_name, item))
-            return out
+            doc_keys = store.item_keys("documents", "docs")
+            delta_keys = store.item_keys("documents", "delta")
+            sv_keys = store.item_keys("documents", "sv")
+            vers: dict[str, list] = {}
+            for p_, v_ in D.con.execute("SELECT paper_id, version FROM docs"):
+                vers.setdefault(p_, []).append(v_)
 
-        def replace_item(pass_name, item, new_rows):
-            con.execute("DELETE FROM statements WHERE pass=? AND item=?", (pass_name, item))
-            con.executemany(INSERT, new_rows)
+            def base_latest(pid):
+                vs = vers.get(pid) or []
+                if not vs:
+                    return None, None
+                bv = 1 if 1 in vs else (0 if 0 in vs else max(vs))
+                lv = max(vs)
+                return f"{pid}@v{bv}", (f"{pid}@v{lv}" if lv != bv else None)
 
-        # ---- T1 / T2 self pass (+ deep call + result pass for T2)
-        doc_keys = store.item_keys("documents", "documents")
-        w_self = run.work("self", store.sha(run.digest, S.PROMPT_SHA, S.DEEP_SHA, S.MODEL))
+            lock = run.lock
+            tot: defaultdict = defaultdict(int)
 
-        def self_fp(aid):
-            p = papers.get(aid) or {}
-            return store.sha(p.get("v1_date"), p.get("title"), p.get("abstract"), aid in deep,
-                             doc_keys.get(aid) if aid in deep else None)
+            def replace(pass_name, item, rows):
+                con.execute("DELETE FROM statements WHERE pass=? AND item=?", (pass_name, item))
+                con.executemany(INSERT, rows)
 
-        todo = w_self.todo((a, self_fp(a)) for a in scope)
+            def stats_row(pid, pass_name, st):
+                con.execute("INSERT OR REPLACE INTO pass_stats VALUES (?,?,?)",
+                            (pid, pass_name, json.dumps(st, ensure_ascii=False, default=str)))
 
-        def drop_self(aid):
-            replace_item("self", aid, [])
-            con.execute("DELETE FROM tiers WHERE arxiv_id=?", (aid,))
+            counter = {"n": 0}
 
-        def do_self(aid):
-            p = papers.get(aid)
-            if not p or not p["v1_date"]:
-                with lock:
-                    replace_item("self", aid, [])
-                    w_self.ok(aid)
-                return
-            body = method = None
-            res_stmts, res_st = [], {}
-            if aid in deep:
-                d = docs.get(aid)
-                body, method = U.abstract_and_intro(d["units"]), U.method_and_experiments(d["units"])
-                res_stmts, res_st = R.run(aid, p["v1_date"], d["raw"], d["source"])
-            stmts, st = S.run(aid, p["v1_date"], p["title"], p["abstract"], body, method_text=method)
-            if st.get("parse_failed") or st.get("deep_parse_failed"):
-                with lock:      # the item has no valid output under its current key: same as a clean build
-                    drop_self(aid)
-                    w_self.fail(aid, "self pass: no parseable answer" if st.get("parse_failed")
-                                else "deep call: no parseable answer")
-                return
+            def commit_soon():
+                counter["n"] += 1
+                if counter["n"] % 200 == 0:
+                    con.commit()
+
+            # ---- t1: every scope paper
+            w_t1 = run.work("t1")
+            t1_fp = {}
+            for pid in scope:
+                bk, _ = base_latest(pid)
+                title, abstract = recs.get(pid, ("", ""))
+                t1_fp[pid] = store.sha(PR.T1_SHA, PS.MODEL, title,
+                                       doc_keys.get(bk) if bk else store.sha(abstract)[:12])
+            todo1 = set(w_t1.todo([(p, t1_fp[p]) for p in scope]))
+            log(f"[extract] t1: {len(todo1):,} of {len(scope):,}")
+
+            def one_t1(pid):
+                if pid not in todo1:
+                    return
+                try:
+                    inp = RD.t1_input(D, reg, pid)
+                    if inp is None:                       # no title/abstract/date anywhere: a valid empty item
+                        with lock:
+                            replace("t1", pid, [])
+                            w_t1.ok(pid)
+                            commit_soon()
+                        return
+                    stmts, names, st = PS.t1(inp)
+                    if stmts is None:
+                        w_t1.fail(pid, "t1: no parseable answer")
+                        return
+                    with lock:
+                        replace("t1", pid, _rows(stmts, run_id, tot))
+                        stats_row(pid, "t1", st)
+                        w_t1.ok(pid)
+                        commit_soon()
+                except Exception as e:
+                    w_t1.fail(pid, f"{type(e).__name__}: {e}")
+
+            store.parallel(one_t1, scope, workers, log=log, every=5000, label="extract:t1")
             with lock:
-                replace_item("self", aid, rows(stmts, S.PROMPT_SHA, "self", aid) +
-                             rows(res_stmts, "results-deterministic", "self", aid))
-                con.execute("INSERT OR REPLACE INTO tiers VALUES (?,?,?)",
-                            (aid, "T2" if aid in deep else "T1", json.dumps({**st, **res_st})))
-                w_self.ok(aid)
                 con.commit()
-                for k, v in {**st, **res_st}.items():
-                    tot["self_" + k] += v
+            w_t1.sweep(scope, lambda p: replace("t1", p, []))
 
-        store.parallel(do_self, todo, workers, log, 500, "extract self")
-        tot["self_removed"] = w_self.sweep(scope, drop_self)
+            # ---- t2 + results: deep papers with a full text
+            w_t2 = run.work("t2")
+            w_res = run.work("results")
+            t2_items = []
+            for pid in sorted(deep):
+                bk, lk = base_latest(pid)
+                t2_items.append((pid, bk, lk))
+            t2_fp = {pid: store.sha(PR.T2_SHA, PS.MODEL, sv_keys.get(pid), doc_keys.get(bk),
+                                    (doc_keys.get(lk), delta_keys.get(pid)) if lk else None)
+                     for pid, bk, lk in t2_items}
+            todo2 = set(w_t2.todo([(p, t2_fp[p]) for p, _, _ in t2_items]))
+            log(f"[extract] t2: {len(todo2):,} of {len(t2_items):,}")
 
-        # ---- R: other pass over citation sentences about scope papers
-        cit_keys = store.item_keys("citations", "citations")
-        pairs = select_pairs(cit, [f"paper:{a}" for a in scope])
-        groups: dict[str, list[dict]] = defaultdict(list)
-        for t, lst in pairs.items():
-            for sid, citing, date, ng in lst:
-                groups[f"{citing}|{t}"].append({"sentence_id": sid, "citing": citing, "cited": t, "date": date})
-        w_other = run.work("other", store.sha(run.digest, O.PROMPT_SHA, O.MODEL))
-        todo = set(w_other.todo((g, store.sha(cit_keys.get(g.split("|")[0]), [it["sentence_id"] for it in items]))
-                                for g, items in groups.items()))
-        by_citing: dict[str, list[list[dict]]] = defaultdict(list)
-        for g in sorted(todo):
-            grp_items = []
-            for it in groups[g]:
-                sent = cit.execute("SELECT sentence FROM sentences WHERE id=?", (it["sentence_id"],)).fetchone()[0]
-                ent = cit.execute("SELECT raw, title FROM entries WHERE citing=? AND cited=? LIMIT 1",
-                                  (it["citing"], it["cited"])).fetchone()
-                grp = [r[0] for r in cit.execute("SELECT cited FROM cites WHERE sentence_id=?", (it["sentence_id"],))]
-                grp_items.append({**it, "group_id": g, "sentence": sent, "title": ent[1] if ent else "",
-                                  "raw": ent[0] if ent else "", "group": grp})
-            by_citing[groups[g][0]["citing"]].append(grp_items)
-        # whole groups per batch (an item's rows are replaced as a unit, so a group never spans two calls)
-        batches = []
-        for c, glist in by_citing.items():
-            cur: list[dict] = []
-            for gi in glist:
-                if cur and len(cur) + len(gi) > O.BATCH:
-                    batches.append((c, cur))
-                    cur = []
-                cur = cur + gi
-            if cur:
-                batches.append((c, cur))
-        log(f"[extract] other pass: {sum(len(v) for v in groups.values())} pairs in {len(groups)} groups, "
-            f"{len(todo)} to do, {len(batches)} batches")
+            def _t1_names(pid):
+                names = []
+                for (meta,) in rconn.execute("SELECT meta FROM statements WHERE pass='t1' AND item=? "
+                                             "AND role='proposes'", (pid,)):
+                    try:
+                        m = json.loads(meta)
+                    except (TypeError, ValueError):
+                        continue
+                    if m.get("name"):
+                        names.append(m["name"])
+                return names
 
-        def do_other(b):
-            citing, items = b
-            gids = list(dict.fromkeys(it["group_id"] for it in items))
-            stmts, st = O.run_batch(citing, items[0]["date"], items)
-            if st.get("failed"):
-                with lock:
-                    for g in gids:
-                        replace_item("other", g, [])
-                    w_other.fail_many(gids, "other pass: no parseable answer")
-                return
-            by_g: dict[str, list] = defaultdict(list)
-            for stmt in stmts:
-                by_g[f"{citing}|{stmt.about}"].append(stmt)
+            def one_t2(triple):
+                pid = triple[0]
+                if pid not in todo2:
+                    return
+                try:
+                    full = RD.full_text(D, pid)
+                    if full is None:                      # deep-selected but the text vanished: valid empty
+                        with lock:
+                            replace("t2", pid, [])
+                            w_t2.ok(pid)
+                            commit_soon()
+                        return
+                    title = recs.get(pid, ("", ""))[0]
+                    stmts, own, st = PS.t2(pid, title, full, seed_own=_t1_names(pid))
+                    if stmts is None:
+                        w_t2.fail(pid, f"t2: chunk {st.get('failed_chunk')} gave no parseable answer")
+                        return
+                    st["own_methods"] = own
+                    with lock:
+                        replace("t2", pid, _rows(stmts, run_id, tot))
+                        stats_row(pid, "t2", st)
+                        w_t2.ok(pid)
+                        commit_soon()
+                except Exception as e:
+                    w_t2.fail(pid, f"{type(e).__name__}: {e}")
+
+            store.parallel(one_t2, [t for t in t2_items if t[0] in todo2], workers, log=log, every=2000,
+                           label="extract:t2")
             with lock:
-                for g in gids:
-                    replace_item("other", g, rows(by_g.get(g, []), O.PROMPT_SHA, "other", g))
-                w_other.ok_many(gids)
                 con.commit()
-                for k, v in st.items():
-                    tot["other_" + k] += v
+            w_t2.sweep([p for p, _, _ in t2_items], lambda p: replace("t2", p, []))
 
-        store.parallel(do_other, batches, workers, log, 200, "extract other")
-        tot["other_removed"] = w_other.sweep(groups, lambda g: replace_item("other", g, []))
+            res_fp = {pid: store.sha(PR.RESULTS_SHA, PS.MODEL, w_t2.key(pid), t2_fp[pid])
+                      for pid, _, _ in t2_items}
+            todo_r = set(w_res.todo([(p, res_fp[p]) for p, _, _ in t2_items]))
+            log(f"[extract] results: {len(todo_r):,} of {len(t2_items):,}")
 
-        counts = {"statements": con.execute("SELECT count(*) FROM statements").fetchone()[0],
-                  "self": con.execute("SELECT count(*) FROM statements WHERE kind='self'").fetchone()[0],
-                  "other": con.execute("SELECT count(*) FROM statements WHERE kind='other'").fetchone()[0],
-                  "results": con.execute("SELECT count(*) FROM statements WHERE facet='result' AND kind='self'"
-                                         ).fetchone()[0],
-                  "scope": len(scope), "deep": len(deep), **tot}
-        run.finish(counts)
+            def one_results(pid):
+                if pid not in todo_r:
+                    return
+                try:
+                    full = RD.full_text(D, pid)
+                    tbs = RD.tables_of(D, pid, full) if full else []
+                    if not tbs:
+                        with lock:
+                            replace("results", pid, [])
+                            w_res.ok(pid)
+                            commit_soon()
+                        return
+                    own = list(_t1_names(pid))
+                    r = rconn.execute("SELECT stats FROM pass_stats WHERE paper_id=? AND pass='t2'", (pid,)).fetchone()
+                    if r:
+                        try:
+                            own += json.loads(r[0]).get("own_methods") or []
+                        except (TypeError, ValueError):
+                            pass
+                    default_date = max((s["date"] for s in full["sentences"] if s.get("date")), default=None)
+                    stmts, st = PS.results(pid, tbs, own_methods=own, default_date=default_date)
+                    with lock:
+                        replace("results", pid, _rows(stmts, run_id, tot))
+                        stats_row(pid, "results", st)
+                        w_res.ok(pid)
+                        commit_soon()
+                except Exception as e:
+                    w_res.fail(pid, f"{type(e).__name__}: {e}")
+
+            store.parallel(one_results, [p for p, _, _ in t2_items if p in todo_r], workers, log=log, every=2000,
+                           label="extract:results")
+            with lock:
+                con.commit()
+            w_res.sweep([p for p, _, _ in t2_items], lambda p: replace("results", p, []))
+
+            # ---- other: sampled citation sentences, item = citing paper
+            w_other = run.work("other")
+            if cit is not None:
+                pairs = select_pairs(cit, scope, N_OTHER)
+                by_citing: dict[str, list] = defaultdict(list)
+                for cited_, lst in pairs.items():
+                    for sent_id, citing, date, version, key, self_cite in lst:
+                        by_citing[citing].append((sent_id, cited_, version, key, date, self_cite))
+                cit_keys = store.item_keys("citations", "citations")
+                other_items = sorted(by_citing)
+                other_fp = {c: store.sha(PR.OTHER_SHA, PS.MODEL, cit_keys.get(c),
+                                         sorted((s, k) for s, _, _, k, _, _ in by_citing[c]))
+                            for c in other_items}
+                todo_o = set(w_other.todo([(c, other_fp[c]) for c in other_items]))
+                n_pairs = sum(len(v) for v in by_citing.values())
+                log(f"[extract] other: {n_pairs:,} sampled pairs over {len(other_items):,} citing papers; "
+                    f"{len(todo_o):,} to do")
+
+                def one_other(citing):
+                    if citing not in todo_o:
+                        return
+                    try:
+                        per_sent: dict[int, dict] = {}
+                        for sent_id, cited_, version, key, date, self_cite in by_citing[citing]:
+                            it = per_sent.get(sent_id)
+                            if it is None:
+                                r = cit.execute("SELECT citing_key, sid, sentence, in_delta FROM sentences "
+                                                "WHERE id=?", (sent_id,)).fetchone()
+                                if r is None:
+                                    continue
+                                it = per_sent[sent_id] = {"s": len(per_sent) + 1, "sentence": r[2], "date": date,
+                                                          "citing_key": r[0], "sid": r[1], "in_delta": r[3],
+                                                          "cites": []}
+                            e = cit.execute("SELECT title, raw FROM entries WHERE citing=? AND version=? AND key=?",
+                                            (citing, version, key)).fetchone()
+                            it["cites"].append({"key": key, "cited": cited_, "self_cite": self_cite,
+                                                "title": (e[0] if e else "") or "", "raw": (e[1] if e else "") or ""})
+                        items = sorted(per_sent.values(), key=lambda x: x["s"])
+                        batches, cur, n = [], [], 0
+                        for it in items:                   # whole sentences per batch (an item's rows replace as one)
+                            if cur and n + len(it["cites"]) > BATCH_PAIRS:
+                                batches.append(cur)
+                                cur, n = [], 0
+                            cur.append(it)
+                            n += len(it["cites"])
+                        if cur:
+                            batches.append(cur)
+                        out, merged = [], defaultdict(int)
+                        for b in batches:
+                            stmts, st = PS.other_batch(citing, b)
+                            if stmts is None:
+                                w_other.fail(citing, "other: a batch gave no parseable answer")
+                                return
+                            out += stmts
+                            for k, v in st.items():
+                                merged[k] += v
+                        with lock:
+                            replace("other", citing, _rows(out, run_id, tot))
+                            stats_row(citing, "other", dict(merged))
+                            w_other.ok(citing)
+                            commit_soon()
+                    except Exception as e:
+                        w_other.fail(citing, f"{type(e).__name__}: {e}")
+
+                store.parallel(one_other, [c for c in other_items if c in todo_o], workers, log=log, every=2000,
+                               label="extract:other")
+                with lock:
+                    con.commit()
+                w_other.sweep(other_items, lambda c: replace("other", c, []))
+                tot["other_pairs_sampled"] = n_pairs
+
+            # ---- figures: deterministic, careful-tier papers (the docs table is the documents stage's — via D)
+            w_fig = run.work("figures")
+            fig_items = [(p, k) for k, p in D.con.execute(
+                "SELECT key, paper_id FROM docs WHERE careful_z IS NOT NULL")]
+            todo_f = set(w_fig.todo([(p, doc_keys.get(k, k)) for p, k in fig_items]))
+
+            def one_figures(pair):
+                pid, key = pair
+                if pid not in todo_f:
+                    return
+                try:
+                    d = D.get(key)
+                    rows = []
+                    for u in (d or {}).get("careful", {}).get("units", []) if d and d.get("careful") else []:
+                        if u.get("kind") != "figure":
+                            continue
+                        m = _FIG_NO.match(u.get("text") or "")
+                        rows.append((pid, u["uid"], int(m.group(1)) if m else None, u.get("text") or "",
+                                     u.get("page"), json.dumps(u.get("bbox"))))
+                    with lock:
+                        con.execute("DELETE FROM figure_units WHERE paper_id=?", (pid,))
+                        con.executemany("INSERT OR REPLACE INTO figure_units VALUES (?,?,?,?,?,?)", rows)
+                        w_fig.ok(pid)
+                        commit_soon()
+                except Exception as e:
+                    w_fig.fail(pid, f"{type(e).__name__}: {e}")
+
+            store.parallel(one_figures, [t for t in fig_items if t[0] in todo_f], 8, log=log, every=2000,
+                           label="extract:figures")
+            with lock:
+                con.commit()
+            w_fig.sweep([p for p, _ in fig_items],
+                        lambda p: con.execute("DELETE FROM figure_units WHERE paper_id=?", (p,)))
+
+            # ---- deterministic tail: full monthly cited counts
+            if cit is not None:
+                con.execute("DELETE FROM cite_counts")
+                cur = cit.execute("SELECT cited, substr(date, 1, 7) AS month, count(*) FROM cites "
+                                  "GROUP BY cited, month")
+                while True:
+                    chunk = cur.fetchmany(50000)
+                    if not chunk:
+                        break
+                    con.executemany("INSERT OR REPLACE INTO cite_counts VALUES (?,?,?)", chunk)
+                con.commit()
+                tot["cite_count_rows"] = con.execute("SELECT count(*) FROM cite_counts").fetchone()[0]
+
+            q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
+            counts = {"scope": len(scope), "deep": len(deep),
+                      "statements": q("SELECT count(*) FROM statements"),
+                      "by_pass": dict(con.execute("SELECT pass, count(*) FROM statements GROUP BY pass")),
+                      "by_facet": dict(con.execute("SELECT facet, count(*) FROM statements GROUP BY facet")),
+                      "by_epistemic": dict(con.execute("SELECT epistemic, count(*) FROM statements GROUP BY 1")),
+                      "figures": q("SELECT count(*) FROM figure_units"),
+                      "cited_papers_counted": q("SELECT count(DISTINCT cited) FROM cite_counts"),
+                      **tot}
+            run.finish(counts)
+        finally:
+            reg.close()
+            if cit is not None:
+                cit.close()
+            D.close()
+            rconn.close()
     return counts
-

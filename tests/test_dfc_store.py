@@ -61,12 +61,13 @@ def test_transitive_staleness_from_code(store):
 
 def test_p1_code_identity_is_the_import_closure(store):
     code = store.code_hashes(store.ENTRY["extract"])
-    for f in ("llm/client.py", "llm/jsonparse.py", "compile/skeleton/proposes.py", "extract/self_pass.py",
-              "documents/units.py"):
+    for f in ("llm/client.py", "llm/jsonparse.py", "compile/skeleton/proposes.py", "extract/passes.py",
+              "extract/prompts.py", "extract/reading.py", "documents/sciverse.py", "documents/tables.py"):
         assert f in code, f
     assert "llm/embedding.py" in store.code_hashes(store.ENTRY["index"])
     docs_closure = store.code_hashes(store.ENTRY["documents"])
-    for f in ("documents/tei.py", "documents/assemble.py", "documents/versions.py", "library/identity.py"):
+    for f in ("documents/tei.py", "documents/assemble.py", "documents/versions.py", "library/identity.py",
+              "documents/sciverse.py"):
         assert f in docs_closure, f
 
 

@@ -287,7 +287,7 @@ def doc(pid: str, text: str) -> dict:
 
 
 # ---------------------------------------------------------------- version determination + sentence dates
-def _bigrams(s: str) -> set:
+def bigrams(s: str) -> set:
     w = re.findall(r"[a-z0-9]+", s.lower())
     return set(zip(w, w[1:]))
 
@@ -297,7 +297,7 @@ def _found(sent_texts: list[str], bg: set) -> tuple[int, int]:
     the other text's bigram set (sciverse_versions.py's measured rule)."""
     hit = n = 0
     for t in sent_texts:
-        b = _bigrams(t)
+        b = bigrams(t)
         if len(b) < 6:
             continue
         n += 1
@@ -306,7 +306,7 @@ def _found(sent_texts: list[str], bg: set) -> tuple[int, int]:
 
 
 def _bg_of(fast: dict) -> set:
-    return _bigrams(" ".join(s["text"] for s in fast["sentences"]))
+    return bigrams(" ".join(s["text"] for s in fast["sentences"]))
 
 
 def held_version(sv_sentences: list[str], v1_fast: dict | None, latest_fast: dict | None) -> tuple[str, dict]:
@@ -316,7 +316,7 @@ def held_version(sv_sentences: list[str], v1_fast: dict | None, latest_fast: dic
         return "single", {}
     only_latest = VV.delta(v1_fast, latest_fast)["sentences"]
     only_v1 = VV.delta(latest_fast, v1_fast)["sentences"]
-    bg = _bigrams(" ".join(sv_sentences))
+    bg = bigrams(" ".join(sv_sentences))
     h1, n1 = _found([s["text"] for s in only_v1], bg)
     hl, nl = _found([s["text"] for s in only_latest], bg)
     d = {"v1_only": [h1, n1], "latest_only": [hl, nl]}
@@ -353,7 +353,7 @@ def date_sentences(sentences: list[dict], v1_fast: dict | None, v1_date: str | N
     out = []
     for s in sentences:
         t = ids.norm_title(s["text"])
-        b = _bigrams(s["text"])
+        b = bigrams(s["text"])
         in_v1 = bool(bg) and len(b) >= 6 and len(b & bg) / len(b) >= 0.8
         if v1n:
             sv1 = best(t, v1n)

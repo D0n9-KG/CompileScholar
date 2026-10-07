@@ -528,3 +528,111 @@ def test_sv_pass_reopens_on_new_fetch_and_sweeps(env, tmp_path):
     D = Documents()
     assert D.sv(P1) is None
     D.close()
+
+
+# ---------------------------------------------------------------- extract (C④)
+
+SV_MD_EXT = """# 1 Introduction
+
+We propose FastGF, an efficient graph transformer. It trains quickly.
+
+Table 1: main results for the benchmark.
+
+<table><tr><td>Method</td><td>Score</td></tr><tr><td>FastGF</td><td>91.2</td></tr><tr><td>Base</td><td>88.0</td></tr></table>
+
+We also prove a convergence bound for the attention layer.
+
+# References
+
+[1] A first reference here. 2020.
+[2] A second reference here. 2021.
+[3] A third reference sits here. 2019.
+"""
+
+OTHER_RE = __import__("re").compile(r"^\[(\d+)\]|cites \"([^\"]+)\"")
+
+
+def _stub_llm(log):
+    """Prompt-routed LLM stub: answers each pass's JSON contract generically; the other pass answers exactly the
+    (sentence, key) pairs the prompt lists."""
+    def chat(prompt, **kw):
+        log.append(prompt[:40])
+        if "numbered abstract sentences" in prompt:
+            return json.dumps({"items": [{"n": 1, "facet": "contribution", "role": "proposes",
+                                          "epistemic": "stated", "condition": "",
+                                          "text": "proposes a graph attention model"}],
+                               "names": [{"name": "GraphFormer", "aliases": [], "artefact": "method",
+                                          "relation": "proposes", "n": 1},
+                                         {"name": "FastGF", "aliases": [], "artefact": "method",
+                                          "relation": "proposes", "n": 1}]})
+        if "chunk of a research paper" in prompt:
+            return json.dumps({"items": [{"n": 1, "facet": "method", "role": "describes", "epistemic": "stated",
+                                          "condition": "", "text": "uses an efficient attention mechanism",
+                                          "mentions": []}],
+                               "config": [], "own_methods": ["FastGF"]})
+        if "repaired into a grid" in prompt:
+            return json.dumps({"usable": True, "object_axis": "row", "object_index": 0, "header_rows": [0],
+                               "conditions": [], "skip_rows": [],
+                               "measures": [{"index": 1, "metric": "score", "unit": "", "direction": "higher"}]})
+        if "citation sentences from ONE" in prompt:
+            pairs, s = [], None
+            for line in prompt.splitlines():
+                m = OTHER_RE.match(line.strip())
+                if m and m.group(1):
+                    s = int(m.group(1))
+                elif m and m.group(2) and s is not None:
+                    pairs.append({"s": s, "key": m.group(2), "function": "basis", "role": "uses", "about": None,
+                                  "facet": "contribution", "epistemic": "stated", "category": None,
+                                  "limitation": None, "name": None, "outcome": None, "builds_on": None,
+                                  "builds_on_relation": None})
+            return json.dumps({"pairs": pairs})
+        raise AssertionError(f"unrouted prompt: {prompt[:80]}")
+    return chat
+
+
+def test_extract_stage_endtoend(env, tmp_path, monkeypatch):
+    from compilescholar.citations import build as CB
+    from compilescholar.documents import build as DB
+    from compilescholar.extract import build as EB
+    from compilescholar.extract import passes as PS
+    # scope: P0 (the cited target), P1 and P2 as benchmark members with arXiv records
+    con = _reg()
+    for i, (pid, t) in enumerate([(P0, "Neural message passing for quantum chemistry"),
+                                  (P1, "GraphFormer: attention for graphs"), (P2, "Faster graph transformers")]):
+        con.execute("INSERT OR REPLACE INTO members VALUES (?,?,?)", ("testbench", f"k{i}", pid))
+        if pid != P0:
+            con.execute("INSERT OR REPLACE INTO records(paper_id, source, version, date_hi, title, title_key, "
+                        "abstract, categories, venue) VALUES (?,?,?,?,?,?,?,?,?)",
+                        (pid, "arxiv", 1, None, t, ids.title_key(t), None, "cs.LG", None))
+    con.commit()
+    con.close()
+    _texts(tmp_path, P2, SV_MD_EXT)                       # the sv tier for P2 (table + prose)
+    DB.build(workers=2, log=lambda *a: None)
+    CB.build(workers=2, log=lambda *a: None)              # documents grew (sv): citations re-validates, no-op
+    calls = []
+    monkeypatch.setattr(PS, "call_local", _stub_llm(calls))
+    counts = EB.build(benchmark="testbench", n_deep=5, workers=2, log=lambda *a: None)
+    assert counts["scope"] == 3 and counts["deep"] == 2   # P0 has no full text -> not deep
+    bp = counts["by_pass"]
+    assert bp.get("t1", 0) >= 4                           # P1: item + GraphFormer; P2: item + FastGF
+    assert bp.get("t2", 0) >= 2 and bp.get("results") == 2
+    assert bp.get("other") == 4                             # P1, P2, P4 and JD all cite P0
+    con = env.connect("extract", readonly=True)
+    row = con.execute("SELECT date, epistemic, loc, schema_version, run_id, model, prompt_sha, meta FROM statements "
+                      "WHERE pass='other' AND speaker=?", (P2,)).fetchone()
+    assert row[0] == "2021-01-12"                         # the v1 citing sentence keeps its v1 date
+    assert row[3] == 2 and row[4] and row[5] and row[6]
+    assert json.loads(row[7])["self_cite"] == 1           # Gilmer cites Gilmer (C② -> C④ chain)
+    res = con.execute("SELECT text, epistemic, quote, meta FROM statements WHERE pass='results' ORDER BY text"
+                      ).fetchall()
+    assert any("FastGF" in r[0] and "91.2" in r[0] and r[1] == "demonstrated" for r in res)
+    assert any("Base" in r[0] and "88.0" in r[0] and r[1] == "cited" for r in res)
+    assert all("91.2" in r[2] or "88.0" in r[2] for r in res)     # quotes carry the cell values verbatim
+    cc = con.execute("SELECT month, n FROM cite_counts WHERE cited=?", (P0,)).fetchall()
+    assert cc and sum(n for _, n in cc) >= 2
+    n_first = con.execute("SELECT count(*) FROM statements").fetchone()[0]
+    con.close()
+    # rebuild with nothing changed: no work, no new LLM calls, no new rows
+    calls.clear()
+    counts2 = EB.build(benchmark="testbench", n_deep=5, workers=2, log=lambda *a: None)
+    assert calls == [] and counts2["statements"] == n_first

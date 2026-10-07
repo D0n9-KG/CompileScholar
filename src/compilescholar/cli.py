@@ -189,7 +189,7 @@ def cmd_build(a):
             from .extract import build as B
             bc = cfg.build
             cats = tuple(a.categories.split(",")) if a.categories else tuple(bc.categories)
-            print(json.dumps(B.build(categories=cats, since=a.since or bc.since,
+            print(json.dumps(B.build(benchmark=a.benchmark, categories=cats, since=a.since or bc.since,
                                      n_deep=a.n_deep if a.n_deep is not None else bc.n_deep,
                                      workers=a.workers or bc.workers, rebuild=rb)))
         elif s == "index":
@@ -356,6 +356,7 @@ def main(argv=None):
     p.add_argument("--categories", default=None, help="extract: primary categories in scope (default build.categories)")
     p.add_argument("--since", default=None, help="extract: first v1 date in scope (default build.since)")
     p.add_argument("--n-deep", type=int, default=None, help="extract: number of T2 papers (default build.n_deep)")
+    p.add_argument("--benchmark", default=None, help="extract: scope = this benchmark's members (overrides categories/since)")
     p.add_argument("--workers", type=int, default=None, help="default build.workers")
     p.add_argument("--dense", default=None, help="index: which indexes get dense vectors (default build.dense)")
     p.add_argument("--rebuild", action="store_true",
