@@ -161,10 +161,32 @@ def _author_key(surname: str, name: str) -> str | None:
     return f"{sur}|{ini}"
 
 
+SNAPSHOT_SEED = 20261007
+MIN_FAMILY = 2
+
+
+def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list[str]:
+    """The §8 snapshot grid: monthly over the last 3 years of the range, quarterly before that, plus explicit
+    extra dates (benchmark cut-offs). Capped at `years` back from the latest date (the design's ~80 snapshots:
+    36 monthly + ~48 quarterly); queries before the grid clamp to the earliest snapshot and say so."""
+    import datetime as dt
+    hi = dt.date.fromisoformat(latest[:10])
+    lo = max(dt.date.fromisoformat(earliest[:10]), hi - dt.timedelta(days=years * 365))
+    monthly_from = hi - dt.timedelta(days=3 * 365)
+    out = set()
+    d = dt.date(lo.year, lo.month, 1)
+    while d <= hi:
+        if d >= monthly_from or d.month in (1, 4, 7, 10):
+            out.add(d.isoformat())
+        d = dt.date(d.year + (d.month == 12), (d.month % 12) + 1, 1)
+    out.update(x[:10] for x in extra)
+    return sorted(out)
+
+
 def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None, ext=None, reg=None,
-          chat=None) -> dict:
+          chat=None, snapshot_extra=()) -> dict:
     chat = chat or call_local
-    params = {"v": 1}
+    params = {"v": 1, "snapshot_extra": list(snapshot_extra)}
     with store.Run("cognition", params, rebuild=rebuild) as run:
         con = run.con
         con.executescript(DDL)
@@ -558,6 +580,90 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 con.commit()
                 w.ok("all")
 
+            # ---- families: time-sliced Leiden snapshots (§8: the only grid-snapshot object; fixed seed, weighted
+            #      modularity — its configuration null model is the degree-based hub de-weighting)
+            import igraph as ig
+            import leidenalg
+            w = run.work("families")
+            lo_row = reg.execute("SELECT min(first_hi) FROM papers WHERE status='active' "
+                                 "AND first_hi IS NOT NULL").fetchone()
+            hi_cands = [x for x in (reg.execute("SELECT max(first_hi) FROM papers WHERE status='active'").fetchone()[0],
+                                    con.execute("SELECT max(day) FROM cocite").fetchone()[0],
+                                    con.execute("SELECT max(valid_from) FROM lineage_edge").fetchone()[0],
+                                    ext.execute("SELECT max(date) FROM statements").fetchone()[0]) if x]
+            if lo_row[0] and hi_cands:
+                data_hi = max(hi_cands)
+                snaps = snapshot_grid(lo_row[0], data_hi, extra=snapshot_extra)
+                fam_fp = store.sha(cit_fp, ext_fp, SNAPSHOT_SEED, ig.__version__, leidenalg.version)
+                todo_f = set(w.todo([(s, store.sha(fam_fp, s)) for s in snaps]))
+                if todo_f:
+                    log(f"[cognition] families: {len(todo_f):,} of {len(snaps):,} snapshots to cluster")
+                first_hi = dict(reg.execute("SELECT paper_id, first_hi FROM papers "
+                                            "WHERE status='active' AND first_hi IS NOT NULL"))
+                coc = sorted(con.execute("SELECT a, b, day, n FROM cocite WHERE day IS NOT NULL"),
+                             key=lambda r: r[2])
+                lin = sorted(con.execute("SELECT child, parent, valid_from FROM lineage_edge"), key=lambda r: r[2])
+                canon_map = dict(con.execute("SELECT phrase, canonical FROM category_canon"))
+                umbrella = {p for p, u in con.execute("SELECT phrase, umbrella FROM category_canon") if u}
+                cat_first: dict[tuple, str] = {}
+                for about, phr, date in ext.execute(
+                        "SELECT about, json_extract(meta, '$.category'), date FROM statements "
+                        "WHERE kind='other' AND date IS NOT NULL "
+                        "AND json_extract(meta, '$.category') IS NOT NULL"):
+                    raw = (phr or "").strip()
+                    c = canon_map.get(raw, raw.lower())
+                    if c and raw not in umbrella:
+                        k = (c, about)
+                        if k not in cat_first or date < cat_first[k]:
+                            cat_first[k] = date
+                by_cat: dict[str, dict] = defaultdict(dict)
+                for (c, p_), d_ in cat_first.items():
+                    by_cat[c][p_] = d_
+                cat_edges = []
+                for c, papers_ in by_cat.items():
+                    if len(papers_) > 50:                  # umbrella-scale categories carry no family signal
+                        continue
+                    ps = sorted(papers_)
+                    for i, a_ in enumerate(ps):
+                        for b_ in ps[i + 1:]:
+                            cat_edges.append((a_, b_, max(papers_[a_], papers_[b_])))
+                cat_edges.sort(key=lambda r: r[2])
+                weights: Counter = Counter()
+                ci = li = ki = 0
+                for snap in snaps:                         # cumulative: every snapshot advances the pointers
+                    while ci < len(coc) and coc[ci][2] <= snap:
+                        weights[(coc[ci][0], coc[ci][1])] += coc[ci][3]
+                        ci += 1
+                    while li < len(lin) and lin[li][2] <= snap:
+                        weights[tuple(sorted(lin[li][:2]))] += 2      # a direct lineage claim weighs 2 co-cites
+                        li += 1
+                    while ki < len(cat_edges) and cat_edges[ki][2] <= snap:
+                        weights[tuple(sorted(cat_edges[ki][:2]))] += 1
+                        ki += 1
+                    if snap not in todo_f:
+                        continue
+                    edges = [(a_, b_) for (a_, b_), wt in weights.items()
+                             if wt > 0 and first_hi.get(a_, "9999") <= snap and first_hi.get(b_, "9999") <= snap]
+                    con.execute("DELETE FROM family_snapshot WHERE snapshot=?", (snap,))
+                    if edges:
+                        nodes = sorted({x for e in edges for x in e})
+                        idx = {p_: i for i, p_ in enumerate(nodes)}
+                        g = ig.Graph(n=len(nodes), edges=[(idx[a_], idx[b_]) for a_, b_ in edges], directed=False)
+                        part = leidenalg.find_partition(g, leidenalg.RBConfigurationVertexPartition,
+                                                        weights=[weights[e] for e in edges],
+                                                        seed=SNAPSHOT_SEED, n_iterations=3)
+                        rows = []
+                        comms = sorted(part, key=lambda c: (-len(c), min(c)))
+                        for k, comm in enumerate(comms):
+                            members = sorted(nodes[i] for i in comm)
+                            if len(members) < MIN_FAMILY:
+                                continue
+                            rows.append((snap, f"{snap}#f{k}", None, json.dumps(members), None))
+                        con.executemany("INSERT OR REPLACE INTO family_snapshot VALUES (?,?,?,?,?)", rows)
+                    con.commit()
+                    w.ok(snap)
+                w.sweep(snaps, lambda s: con.execute("DELETE FROM family_snapshot WHERE snapshot=?", (s,)))
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
@@ -571,7 +677,9 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "lineage_edge": q("SELECT count(*) FROM lineage_edge"),
                       "lineage_hyper": q("SELECT count(*) FROM lineage_hyper"),
                       "category_canon": q("SELECT count(*) FROM category_canon"),
-                      "category_daily": q("SELECT count(*) FROM category_daily")}
+                      "category_daily": q("SELECT count(*) FROM category_daily"),
+                      "family_snapshots": q("SELECT count(DISTINCT snapshot) FROM family_snapshot"),
+                      "families": q("SELECT count(*) FROM family_snapshot")}
             run.finish(counts)
         finally:
             for c in mine:

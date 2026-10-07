@@ -143,7 +143,14 @@ def test_cognition_build_materialises(env):
     assert counts["identities"] == {"ok": 2, "adjudicated": 1}
     assert counts["lineage_edge"] == 3 and counts["lineage_hyper"] == 0
     assert counts["category_canon"] == 1 and counts["category_daily"] == 1
+    # families: the lineage edges (valid_from 2022-01-01+) form one family {PB, PD}; the cocite pair
+    # (PB, stub:xray) never does — stubs are boundary nodes, not family members; PA stays isolated
+    assert counts["family_snapshots"] == 6 and counts["families"] == 6     # 2022-01 .. 2022-06, one family each
     con = env.connect("cognition", readonly=True)
+    fams = con.execute("SELECT snapshot, members FROM family_snapshot ORDER BY snapshot").fetchall()
+    assert min(s for s, _ in fams) >= "2022-01-01"
+    for snap, members in fams:
+        assert sorted(json.loads(members)) == sorted([PB, PD])
     a, b, day, n = con.execute("SELECT * FROM cocite").fetchone()
     assert {a, b} == {PB, "stub:xray"} and day == "2019-06-01" and n == 1     # ordered pair, one co-citation
     rec19 = dict(con.execute("SELECT cited, n FROM reception_daily WHERE day='2019-06-01'"))
