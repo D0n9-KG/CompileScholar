@@ -27,16 +27,18 @@ Rules: choose a candidate only when the contexts (titles, abstracts, years, who 
 introducer of the named method; when two papers genuinely use the same name for different methods and the
 contexts do not separate them, answer 0. Do not guess."""
 
-CATEGORY_CANON = """Normalize research-topic phrases extracted from citation sentences into canonical category
-names. Phrases that mean the same topic must map to the same canonical name; an UMBRELLA phrase (a broad area
-that contains other listed phrases as subtopics, like "machine learning" or "NLP") gets "umbrella": true.
+CATEGORY_CANON = """Normalize ONE research-topic phrase (extracted from a citation sentence) into its canonical
+category name. An UMBRELLA phrase (a broad area containing other topics as subtopics, like "machine learning" or
+"NLP") gets "umbrella": true.
 
-Phrases (numbered):
-{phrases}
+Existing canonical names — REUSE one of these when it already fits the phrase:
+{existing}
+
+Phrase: "{phrase}"
 
 Answer with JSON only:
-{{"canon": [{{"i": <number>, "canonical": "<canonical phrase, lowercase, <= 6 words>", "umbrella": true|false}}]}}
-Rules: keep the most specific standard name of the topic; do not invent topics not present in the phrase;
+{{"canonical": "<canonical phrase, lowercase, <= 6 words>", "umbrella": true|false}}
+Rules: keep the most specific standard name of the topic; do not invent topics the phrase does not contain;
 English only."""
 
 

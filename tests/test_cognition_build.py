@@ -97,7 +97,7 @@ def env(tmp_path, monkeypatch):
                      json.dumps({"unit_id": "u", "sent_id": f"s{i}"}), json.dumps(meta), "t", speaker))
 
     _stmt(1, PB, "2020-06-01", "other", PA, "compares", "result", "B beats A on graphs",
-          {"outcome": "citing_better"})
+          {"outcome": "citing_better", "category": "Graph Attention Models"})
     _stmt(2, PA, "2019-06-01", "self", PA, "proposes", "contribution", "proposes M", {})
     _stmt(3, PA, "2019-06-01", "self", PA, "proposes", "contribution", "proposes FastGF",
           {"name": "FastGF", "aliases": ["BiAttn"]})
@@ -123,8 +123,13 @@ def env(tmp_path, monkeypatch):
 
 def _chat(prompt, **kw):
     import json as _json
-    assert "BiAttn" in prompt or "biattn" in prompt          # the only ambiguous name in the fixture
-    return _json.dumps({"paper": 1, "why": "proposal evidence"})   # most_common: PB(3) first
+    if "OWNED" in prompt:                                    # method-identity adjudication
+        assert "BiAttn" in prompt                            # the only ambiguous name in the fixture
+        return _json.dumps({"paper": 1, "why": "proposal evidence"})   # most_common: PB(3) first
+    if "canonical" in prompt:                                # category canonicalisation
+        assert "Graph Attention Models" in prompt
+        return _json.dumps({"canonical": "graph attention models", "umbrella": False})
+    raise AssertionError(f"unrouted prompt: {prompt[:80]}")
 
 
 def test_cognition_build_materialises(env):
@@ -137,6 +142,7 @@ def test_cognition_build_materialises(env):
     assert counts["mentions_ambiguous"] == 0 and counts["mentions_adjudicated"] == 1
     assert counts["identities"] == {"ok": 2, "adjudicated": 1}
     assert counts["lineage_edge"] == 3 and counts["lineage_hyper"] == 0
+    assert counts["category_canon"] == 1 and counts["category_daily"] == 1
     con = env.connect("cognition", readonly=True)
     a, b, day, n = con.execute("SELECT * FROM cocite").fetchone()
     assert {a, b} == {PB, "stub:xray"} and day == "2019-06-01" and n == 1     # ordered pair, one co-citation
@@ -159,6 +165,9 @@ def test_cognition_build_materialises(env):
     assert not any(sid == f"{PA}@v1#s4" for (_, sid, *_ ) in
                    con.execute("SELECT name, sid FROM mention_link"))           # word-boundary discipline
     # lineage: the time-inconsistent edge is dropped, the valid ones carry §2.4 effective dates
+    assert con.execute("SELECT canonical, umbrella FROM category_canon WHERE phrase='Graph Attention Models'"
+                       ).fetchone() == ("graph attention models", 0)
+    assert con.execute("SELECT * FROM category_daily").fetchall() == [("graph attention models", "2020-06-01", 1)]
     edges = sorted(con.execute("SELECT child, parent, relation, kind, date, valid_from FROM lineage_edge"))
     assert edges == [(PD, PB, "extends", "self", "2022-01-01", "2022-01-01"),          # id6 self claim
                      (PD, PB, "extends", "self", "2022-02-01", "2022-02-01"),          # id9 via adjudicated identity

@@ -495,6 +495,69 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 w.ok("all")
                 log(f"[cognition] lineage: {len(edges):,} edges, {len(hyper):,} hyper rows, dropped {dropped}")
 
+            # ---- category canon: normalise the other pass's category phrases (LLM, item = the phrase — stable
+            #      under corpus growth; the prompt offers the current canonical names for reuse)
+            w = run.work("categories")
+            phrases = sorted({c.strip() for (c,) in ext.execute(
+                "SELECT DISTINCT json_extract(meta, '$.category') FROM statements "
+                "WHERE kind='other' AND json_extract(meta, '$.category') IS NOT NULL")
+                if c and len(c.strip()) >= 3})
+            existing = [r[0] for r in con.execute("SELECT canonical FROM category_canon "
+                                                  "GROUP BY canonical ORDER BY count(*) DESC LIMIT 40")]
+            todo_c = set(w.todo([(p, store.sha(PR.CATEGORY_CANON_SHA, PR.MODEL)) for p in phrases]))
+            if todo_c:
+                log(f"[cognition] categories: {len(todo_c):,} of {len(phrases):,} phrases to canonicalise")
+
+            def one_category(phrase):
+                if phrase not in todo_c:
+                    return
+                try:
+                    raw = chat(PR.CATEGORY_CANON.format(
+                        existing="\n".join(f"- {x}" for x in existing) or "(none yet)", phrase=phrase[:200]),
+                        model=PR.MODEL, max_tokens=120, temperature=0.0, enable_thinking=False,
+                        item=f"category:{phrase[:60]}")
+                    obj = parse_json_response(raw or "")
+                    canon = (obj or {}).get("canonical") if isinstance(obj, dict) else None
+                    if not isinstance(canon, str) or not canon.strip():
+                        w.fail(phrase, "category: no parseable answer")
+                        return
+                    with run.lock:
+                        con.execute("INSERT OR REPLACE INTO category_canon VALUES (?,?,?,?)",
+                                    (phrase, canon.strip().lower()[:120],
+                                     int(bool((obj or {}).get("umbrella"))), PR.MODEL))
+                        ccounter["n"] += 1
+                        if ccounter["n"] % 200 == 0:
+                            con.commit()
+                        w.ok(phrase)
+                except Exception as e:
+                    w.fail(phrase, f"{type(e).__name__}: {e}")
+
+            ccounter = {"n": 0}
+            store.parallel(one_category, [p for p in phrases if p in todo_c], workers or 8, log=log, every=2000,
+                           label="cognition:categories")
+            with run.lock:
+                con.commit()
+            w.sweep(phrases, lambda p: con.execute("DELETE FROM category_canon WHERE phrase=?", (p,)))
+
+            # ---- category_daily: statement counts per canonical category per day (deterministic; phrases with
+            #      no adjudicated canonical yet count under their own lowercased surface)
+            w = run.work("category_daily")
+            canon_fp = store.sha(list(con.execute("SELECT phrase, canonical FROM category_canon ORDER BY phrase")))
+            if w.todo([("all", store.sha(ext_fp, canon_fp))]):
+                canon_map = dict(con.execute("SELECT phrase, canonical FROM category_canon"))
+                agg: Counter = Counter()
+                for phr, day, n in ext.execute(
+                        "SELECT json_extract(meta, '$.category'), date, count(*) FROM statements "
+                        "WHERE kind='other' AND date IS NOT NULL AND json_extract(meta, '$.category') IS NOT NULL "
+                        "GROUP BY 1, 2"):
+                    phr = (phr or "").strip()
+                    agg[(canon_map.get(phr, phr.lower()), day)] += n
+                con.execute("DELETE FROM category_daily")
+                con.executemany("INSERT OR REPLACE INTO category_daily VALUES (?,?,?)",
+                                [(c, d, n) for (c, d), n in sorted(agg.items()) if c])
+                con.commit()
+                w.ok("all")
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
@@ -506,7 +569,9 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "names": len(vocab),
                       "identities": dict(con.execute("SELECT status, count(*) FROM method_identity GROUP BY status")),
                       "lineage_edge": q("SELECT count(*) FROM lineage_edge"),
-                      "lineage_hyper": q("SELECT count(*) FROM lineage_hyper")}
+                      "lineage_hyper": q("SELECT count(*) FROM lineage_hyper"),
+                      "category_canon": q("SELECT count(*) FROM category_canon"),
+                      "category_daily": q("SELECT count(*) FROM category_daily")}
             run.finish(counts)
         finally:
             for c in mine:
