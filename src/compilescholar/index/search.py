@@ -194,6 +194,24 @@ class Index:
             self._vec[name] = VecStore(name, self._label(), dir=d) if (d / "meta.json").exists() else None
         return self._vec[name]
 
+    def warm(self, names=("papers", "passages", "statements"), vecs=("papers", "statements")) -> dict:
+        """Open the tantivy indexes and the vector memmaps without preloading anything else (§9.2: an MCP
+        session process starts light). Returns what opened; a missing index is reported, not raised."""
+        opened = {"indexes": [], "vectors": [], "missing": []}
+        for n in names:
+            try:
+                self._open(n)
+                opened["indexes"].append(n)
+            except RuntimeError:
+                opened["missing"].append(n)
+        for n in vecs:
+            try:
+                if self._vecstore(n) is not None:
+                    opened["vectors"].append(n)
+            except RuntimeError:
+                opened["missing"].append(f"vectors/{n}")
+        return opened
+
     def close(self) -> None:
         """Release the memmap handles. Windows keeps a mapped file locked, and an index rebuild replaces the
         vector files atomically — a reader that stays open across a build makes the export fail, so tools

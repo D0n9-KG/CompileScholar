@@ -195,19 +195,24 @@ class SciverseClient:
         return request_json(method, path, payload=payload, query=query, timeout_seconds=timeout_seconds,
                             token=self.token, base_url=self.base_url)
 
-    def semantic_search(self, query: str, *, limit: int = 10) -> list[SourceCandidate]:
+    def semantic_search(self, query: str, *, limit: int = 10, year_lte: int | None = None) -> list[SourceCandidate]:
         """Semantic full-text search, one candidate per document (consecutive chunks of one paper collapse to the
-        first hit). The cutoff is pushed to the server as publication_published_year <= cutoff_year - 1 (year
-        granularity only, so the cutoff year itself is excluded). Never raises: errors become a failed candidate."""
+        first hit). The cutoff is pushed to the server as publication_published_year <= year_lte. Default: the
+        env cutoff's year minus one (year granularity cannot decide same-year visibility, so the cutoff year is
+        excluded). A caller that re-checks every hit's exact date itself (the D④ search_external tool) may pass
+        year_lte = the cutoff year. Never raises: errors become a failed candidate."""
         q = (query or "").strip()
         if not q:
             return []
         if not self.token:
             return [_blocked("sciverse-semantic", "semantic", "SCIVERSE_API_TOKEN missing")]
         payload: dict[str, Any] = {"query": q, "page_size": limit}
-        cut = _cutoff.raw_cutoff()
-        if cut[:4].isdigit():
-            payload["filters"] = {"publication_published_year": {"lte": int(cut[:4]) - 1}}
+        if year_lte is None:
+            cut = _cutoff.raw_cutoff()
+            if cut[:4].isdigit():
+                year_lte = int(cut[:4]) - 1
+        if year_lte is not None:
+            payload["filters"] = {"publication_published_year": {"lte": int(year_lte)}}
         try:
             response = self._request("POST", "/agentic-search", payload=payload, query=None,
                                      timeout_seconds=self.timeout_seconds)
