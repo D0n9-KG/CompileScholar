@@ -425,10 +425,15 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 w_other.sweep(other_items, lambda c: replace("other", c, []))
                 tot["other_pairs_sampled"] = n_pairs
 
-            # ---- figures: deterministic, careful-tier papers (the docs table is the documents stage's — via D)
+            # ---- figures: deterministic, careful-tier papers (the docs table is the documents stage's — via D);
+            # one item per paper: the highest carefully-parsed version
             w_fig = run.work("figures")
-            fig_items = [(p, k) for k, p in D.con.execute(
-                "SELECT key, paper_id FROM docs WHERE careful_z IS NOT NULL")]
+            fig_docs: dict[str, tuple] = {}
+            for k, p in D.con.execute("SELECT key, paper_id FROM docs WHERE careful_z IS NOT NULL"):
+                v = int(k.rsplit("@v", 1)[1])
+                if p not in fig_docs or v > fig_docs[p][0]:
+                    fig_docs[p] = (v, k)
+            fig_items = [(p, k) for p, (_, k) in sorted(fig_docs.items())]
             todo_f = set(w_fig.todo([(p, doc_keys.get(k, k)) for p, k in fig_items]))
 
             def one_figures(pair):
@@ -438,7 +443,7 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 try:
                     d = D.get(key)
                     rows = []
-                    for u in (d or {}).get("careful", {}).get("units", []) if d and d.get("careful") else []:
+                    for u in ((d.get("careful") or {}).get("units") or []) if d else []:
                         if u.get("kind") != "figure":
                             continue
                         m = _FIG_NO.match(u.get("text") or "")
