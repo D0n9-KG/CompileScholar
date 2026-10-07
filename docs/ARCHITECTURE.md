@@ -12,11 +12,16 @@ DESIGN-UPGRADE-1005, DESIGN-LITERATURE-LAYER-1005 and the research reports behin
 **State (2026-10-06).** Phase A (foundations) is done: the stage contract, the one LLM client, identifiers and time,
 configuration and paths, a single package and a clean workspace. Phase B (the base) is built: the library with
 DOI-first identity and a merge queue judged by two models, acquisition with identity checks, the two document tiers
-(GROBID + PDF links for every paper, MinerU for the deep subset) and version awareness. Phase C has started: the
-derived `documents` stage now builds from the registry (C-1, 2026-10-06) — keyed on `paper_id@vN`, every row dated
-by its text version, version deltas stored; the old `papers` stage is retired (the registry replaces it). Citations,
-extract and index still key on arXiv ids and are being rebuilt onto the same contract (C②–C⑤). The data flow below
-marks what each stage is today and what it becomes.
+(GROBID + PDF links for every paper, MinerU for the deep subset) and version awareness. Phase C is underway: the
+derived `documents` stage builds from the registry (C-1, 2026-10-06) — keyed on `paper_id@vN`, every row dated
+by its text version, version deltas stored; the old `papers` stage is retired (the registry replaces it).
+`citations` is rebuilt (C②): tei citation pairs -> paper_id through the four-stage cascade, self-citation flags,
+v1/delta dates; stage 2 (external resolution) runs as the `library resolve-stubs` batch — Crossref
+query.bibliographic / OpenAlex create metadata-only registry papers and remember raw-text -> paper_id mappings in
+`ref_resolutions` (smoke: cite-level resolution 48.8% -> 88.5%, CS and non-CS alike). The Sciverse content layer
+(②′) caches Sciverse's pre-parsed full texts (`sciverse fetch`) and dates their sentences per v2.5 in the
+documents stage's sv pass. Extract and index still key on arXiv ids and are being rebuilt onto the same contract
+(C③–C⑤). The data flow below marks what each stage is today and what it becomes.
 
 ## The library (phase B)
 
@@ -35,7 +40,9 @@ acquire/   channels (arXiv per-version NAS mirror -> GCS bucket; OpenAlex OA -> 
 documents/ parse (fast: GROBID 0.9.1-full + hyperref links, every asset; careful: MinerU task router, the deep
            subset), tei (units, sentences, entries, citation pairs with page + bbox), mineru (sections, paragraphs,
            table HTML, formulas, captions, footnotes, references), assemble (one paper version + its text date),
-           versions (v1 in full, the latest version's delta)
+           versions (v1 in full, the latest version's delta), sciverse (v2.5's preferred body/table/formula text:
+           the fetch marathon caching sciverse_text.sqlite, the markdown adapter, version determination by each
+           version's own sentences, per-sentence dates by delta-screened fuzzy contest)
 ```
 
 ## Data flow
@@ -44,9 +51,10 @@ documents/ parse (fast: GROBID 0.9.1-full + hyperref links, every asset; careful
 papers      retired (C-1): the library/ registry replaces it — DOI-first identity, dates with precision per
             version and source
 documents   built (C-1): registry parses -> per-version docs (paper_id@vN, GROBID fast tier + MinerU careful
-            tier, text_date per version) + stored version deltas; zero LLM
-citations   citation sentences -> bibliography entries -> paper   -> phase C②: rebuilt on tei cites, entries
-            (zero LLM; pre-C legacy code, dark)                     resolved to paper_id, self-citation flags
+            tier, text_date per version) + stored version deltas + the sv tier (②′: cached Sciverse texts,
+            held version, per-sentence dates); zero LLM
+citations   built (C②): tei citation pairs -> entries -> paper_id (four-stage cascade + ref_resolutions from
+            `library resolve-stubs`), self-citation flags, v1 cites dated v1 / delta cites dated latest; zero LLM
 extract     statements: self pass (T1 / T2), result pass, other   -> phase C: schema v2, T2 over the full text,
             pass (what citing sentences say about the cited work)    unified final check, time-stratified sampling
 index       BM25 (FTS5) + optional dense vectors                  -> phase D: tantivy + binary-code vectors
@@ -102,8 +110,8 @@ grow        typed gap diagnosis -> acquisition -> the same stages (offline, ques
 | `library/` | the registry (identity, identifiers, dates, assets, parses), imports, merge queue and its LLM verdicts |
 | `acquire/` | full-text channels, identity check, quarantine |
 | `corpus/papers.py` | legacy papers stage (retired from the pipeline in C-1; kept until the legacy citations/extract importers are replaced in C②–C④) |
-| `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; deterministic table parsing |
-| `citations/` | citation sentences, entry -> paper |
+| `documents/` | the two parse tiers (GROBID TEI, MinerU), version deltas, assembly by paper version; the documents stage; the Sciverse content tier (fetch marathon + adapter + version/date rules); deterministic table parsing |
+| `citations/` | citation sentences, entry -> paper; `external.py` = the stage-2 batch (Crossref/OpenAlex -> metadata-only papers + ref_resolutions) |
 | `extract/` | the schema and the passes |
 | `index/` | multi-granularity search with as_of |
 | `cognition/` | AsOf view and the compiled objects |

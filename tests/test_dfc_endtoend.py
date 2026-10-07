@@ -188,7 +188,7 @@ def _reg():
 
 
 def _work(env, pass_name="docs"):
-    con = env.connect("documents" if pass_name in ("docs", "delta") else "citations", readonly=True)
+    con = env.connect("documents" if pass_name in ("docs", "delta", "sv") else "citations", readonly=True)
     try:
         return {r[0]: r[1:] for r in con.execute("SELECT item, key, status, attempts FROM _work WHERE pass=?",
                                                  (pass_name,))}
@@ -451,3 +451,80 @@ def test_citations_sweep_after_merge(env):
     # P1 keeps its own v1 cite; the moved version adds no new citation pair (its citing sentence was unchanged)
     assert cit.execute("SELECT cited, date FROM cites WHERE citing=?", (P1,)).fetchall() == [(P0, "2020-01-10")]
     cit.close()
+
+
+# ---------------------------------------------------------------- Sciverse content tier (v2.5, ②′)
+
+SV_MD = """# 1 Introduction
+
+We propose FastGF, an efficient graph transformer. Training takes three days on one GPU.
+
+We also prove a convergence bound for the attention layer.
+
+<table><tr><td>0.91</td></tr></table>
+
+# References
+
+[1] A first reference here. 2020.
+[2] A second reference here. 2021.
+[3] A third reference sits here. 2019.
+"""
+
+
+def _texts(tmp_path, pid, text, fetched_at="2026-10-07T01:00:00", doc_id="DOC1"):
+    """Write one cached Sciverse text row (the fetch marathon's output) into the env's derived dir."""
+    import zlib
+    from compilescholar.documents import sciverse as SV
+    tp = tmp_path / "data" / "derived" / "sciverse_text.sqlite"
+    tp.parent.mkdir(parents=True, exist_ok=True)
+    con = SV._connect(tp)
+    con.execute("INSERT OR REPLACE INTO texts VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                (pid, doc_id, "t", None, "ok", "", len(text), 1, 1, fetched_at, zlib.compress(text.encode())))
+    con.commit()
+    con.close()
+    return tp
+
+
+def test_sv_pass_dates_sentences_by_version(env, tmp_path):
+    from compilescholar.documents import build as DB
+    from compilescholar.documents.build import Documents
+    _texts(tmp_path, P2, SV_MD)
+    counts = DB.build(workers=2, log=lambda *a: None)
+    assert counts["sv"] == 1 and counts["sv_held"] == {"latest": 1}
+    assert _work(env, "sv")[P2][1] == "ok"
+    D = Documents()
+    sv = D.sv(P2)
+    assert sv["held"] == "latest" and sv["doc_id"] == "DOC1"
+    d = {s["text"]: s["date"] for s in sv["sentences"]}
+    assert d["We propose FastGF, an efficient graph transformer."] == "2021-01-12"        # in v1 -> v1's date
+    assert d["Training takes three days on one GPU."] == "2021-06-01"                     # revised -> latest
+    assert d["We also prove a convergence bound for the attention layer."] == "2021-06-01"  # latest-only
+    assert not any("0.91" in s["text"] for s in sv["sentences"])                          # tables are not prose
+    D.close()
+
+
+def test_sv_pass_reopens_on_new_fetch_and_sweeps(env, tmp_path):
+    from compilescholar.documents import build as DB
+    from compilescholar.documents.build import Documents
+    t1 = ("GraphFormer applies attention to graphs. Experiments show consistent gains over strong baselines.")
+    tp = _texts(tmp_path, P1, t1)
+    DB.build(workers=2, log=lambda *a: None)
+    D = Documents()
+    assert D.sv(P1)["held"] == "single"                                                   # one version: nothing to decide
+    assert {s["date"] for s in D.sv(P1)["sentences"]} == {"2020-01-10"}                   # all dated v1
+    n1 = len(D.sv(P1)["sentences"])
+    D.close()
+    _texts(tmp_path, P1, t1 + " A later addition sentence comes here.", fetched_at="2026-10-07T02:00:00")
+    DB.build(workers=2, log=lambda *a: None)                                              # fetched_at moved -> reopened
+    D = Documents()
+    assert len(D.sv(P1)["sentences"]) == n1 + 1
+    D.close()
+    con = sqlite3.connect(tp)
+    con.execute("UPDATE texts SET status='absent' WHERE paper_id=?", (P1,))
+    con.commit()
+    con.close()
+    counts = DB.build(workers=2, log=lambda *a: None)                                     # text gone -> row swept
+    assert counts["sv"] == 0
+    D = Documents()
+    assert D.sv(P1) is None
+    D.close()

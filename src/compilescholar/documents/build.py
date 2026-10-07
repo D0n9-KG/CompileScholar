@@ -13,10 +13,17 @@ One docs row per (paper, version) that has an ok parse in data/library/registry.
 One deltas row per multi-version paper whose v1 and latest version are both materialised: versions.delta — the
 sentences, revisions, bibliography entries and citation pairs only the latest version has.
 
+One sv row per paper whose Sciverse text the fetch marathon cached (documents.sciverse, v2.5's preferred
+body/table/formula source): the markdown adapter's units + sentences, each sentence dated by the earliest version
+it appears in (in the v1 GROBID text -> v1's date, else the latest known version's date), plus `held` — the
+version the text belongs to, determined by each version's own sentences, not Sciverse's date field.
+
 Work items (no LLM anywhere in this stage):
   docs pass   item = key, fingerprint = (chosen asset's sha256, its parses rows incl. created_at, text_date) —
               a re-parsed PDF or a corrected version date re-opens exactly that item;
-  delta pass  item = paper_id, fingerprint = the two docs work keys.
+  delta pass  item = paper_id, fingerprint = the two docs work keys;
+  sv pass     item = paper_id, fingerprint = (the cached text's fetched_at, the two docs work keys) — a new
+              fetch or a re-materialised end re-opens the dating.
 Assets that disappeared (a merge moved them to the survivor) are swept with their rows.
 
 Legacy: citations / extract / index / tools / grow still import Documents from here expecting the pre-C arXiv-id
@@ -25,10 +32,12 @@ from __future__ import annotations
 
 import json
 import zlib
+from pathlib import Path
 
 from ..core import paths
 from ..dfc import store
 from . import assemble as A
+from . import sciverse as SV
 from . import versions as VV
 
 DDL = """CREATE TABLE IF NOT EXISTS docs(
@@ -39,7 +48,10 @@ DDL = """CREATE TABLE IF NOT EXISTS docs(
 CREATE INDEX IF NOT EXISTS ix_docs_paper ON docs(paper_id, version);
 CREATE TABLE IF NOT EXISTS deltas(
   paper_id TEXT PRIMARY KEY, v1_key TEXT, latest_key TEXT,
-  n_new INT, n_revised INT, n_new_entries INT, n_cites INT, delta_z BLOB);"""
+  n_new INT, n_revised INT, n_new_entries INT, n_cites INT, delta_z BLOB);
+CREATE TABLE IF NOT EXISTS sv(
+  paper_id TEXT PRIMARY KEY, doc_id TEXT, held TEXT, chars INT,
+  n_units INT, n_sentences INT, n_v1_dated INT, sv_z BLOB);"""
 
 
 def _z(obj) -> bytes:
@@ -112,7 +124,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print) -> dict:
     """Materialise every parsed library asset. Incremental and question-blind: an item is redone only when its
     PDF was re-parsed, its version date changed, or this stage's code changed."""
     workers = workers or 8                        # CPU-bound (lxml + rapidfuzz), not an LLM stage
-    params = {"v": 2}
+    params = {"v": 3}
     with store.Run("documents", params, rebuild=rebuild) as run:
         con = run.con
         con.executescript(DDL)
@@ -169,13 +181,72 @@ def build(workers: int | None = None, rebuild: bool = False, log=print) -> dict:
             with run.lock:
                 con.commit()
             w_delta.sweep([p for p, _, _ in pairs], lambda p: con.execute("DELETE FROM deltas WHERE paper_id=?", (p,)))
+
+            # Sciverse content tier (v2.5): date the cached texts against the materialised v1/latest docs
+            tp = Path(SV.text_store())
+            svscon = store.ReadConn(f"file:{tp}?mode=ro") if tp.exists() else None
+            sv_items = []
+            if svscon is not None:
+                fetched = dict(svscon.execute("SELECT paper_id, fetched_at FROM texts WHERE status='ok'"))
+                dvers: dict[str, list] = {}
+                for p_, v_ in rconn.execute("SELECT paper_id, version FROM docs"):
+                    dvers.setdefault(p_, []).append(v_)
+                for p_, vs in sorted(dvers.items()):
+                    if p_ not in fetched:
+                        continue
+                    base_v = 1 if 1 in vs else (0 if 0 in vs else max(vs))
+                    latest_v = max(vs) if max(vs) > base_v else None
+                    sv_items.append((p_, f"{p_}@v{base_v}", f"{p_}@v{latest_v}" if latest_v else None))
+                w_sv = run.work("sv")
+                sv_todo = set(w_sv.todo([(p_, store.sha(fetched[p_], w_docs.key(bk),
+                                                        (w_docs.key(lk),) if lk else None))
+                                         for p_, bk, lk in sv_items]))
+                log(f"[documents] {len(sv_todo):,} of {len(sv_items):,} papers to date from Sciverse text")
+                svcounter = {"written": 0}
+
+                def fast_date(k):
+                    if not k:
+                        return None, None
+                    r = rconn.execute("SELECT fast_z, text_date FROM docs WHERE key=?", (k,)).fetchone()
+                    return (_uz(r[0]) if r and r[0] else None), (r[1] if r else None)
+
+                def one_sv(triple):
+                    p_ = triple[0]
+                    if p_ not in sv_todo:
+                        return
+                    try:
+                        v1_fast, v1_date = fast_date(triple[1])
+                        lt_fast, lt_date = fast_date(triple[2])
+                        dr = rconn.execute("SELECT delta_z FROM deltas WHERE paper_id=?", (p_,)).fetchone()
+                        row = SV.materialize(svscon, p_, v1_fast, v1_date, lt_fast, lt_date,
+                                             delta=_uz(dr[0]) if dr and dr[0] else None)
+                        with run.lock:
+                            if row:
+                                con.execute("INSERT OR REPLACE INTO sv VALUES (?,?,?,?,?,?,?,?)", row)
+                            else:
+                                con.execute("DELETE FROM sv WHERE paper_id=?", (p_,))
+                            svcounter["written"] += 1
+                            if svcounter["written"] % 200 == 0:
+                                con.commit()
+                        w_sv.ok(p_)
+                    except Exception as e:            # a broken cached text is this paper's failure, not the stage's
+                        w_sv.fail(p_, f"{type(e).__name__}: {e}")
+
+                store.parallel(one_sv, [t for t in sv_items if t[0] in sv_todo], workers, log=log, every=5000,
+                               label="documents:sv")
+                with run.lock:
+                    con.commit()
+                w_sv.sweep([p for p, _, _ in sv_items], lambda p: con.execute("DELETE FROM sv WHERE paper_id=?", (p,)))
+                svscon.close()
             rconn.close()
 
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"docs": q("SELECT count(*) FROM docs"), "deltas": q("SELECT count(*) FROM deltas"),
                       "sentences": q("SELECT sum(n_sentences) FROM docs"), "cites": q("SELECT sum(n_cites) FROM docs"),
                       "entries": q("SELECT sum(n_entries) FROM docs"),
-                      "careful": q("SELECT count(*) FROM docs WHERE careful_z IS NOT NULL")}
+                      "careful": q("SELECT count(*) FROM docs WHERE careful_z IS NOT NULL"),
+                      "sv": q("SELECT count(*) FROM sv"),
+                      "sv_held": dict(con.execute("SELECT held, count(*) FROM sv GROUP BY held").fetchall())}
             run.finish(counts)
         finally:
             reg.close()
@@ -211,6 +282,12 @@ class Documents:
         r = self.con.execute("SELECT v1_key, latest_key, delta_z FROM deltas WHERE paper_id=?",
                              (paper_id,)).fetchone()
         return None if not r else {"v1_key": r[0], "latest_key": r[1], **_uz(r[2])}
+
+    def sv(self, paper_id: str) -> dict | None:
+        """The Sciverse content tier (v2.5): {"doc_id", "held", "detail", "has_refs", "units", "sentences"} with
+        every sentence carrying its `date` — the earliest version it appears in."""
+        r = self.con.execute("SELECT doc_id, held, chars, sv_z FROM sv WHERE paper_id=?", (paper_id,)).fetchone()
+        return None if not r else {"paper_id": paper_id, "doc_id": r[0], "held": r[1], "chars": r[2], **_uz(r[3])}
 
     def close(self) -> None:
         self.con.close()

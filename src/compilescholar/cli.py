@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """compilescholar command line.
 
-  compilescholar build  status | all | papers | documents | citations | extract | index   (literature layer)
+  compilescholar build  status | all | documents | citations | extract | index   (literature layer)
+  compilescholar sciverse  fetch --benchmark scholarcatalyst | status              (v2.5 content layer)
   compilescholar answer --config configs/bench/cs2_dev_confirm.yaml --run-id cs2-dev-vnext-20261005-x [--set k=v ...]
                         (--set answer.mode=lit answers through the literature-layer tools)
   compilescholar judge  --run-id <id> [--legacy]
@@ -272,6 +273,36 @@ def cmd_parse(a):
     print(json.dumps(P.run(a.tier, paper_ids=pids, workers=a.workers)))
 
 
+def cmd_sciverse(a):
+    """The Sciverse content layer (v2.5): fetch caches texts in data/derived/sciverse_text.sqlite (the documents
+    stage's sv pass dates them); status reports that store."""
+    import sqlite3
+    from .documents import sciverse as SV
+    if a.action == "fetch":
+        from .library import store as LS
+        if a.ids:
+            pids = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()]
+        elif a.benchmark:
+            con = LS.connect()
+            pids = [p for (p,) in con.execute("SELECT DISTINCT paper_id FROM members WHERE benchmark=?",
+                                              (a.benchmark,))]
+            con.close()
+        else:
+            raise SystemExit("sciverse fetch needs --benchmark or --ids")
+        print(json.dumps(SV.fetch(pids, workers=a.workers, limit=a.limit)))
+    else:
+        p = Path(SV.text_store())
+        if not p.exists():
+            print(json.dumps({"by_status": {}}))
+            return
+        con = sqlite3.connect(f"file:{p.as_posix()}?mode=ro", uri=True)
+        q = lambda s: con.execute(s).fetchone()[0]        # noqa: E731
+        print(json.dumps({"by_status": dict(con.execute("SELECT status, count(*) FROM texts GROUP BY status")),
+                          "chars_total": q("SELECT coalesce(sum(chars),0) FROM texts WHERE status='ok'"),
+                          "with_refs": q("SELECT coalesce(sum(has_refs),0) FROM texts WHERE status='ok'")}, indent=1))
+        con.close()
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="compilescholar")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -280,6 +311,13 @@ def main(argv=None):
     p.add_argument("--ids", default=None, help="file of paper_ids (default: every asset)")
     p.add_argument("--workers", type=int, default=None)
     p.set_defaults(fn=cmd_parse)
+    p = sub.add_parser("sciverse", help="Sciverse content layer: fetch (title search + /content cache) | status")
+    p.add_argument("action", choices=["fetch", "status"])
+    p.add_argument("--benchmark", default=None, help="fetch: members of this benchmark (default corpus: SC)")
+    p.add_argument("--ids", default=None, help="fetch: file of paper_ids, one per line")
+    p.add_argument("--workers", type=int, default=4, help="fetch: parallel workers (the account bucket paces)")
+    p.add_argument("--limit", type=int, default=None, help="fetch: at most this many papers")
+    p.set_defaults(fn=cmd_sciverse)
     p = sub.add_parser("acquire", help="fetch + identity-check full texts (library assets)")
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--benchmark", help="every member of this benchmark")
