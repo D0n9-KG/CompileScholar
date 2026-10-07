@@ -232,3 +232,51 @@ def test_asof_statements_and_citations(env):
     assert PB in refs and "stub:xray" in refs and PD not in refs   # PD invisible at T -> filtered
     assert v.references("arxiv:9999.99999") == []          # an invisible paper has no references
     assert set(v.co_cited(1)) == {PB, "stub:xray"}
+
+
+# ---------------------------------------------------------------- shift screening (pure functions)
+def test_fisher_and_bh():
+    from compilescholar.cognition.build import bh_select, fisher_p
+    assert fisher_p(4, 4, 4, 4) == 1.0
+    assert fisher_p(0, 8, 8, 0) < 0.001                       # perfect flip
+    assert fisher_p(8, 0, 0, 8) < 0.001
+    assert fisher_p(3, 5, 4, 4) > 0.5                         # nothing there
+    assert bh_select([0.001, 0.9, 0.02], q=0.05) == {0, 2}
+    assert bh_select([0.9, 0.8]) == set()
+
+
+def _vote(date, i, role="background", function="background", facet="contribution", category=None):
+    return {"date": date, "role": role, "function": function, "facet": facet, "category": category,
+            "speaker": f"s{i}", "quote": f"{role} vote {i} on {date}"}
+
+
+def test_screen_became_component():
+    from compilescholar.cognition.build import screen_shifts
+    votes = ([_vote(f"2019-{m:02d}-01", m) for m in range(1, 9)]
+             + [_vote(f"2021-{m:02d}-01", 100 + m, role="uses", function="tool") for m in range(1, 9)])
+    cands = screen_shifts({"arxiv:x": votes}, {}, {})
+    comp = [c for c in cands if c["facet"] == "became_component"]
+    assert len(comp) == 1
+    d = json.loads(comp[0]["direction"])
+    assert d["early"] == 0.0 and d["late"] == 1.0 and d["p"] < 0.01
+    ev = json.loads(comp[0]["evidence"])
+    assert len(ev["late"]) == 3 and ev["early"] == []
+
+
+def test_screen_recategorized_and_limitation_independence():
+    from compilescholar.cognition.build import screen_shifts
+    votes = ([_vote(f"2019-{m:02d}-01", m, category="graph models") for m in range(1, 5)]
+             + [_vote(f"2021-{m:02d}-01", 100 + m, category="transformer methods") for m in range(1, 5)])
+    cands = screen_shifts({"arxiv:x": votes}, {}, {})
+    rc = [c for c in cands if c["facet"] == "recategorized"]
+    assert len(rc) == 1 and json.loads(rc[0]["direction"])["from"] == "graph models"
+    # limitation exposure needs two INDEPENDENT stating papers (no shared author key)
+    lim = ([_vote(f"2019-{m:02d}-01", m) for m in range(1, 9)]
+           + [_vote("2020-01-01", 50, facet="limitation"), _vote("2020-06-01", 51, facet="limitation")])
+    same = {"s50": {"smith|j"}, "s51": {"smith|j"}}
+    assert not [c for c in screen_shifts({"arxiv:y": lim}, same, {}) if c["facet"] == "limitation_exposed"]
+    indep = {"s50": {"smith|j"}, "s51": {"wang|k"}}
+    got = [c for c in screen_shifts({"arxiv:y": lim}, indep, {}) if c["facet"] == "limitation_exposed"]
+    assert len(got) == 1 and got[0]["window_end"] == "2020-06-01"
+    # too few votes: nothing screened
+    assert screen_shifts({"arxiv:z": lim[:5]}, {}, {}) == []

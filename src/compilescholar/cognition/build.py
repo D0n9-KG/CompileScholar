@@ -62,7 +62,9 @@ CREATE TABLE IF NOT EXISTS category_daily(category TEXT NOT NULL, day TEXT NOT N
 CREATE TABLE IF NOT EXISTS fact_member(fact_id TEXT, statement_id INT, role TEXT, PRIMARY KEY(fact_id, statement_id));
 CREATE TABLE IF NOT EXISTS fact_status_event(fact_id TEXT, date TEXT, status TEXT, evidence TEXT);
 CREATE TABLE IF NOT EXISTS shift_event(id INTEGER PRIMARY KEY, subject TEXT, facet TEXT, window_start TEXT,
-  window_end TEXT, direction TEXT, evidence TEXT, decided_by TEXT);
+  window_end TEXT, direction TEXT, evidence TEXT, decided_by TEXT, status TEXT,
+  UNIQUE(subject, facet, window_start, window_end, direction));
+CREATE INDEX IF NOT EXISTS ix_shift_subject ON shift_event(subject, status);
 CREATE TABLE IF NOT EXISTS family_snapshot(snapshot TEXT, family_id TEXT, name TEXT, members TEXT, named_by TEXT,
   PRIMARY KEY(snapshot, family_id));"""
 
@@ -163,6 +165,121 @@ def _author_key(surname: str, name: str) -> str | None:
 
 SNAPSHOT_SEED = 20261007
 MIN_FAMILY = 2
+
+# Reception-shift screening (pre-registered constants, carried from the old shifts module; the arbitrary
+# half-split verdicts are replaced by Fisher + BH — the old rule-based shifts measured ~75% false positives)
+MIN_N = 8
+COMP, COMP_GAIN = 0.5, 0.2
+BASE, BASE_GAIN = 0.4, 0.2
+COMPONENT_ROLES = {"uses"}
+COMPONENT_FN = {"tool", "data", "metric"}
+BASELINE_FN = {"baseline", "contrast"}
+FDR_Q = 0.05
+
+
+def fisher_p(a: int, b: int, c: int, d: int) -> float:
+    """Two-sided Fisher exact test of [[a, b], [c, d]] — pure Python (no scipy dependency)."""
+    from math import comb
+    n, r1, c1 = a + b + c + d, a + b, a + c
+    if n == 0 or r1 == 0 or r1 == n or c1 == 0 or c1 == n:
+        return 1.0
+    denom = comb(n, c1)
+
+    def hg(k):
+        return comb(r1, k) * comb(n - r1, c1 - k) / denom
+
+    p0 = hg(a)
+    lo, hi = max(0, c1 - (n - r1)), min(r1, c1)
+    return min(1.0, sum(hg(k) for k in range(lo, hi + 1) if hg(k) <= p0 * (1 + 1e-9)))
+
+
+def bh_select(ps: list[float], q: float = FDR_Q) -> set[int]:
+    """Benjamini-Hochberg: indices of the p-values that pass at FDR level q."""
+    m = len(ps)
+    if not m:
+        return set()
+    order = sorted(range(m), key=lambda i: ps[i])
+    k_max = -1
+    for rank, i in enumerate(order, 1):
+        if ps[i] <= q * rank / m:
+            k_max = rank
+    return set(order[:k_max]) if k_max >= 0 else set()
+
+
+def screen_shifts(obj_votes: dict, author_of: dict, replaces: dict) -> list[dict]:
+    """Deterministic candidate screen for reception shifts. obj_votes: subject -> date-sorted vote dicts
+    (one per (speaker, sentence): date, role, function, facet, category, speaker, quote); author_of: paper ->
+    author keys (independence); replaces: parent subject -> earliest 'replaces' claim date.
+    Returns candidate dicts (facet, windows, direction, evidence, p) after the effect floors, Fisher and BH."""
+    cands = []
+    for obj, votes in obj_votes.items():
+        if len(votes) < MIN_N:
+            continue
+        mid = len(votes) // 2
+        early, late = votes[:mid], votes[mid:]
+        w0, w1 = early[0]["date"], late[-1]["date"]
+
+        def share(rows, pred):
+            return sum(1 for r in rows if pred(r)) / len(rows)
+
+        def is_comp(r):
+            return r.get("role") in COMPONENT_ROLES or r.get("function") in COMPONENT_FN
+
+        def is_base(r):
+            return r.get("function") in BASELINE_FN or r.get("role") == "compares"
+
+        for facet, pred, floor, gain in (("became_component", is_comp, COMP, COMP_GAIN),
+                                         ("became_baseline", is_base, BASE, BASE_GAIN)):
+            ce, cl = share(early, pred), share(late, pred)
+            if cl >= floor and cl - ce >= gain:
+                a = sum(1 for r in late if pred(r))
+                b0 = sum(1 for r in early if pred(r))
+                p = fisher_p(a, len(late) - a, b0, len(early) - b0)
+                cands.append({"subject": obj, "facet": facet, "window_start": w0, "window_end": w1,
+                              "direction": json.dumps({"early": round(ce, 3), "late": round(cl, 3),
+                                                       "p": round(p, 6)}),
+                              "evidence": json.dumps({"early": [r["quote"][:200] for r in early if pred(r)][:2],
+                                                      "late": [r["quote"][:200] for r in late if pred(r)][:3]},
+                                                     ensure_ascii=False),
+                              "p": p})
+        ec = Counter(r.get("category") or "" for r in early if r.get("category"))
+        lc = Counter(r.get("category") or "" for r in late if r.get("category"))
+        if ec and lc:
+            (e1, en), (l1, ln) = ec.most_common(1)[0], lc.most_common(1)[0]
+            if e1 != l1 and en >= 2 and ln >= 2:
+                le = ec.get(l1, 0)                    # the late top category's count in the EARLY window
+                p = fisher_p(ln, len(late) - ln, le, len(early) - le)
+                cands.append({"subject": obj, "facet": "recategorized", "window_start": w0, "window_end": w1,
+                              "direction": json.dumps({"from": e1, "to": l1, "p": round(p, 6)},
+                                                      ensure_ascii=False),
+                              "evidence": json.dumps({"late": [r["quote"][:200] for r in late
+                                                               if (r.get("category") or "") == l1][:3]},
+                                                     ensure_ascii=False),
+                              "p": p})
+        seen: dict[str, str] = {}
+        for r in sorted(votes, key=lambda x: x["date"]):
+            if r.get("facet") == "limitation":
+                sp = r["speaker"]
+                if all(not (author_of.get(sp, {sp}) & author_of.get(o, {o})) for o in seen):
+                    seen[sp] = r["date"]
+                if len(seen) >= 2:
+                    cands.append({"subject": obj, "facet": "limitation_exposed",
+                                  "window_start": min(seen.values()), "window_end": r["date"],
+                                  "direction": json.dumps({"speakers": sorted(seen)}),
+                                  "evidence": json.dumps([r["quote"][:200]], ensure_ascii=False), "p": 0.0})
+                    break
+        rep = replaces.get(obj)
+        if rep:
+            after = [r for r in votes if r["date"] >= rep]
+            if len(after) >= 4 and share(after, is_base) > share(
+                    after, lambda r: r.get("role") in ("extends", "improves", "adapts")):
+                cands.append({"subject": obj, "facet": "superseded", "window_start": rep,
+                              "window_end": after[-1]["date"], "direction": json.dumps({"since": rep}),
+                              "evidence": json.dumps([r["quote"][:200] for r in after if is_base(r)][:3],
+                                                     ensure_ascii=False),
+                              "p": 0.0})
+    passed = bh_select([c["p"] for c in cands])
+    return [c for i, c in enumerate(cands) if i in passed or c["p"] == 0.0]
 
 
 def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list[str]:
@@ -664,6 +781,84 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                     w.ok(snap)
                 w.sweep(snaps, lambda s: con.execute("DELETE FROM family_snapshot WHERE snapshot=?", (s,)))
 
+            # ---- reception shifts: deterministic screen (effect floors + Fisher + BH) -> LLM verification
+            w = run.work("shift_screen")
+            if w.todo([("all", store.sha(ext_fp))]):
+                votes: dict[str, dict] = defaultdict(dict)     # subject -> (speaker, sent_id) -> one vote
+                for about, speaker, date, role, function, facet, cat, quote, sid in ext.execute(
+                        "SELECT about, speaker, date, role, function, facet, json_extract(meta, '$.category'), "
+                        "quote, json_extract(loc, '$.sent_id') FROM statements "
+                        "WHERE kind='other' AND date IS NOT NULL ORDER BY date"):
+                    votes[about][(speaker, sid)] = {"date": date, "role": role, "function": function,
+                                                    "facet": facet, "category": cat, "speaker": speaker,
+                                                    "quote": quote or ""}
+                author_of: dict[str, set] = {}
+                for k, p_ in con.execute("SELECT author_key, paper_id FROM author_link"):
+                    author_of.setdefault(p_, set()).add(k)
+                replaces = dict(con.execute("SELECT parent, min(valid_from) FROM lineage_edge "
+                                            "WHERE relation='replaces' GROUP BY parent"))
+                cands = screen_shifts({o: sorted(v.values(), key=lambda r: r["date"])
+                                       for o, v in votes.items()}, author_of, replaces)
+                con.execute("DELETE FROM shift_event WHERE status='candidate'")   # adjudicated rows survive
+                con.executemany("INSERT OR IGNORE INTO shift_event(subject, facet, window_start, window_end, "
+                                "direction, evidence, status) VALUES (?,?,?,?,?,?,?)",
+                                [(c["subject"], c["facet"], c["window_start"], c["window_end"], c["direction"],
+                                  c["evidence"], "candidate") for c in cands])
+                con.commit()
+                w.ok("all")
+                log(f"[cognition] shift screen: {len(cands):,} candidates")
+
+            w = run.work("shifts")
+            sconn = store.read_only(run.path)
+            try:
+                s_items = [(str(i), store.sha(PR.SHIFT_VERIFY_SHA, PR.MODEL, ev)) for i, ev in
+                           sconn.execute("SELECT id, evidence FROM shift_event WHERE status='candidate'")]
+                todo_s = set(w.todo(s_items))
+                if todo_s:
+                    log(f"[cognition] shifts: {len(todo_s):,} candidates to verify")
+
+                def one_shift(id_str):
+                    if id_str not in todo_s:
+                        return
+                    try:
+                        r = sconn.execute("SELECT subject, facet, direction, evidence FROM shift_event "
+                                          "WHERE id=? AND status='candidate'", (int(id_str),)).fetchone()
+                        if r is None:
+                            w.ok(id_str)
+                            return
+                        t = reg.execute("SELECT title FROM papers WHERE paper_id=?", (r[0],)).fetchone()
+                        dirj = json.loads(r[2] or "{}")
+                        ev = json.loads(r[3] or "[]")
+                        early = ev.get("early", []) if isinstance(ev, dict) else []
+                        late = ev.get("late", ev) if isinstance(ev, dict) else ev
+                        raw = chat(PR.SHIFT_VERIFY.format(
+                            subject=f"{r[0]}" + (f" — {t[0][:120]}" if t and t[0] else ""), facet=r[1],
+                            early_share=dirj.get("early", "—"), late_share=dirj.get("late", "—"),
+                            p=dirj.get("p", "n/a"), direction=(r[2] or "")[:200],
+                            early="\n".join(f"- {x[:200]}" for x in early[:2]) or "(none)",
+                            late="\n".join(f"- {x[:200]}" for x in late[:3]) or "(none)"),
+                            model=PR.MODEL, max_tokens=150, temperature=0.0, enable_thinking=False,
+                            item=f"shift:{id_str}")
+                        obj = parse_json_response(raw or "")
+                        if not isinstance(obj, dict) or not isinstance(obj.get("holds"), bool):
+                            w.fail(id_str, "shift: no parseable verdict")
+                            return
+                        with run.lock:
+                            con.execute("UPDATE shift_event SET status=?, decided_by=? WHERE id=?",
+                                        ("approved" if obj["holds"] else "rejected", PR.MODEL, int(id_str)))
+                            con.commit()
+                            w.ok(id_str)
+                    except Exception as e:
+                        w.fail(id_str, f"{type(e).__name__}: {e}")
+
+                store.parallel(one_shift, [i for i, _ in s_items if i in todo_s], workers or 8, log=log,
+                               every=1000, label="cognition:shifts")
+                with run.lock:
+                    con.commit()
+                w.sweep([i for i, _ in s_items], lambda i: None)
+            finally:
+                sconn.close()
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
@@ -679,7 +874,8 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "category_canon": q("SELECT count(*) FROM category_canon"),
                       "category_daily": q("SELECT count(*) FROM category_daily"),
                       "family_snapshots": q("SELECT count(DISTINCT snapshot) FROM family_snapshot"),
-                      "families": q("SELECT count(*) FROM family_snapshot")}
+                      "families": q("SELECT count(*) FROM family_snapshot"),
+                      "shifts": dict(con.execute("SELECT status, count(*) FROM shift_event GROUP BY status"))}
             run.finish(counts)
         finally:
             for c in mine:
