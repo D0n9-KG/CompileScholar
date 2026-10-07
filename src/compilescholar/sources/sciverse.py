@@ -140,7 +140,7 @@ _BUCKET_LOCK = threading.Lock()
 
 # the account limit (30 req/min) is per key; with several keys the caller rotates them and each key keeps its
 # own bucket (and its own shared-bucket state file, so cross-process pacing stays per account)
-TOKEN_ENVS = ("SCIVERSE_API_TOKEN", "SCIVERSE_KRY_2", "SCIVERSE_KRY_3")
+TOKEN_ENVS = ("SCIVERSE_API_TOKEN", "SCIVERSE_KRY_1", "SCIVERSE_KRY_2", "SCIVERSE_KRY_3")
 
 
 def all_tokens() -> list[str]:
