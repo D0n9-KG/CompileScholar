@@ -859,6 +859,100 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             finally:
                 sconn.close()
 
+            # ---- family names: the latest snapshot (+ benchmark cut-offs) gets LLM names and boundary-member
+            #      verdicts; earlier snapshots inherit by member overlap — naming all ~80 snapshots x thousands
+            #      of families would be an LLM explosion for near-identical member sets
+            w = run.work("family_names")
+            nconn = store.read_only(run.path)
+            try:
+                latest_snap = con.execute("SELECT max(snapshot) FROM family_snapshot").fetchone()[0]
+                naming_snaps = ({latest_snap} if latest_snap else set()) | {x[:10] for x in snapshot_extra}
+                fam_rows = [(s, f, json.loads(m), n) for s, f, m, n in
+                            con.execute("SELECT snapshot, family_id, members, name FROM family_snapshot")]
+                to_name = [(s, f, mm) for s, f, mm, n in fam_rows if s in naming_snaps and not n]
+                todo_n = set(w.todo([(f, store.sha(PR.FAMILY_NAME_SHA, PR.MODEL, store.sha(sorted(mm))))
+                                     for _, f, mm in to_name]))
+
+                def one_name(fid):
+                    if fid not in todo_n:
+                        return
+                    try:
+                        r = nconn.execute("SELECT members FROM family_snapshot WHERE family_id=?", (fid,)).fetchone()
+                        members = json.loads(r[0])
+                        head = members[:15]
+                        deg: Counter = Counter()
+                        if len(head) > 1:
+                            ph = ",".join("?" * len(head))
+                            for a_, b_ in nconn.execute(f"SELECT a, b FROM cocite WHERE a IN ({ph}) AND b IN ({ph})",
+                                                        (*head, *head)):
+                                deg[a_] += 1
+                                deg[b_] += 1
+                            for a_, b_ in nconn.execute(
+                                    f"SELECT DISTINCT child, parent FROM lineage_edge WHERE child IN ({ph}) "
+                                    f"AND parent IN ({ph})", (*head, *head)):
+                                deg[a_] += 1
+                                deg[b_] += 1
+                        titles = {}
+                        for pid in head:
+                            t = reg.execute("SELECT title, first_hi FROM papers WHERE paper_id=?", (pid,)).fetchone()
+                            titles[pid] = ((t[0] if t else "") or pid)[:120] + (f" ({t[1][:4]})" if t and t[1] else "")
+                        lines = [f"{i}. {titles.get(p_, p_)}" + ("" if deg.get(p_, 0) > 1 else " (weak link)")
+                                 for i, p_ in enumerate(head, 1)]
+                        _q = (f"SELECT json_extract(meta, '$.category') FROM statements WHERE kind='other' "
+                              f"AND about IN ({','.join('?' * len(head))}) "
+                              "AND json_extract(meta, '$.category') IS NOT NULL LIMIT 200")
+                        cats = [c for (c,) in ext.execute(_q, tuple(head))] if head else []
+                        top_cats = ", ".join(c for c, _ in Counter(x.lower() for x in cats if x).most_common(5)) \
+                            or "(none)"
+                        raw = chat(PR.FAMILY_NAME.format(members="\n".join(lines), categories=top_cats),
+                                   model=PR.MODEL, max_tokens=300, temperature=0.0, enable_thinking=False,
+                                   item=f"family:{fid}")
+                        obj = parse_json_response(raw or "")
+                        name = (obj or {}).get("name") if isinstance(obj, dict) else None
+                        if not isinstance(name, str) or not name.strip():
+                            w.fail(fid, "family: no parseable name")
+                            return
+                        # weak links only mean something in a family big enough to have an interior
+                        weak = [i for i, p_ in enumerate(head, 1) if deg.get(p_, 0) <= 1] if len(members) > 4 else []
+                        keep = {int(x) for x in (obj or {}).get("keep") or [] if str(x).lstrip("-").isdigit()}
+                        drop = {i for i in weak if i not in keep} if weak else set()
+                        kept = sorted(set([p_ for i, p_ in enumerate(members, 1) if i not in drop]))
+                        with run.lock:
+                            con.execute("UPDATE family_snapshot SET name=?, members=?, named_by=? "
+                                        "WHERE family_id=?",
+                                        (name.strip().lower()[:80], json.dumps(kept), PR.MODEL, fid))
+                            con.commit()
+                            w.ok(fid)
+                    except Exception as e:
+                        w.fail(fid, f"{type(e).__name__}: {e}")
+
+                store.parallel(one_name, [f for _, f, _ in to_name if f in todo_n], workers or 8, log=log,
+                               every=500, label="cognition:family_names")
+                with run.lock:
+                    con.commit()
+                named_fams = [(n, set(json.loads(m))) for _s, f, m, n in
+                              con.execute("SELECT snapshot, family_id, members, name FROM family_snapshot "
+                                          "WHERE name IS NOT NULL")]
+                inherited = 0
+                for s, f, mm, n in fam_rows:
+                    if n or s in naming_snaps:
+                        continue
+                    ms = set(mm)
+                    best, bj = None, 0.0
+                    for n2, ms2 in named_fams:
+                        j = len(ms & ms2) / len(ms | ms2) if (ms | ms2) else 0.0
+                        if j > bj:
+                            best, bj = n2, j
+                    if best is not None and bj >= 0.3:
+                        con.execute("UPDATE family_snapshot SET name=?, named_by='inherit' WHERE family_id=?",
+                                    (best, f))
+                        inherited += 1
+                con.commit()
+                if inherited:
+                    log(f"[cognition] family names: {inherited:,} older-snapshot families inherited a name")
+            finally:
+                nconn.close()
+
             q = lambda s: con.execute(s).fetchone()[0] or 0        # noqa: E731
             counts = {"cocite": q("SELECT count(*) FROM cocite"),
                       "reception": q("SELECT count(*) FROM reception_daily"),
@@ -875,6 +969,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "category_daily": q("SELECT count(*) FROM category_daily"),
                       "family_snapshots": q("SELECT count(DISTINCT snapshot) FROM family_snapshot"),
                       "families": q("SELECT count(*) FROM family_snapshot"),
+                      "families_named": q("SELECT count(*) FROM family_snapshot WHERE name IS NOT NULL"),
                       "shifts": dict(con.execute("SELECT status, count(*) FROM shift_event GROUP BY status"))}
             run.finish(counts)
         finally:

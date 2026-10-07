@@ -129,6 +129,8 @@ def _chat(prompt, **kw):
     if "canonical" in prompt:                                # category canonicalisation
         assert "Graph Attention Models" in prompt
         return _json.dumps({"canonical": "graph attention models", "umbrella": False})
+    if "research FAMILY" in prompt:                          # family naming
+        return _json.dumps({"name": "Graph Transformer Family", "keep": []})
     raise AssertionError(f"unrouted prompt: {prompt[:80]}")
 
 
@@ -147,10 +149,13 @@ def test_cognition_build_materialises(env):
     # (PB, stub:xray) never does — stubs are boundary nodes, not family members; PA stays isolated
     assert counts["family_snapshots"] == 6 and counts["families"] == 6     # 2022-01 .. 2022-06, one family each
     con = env.connect("cognition", readonly=True)
-    fams = con.execute("SELECT snapshot, members FROM family_snapshot ORDER BY snapshot").fetchall()
-    assert min(s for s, _ in fams) >= "2022-01-01"
-    for snap, members in fams:
-        assert sorted(json.loads(members)) == sorted([PB, PD])
+    fams = con.execute("SELECT snapshot, members, name, named_by FROM family_snapshot ORDER BY snapshot").fetchall()
+    assert min(s for s, *_ in fams) >= "2022-01-01"
+    for snap, members, name, named_by in fams:
+        assert sorted(json.loads(members)) == sorted([PB, PD])   # a 2-member family: no weak-link dropping
+        assert name == "graph transformer family"
+    assert counts["families_named"] == 6
+    assert fams[-1][3] != "inherit" and all(f[3] == "inherit" for f in fams[:-1])  # only the latest is LLM-named
     a, b, day, n = con.execute("SELECT * FROM cocite").fetchone()
     assert {a, b} == {PB, "stub:xray"} and day == "2019-06-01" and n == 1     # ordered pair, one co-citation
     rec19 = dict(con.execute("SELECT cited, n FROM reception_daily WHERE day='2019-06-01'"))

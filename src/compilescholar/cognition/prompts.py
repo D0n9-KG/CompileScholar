@@ -61,6 +61,21 @@ Rules: "holds" requires the late sentences to genuinely treat the work different
 change of role, category or stance), not just different phrasings of the same treatment. When unsure, false."""
 
 
+FAMILY_NAME = """You name one research FAMILY: a cluster of papers that the citation patterns of the field group
+together (co-citation, lineage claims, shared topic phrases). Name it the way the field would — a short standard
+topic name, not an invention. Also judge the members flagged "(weak link)": keep them only when their title
+plausibly belongs to the family's topic.
+
+Members (numbered):
+{members}
+
+Most common topic phrases said about these papers: {categories}
+
+Answer with JSON only:
+{{"name": "<= 6 words, lowercase, the field's own name for this kind of work",
+  "keep": [<numbers of the weak-link members that belong; omit if none were flagged>]}}"""
+
+
 def sha(prompt: str) -> str:
     return hashlib.sha256(prompt.encode()).hexdigest()[:16]
 
@@ -68,3 +83,4 @@ def sha(prompt: str) -> str:
 METHOD_ID_SHA = sha(METHOD_ID)
 CATEGORY_CANON_SHA = sha(CATEGORY_CANON)
 SHIFT_VERIFY_SHA = sha(SHIFT_VERIFY)
+FAMILY_NAME_SHA = sha(FAMILY_NAME)
