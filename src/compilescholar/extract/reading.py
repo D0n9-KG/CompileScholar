@@ -208,7 +208,7 @@ def _chunk(parts, sids, numbered) -> dict:
             "sid_by_n": {numbered[s]["n"]: s for s in sids if s in numbered}}
 
 
-def tables_of(D, pid: str, full: dict) -> list[dict]:
+def tables_of(full: dict) -> list[dict]:
     """The paper's table grids input for the results pass: (html|pipes, caption, context sentences) from the
     chosen tier — sv table units carry their HTML in `text`, careful units in `html`. Papers whose only text is
     the GROBID fast tier have no tables here (measured: GROBID rebuilds 60/218 table structures, MinerU 164/218 —
