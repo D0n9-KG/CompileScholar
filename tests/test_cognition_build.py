@@ -108,8 +108,10 @@ def env(tmp_path, monkeypatch):
           {"mentions": [{"name": "GraphNet", "relation": "extends"}]})          # valid self edge
     _stmt(7, PB, "2022-06-01", "other", PD, "uses", "method", "PD improves GraphNet",
           {"builds_on": "GraphNet", "builds_on_relation": "improves"})           # third-party edge
-    _stmt(8, PB, "2020-06-01", "self", PB, "proposes", "contribution", "proposes AttnNet",
-          {"name": "BiAttn"})                                                   # makes attnet ambiguous
+    _stmt(8, PB, "2020-06-01", "self", PB, "proposes", "contribution", "proposes BiAttn",
+          {"name": "BiAttn"})                                                   # makes biattn ambiguous
+    _stmt(9, PD, "2022-02-01", "self", PD, "extends", "method", "extends BiAttn",
+          {"mentions": [{"name": "BiAttn", "relation": "extends"}]})            # edge needs the adjudication
     ext.commit()
     ext.close()
 
@@ -119,14 +121,22 @@ def env(tmp_path, monkeypatch):
     return store
 
 
+def _chat(prompt, **kw):
+    import json as _json
+    assert "BiAttn" in prompt or "biattn" in prompt          # the only ambiguous name in the fixture
+    return _json.dumps({"paper": 1, "why": "proposal evidence"})   # most_common: PB(3) first
+
+
 def test_cognition_build_materialises(env):
     from compilescholar.cognition import build as CB
-    counts = CB.build(log=lambda *a: None)
+    counts = CB.build(log=lambda *a: None, chat=_chat)
     assert counts["cocite"] == 1 and counts["reception"] == 3
     assert counts["author_link"] == 3 and counts["comparison_edge"] == 1
     assert counts["names"] == 3                              # fastgf, graphnet, biattn
-    assert counts["mention_link"] == 4 and counts["mentions_ambiguous"] == 1
-    assert counts["lineage_edge"] == 2 and counts["lineage_hyper"] == 0
+    assert counts["mention_link"] == 4
+    assert counts["mentions_ambiguous"] == 0 and counts["mentions_adjudicated"] == 1
+    assert counts["identities"] == {"ok": 2, "adjudicated": 1}
+    assert counts["lineage_edge"] == 3 and counts["lineage_hyper"] == 0
     con = env.connect("cognition", readonly=True)
     a, b, day, n = con.execute("SELECT * FROM cocite").fetchone()
     assert {a, b} == {PB, "stub:xray"} and day == "2019-06-01" and n == 1     # ordered pair, one co-citation
@@ -144,31 +154,32 @@ def test_cognition_build_materialises(env):
     assert ("fastgf", PA) in ment and ment[("fastgf", PA)][5] == PA and ment[("fastgf", PA)][6] == "ok"
     assert ("graphnet", PA) in ment and ment[("graphnet", PA)][5] == PB       # mention in PA cites PB's method
     assert ("graphnet", PB) in ment                                            # self-mention kept
-    assert ment[("biattn", PA)][5] is None and ment[("biattn", PA)][6] == "ambiguous"
+    assert ment[("biattn", PA)][5] == PB and ment[("biattn", PA)][6] == "adjudicated"
     assert json.loads(ment[("biattn", PA)][4]) == [[PA, 2], [PB, 3]]           # alias(2) vs proposal(3)
     assert not any(sid == f"{PA}@v1#s4" for (_, sid, *_ ) in
                    con.execute("SELECT name, sid FROM mention_link"))           # word-boundary discipline
     # lineage: the time-inconsistent edge is dropped, the valid ones carry §2.4 effective dates
     edges = sorted(con.execute("SELECT child, parent, relation, kind, date, valid_from FROM lineage_edge"))
     assert edges == [(PD, PB, "extends", "self", "2022-01-01", "2022-01-01"),          # id6 self claim
+                     (PD, PB, "extends", "self", "2022-02-01", "2022-02-01"),          # id9 via adjudicated identity
                      (PD, PB, "improves", "third", "2022-06-01", "2022-06-01")]        # id7 builds_on (child=about)
     con.close()
 
 
 def test_cognition_incremental(env):
     from compilescholar.cognition import build as CB
-    CB.build(log=lambda *a: None)
+    CB.build(log=lambda *a: None, chat=_chat)
     con = env.connect("cognition", readonly=True)
     w = {r[0]: r[1:] for r in con.execute("SELECT item, key, status FROM _work WHERE pass='cocite'")}
     con.close()
-    CB.build(log=lambda *a: None)                        # nothing changed: no re-open
+    CB.build(log=lambda *a: None, chat=_chat)            # nothing changed: no re-open
     con = env.connect("cognition", readonly=True)
     w2 = {r[0]: r[1:] for r in con.execute("SELECT item, key, status FROM _work WHERE pass='cocite'")}
     con.close()
     assert w == w2
     env.write_manifest("citations", {}, {"n": 1})        # citations data moved...
     env.write_manifest("extract", {}, {})                # ...extract re-registers against it (the real chain rebuilds)
-    CB.build(log=lambda *a: None)
+    CB.build(log=lambda *a: None, chat=_chat)
     con = env.connect("cognition", readonly=True)
     w3 = con.execute("SELECT key FROM _work WHERE pass='cocite' AND item='all'").fetchone()[0]
     wa = con.execute("SELECT key FROM _work WHERE pass='authors' AND item='all'").fetchone()[0]

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from collections import Counter, defaultdict
 
 import ahocorasick
@@ -30,6 +31,9 @@ from ..compile.skeleton.proposes import GENERIC
 from ..core import paths
 from ..dfc import store
 from ..extract.schema import LINEAGE
+from ..llm.client import call_local
+from ..llm.jsonparse import parse_json_response
+from . import prompts as PR
 
 DDL = """CREATE TABLE IF NOT EXISTS cocite(a TEXT NOT NULL, b TEXT NOT NULL, day TEXT NOT NULL, n INT NOT NULL,
   PRIMARY KEY(a, b, day));
@@ -45,6 +49,9 @@ CREATE TABLE IF NOT EXISTS comparison_edge(stmt_id INT PRIMARY KEY, a TEXT, b TE
 CREATE INDEX IF NOT EXISTS ix_comp_b ON comparison_edge(b, date);
 CREATE TABLE IF NOT EXISTS mention_link(id INTEGER PRIMARY KEY, name TEXT, sid TEXT, citing TEXT, date TEXT,
   candidates TEXT, paper_id TEXT, status TEXT);
+CREATE INDEX IF NOT EXISTS ix_mention_name ON mention_link(name);
+CREATE TABLE IF NOT EXISTS method_identity(name TEXT PRIMARY KEY, paper_id TEXT, status TEXT, decided_by TEXT,
+  decided_at TEXT);
 CREATE TABLE IF NOT EXISTS lineage_edge(stmt_id INT, child TEXT, parent TEXT, relation TEXT, speaker TEXT,
   date TEXT, valid_from TEXT, kind TEXT);
 CREATE TABLE IF NOT EXISTS lineage_hyper(stmt_id INT, child TEXT, member TEXT, relation TEXT, speaker TEXT,
@@ -113,6 +120,24 @@ def name_vocab(ext) -> dict:
     return dict(vocab)
 
 
+def _sent_text(D, pid: str, sid: str) -> str:
+    """The verbatim sentence text behind a mention's sid (sv tier or a version's fast tier); '' when the
+    document or sentence is gone (a merge moved it) — the adjudication then runs on the remaining contexts."""
+    try:
+        if "@sv#" in sid:
+            d = D.sv(pid)
+            sents = (d or {}).get("sentences") or []
+        else:
+            m = re.match(r"(.+)@v(\d+)#", sid or "")
+            if not m:
+                return ""
+            d = D.get(f"{pid}@v{m.group(2)}")
+            sents = ((d or {}).get("fast") or {}).get("sentences") or []
+        return next((s["text"] for s in sents if s.get("sid") == sid), "")
+    except Exception:
+        return ""
+
+
 def resolve_name(cand: Counter) -> tuple[str | None, str]:
     """Deterministic identity: one candidate resolves; several resolve only on clear evidence dominance
     (>= 2 and >= 2x the runner-up — the old rule); otherwise 'ambiguous', which is the LLM adjudication's queue
@@ -136,7 +161,9 @@ def _author_key(surname: str, name: str) -> str | None:
     return f"{sur}|{ini}"
 
 
-def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None, ext=None, reg=None) -> dict:
+def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None, ext=None, reg=None,
+          chat=None) -> dict:
+    chat = chat or call_local
     params = {"v": 1}
     with store.Run("cognition", params, rebuild=rebuild) as run:
         con = run.con
@@ -306,13 +333,96 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                     con.commit()
                 w.sweep([p for p, _, _ in m_items],
                         lambda p: con.execute("DELETE FROM mention_link WHERE citing=?", (p,)))
+
+                # ---- method identity: the LLM adjudication of ambiguous names (§8: 18.3% of named papers share
+                #      a name with someone else; §12 D②: pilot 200 with the dual-model gate before full runs)
+                rconn = store.read_only(run.path)          # per-thread reads of this run's file
+                w = run.work("identities")
+                amb = sorted(n for n, r in resolved.items() if r[1] == "ambiguous")
+                now = time.strftime("%Y-%m-%dT%H:%M:%S")
+                con.execute("DELETE FROM method_identity WHERE status IN ('ok', 'ambiguous')")
+                for n, (p_, st_) in sorted(resolved.items()):
+                    if st_ == "ok":
+                        con.execute("INSERT OR REPLACE INTO method_identity VALUES (?,?,?,?,?)",
+                                    (n, p_, "ok", "deterministic", now))
+                for n in amb:                              # pending rows survive; adjudicated rows are never reset
+                    con.execute("INSERT OR IGNORE INTO method_identity VALUES (?,?,?,?,?)",
+                                (n, None, "ambiguous", None, None))
+                con.commit()
+                todo_i = set(w.todo([(n, store.sha(PR.METHOD_ID_SHA, PR.MODEL, sorted(vocab[n]["papers"].items())))
+                                     for n in amb]))
+                if todo_i:
+                    log(f"[cognition] identities: {len(todo_i):,} of {len(amb):,} ambiguous names to adjudicate")
+
+                def one_identity(name):
+                    if name not in todo_i:
+                        return
+                    try:
+                        lines, cand_pids = [], []
+                        for i, (pid, _wt) in enumerate(vocab[name]["papers"].most_common()[:8], 1):
+                            r = reg.execute(
+                                "SELECT first_hi, (SELECT title FROM records r WHERE r.paper_id=p.paper_id "
+                                "ORDER BY r.source='arxiv' DESC LIMIT 1), (SELECT abstract FROM records r "
+                                "WHERE r.paper_id=p.paper_id AND abstract IS NOT NULL AND abstract!='' "
+                                "ORDER BY r.source='arxiv' DESC LIMIT 1) FROM papers p WHERE p.paper_id=?",
+                                (pid,)).fetchone()
+                            title = (r[1] if r else "") or pid
+                            year = ((r[0] or "")[:4]) if r else ""
+                            lines.append(f"{i}. {title} ({year}) — {((r[2] if r else '') or '')[:220]}")
+                            cand_pids.append(pid)
+                        ctx = []
+                        for sid, citing in rconn.execute("SELECT sid, citing FROM mention_link "
+                                                         "WHERE name=? AND status='ambiguous' LIMIT 6", (name,)):
+                            t = _sent_text(D, citing, sid)
+                            if t:
+                                ctx.append(f"[{citing}] {t[:220]}")
+                        raw = chat(PR.METHOD_ID.format(name=vocab[name]["surface"] or name,
+                                                       candidates="\n".join(lines),
+                                                       contexts="\n".join(ctx) or "(none captured)"),
+                                   model=PR.MODEL, max_tokens=200, temperature=0.0, enable_thinking=False,
+                                   item=f"identity:{name}")
+                        obj = parse_json_response(raw or "")
+                        if not isinstance(obj, dict) or not isinstance(obj.get("paper"), int):
+                            w.fail(name, "identity: no parseable answer")
+                            return
+                        pick = obj["paper"]
+                        pid_res = cand_pids[pick - 1] if 1 <= pick <= len(cand_pids) else None
+                        with run.lock:
+                            con.execute("INSERT OR REPLACE INTO method_identity VALUES (?,?,?,?,?)",
+                                        (name, pid_res, "adjudicated" if pid_res else "unresolved", PR.MODEL, now))
+                            if pid_res:
+                                con.execute("UPDATE mention_link SET paper_id=?, status='adjudicated' "
+                                            "WHERE name=? AND status='ambiguous'", (pid_res, name))
+                            icounter["n"] += 1
+                            if icounter["n"] % 100 == 0:
+                                con.commit()
+                            w.ok(name)
+                    except Exception as e:
+                        w.fail(name, f"{type(e).__name__}: {e}")
+
+                icounter = {"n": 0}
+                store.parallel(one_identity, [n for n in amb if n in todo_i], workers or 8, log=log, every=1000,
+                               label="cognition:identities")
+                with run.lock:
+                    con.commit()
+                id_map = dict(rconn.execute("SELECT name, paper_id FROM method_identity "
+                                            "WHERE status='adjudicated' AND paper_id IS NOT NULL"))
+                id_fp = store.sha(sorted((k, v) for k, v in rconn.execute(
+                    "SELECT name, paper_id FROM method_identity WHERE status='adjudicated'")))
+                rconn.close()
             finally:
                 D.close()
 
-            # ---- lineage: paper -> paper edges with the §2.4 effective date (deterministic half; ambiguous
-            #      parent identities wait for the D② method-identity adjudication)
+            def owner(n):
+                """The paper a method name belongs to: the deterministic resolution first, then the adjudicated
+                identity (the ambiguity is exactly what the LLM decided)."""
+                p_, st_ = resolved.get(n, (None, "empty"))
+                return p_ if st_ == "ok" else id_map.get(n)
+
+            # ---- lineage: paper -> paper edges with the §2.4 effective date (deterministic assembly; parent
+            #      identities come from the resolution/adjudication above)
             w = run.work("lineage")
-            if w.todo([("all", store.sha(ext_fp, vocab_fp))]):
+            if w.todo([("all", store.sha(ext_fp, vocab_fp, id_fp))]):
                 first_hi = dict(reg.execute("SELECT paper_id, first_hi FROM papers "
                                             "WHERE status='active' AND first_hi IS NOT NULL"))
                 edges, hyper, dropped = [], [], {"time": 0, "stub": 0, "unknown": 0}
@@ -355,7 +465,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                         parents = []
                         for mn in m.get("mentions") or []:
                             rel = mn.get("relation") if mn.get("relation") in LINEAGE else role
-                            p = resolved.get(norm_name(mn.get("name") or ""), (None,))[0]
+                            p = owner(norm_name(mn.get("name") or ""))
                             if p:
                                 add_edge(sid, speaker, p, rel, "self", speaker, date)
                                 parents.append(p)
@@ -369,7 +479,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                         bo, bor = m.get("builds_on"), m.get("builds_on_relation")
                         if bo and bor in LINEAGE:
                             bn = norm_name(bo)
-                            p = resolved.get(bn, (None,))[0]
+                            p = owner(bn)
                             if p is None and bn in vocab:
                                 # a globally ambiguous name is disambiguated by the sentence: a co-cited work
                                 # that claims the name is the parent (the old Identity fallback, kept)
@@ -392,7 +502,9 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "comparison_edge": q("SELECT count(*) FROM comparison_edge"),
                       "mention_link": q("SELECT count(*) FROM mention_link"),
                       "mentions_ambiguous": q("SELECT count(*) FROM mention_link WHERE status='ambiguous'"),
+                      "mentions_adjudicated": q("SELECT count(*) FROM mention_link WHERE status='adjudicated'"),
                       "names": len(vocab),
+                      "identities": dict(con.execute("SELECT status, count(*) FROM method_identity GROUP BY status")),
                       "lineage_edge": q("SELECT count(*) FROM lineage_edge"),
                       "lineage_hyper": q("SELECT count(*) FROM lineage_hyper")}
             run.finish(counts)
