@@ -64,7 +64,9 @@ def test_p1_code_identity_is_the_import_closure(store):
     for f in ("llm/client.py", "llm/jsonparse.py", "compile/skeleton/proposes.py", "extract/passes.py",
               "extract/prompts.py", "extract/reading.py", "documents/sciverse.py", "documents/tables.py"):
         assert f in code, f
-    assert "llm/embedding.py" in store.code_hashes(store.ENTRY["index"])
+    idx_closure = store.code_hashes(store.ENTRY["index"])
+    for f in ("llm/embedding.py", "index/search.py", "extract/reading.py"):
+        assert f in idx_closure, f
     docs_closure = store.code_hashes(store.ENTRY["documents"])
     for f in ("documents/tei.py", "documents/assemble.py", "documents/versions.py", "library/identity.py",
               "documents/sciverse.py"):

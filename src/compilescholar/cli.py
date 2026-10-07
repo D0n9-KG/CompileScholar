@@ -200,7 +200,7 @@ def cmd_build(a):
         elif s == "index":
             from .index import build as B
             dense = tuple(x for x in a.dense.split(",") if x) if a.dense is not None else tuple(cfg.build.dense)
-            print(json.dumps(B.build(dense=dense)))
+            print(json.dumps(B.build(dense=dense, rebuild=rb)))
 
 
 def cmd_library(a):
