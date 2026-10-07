@@ -172,6 +172,7 @@ _HEAD = re.compile(r"(?m)^(#{1,6})\s+(.+?)\s*$")
 _TABLE = re.compile(r"<table.*?</table>", re.S)
 _DISPLAY_MATH = re.compile(r"\$\$.+?\$\$", re.S)
 _CAPTION = re.compile(r"(?mi)^\s*((?:table|figure|fig\.)\s*\d+[.:]\s*.+)$")
+_IMAGE_MD = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 _MATH_HOLD = re.compile(r"\$[^$\n]+\$|\\\(.+?\\\)")
 _BOUND = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\[\\$0-9])")
 _ABBR = {"e.g", "i.e", "et al", "cf", "vs", "etc", "fig", "figs", "eq", "eqs", "sec", "secs", "tab", "no", "vol",
@@ -179,7 +180,7 @@ _ABBR = {"e.g", "i.e", "et al", "cf", "vs", "etc", "fig", "figs", "eq", "eqs", "
 
 
 def _clean(s: str) -> str:
-    return re.sub(r"\s+", " ", s).strip()
+    return re.sub(r"\s+", " ", _IMAGE_MD.sub(" ", s)).strip()      # base64/linked figures are noise for prose
 
 
 def split_sentences(text: str) -> list[str]:
@@ -213,10 +214,20 @@ def split_sentences(text: str) -> list[str]:
     return out
 
 
+_TRAILING_ENTRIES = re.compile(r"(?ms)(?:^\s*\[\d+\][^\n]*\n?){3,}\s*$")
+
+
 def _cut_refs(text: str) -> tuple[str, bool]:
+    """(body, has_refs): the reference block is cut by heading (citations.markdown.find_refs); MinerU texts with
+    an UNTITLED reference list (the chemistry/medicine sentinel form) are cut at the trailing [n]-entry block."""
     from ..citations.markdown import find_refs
     parts = find_refs(text)
-    return (parts[0], True) if parts else (text, False)
+    if parts:
+        return parts[0], True
+    m = _TRAILING_ENTRIES.search(text)
+    if m:
+        return text[:m.start()], True
+    return text, False
 
 
 def doc(pid: str, text: str) -> dict:

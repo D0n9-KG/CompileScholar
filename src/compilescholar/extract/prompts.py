@@ -93,7 +93,9 @@ Return JSON only:
                   is row; or the header row index when object_axis is column>,
  "conditions": [{{"index": <int>, "axis": "row" | "column",
                   "label": "<what this axis conditions on, e.g. dataset, method, hyper-parameter setting>"}}],
- "measures": [{{"index": <int>, "metric": "<what is measured, in the paper's words>",
+ "measures": [{{"index": <int>,
+                "metric": "<what this column measures, in the paper's words, INCLUDING the column's header label
+                           (on a multi-task table: 'QA RoBERTa-L accuracy', not just 'accuracy')>",
                 "unit": "<unit as written, or empty>", "direction": "higher | lower | neutral"}}],
  "skip_rows": [<int>, ...]}}
 
@@ -132,6 +134,22 @@ One object per (sentence, cited work) pair: a sentence citing three works gets t
 sentence itself — do not restate it."""
 
 
+REPAIR = """A quality gate rejected the following extracted statements about a research paper. Each case shows
+the anchor sentence from the source, the rejected statement, and the violation. Repair each statement so that:
+- "quote" is EXACTLY the anchor sentence, copied verbatim (no edits, no truncation);
+- every number in "text" appears verbatim in that sentence — never convert, round or compute a number;
+- "facet" / "role" / "epistemic" stay inside their enums; "text" stays one normalized sentence fully supported
+  by the quote.
+If a statement cannot be repaired from its anchor sentence, mark it dropped.
+
+{cases}
+
+Return JSON only:
+{{"fixed": [{{"i": <case number>, "drop": false, "text": "...", "quote": "...", "facet": "...", "role": "...",
+             "epistemic": "...", "condition": "..."}}]}}
+For a statement that cannot be repaired return {{"i": <case number>, "drop": true}}."""
+
+
 def sha(prompt: str) -> str:
     """The prompt sha stored on its rows: the template plus the vocabularies it formats in — a changed vocabulary
     re-opens the pass exactly like a changed template."""
@@ -142,3 +160,4 @@ T1_SHA = sha(T1)
 T2_SHA = sha(T2)
 RESULTS_SHA = sha(RESULTS_AXES)
 OTHER_SHA = sha(OTHER)
+REPAIR_SHA = sha(REPAIR)

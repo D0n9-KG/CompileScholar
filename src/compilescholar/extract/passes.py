@@ -261,22 +261,44 @@ def results(pid: str, tables: list[dict], own_methods=(), default_date: str | No
         if not (0 <= oidx < ncols):
             st["gate_object_index"] += 1
             continue
+        # a column is either a measure or a condition, never both (the LLM sometimes proposes the measure
+        # columns again as "conditions" of a multi-task table — the gate is structural, so it just drops them)
         conds = [c for c in ax.get("conditions") or []
                  if isinstance(c, dict) and isinstance(c.get("index"), int) and 0 <= c["index"] < ncols
-                 and c["index"] != oidx and _n(c.get("label"))]
-        headers = {int(h) for h in ax.get("header_rows") or [] if str(h).lstrip("-").isdigit()} or {0}
+                 and c["index"] != oidx and _n(c.get("label"))
+                 and c["index"] not in {m["index"] for m in measures}]
+        headers = {int(h) for h in ax.get("header_rows") or []
+                   if str(h).lstrip("-").isdigit() and 0 <= int(h) < nrows} or {0}
         skip = {int(x) for x in ax.get("skip_rows") or [] if str(x).lstrip("-").isdigit()}
         date = tb.get("date") or default_date
         if not date:
             st["no_date"] += 1
             continue
+
+        def header_label(idx):
+            """The column's header cell texts (deterministic, from cells) — labels the LLM metric when it
+            answered with a bare 'accuracy' on a multi-task table."""
+            parts = []
+            for h in sorted(headers):
+                cell = _n(grid[h][idx]) if h < len(grid) and idx < len(grid[h]) else ""
+                if cell and not re.fullmatch(r"[\d.,;%\s±\-–—]+", cell) and cell not in parts:
+                    parts.append(cell)
+            return " ".join(parts)
+
+        def labeled(idx, llm_label):
+            hl = header_label(idx)
+            llm_label = _n(llm_label)
+            if hl and re.sub(r"\s+", "", hl).lower() not in re.sub(r"\s+", "", llm_label).lower():
+                return f"{hl} {llm_label}".strip()
+            return llm_label or hl
+
         for ri, row in enumerate(grid):
             if ri in headers or ri in skip or ri >= len(quotes) or not quotes[ri]:
                 continue
             obj = _n(row[oidx] if oidx < len(row) else "")
             if not obj:
                 continue
-            cond = "; ".join(f"{_n(c['label'])}={_n(row[c['index']])}" for c in conds
+            cond = "; ".join(f"{labeled(c['index'], c['label'])}={_n(row[c['index']])}" for c in conds
                              if c["index"] < len(row) and _n(row[c["index"]]))
             mine = any(o and (o in obj.lower() or obj.lower() in o) for o in own_norm)
             for m in measures:
@@ -284,12 +306,13 @@ def results(pid: str, tables: list[dict], own_methods=(), default_date: str | No
                 if not cell or len(cell) > 40 or not re.search(r"\d", cell):
                     continue                        # no number in the cell: nothing to state, never infer one
                 st["cells"] += 1
+                metric = labeled(m["index"], m["metric"])
                 out.append(Statement(
                     speaker=pid, date=date, kind="self", about=pid, role="describes", facet="result",
-                    text=f"{obj}{(' — ' + cond) if cond else ''}: {_n(m['metric'])}: {cell}"[:400],
+                    text=f"{obj}{(' — ' + cond) if cond else ''}: {metric}: {cell}"[:400],
                     quote=quotes[ri], epistemic="demonstrated" if mine else "cited", condition=cond[:300],
                     loc={"unit_id": tb["uid"], "sent_id": f"{pid}@{tb['uid']}:r{ri}"},
-                    meta={"object": obj, "metric": _n(m["metric"]), "value": cell, "unit": _n(m.get("unit")),
+                    meta={"object": obj, "metric": metric, "value": cell, "unit": _n(m.get("unit")),
                           "direction": m.get("direction") if m.get("direction") in ("higher", "lower", "neutral")
                           else None, "own": mine, "table": tb["uid"], "row": ri},
                     model=model, prompt_sha=PR.RESULTS_SHA, pass_name="results", item=pid))
@@ -392,6 +415,7 @@ def deep_read(D, reg, pid: str, chat=None) -> dict:
     """The per-paper runtime entry (v2.4: `deep_read(paper_id)` — same code as the offline build; the caller
     decides where the statements go, and during evaluation nothing is written back). Best effort: a failed pass
     is reported in stats, the others still return."""
+    from . import final_check as FC
     chat = chat or call_local
     stats: dict = {}
     out: list[Statement] = []
@@ -402,6 +426,10 @@ def deep_read(D, reg, pid: str, chat=None) -> dict:
         stmts, names, st = t1(inp, chat=chat)
         stats["t1"] = st
         if stmts is not None:
+            stmts, _, fst = FC.run(stmts, " ".join(x["text"] for x in inp["sentences"]),
+                                   {f"{pid}@abs{x['n']}": x["text"] for x in inp["sentences"]},
+                                   chat=chat, item=pid)
+            stats["t1_final_check"] = fst
             out += stmts
             own += names
     full = reading.full_text(D, pid)
@@ -409,13 +437,19 @@ def deep_read(D, reg, pid: str, chat=None) -> dict:
         stmts, own2, st = t2(pid, title, full, seed_own=own, chat=chat)
         stats["t2"] = st
         if stmts is not None:
+            stmts, _, fst = FC.run(stmts, " ".join(x["text"] for x in full["sentences"]),
+                                   {x["sid"]: x["text"] for x in full["sentences"]}, chat=chat, item=pid)
+            stats["t2_final_check"] = fst
             out += stmts
             own = sorted(set(own) | set(own2))
-        tbs = reading.tables_of(D, pid, full)
+        tbs = reading.tables_of(full)
         if tbs:
             default_date = max((s["date"] for s in full["sentences"] if s.get("date")), default=None)
             stmts, st = results(pid, tbs, own_methods=own, default_date=default_date, chat=chat)
-            stats["results"] = st
+            stmts, _, fst = FC.run(stmts, " ".join(f"{tb['html']} {tb.get('caption') or ''} "
+                                                   f"{' '.join(tb.get('context') or [])}" for tb in tbs),
+                                   {s.loc.get("sent_id"): s.quote for s in stmts}, chat=chat, item=pid)
+            stats["results"] = {**st, **{f"fc_{k}": v for k, v in fst.items()}}
             out += stmts
     else:
         stats["t2"] = {"no_full_text": 1}

@@ -273,6 +273,19 @@ def cmd_parse(a):
     print(json.dumps(P.run(a.tier, paper_ids=pids, workers=a.workers)))
 
 
+def cmd_sentinel(a):
+    """The extraction sentinel cases (§7.3): canary + chemistry papers through the REAL pipeline (same per-paper
+    code as the build), rule-scored facts and traps. Must pass after every prompt change; exit code = the gate."""
+    from .extract import sentinels as S
+    from .llm import client as LC
+    cfg = C.load(a.config, a.set)
+    LC.configure(_llm_settings(cfg), run_id=f"sentinel-{time.strftime('%Y%m%dT%H%M%S')}", caller="sentinel")
+    only = tuple(x for x in (a.only or "").split(",") if x)
+    r = S.run(only=only)
+    print(json.dumps(r, indent=1, ensure_ascii=False, default=str))
+    raise SystemExit(0 if r.get("pass") else 1)
+
+
 def cmd_sciverse(a):
     """The Sciverse content layer (v2.5): fetch caches texts in data/derived/sciverse_text.sqlite (the documents
     stage's sv pass dates them); status reports that store."""
@@ -311,6 +324,11 @@ def main(argv=None):
     p.add_argument("--ids", default=None, help="file of paper_ids (default: every asset)")
     p.add_argument("--workers", type=int, default=None)
     p.set_defaults(fn=cmd_parse)
+    p = sub.add_parser("sentinel", help="extraction sentinel cases (canary + chem): run after every prompt change")
+    p.add_argument("--only", default=None, help="comma list: canary,chem (default: both)")
+    p.add_argument("--config")
+    p.add_argument("--set", action="append", default=[])
+    p.set_defaults(fn=cmd_sentinel)
     p = sub.add_parser("sciverse", help="Sciverse content layer: fetch (title search + /content cache) | status")
     p.add_argument("action", choices=["fetch", "status"])
     p.add_argument("--benchmark", default=None, help="fetch: members of this benchmark (default corpus: SC)")

@@ -265,6 +265,7 @@ def test_results_gate_values_and_quotes():
     assert mine.epistemic == "demonstrated" and other.epistemic == "cited"
     assert mine.meta["value"] == "91.2%" and "91.2%" in mine.quote    # the number comes from the cell
     assert mine.quote == "FastGF 91.2% 2d"                            # pre-expansion cell texts, no rowspan dup
+    assert mine.meta["metric"] == "accuracy"                          # "Acc" is contained in the LLM's label
     assert mine.date == "2021-06-01" and mine.loc["sent_id"] == f"{PID}@t1:r1"
     assert mine.validate() == []
     # gates: unusable / column-object / no valid measure

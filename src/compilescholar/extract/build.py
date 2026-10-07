@@ -36,6 +36,7 @@ from collections import defaultdict
 from ..core import paths
 from ..dfc import store
 from ..documents.build import Documents
+from . import final_check as FC
 from . import passes as PS
 from . import prompts as PR
 from . import reading as RD
@@ -221,6 +222,9 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                     if stmts is None:
                         w_t1.fail(pid, "t1: no parseable answer")
                         return
+                    stmts, _, fst = FC.run(stmts, " ".join(x["text"] for x in inp["sentences"]),
+                                           {f"{pid}@abs{x['n']}": x["text"] for x in inp["sentences"]}, item=pid)
+                    st = {**st, **{f"fc_{k}": v for k, v in fst.items()}}
                     with lock:
                         replace("t1", pid, _rows(stmts, run_id, tot))
                         stats_row(pid, "t1", st)
@@ -276,7 +280,9 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                     if stmts is None:
                         w_t2.fail(pid, f"t2: chunk {st.get('failed_chunk')} gave no parseable answer")
                         return
-                    st["own_methods"] = own
+                    stmts, _, fst = FC.run(stmts, " ".join(x["text"] for x in full["sentences"]),
+                                           {x["sid"]: x["text"] for x in full["sentences"]}, item=pid)
+                    st = {**st, "own_methods": own, **{f"fc_{k}": v for k, v in fst.items()}}
                     with lock:
                         replace("t2", pid, _rows(stmts, run_id, tot))
                         stats_row(pid, "t2", st)
@@ -301,7 +307,7 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                     return
                 try:
                     full = RD.full_text(D, pid)
-                    tbs = RD.tables_of(D, pid, full) if full else []
+                    tbs = RD.tables_of(full) if full else []
                     if not tbs:
                         with lock:
                             replace("results", pid, [])
@@ -317,6 +323,11 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                             pass
                     default_date = max((s["date"] for s in full["sentences"] if s.get("date")), default=None)
                     stmts, st = PS.results(pid, tbs, own_methods=own, default_date=default_date)
+                    stmts, _, fst = FC.run(
+                        stmts, " ".join(f"{tb['html']} {tb.get('caption') or ''} "
+                                        f"{' '.join(tb.get('context') or [])}" for tb in tbs),
+                        {s.loc.get("sent_id"): s.quote for s in stmts}, item=pid)
+                    st = {**st, **{f"fc_{k}": v for k, v in fst.items()}}
                     with lock:
                         replace("results", pid, _rows(stmts, run_id, tot))
                         stats_row(pid, "results", st)
@@ -387,6 +398,11 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                             out += stmts
                             for k, v in st.items():
                                 merged[k] += v
+                        out, _, fst = FC.run(out, " ".join(it["sentence"] for it in items),
+                                             {it["sid"]: it["sentence"] for it in items if it.get("sid")},
+                                             item=citing)
+                        for k, v in fst.items():
+                            merged["fc_" + k] += v
                         with lock:
                             replace("other", citing, _rows(out, run_id, tot))
                             stats_row(citing, "other", dict(merged))
