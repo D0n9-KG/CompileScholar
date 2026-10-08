@@ -321,15 +321,17 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                             w_res.ok(pid)
                             commit_soon()
                         return
-                    own = list(_t1_names(pid))
+                    own_strong = list(_t1_names(pid))          # t1-validated proposed names (trusted)
+                    own_weak: list = []
                     r = rconn.execute("SELECT stats FROM pass_stats WHERE paper_id=? AND pass='t2'", (pid,)).fetchone()
                     if r:
                         try:
-                            own += json.loads(r[0]).get("own_methods") or []
+                            own_weak = json.loads(r[0]).get("own_methods") or []
                         except (TypeError, ValueError):
                             pass
                     default_date = max((s["date"] for s in full["sentences"] if s.get("date")), default=None)
-                    stmts, st = PS.results(pid, tbs, own_methods=own, default_date=default_date)
+                    stmts, st = PS.results(pid, tbs, own_methods=own_weak, own_strong=own_strong,
+                                           default_date=default_date)
                     stmts, _, fst = FC.run(
                         stmts, " ".join(f"{tb['html']} {tb.get('caption') or ''} "
                                         f"{' '.join(tb.get('context') or [])}" for tb in tbs),
@@ -397,6 +399,7 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                         if cur:
                             batches.append(cur)
                         out, merged = [], defaultdict(int)
+                        list_stats: dict = {}          # FC stats can carry lists (fuzzy_samples); += would crash
                         for b in batches:
                             stmts, st = PS.other_batch(citing, b)
                             if stmts is None:
@@ -404,12 +407,19 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                                 return
                             out += stmts
                             for k, v in st.items():
-                                merged[k] += v
+                                if isinstance(v, list):
+                                    list_stats.setdefault(k, []).extend(v)
+                                else:
+                                    merged[k] += v
                         out, _, fst = FC.run(out, " ".join(it["sentence"] for it in items),
                                              {it["sid"]: it["sentence"] for it in items if it.get("sid")},
                                              item=citing)
                         for k, v in fst.items():
-                            merged["fc_" + k] += v
+                            if isinstance(v, list):
+                                list_stats.setdefault("fc_" + k, []).extend(v)
+                            else:
+                                merged["fc_" + k] += v
+                        merged.update(list_stats)
                         with lock:
                             replace("other", citing, _rows(out, run_id, tot))
                             stats_row(citing, "other", dict(merged))
