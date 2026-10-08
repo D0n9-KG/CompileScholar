@@ -1,0 +1,20 @@
+description: >
+  CS2 dev full-arm run (literature-layer answering): answer.mode=lit routes through tools.api,
+  server-side configured as arm=full with the external channel on and every tool call ledgered
+  into runs/<run_id>/tool_budget.jsonl (INTEGRATED-SYSTEM-1005 §9.4). dev split = rubrics v1;
+  test (rubrics v2) is permanently frozen — no config here may point at it.
+  cutoff 2025-05 = the official inserted_before; word_budget 1000 = PREREG §6 answer length.
+  Dry runs: --set bench.sample=3 (seeded by bench.seed). The confirm subset is
+  --set bench.offset=25 bench.limit=75.
+answer:
+  mode: lit
+  kb: false
+  ext: true
+  screen: true
+  cutoff: 2025-05
+  word_budget: 1000
+bench:
+  name: cs2
+  split: dev
+  offset: 0
+  limit: 100

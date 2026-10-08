@@ -39,6 +39,9 @@ def _questions(cfg: C.RunConfig) -> tuple[list[dict], Path]:
     from .eval.cs2.scoring import rubric_path
     p = Path(rubric_path(cfg.bench.split))
     qs = json.load(open(p, encoding="utf-8"))[cfg.bench.offset:cfg.bench.offset + cfg.bench.limit]
+    if cfg.bench.sample:                  # seeded subset of the slice (dry runs); the seed is in the resolved config
+        import random
+        qs = random.Random(cfg.bench.seed).sample(qs, min(cfg.bench.sample, len(qs)))
     return [{"qid": q["case_id"][:24], "question": q["question"]} for q in qs], p
 
 
@@ -79,6 +82,10 @@ def cmd_answer(a):
             inputs[f"dfc/{s}.manifest"] = _st.root() / "manifests" / f"{s}.json"
         _st.require_fresh(*_st.STAGES)
         M.write(rd, M.build(a.run_id, cfg.to_dict(), inputs))
+        # the tool layer is server-side configured (§9.4): full arm, external on, and every call ledgered into the
+        # run directory for the same-budget audits
+        from .tools import api as TA
+        TA.configure(TA.ToolConfig(arm="full", external=cfg.answer.ext, budget_log=str(rd / "tool_budget.jsonl")))
     kb = AP.KB(str(kbp)) if kbp and not lit else None
     todo = [q for q in qs if q["qid"] not in done]
     print(f"[answer] {a.run_id}: {len(todo)} to answer, {len(done)} done (mode={cfg.answer.mode})", flush=True)
@@ -112,6 +119,14 @@ def cmd_answer(a):
 
 
 def cmd_judge(a):
+    # inspect_ai (0.3.268 measured) lazily loads its bundled model-info YAMLs through open() with no encoding;
+    # under the Windows gbk default the first model.generate raises UnicodeDecodeError, and the official retry
+    # loop (21 attempts, 1.5^k backoff) turns it into a ~3.7 h "hang" with identical failures. UTF-8 mode only
+    # takes effect before interpreter start, so re-exec once (config level; the scoring logic is untouched).
+    if sys.platform == "win32" and not sys.flags.utf8_mode and not os.environ.get("CS_JUDGE_UTF8"):
+        import subprocess
+        env = {**os.environ, "PYTHONUTF8": "1", "CS_JUDGE_UTF8": "1"}
+        raise SystemExit(subprocess.call([sys.executable, "-m", "compilescholar.cli", *sys.argv[1:]], env=env))
     import asyncio
     from .eval.cs2 import judge as J
     rd = _run_dir(a.run_id)

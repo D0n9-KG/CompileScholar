@@ -46,6 +46,8 @@ class BenchConfig:
     split: str = "dev"
     offset: int = 0
     limit: int = 100
+    sample: int | None = None             # seeded random subset of the offset/limit slice (dry runs)
+    seed: int = 20261009
 
 
 @dataclass(frozen=True)

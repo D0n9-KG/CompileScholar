@@ -16,6 +16,7 @@ ENV_ALLOWED = {
     "eval/cs2/judge.py", "eval/dsb.py", "eval/field.py", "baselines/harness/runner.py", "baselines/harness/proxy.py",
     "baselines/harness/mcp_server.py", "tools/mcp_server.py", "sources/sciverse.py", "sources/refgraph.py",
     "answer/pipeline.py", "cli.py", "llm/client.py",
+    "eval/sc/runner.py",   # passes the environment through to the official evaluate.py subprocess
 }
 
 
