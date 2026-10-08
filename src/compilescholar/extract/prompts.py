@@ -125,8 +125,10 @@ Return JSON only:
 {{"pairs": [{{"s": <sentence number>, "key": "<cited key exactly as given>",
   "function": "background | basis | baseline | contrast | data | tool | metric",
   "role": "extends | improves | replaces | adapts | combines | uses | compares | background | criticizes",
-  "about": "<one short sentence: what THIS sentence says the cited work is or does, in the sentence's own words;
-            null if the sentence says nothing specific (e.g. a bare citation list)>",
+  "about": "<one short sentence: what THIS sentence says the cited work is or does, in the sentence's own words.
+            Describe the CITED WORK itself — never the sentence or the act of citing; forms like 'The sentence
+            lists/mentions/states/identifies this work as...' are INVALID (return null instead).
+            null if the sentence says nothing specific about the work (e.g. a bare citation list)>",
   "facet": "<what 'about' describes: contribution | method | result | limitation | setting | categorization>",
   "epistemic": "<one of: {epistemic}>",
   "category": "<the class or family of methods the sentence puts the cited work in, in its words; null if none>",

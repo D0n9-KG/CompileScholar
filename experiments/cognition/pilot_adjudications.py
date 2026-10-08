@@ -35,7 +35,10 @@ def pilot_identity(n: int, chat_a, chat_b) -> dict:
     cog = store.connect("cognition", readonly=True)
     reg = store.read_only(paths.library() / "registry.sqlite")
     D = Documents()
+    # the build adjudicates ambiguous names as it goes, so by pilot time the population is
+    # status IN (adjudicated, unresolved) — re-run the same task dual-model over those
     names = [r[0] for r in cog.execute("SELECT name FROM method_identity WHERE status='ambiguous' "
+                                       "OR status IN ('adjudicated','unresolved') "
                                        "OR (status IS NULL AND paper_id IS NULL)")]
     sample = random.Random(20261007).sample(sorted(names), min(n, len(names)))
     out = []
@@ -75,10 +78,18 @@ def pilot_category(n: int, chat_a, chat_b) -> dict:
         "SELECT DISTINCT json_extract(meta, '$.category') FROM statements "
         "WHERE kind='other' AND json_extract(meta, '$.category') IS NOT NULL") if c and len(c.strip()) >= 3})
     ext.close()
+    # replicate the production task: the build's canon pass offers the current top-40 canonical
+    # names for reuse (cognition/build.py one_category); a free-generation pilot measures a harder
+    # task than production and underestimates agreement
+    cog = store.connect("cognition", readonly=True)
+    existing = [r[0] for r in cog.execute("SELECT canonical FROM category_canon "
+                                          "GROUP BY canonical ORDER BY count(*) DESC LIMIT 40")]
+    cog.close()
+    existing_s = "\n".join(f"- {x}" for x in existing) or "(none yet)"
     sample = random.Random(20261007).sample(phrases, min(n, len(phrases)))
     out = []
     for phr in sample:
-        prompt = PR.CATEGORY_CANON.format(existing="(pilot: no reuse list)", phrase=phr[:200])
+        prompt = PR.CATEGORY_CANON.format(existing=existing_s, phrase=phr[:200])
         canons = []
         for chat in (chat_a, chat_b):
             obj = parse_json_response(chat(prompt, model=PR.MODEL, max_tokens=120, temperature=0.0,

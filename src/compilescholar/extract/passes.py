@@ -206,6 +206,16 @@ def t2(pid: str, title: str, full: dict, seed_own=(), chat=None,
 
 
 # ---------------------------------------------------------------- results pass
+# a row object carrying a citation marker is reporting someone else's result, whatever the vocab says
+_CITE_MARK = re.compile(r"\[\d+[a-z]?\]|\(\d{4}\)|\bet al\b", re.I)
+
+
+def _name_in(name: str, s: str) -> bool:
+    """Vocab-name match: substring both ways for names >= 4 chars; exact only for short ones ('ST' must
+    not match 'STANDARD')."""
+    return name == s if len(name) < 4 else (name in s or s in name)
+
+
 def _repair_grid(html: str):
     """HTML -> (grid, row quotes): spans expanded for the grid; the quotes come from the PRE-expansion rows'
     cell texts (a rowspan continuation would duplicate text the source has once), whitespace-collapsed — the
@@ -224,13 +234,23 @@ def _repair_grid(html: str):
     return (grid if len(grid) >= 2 else None), quotes
 
 
-def results(pid: str, tables: list[dict], own_methods=(), default_date: str | None = None, chat=None,
-            model: str = MODEL) -> tuple[list[Statement], dict]:
+def results(pid: str, tables: list[dict], own_methods=(), own_strong=(), default_date: str | None = None,
+            chat=None, model: str = MODEL) -> tuple[list[Statement], dict]:
     """Deterministic grid repair + LLM axis roles + a structural gate; every value is read from a cell. Tables
-    whose axes cannot be gated are skipped and counted — never guessed."""
+    whose axes cannot be gated are skipped and counted — never guessed.
+
+    own/cited attribution is deterministic: own_strong = the paper's t1-validated proposed names (trusted);
+    own_methods = the t2 model-supplied vocabulary (fallback only, and only when t1 gave no names — the t2
+    list leaks dataset/tool names). A row object with a citation marker ('X [11]', 'et al') is always cited;
+    the method name may sit in the measure label instead of the row object (dataset-row tables)."""
     chat = chat or call_local
     out, st = [], Counter()
-    own_norm = {re.sub(r"\s+", " ", str(m).strip().lower()) for m in own_methods if m}
+
+    def _norm(ms):
+        return {re.sub(r"\s+", " ", str(m).strip().lower()) for m in ms if m}
+
+    strong = _norm(own_strong)
+    own_norm = strong or (_norm(own_methods) - strong)
     for tb in tables:
         grid, quotes = _repair_grid(tb["html"])
         if not grid:
@@ -305,13 +325,19 @@ def results(pid: str, tables: list[dict], own_methods=(), default_date: str | No
                 continue
             cond = "; ".join(f"{labeled(c['index'], c['label'])}={_n(row[c['index']])}" for c in conds
                              if c["index"] < len(row) and _n(row[c["index"]]))
-            mine = any(o and (o in obj.lower() or obj.lower() in o) for o in own_norm)
+            obj_l = obj.lower()
+            cited_row = bool(_CITE_MARK.search(obj))     # 'Original Residual Unit [1]' is never this paper's own
             for m in measures:
                 cell = _n(row[m["index"]]) if m["index"] < len(row) else ""
                 if not cell or len(cell) > 40 or not re.search(r"\d", cell):
                     continue                        # no number in the cell: nothing to state, never infer one
                 st["cells"] += 1
                 metric = labeled(m["index"], m["metric"])
+                met_l = metric.lower()
+                # the method name may sit in the measure label instead of the row object (dataset-row tables:
+                # 'RCV1 | HOGWILD! time (s) = 9.5' is the paper's own result even though the object is a dataset)
+                mine = (not cited_row) and any(
+                    o and (_name_in(o, obj_l) or (len(o) >= 4 and o in met_l)) for o in own_norm)
                 out.append(Statement(
                     speaker=pid, date=date, kind="self", about=pid, role="describes", facet="result",
                     text=f"{obj}{(' — ' + cond) if cond else ''}: {metric}: {cell}"[:400],
@@ -410,8 +436,14 @@ def other_batch(citing: str, items: list[dict], chat=None,
                           model=model, prompt_sha=PR.OTHER_SHA, pass_name="other", item=citing)
             if lim and facet != "limitation":       # a stated limitation gets its own statement
                 out.append(Statement(**common, facet="limitation", text=lim[:400]))
-            out.append(Statement(**common, facet=facet,
-                                 text=(about or lim or cat or "(cited without description)")[:400]))
+            desc = about or lim or cat
+            if desc:
+                out.append(Statement(**common, facet=facet, text=desc[:400]))
+            else:
+                # a bare citation is a typed weak-reception signal, not a description — flag it so readers
+                # can treat it as an object instead of displaying placeholder prose
+                out.append(Statement(**{**common, "meta": {**common["meta"], "bare": 1}},
+                                     facet=facet, text="(cited without description)"))
     return out, dict(st)
 
 
@@ -439,6 +471,7 @@ def deep_read(D, reg, pid: str, chat=None) -> dict:
             own += names
     full = reading.full_text(D, pid)
     if full:
+        own1 = list(own)                      # t1-validated names, before the t2 vocabulary is merged in
         stmts, own2, st = t2(pid, title, full, seed_own=own, chat=chat)
         stats["t2"] = st
         if stmts is not None:
@@ -450,7 +483,7 @@ def deep_read(D, reg, pid: str, chat=None) -> dict:
         tbs = reading.tables_of(full)
         if tbs:
             default_date = max((s["date"] for s in full["sentences"] if s.get("date")), default=None)
-            stmts, st = results(pid, tbs, own_methods=own, default_date=default_date, chat=chat)
+            stmts, st = results(pid, tbs, own_methods=own2, own_strong=own1, default_date=default_date, chat=chat)
             stmts, _, fst = FC.run(stmts, " ".join(f"{tb['html']} {tb.get('caption') or ''} "
                                                    f"{' '.join(tb.get('context') or [])}" for tb in tbs),
                                    {s.loc.get("sent_id"): s.quote for s in stmts}, chat=chat, item=pid)
