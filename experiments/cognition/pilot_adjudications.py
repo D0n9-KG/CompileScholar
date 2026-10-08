@@ -15,6 +15,7 @@ import json
 import random
 import re
 import time
+from collections import Counter
 
 from compilescholar.cognition import prompts as PR
 from compilescholar.cognition.build import _sent_text
@@ -89,6 +90,56 @@ def pilot_category(n: int, chat_a, chat_b) -> dict:
     return _report("category", out, gate_key="agree_norm")
 
 
+ENTAIL_PROMPT = (
+    "You are auditing one extracted claim against the verbatim source sentence it cites.\n"
+    "CLAIM: {text}\n"
+    "EVIDENCE (verbatim from the paper): {quote}\n"
+    "Verdict:\n"
+    '- "supported": the evidence fully backs the claim (paraphrasing is fine; no new facts)\n'
+    '- "partial": the evidence backs only part of the claim, or the claim adds specifics the evidence lacks\n'
+    '- "unsupported": the evidence does not back the claim (different subject, contradiction, or unrelated)\n'
+    'Answer JSON only: {{"verdict": "supported"|"partial"|"unsupported", "reason": "<= 15 words"}}'
+)
+_LABELS = ("supported", "partial", "unsupported")
+
+
+def pilot_entailment(n: int, chat_a, chat_b) -> dict:
+    """text<->quote entailment audit — the reporting rule says locatability and entailment are reported
+    separately, and the final check only guarantees locatability. Stratified over passes; the config
+    facet and names entries are excluded (their texts are deterministic constructs of the quote/cell)."""
+    ext = store.connect("extract", readonly=True)
+    rows = []
+    quotas = {"t1": max(1, n // 4), "t2": max(1, n // 2), "other": max(1, n // 4)}
+    for pass_, q in quotas.items():
+        pool = ext.execute(
+            "SELECT text, quote, facet, role FROM statements WHERE pass=? AND quote!='' AND text!='' "
+            "AND facet!='config' AND NOT (text LIKE 'proposes %' AND length(text)<80) "
+            "AND NOT (text LIKE 'uses %' AND length(text)<80)", (pass_,)).fetchall()
+        rows += [(pass_,) + tuple(r) for r in random.Random(20261007).sample(pool, min(q, len(pool)))]
+    ext.close()
+    out = []
+    for pass_, text, quote, facet, role in rows:
+        prompt = ENTAIL_PROMPT.format(text=text[:400], quote=quote[:600])
+        verdicts = []
+        for chat in (chat_a, chat_b):
+            obj = parse_json_response(chat(prompt, model=PR.MODEL, max_tokens=120, temperature=0.0,
+                                           enable_thinking=False, item=f"pilot-ent:{text[:30]}") or "")
+            v = (obj or {}).get("verdict") if isinstance(obj, dict) else None
+            verdicts.append(v if v in _LABELS else None)
+        out.append({"pass": pass_, "facet": facet, "text": text[:160], "quote": quote[:200],
+                    "a": verdicts[0], "b": verdicts[1],
+                    "agree": verdicts[0] == verdicts[1] and verdicts[0] is not None})
+    rep = _report("entailment", out)
+    judged = [r for r in out if r["agree"]]
+    dist = Counter(r["a"] for r in judged)
+    rep["verdict_dist_agreed"] = {k: dist.get(k, 0) for k in _LABELS}
+    rep["entailment_rate"] = round(dist.get("supported", 0) / max(1, len(judged)), 4)
+    rep["by_pass"] = {p: {"n": sum(1 for r in judged if r["pass"] == p),
+                          "supported": sum(1 for r in judged if r["pass"] == p and r["a"] == "supported")}
+                      for p in quotas}
+    return rep
+
+
 def _report(cls, rows, gate_key="agree") -> dict:
     judged = [r for r in rows if r.get(gate_key) is not None]
     agree = sum(1 for r in judged if r[gate_key])
@@ -101,7 +152,7 @@ def _report(cls, rows, gate_key="agree") -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--class", dest="cls", choices=["identity", "category"], required=True)
+    ap.add_argument("--class", dest="cls", choices=["identity", "category", "entailment"], required=True)
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--min", type=float, default=0.95)
     ap.add_argument("--config", default=None)
@@ -109,7 +160,7 @@ def main() -> None:
     cfg = C.load(a.config, [])
     LC.configure(json.loads(json.dumps(cfg.llm or {})), run_id=f"pilot-{a.cls}-{time.strftime('%Y%m%dT%H%M%S')}",
                  caller="pilot")
-    fn = pilot_identity if a.cls == "identity" else pilot_category
+    fn = {"identity": pilot_identity, "category": pilot_category, "entailment": pilot_entailment}[a.cls]
     rep = fn(a.n, LC.call_local, LC.call_paratera)
     rep["gate"] = rep["agreement"] >= a.min     # category: agreement is the normalised口径 (gate_key)
     rep["min"] = a.min
