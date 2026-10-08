@@ -256,21 +256,24 @@ def screen_shifts(obj_votes: dict, author_of: dict, replaces: dict) -> list[dict
                 cands.append({"subject": obj, "facet": "recategorized", "window_start": w0, "window_end": w1,
                               "direction": json.dumps({"from": e1, "to": l1, "p": round(p, 6)},
                                                       ensure_ascii=False),
-                              "evidence": json.dumps({"late": [r["quote"][:200] for r in late
+                              "evidence": json.dumps({"early": [r["quote"][:200] for r in early
+                                                                if (r.get("category") or "") == e1][:2],
+                                                      "late": [r["quote"][:200] for r in late
                                                                if (r.get("category") or "") == l1][:3]},
                                                      ensure_ascii=False),
                               "p": p})
-        seen: dict[str, str] = {}
+        seen: dict[str, tuple] = {}                 # speaker -> (date, quote): one quote per independent speaker
         for r in sorted(votes, key=lambda x: x["date"]):
             if r.get("facet") == "limitation":
                 sp = r["speaker"]
                 if all(not (author_of.get(sp, {sp}) & author_of.get(o, {o})) for o in seen):
-                    seen[sp] = r["date"]
+                    seen[sp] = (r["date"], r["quote"][:200])
                 if len(seen) >= 2:
                     cands.append({"subject": obj, "facet": "limitation_exposed",
-                                  "window_start": min(seen.values()), "window_end": r["date"],
+                                  "window_start": min(d for d, _ in seen.values()), "window_end": r["date"],
                                   "direction": json.dumps({"speakers": sorted(seen)}),
-                                  "evidence": json.dumps([r["quote"][:200]], ensure_ascii=False), "p": 0.0})
+                                  "evidence": json.dumps([q for _, q in seen.values()], ensure_ascii=False),
+                                  "p": 0.0})
                     break
         rep = replaces.get(obj)
         if rep:
@@ -279,11 +282,49 @@ def screen_shifts(obj_votes: dict, author_of: dict, replaces: dict) -> list[dict
                     after, lambda r: r.get("role") in ("extends", "improves", "adapts")):
                 cands.append({"subject": obj, "facet": "superseded", "window_start": rep,
                               "window_end": after[-1]["date"], "direction": json.dumps({"since": rep}),
-                              "evidence": json.dumps([r["quote"][:200] for r in after if is_base(r)][:3],
+                              "evidence": json.dumps({"baseline": [r["quote"][:200] for r in after
+                                                                   if is_base(r)][:3],
+                                                     "extends": [r["quote"][:200] for r in after
+                                                                 if r.get("role") in
+                                                                 ("extends", "improves", "adapts")][:2]},
                                                      ensure_ascii=False),
                               "p": 0.0})
     passed = bh_select([c["p"] for c in cands])
     return [c for i, c in enumerate(cands) if i in passed or c["p"] == 0.0]
+
+
+def _shift_claim(facet: str, dirj: dict, ev) -> tuple[str, list]:
+    """Facet-aware claim sentence + labelled evidence blocks for SHIFT_VERIFY. Structural formatting only —
+    the judgement stays with the LLM. (10-09 fix: single-window facets used to render an empty 'early' block
+    and the judge rejected 88/91 candidates with 'no early sentences exist' — a rendering artifact, not a
+    verdict on the evidence.)"""
+    if facet in ("became_component", "became_baseline"):
+        what = "a building-block component" if facet == "became_component" else "a comparison baseline"
+        claim = (f"between the early window (share {dirj.get('early', '—')}) and the late window "
+                 f"(share {dirj.get('late', '—')}, Fisher p={dirj.get('p', 'n/a')}), citing papers "
+                 f"increasingly treat the work as {what}.")
+        d = ev if isinstance(ev, dict) else {"late": ev}
+        return claim, [("Early-window sentences (from citing papers)", d.get("early", [])),
+                       ("Late-window sentences", d.get("late", []))]
+    if facet == "recategorized":
+        claim = (f"the dominant category citing papers use for the work changed from "
+                 f"'{dirj.get('from', '?')}' to '{dirj.get('to', '?')}' (Fisher p={dirj.get('p', 'n/a')}).")
+        d = ev if isinstance(ev, dict) else {"late": ev}
+        return claim, [("Early-window sentences (old dominant category)", d.get("early", [])),
+                       ("Late-window sentences (new dominant category)", d.get("late", []))]
+    if facet == "limitation_exposed":
+        claim = ("at least two author-independent citing papers explicitly expose a limitation of this work "
+                 "(single-window claim; no early/late contrast).")
+        return claim, [("Limitation-exposing sentences (from independent citing papers)",
+                        ev if isinstance(ev, list) else [])]
+    if facet == "superseded":
+        claim = (f"since {dirj.get('since', '?')} (an explicit 'replaces' claim), citing papers treat the "
+                 "work mainly as a comparison baseline rather than extending it.")
+        d = ev if isinstance(ev, dict) else {"baseline": ev}
+        return claim, [("Baseline-style sentences since then", d.get("baseline", [])),
+                       ("Extension-style sentences since then (should be rarer)", d.get("extends", []))]
+    return (f"{facet} — {json.dumps(dirj, ensure_ascii=False)[:200]}",
+            [("Evidence sentences", ev if isinstance(ev, list) else [])])
 
 
 def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list[str]:
@@ -832,7 +873,10 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                                             "WHERE relation='replaces' GROUP BY parent"))
                 cands = screen_shifts({o: sorted(v.values(), key=lambda r: r["date"])
                                        for o, v in votes.items()}, author_of, replaces)
-                con.execute("DELETE FROM shift_event WHERE status='candidate'")   # adjudicated rows survive
+                # approved rows survive; rejected rows are re-screened and re-adjudicated every build (the
+                # evidence format and the verify prompt evolve — 10-09 fix: the old single-window evidence
+                # rendering made 88/91 rejections structural, and keeping them would freeze that bug in)
+                con.execute("DELETE FROM shift_event WHERE status IN ('candidate','rejected')")
                 con.executemany("INSERT OR IGNORE INTO shift_event(subject, facet, window_start, window_end, "
                                 "direction, evidence, status) VALUES (?,?,?,?,?,?,?)",
                                 [(c["subject"], c["facet"], c["window_start"], c["window_end"], c["direction"],
@@ -862,14 +906,13 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                         t = reg.execute("SELECT title FROM papers WHERE paper_id=?", (r[0],)).fetchone()
                         dirj = json.loads(r[2] or "{}")
                         ev = json.loads(r[3] or "[]")
-                        early = ev.get("early", []) if isinstance(ev, dict) else []
-                        late = ev.get("late", ev) if isinstance(ev, dict) else ev
+                        claim, blocks = _shift_claim(r[1], dirj, ev)
                         raw = chat(PR.SHIFT_VERIFY.format(
-                            subject=f"{r[0]}" + (f" — {t[0][:120]}" if t and t[0] else ""), facet=r[1],
-                            early_share=dirj.get("early", "—"), late_share=dirj.get("late", "—"),
-                            p=dirj.get("p", "n/a"), direction=(r[2] or "")[:200],
-                            early="\n".join(f"- {x[:200]}" for x in early[:2]) or "(none)",
-                            late="\n".join(f"- {x[:200]}" for x in late[:3]) or "(none)"),
+                            subject=f"{r[0]}" + (f" — {t[0][:120]}" if t and t[0] else ""),
+                            claim=claim,
+                            evidence="\n\n".join(
+                                f"{title}:\n" + ("\n".join(f"- {x[:200]}" for x in rows[:3]) or "(none)")
+                                for title, rows in blocks)),
                             model=PR.MODEL, max_tokens=150, temperature=0.0, enable_thinking=False,
                             item=f"shift:{id_str}")
                         obj = parse_json_response(raw or "")

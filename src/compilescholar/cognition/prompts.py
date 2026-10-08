@@ -42,23 +42,21 @@ Rules: keep the most specific standard name of the topic; do not invent topics t
 English only."""
 
 
-SHIFT_VERIFY = """A statistical screen flagged a possible RECEPTION SHIFT for one research work: the way other
-papers talk about it changed between two time windows. Decide whether the evidence sentences actually show the
-shift, or whether the statistics fired on noise / a wording artifact.
+SHIFT_VERIFY = """A deterministic screen flagged a possible RECEPTION SHIFT for one research work: the way other
+papers talk about it may have changed. Decide whether the evidence sentences actually support the screen's
+claim, or whether the screen fired on noise / a wording artifact.
 
 Work: {subject}
-Claimed shift: {facet} — early window {early_share}, late window {late_share} (statistical p={p}).
-{direction}
-Early-window sentences (from citing papers):
-{early}
+Screen claim: {claim}
 
-Late-window sentences:
-{late}
+{evidence}
 
 Answer with JSON only:
 {{"holds": true|false, "why": "<= 12 words"}}
-Rules: "holds" requires the late sentences to genuinely treat the work differently in the claimed way (a real
-change of role, category or stance), not just different phrasings of the same treatment. When unsure, false."""
+Rules: "holds" requires the evidence sentences to genuinely support the claimed change — a real change of role,
+category or stance between the windows; for single-window claims (no early/late contrast), the quoted sentences
+must genuinely make the claimed point about this work. Different phrasings of the same treatment are NOT a
+shift. When unsure, false."""
 
 
 FAMILY_NAME = """You name one research FAMILY: a cluster of papers that the citation patterns of the field group
