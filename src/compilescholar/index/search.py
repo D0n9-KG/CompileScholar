@@ -22,6 +22,7 @@ nothing — measured); text fields use "en_stem"; `day_hi` is indexed+fast+store
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -55,6 +56,17 @@ def asof_int(T) -> int:
     """The range-query upper bound for a cutoff: AsOf normalisation (YYYY-MM-DD required; None = no cutoff)."""
     iso = AsOf(T).iso
     return day_int(iso) if iso else 99999999
+
+
+_Q_UNSAFE = re.compile(r"[^\w\s]", re.UNICODE)
+
+
+def _safe_query(query: str) -> str:
+    """Strip tantivy query-grammar characters from user questions before parse_query. Natural-language
+    questions carry apostrophes, quotes, parens and '?' — unescaped they are grammar tokens and the parser
+    raises ValueError('Syntax Error: ...') (10-09: CS2 lit smoke died on "haven't"). Deterministic structural
+    sanitisation: keep word characters and whitespace, everything else becomes a space."""
+    return _Q_UNSAFE.sub(" ", query or "").strip()
 
 
 def make_schema(name: str):
@@ -239,7 +251,7 @@ class Index:
         import tantivy
         parts = []
         for f, b in zip(fields, boosts):
-            q = ix.parse_query(query, [f])
+            q = ix.parse_query(_safe_query(query), [f])
             parts.append((tantivy.Occur.Should, tantivy.Query.boost_query(q, float(b)) if b != 1.0 else q))
         return tantivy.Query.boolean_query(parts)
 
@@ -273,7 +285,7 @@ class Index:
         import tantivy
         ix = self._open("passages")
         schema = ix.schema
-        clauses = [(tantivy.Occur.Must, ix.parse_query(query, ["body"])),
+        clauses = [(tantivy.Occur.Must, ix.parse_query(_safe_query(query), ["body"])),
                    (tantivy.Occur.Must, tantivy.Query.range_query(schema, "day_hi", tantivy.FieldType.Integer,
                                                                   0, asof_int(as_of)))]
         if paper:
@@ -302,7 +314,7 @@ class Index:
         ix = self._open("statements")
         schema = ix.schema
         day = asof_int(as_of)
-        clauses = [(tantivy.Occur.Must, ix.parse_query(query, ["body"])),
+        clauses = [(tantivy.Occur.Must, ix.parse_query(_safe_query(query), ["body"])),
                    (tantivy.Occur.Must, tantivy.Query.range_query(schema, "day_hi", tantivy.FieldType.Integer,
                                                                   0, day))]
         for f, v in (("kind", kind), ("facet", facet), ("about", about), ):
