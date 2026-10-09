@@ -50,6 +50,8 @@ CREATE INDEX IF NOT EXISTS ix_comp_b ON comparison_edge(b, date);
 CREATE TABLE IF NOT EXISTS mention_link(id INTEGER PRIMARY KEY, name TEXT, sid TEXT, citing TEXT, date TEXT,
   candidates TEXT, paper_id TEXT, status TEXT);
 CREATE INDEX IF NOT EXISTS ix_mention_name ON mention_link(name);
+CREATE INDEX IF NOT EXISTS ix_mention_citing ON mention_link(citing);   /* per-item DELETE ... WHERE citing=? —
+  without it the mentions pass is O(rows x items) full scans (10-09: 5.1k items/h on a 2.7M-row table) */
 CREATE TABLE IF NOT EXISTS method_identity(name TEXT PRIMARY KEY, paper_id TEXT, status TEXT, decided_by TEXT,
   decided_at TEXT);
 CREATE TABLE IF NOT EXISTS lineage_edge(stmt_id INT, child TEXT, parent TEXT, relation TEXT, speaker TEXT,
