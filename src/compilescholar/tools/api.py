@@ -49,6 +49,8 @@ ABLATIONS = ("-time", "-reception", "self_only")
 _lock = threading.Lock()
 _index = [None]
 _docs = [None]          # the shared Documents reader (thread-safe ReadConn) + its papers set, memoised
+_fam_idx: dict[str, dict[str, list]] = {}   # family_snapshot -> inverted member index (snapshots are immutable
+                                            # once built; process memo, cleared by reset_caches like _docs)
 
 
 @dataclass(frozen=True)
@@ -129,6 +131,7 @@ def reset_caches() -> None:
         if _docs[0] is not None:
             _docs[0][0].close()
         _docs[0] = None
+        _fam_idx.clear()
 
 
 def _view(T) -> AsOf:
@@ -429,6 +432,64 @@ def expand_citations(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
             out_local.append({**_paper_head(view, pid), "n_cocite": sc, "via": sorted(via.get(pid, ()))})
     return {"seeds": seeds, "as_of": view.T, "local": out_local, "external": ext_rows,
             "note": "ranked by co-citation count; external hits are read-only during evaluation"}
+
+
+def _family_index(view: AsOf, snap: str) -> dict[str, list]:
+    """Inverted member index {paper_id: [(family_id, name, members)]} of one snapshot, memoised per process.
+    Snapshots are immutable once built (the cognition stage rebuilds the whole table), so the memo is safe for
+    the lifetime of a consumer session; reset_caches() drops it together with the Documents reader."""
+    with _lock:
+        idx = _fam_idx.get(snap)
+    if idx is None:
+        idx = {}
+        for fid, name, members in view.cog.execute(
+                "SELECT family_id, name, members FROM family_snapshot WHERE snapshot=?", (snap,)):
+            try:
+                mm = json.loads(members)
+            except (TypeError, ValueError):
+                continue
+            for m in mm:
+                idx.setdefault(m, []).append((fid, name or fid, mm))
+        with _lock:
+            _fam_idx[snap] = idx
+    return idx
+
+
+@tool
+def family_neighbors(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
+    """The compiled state's family channel: co-members of the seeds' families at T (materialised Leiden
+    snapshots + LLM names), ranked by how many distinct seeds share a family with the co-member (support),
+    then family size. No LLM call — a pure read of the compiled state. Read-only."""
+    view = _view(as_of)
+    if isinstance(seeds, str):
+        seeds = [seeds]
+    seeds = [view.canonical(s) for s in list(seeds)[:10]]
+    snap, lo = F.snapshot_at(view)
+    if not snap:
+        return {"seeds": seeds, "as_of": view.T, "before_grid": bool(lo and view.T < lo), "local": []}
+    idx = _family_index(view, snap)
+    seed_set = set(seeds)
+    support: dict[str, set] = {}
+    fam_of: dict[str, tuple] = {}
+    for s in seeds:
+        for fid, name, mm in idx.get(s, ()):
+            for m in mm:
+                if m in seed_set:
+                    continue
+                support.setdefault(m, set()).add(s)
+                cur = fam_of.get(m)
+                if cur is None or len(mm) < cur[1]:       # prefer the tighter family when several overlap
+                    fam_of[m] = (name, len(mm), fid)
+    out = []
+    for pid, sup in sorted(support.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:k * 4]:
+        if pid.startswith("stub:") or not view.visible(pid):
+            continue
+        name, n_mem, fid = fam_of[pid]
+        out.append({**_paper_head(view, pid), "n_shared_seeds": len(sup),
+                    "family": name, "family_id": fid, "n_members": n_mem})
+        if len(out) >= k:
+            break
+    return {"seeds": seeds, "as_of": view.T, "snapshot": snap, "local": out}
 
 
 # ---------------------------------------------------------------- read

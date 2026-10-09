@@ -193,3 +193,15 @@ def test_summary_arm_compresses(tenv, monkeypatch):
     api.configure(api.ToolConfig(arm="summary", external=False))
     got = api.search_papers("graphs", "2022-01-01", 3)
     assert got == {"compressed": True, "kept": "ids and quotes"} and calls
+
+
+def test_family_neighbors_shape_and_before_grid(tenv):
+    api = tenv.api
+    got = api.family_neighbors([PA, PB], "2022-01-01", 8)
+    assert got["seeds"] == [PA, PB] and isinstance(got["local"], list)
+    for r in got["local"]:
+        assert {"id", "n_shared_seeds", "family", "family_id", "n_members"} <= set(r)
+        assert r["id"] not in (PA, PB) and r["n_shared_seeds"] >= 1
+    early = api.family_neighbors([PA], "1900-01-01", 8)      # before the snapshot grid
+    assert early["local"] == [] and "before_grid" in early
+    assert api.family_neighbors(PA, "2022-01-01", 8)["seeds"] == [PA]   # a bare string seed is accepted

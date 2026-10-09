@@ -10,7 +10,8 @@ Steps and their LLM cost (default budget 8 calls/query, enforced — exceeding i
 the query as failed rather than silently swapping in a cheaper system):
   plan   1 call   the question -> 3-4 keyword sub-queries (angles: method / problem / application / prior work)
   search 0 calls  per sub-query + the raw question: SystemSearch.search (as-of filtered, pool-only);
-                  one find_evidence pass and one expand_citations pass over the pool head
+                  one find_evidence pass, one expand_citations pass and one state_expand pass (family
+                  co-members of the pool head — the compiled state's graph channel) over the pool
   judge  <=4 calls  batches of JUDGE_BATCH pool candidates scored 0-3 ("could this have inspired the
                   direction?"); score >= 2 is kept, ties in discovery order
   rank   1 call    the kept candidates (<= RANK_CAP) ordered best-first; ids missing from a truncated reply
@@ -86,12 +87,14 @@ class AgentConfig:
     max_llm_calls: int = 8
     n_subqueries: int = 4
     per_query_k: int = 25          # pool hits kept per search call
-    pool_cap: int = 100            # candidates judged (discovery order)
+    pool_cap: int = 125            # candidates judged (discovery order); headroom for the state channel
+                                   # (5 judge batches -> plan 1 + judge 5 + rank 1 = 7 <= budget 8)
     judge_batch: int = 25
     rank_cap: int = 40             # kept candidates the rank call orders in one pass
     question_chars: int = 1600
     use_evidence: bool = True
     use_expand: bool = True
+    use_state: bool = True         # family/cocite state-graph channel (0 LLM calls; reachability audit 10-10)
     rrf_k: int = 60                  # standard RRF constant; fuse step, see module docstring
 
 
@@ -157,8 +160,15 @@ class SCSearchAgent:
         r = {d: i for i, d in enumerate(ranked)}
         s = {d: i for i, d in enumerate(discovery)}
         docs = list(dict.fromkeys(list(ranked) + list(discovery)))
-        return sorted(docs, key=lambda d: -(1.0 / (k + r.get(d, len(ranked)) + 1)
-                                            + 1.0 / (k + s.get(d, len(discovery)) + 1)))
+
+        def sc(d):                                   # classic RRF: a list a doc is absent from contributes 0
+            v = 0.0
+            if d in r:
+                v += 1.0 / (k + r[d] + 1)
+            if d in s:
+                v += 1.0 / (k + s[d] + 1)
+            return v
+        return sorted(docs, key=lambda d: (-sc(d), d))
 
     def _rank(self, question: str, cands: list[dict]) -> list[str]:
         cfg = self.cfg
@@ -204,6 +214,9 @@ class SCSearchAgent:
             add(self.backend.evidence(question, as_of, cfg.per_query_k, withheld))
         if cfg.use_expand and pool:
             add(self.backend.expand(list(pool), as_of, cfg.per_query_k, withheld))
+        if cfg.use_state and pool:
+            # the compiled-state channel: family co-members of the pool head (pure state read, 0 LLM calls)
+            add(self.backend.state_expand(list(pool), as_of, cfg.per_query_k, withheld))
 
         cands = list(pool.values())[: cfg.pool_cap]
         kept_ids = self._judge(question, cands) if cands else []

@@ -94,6 +94,24 @@ class SystemSearch:
         return self._to_docs([r.get("id") for r in rows if isinstance(r, dict) and not r.get("stub")],
                              withheld)[:k]
 
+    def state_expand(self, seed_docs: list[str], as_of: str, k: int, withheld: set[str]) -> list[str]:
+        """Pool doc_ids via the compiled state's family channel: co-members of the seeds' families at T.
+        Pure state read (no LLM call); as-of enforced twice — the reader picks the snapshot <= T, and the
+        corpus-date guard below drops anything published after the query's as-of month. Reachability audit
+        10-10: 46% of never-seen pilot50 positives are one family/cocite hop from the agent's seen set."""
+        t = self._tools()
+        seeds = [p for d in seed_docs[:10] if (p := self.idmap.paper_of(d))]
+        if not seeds:
+            return []
+        try:
+            got = t.family_neighbors(seeds, as_of, min(k * self.POOL_FACTOR, 60))
+        except Exception as e:                          # noqa: BLE001 — a degraded channel is recorded, not fatal
+            self.degraded.append(f"family_neighbors: {type(e).__name__}: {str(e)[:100]}")
+            return []
+        rows = (got or {}).get("local") or []
+        docs = self._to_docs([r.get("id") for r in rows if isinstance(r, dict)], withheld)
+        return [d for d in docs if (self.corpus.dates.get(d) or "")[:7] <= as_of[:7]][:k]
+
     def card(self, doc_id: str, as_of: str) -> dict | None:
         """The paper_card of one pool paper (self statements); None when the card errors or is empty."""
         pid = self.idmap.paper_of(doc_id)
