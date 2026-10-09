@@ -15,7 +15,9 @@ the query as failed rather than silently swapping in a cheaper system):
   judge  <=4 calls  batches of JUDGE_BATCH pool candidates scored 0-3 ("could this have inspired the
                   direction?"); score >= 2 is kept, ties in discovery order
   rank   1 call    the kept candidates (<= RANK_CAP) ordered best-first; ids missing from a truncated reply
-                  are appended in judge order (the reply is still usable)
+                  are appended in judge order (the reply is still usable). A spent budget at rank degrades
+                  to the judge order — it never fails the query (10-10: 8/50 27B queries died at rank when
+                  pool_cap 125 made judge 5 batches and parse retries ate the budget of 8)
   fuse   0 calls   RRF (k=60) over the LLM order and the retrieval discovery order (pilot50 diagnosis 10-09:
                   57-62% of official-BM25-top-20 positives that our channels DID surface were buried below
                   rank 20 by judge-gate + LLM re-rank alone, median rank shift 11 -> 50; fusion keeps the
@@ -84,7 +86,9 @@ class AgentConfig:
     model: str = "Qwen3.8-27B"
     provider: str = "local"               # llm.client provider; SC dual-backbone protocol: local 27B (‡ zone)
                                           # or paratera DeepSeek-V3-250324 (cutoff<2025, main-table eligible)
-    max_llm_calls: int = 8
+    max_llm_calls: int = 8           # kept at 8 for comparability across all pilot arms (10-10: budget-8 +
+                                     # pool_cap-125 failed 8/50 queries AT RANK on the weaker-JSON 27B arm —
+                                     # fixed by the rank step's judge-order fallback below, not by inflation)
     n_subqueries: int = 4
     per_query_k: int = 25          # pool hits kept per search call
     pool_cap: int = 125            # candidates judged (discovery order); headroom for the state channel
@@ -221,7 +225,11 @@ class SCSearchAgent:
         cands = list(pool.values())[: cfg.pool_cap]
         kept_ids = self._judge(question, cands) if cands else []
         kept = [pool[d] for d in kept_ids]
-        ranked = self._rank(question, kept) if len(kept) > 1 else kept_ids
+        try:
+            ranked = self._rank(question, kept) if len(kept) > 1 else kept_ids
+        except LLMBudgetError:
+            ranked = kept_ids       # the judge order (score desc, discovery ties) is a valid submission order —
+                                    # a spent budget demotes the refinement step, it never fails the query
         # fuse step (0 LLM calls): discovery order over the kept set, from the pool's insertion order
         kept_set = set(kept_ids)
         discovery = [d for d in pool if d in kept_set]
