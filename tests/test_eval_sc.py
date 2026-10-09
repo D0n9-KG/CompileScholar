@@ -50,15 +50,17 @@ class _Tools:
 
 
 def test_state_expand_filters_pool_withheld_and_date():
-    tools = _Tools(rows=[{"id": "p2"}, {"id": "pX"}, {"id": "p3"}], coc_rows=[{"id": "p1"}, {"id": "pX"}])
-    be = SystemSearch(_IdMap([("d1", "p1"), ("d2", "p2"), ("d3", "p3")]),
-                      _Corpus({"d1": "2020-01-15", "d2": "2021-03-01", "d3": "2025-09-30"}), tools=tools)
+    tools = _Tools(rows=[{"id": "p2"}, {"id": "pX"}, {"id": "p3"}],
+                   coc_rows=[{"id": "p4"}, {"id": "p2"}, {"id": "p1"}])
+    be = SystemSearch(_IdMap([("d1", "p1"), ("d2", "p2"), ("d3", "p3"), ("d4", "p4")]),
+                      _Corpus({"d1": "2020-01-15", "d2": "2021-03-01", "d3": "2025-09-30",
+                               "d4": "2022-05-01"}), tools=tools)
     got = be.state_expand(["d1"], "2025-06-30", 10, withheld={"d2"})
-    # pX is not pool; d2 withheld; d3 published 2025-09 > as-of 2025-06; d1 (cocite hit) passes — the agent
-    # dedups on add; family hits come first in the merged order
-    assert got == ["d1"]
+    # pX is not pool; d2 withheld; d3 published 2025-09 > as-of 2025-06; d1 is the seed itself (known ->
+    # dropped by the novelty filter); only the novel in-pool in-date d4 survives
+    assert got == ["d4"]
     assert be.degraded == []
-    assert tools.calls == [("fam", ["p1"], "2025-06-30", 30), ("coc", ["p1"], "2025-06-30", 30)]
+    assert tools.calls == [("fam", ["p1"], "2025-06-30", 30), ("coc", ["p1"], "2025-06-30", 300)]
 
 
 def test_state_expand_seed_chunking():

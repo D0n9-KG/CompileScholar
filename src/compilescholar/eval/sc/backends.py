@@ -106,6 +106,7 @@ class SystemSearch:
         seeds = [p for d in seed_docs[:20] if (p := self.idmap.paper_of(d))]
         if not seeds:
             return []
+        known = set(seed_docs)
         pids: list[str] = []
         for chunk in (seeds[:10], seeds[10:20]):        # the tool caps seeds at 10 per call
             if not chunk:
@@ -119,7 +120,9 @@ class SystemSearch:
             if not chunk:
                 continue
             try:
-                got = t.expand_citations(chunk, as_of, min(k * self.POOL_FACTOR, 60))
+                # deep fetch: the top-by-count cocite partners are the famous papers lexical search already
+                # found; the positives reachable through WEAK edges (n=1 co-citations) sit deeper in the list
+                got = t.expand_citations(chunk, as_of, 300)
                 pids += [r.get("id") for r in (got or {}).get("local") or []
                          if isinstance(r, dict) and not r.get("stub")]
             except Exception as e:                      # noqa: BLE001
@@ -127,7 +130,9 @@ class SystemSearch:
         if not pids:
             return []
         docs = self._to_docs(pids, withheld)
-        return [d for d in docs if (self.corpus.dates.get(d) or "")[:7] <= as_of[:7]][:k]
+        # NOVEL docs only, before the k-cut — otherwise every slot goes to papers the search channels
+        # already surfaced and the channel adds nothing (measured: st2 arm, +0-7 docs/query, 0 positives)
+        return [d for d in docs if d not in known and (self.corpus.dates.get(d) or "")[:7] <= as_of[:7]][:k]
 
     def card(self, doc_id: str, as_of: str) -> dict | None:
         """The paper_card of one pool paper (self statements); None when the card errors or is empty."""

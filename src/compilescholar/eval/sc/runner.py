@@ -195,7 +195,9 @@ def main() -> None:
                          "‡ zone; paratera=DeepSeek-V3-250324 cutoff<2025 main-table eligible)")
     ap.add_argument("--max-llm-calls", type=int, default=8)
     ap.add_argument("--per-query-k", type=int, default=25)
-    ap.add_argument("--pool-cap", type=int, default=100)
+    ap.add_argument("--pool-cap", type=int, default=125,
+                    help="judged candidate window; 125 leaves headroom for the state channel's adds "
+                         "(plan 1 + judge 5 + rank 1 = 7 calls <= the default budget 8)")
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--deep-read-cap", type=int, default=0,
                     help="full-form switch (runtime deep_read per query); 0 = off (shallow pilot)")
