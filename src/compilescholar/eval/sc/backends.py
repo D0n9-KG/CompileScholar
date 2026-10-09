@@ -95,21 +95,38 @@ class SystemSearch:
                              withheld)[:k]
 
     def state_expand(self, seed_docs: list[str], as_of: str, k: int, withheld: set[str]) -> list[str]:
-        """Pool doc_ids via the compiled state's family channel: co-members of the seeds' families at T.
-        Pure state read (no LLM call); as-of enforced twice — the reader picks the snapshot <= T, and the
-        corpus-date guard below drops anything published after the query's as-of month. Reachability audit
-        10-10: 46% of never-seen pilot50 positives are one family/cocite hop from the agent's seen set."""
+        """Pool doc_ids via the compiled state's graph channels: co-members of the seeds' tight families at T
+        (family_neighbors; giant Leiden catch-alls are skipped inside the tool), then co-citation partners of
+        the same seeds (expand_citations in two 5-seed chunks — the tool caps seeds at 5 per call).
+        Pure state reads (no LLM call); as-of enforced twice — the readers pick the snapshot / cocite rows
+        <= T, and the corpus-date guard below drops anything published after the query's as-of month.
+        Reachability audit 10-10: 46% of never-seen pilot50 positives are one family/cocite hop from the
+        agent's seen set (the operational ceiling is lower — giant families carry no ranking signal)."""
         t = self._tools()
-        seeds = [p for d in seed_docs[:10] if (p := self.idmap.paper_of(d))]
+        seeds = [p for d in seed_docs[:20] if (p := self.idmap.paper_of(d))]
         if not seeds:
             return []
-        try:
-            got = t.family_neighbors(seeds, as_of, min(k * self.POOL_FACTOR, 60))
-        except Exception as e:                          # noqa: BLE001 — a degraded channel is recorded, not fatal
-            self.degraded.append(f"family_neighbors: {type(e).__name__}: {str(e)[:100]}")
+        pids: list[str] = []
+        for chunk in (seeds[:10], seeds[10:20]):        # the tool caps seeds at 10 per call
+            if not chunk:
+                continue
+            try:
+                got = t.family_neighbors(chunk, as_of, min(k * self.POOL_FACTOR, 60))
+                pids += [r.get("id") for r in (got or {}).get("local") or [] if isinstance(r, dict)]
+            except Exception as e:                      # noqa: BLE001 — a degraded channel is recorded, not fatal
+                self.degraded.append(f"family_neighbors: {type(e).__name__}: {str(e)[:100]}")
+        for chunk in (seeds[:5], seeds[5:10], seeds[10:15], seeds[15:20]):
+            if not chunk:
+                continue
+            try:
+                got = t.expand_citations(chunk, as_of, min(k * self.POOL_FACTOR, 60))
+                pids += [r.get("id") for r in (got or {}).get("local") or []
+                         if isinstance(r, dict) and not r.get("stub")]
+            except Exception as e:                      # noqa: BLE001
+                self.degraded.append(f"expand_citations(state): {type(e).__name__}: {str(e)[:100]}")
+        if not pids:
             return []
-        rows = (got or {}).get("local") or []
-        docs = self._to_docs([r.get("id") for r in rows if isinstance(r, dict)], withheld)
+        docs = self._to_docs(pids, withheld)
         return [d for d in docs if (self.corpus.dates.get(d) or "")[:7] <= as_of[:7]][:k]
 
     def card(self, doc_id: str, as_of: str) -> dict | None:

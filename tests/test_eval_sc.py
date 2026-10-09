@@ -30,27 +30,46 @@ class _Corpus:
 
 
 class _Tools:
-    def __init__(self, rows=None, boom=None):
+    def __init__(self, rows=None, coc_rows=None, boom=None):
         self.rows = rows or []
+        self.coc_rows = coc_rows or []
         self.boom = boom
         self.calls = []
 
     def family_neighbors(self, seeds, as_of, k):
         if self.boom:
             raise self.boom
-        self.calls.append((list(seeds), as_of, k))
+        self.calls.append(("fam", list(seeds), as_of, k))
         return {"local": self.rows}
+
+    def expand_citations(self, seeds, as_of, k):
+        if self.boom:
+            raise self.boom
+        self.calls.append(("coc", list(seeds), as_of, k))
+        return {"local": self.coc_rows}
 
 
 def test_state_expand_filters_pool_withheld_and_date():
-    tools = _Tools(rows=[{"id": "p2"}, {"id": "pX"}, {"id": "p3"}, {"id": "p1"}])
+    tools = _Tools(rows=[{"id": "p2"}, {"id": "pX"}, {"id": "p3"}], coc_rows=[{"id": "p1"}, {"id": "pX"}])
     be = SystemSearch(_IdMap([("d1", "p1"), ("d2", "p2"), ("d3", "p3")]),
                       _Corpus({"d1": "2020-01-15", "d2": "2021-03-01", "d3": "2025-09-30"}), tools=tools)
     got = be.state_expand(["d1"], "2025-06-30", 10, withheld={"d2"})
-    # pX is not pool; d2 withheld; d3 published 2025-09 > as-of 2025-06; d1 passes (the agent dedups on add)
+    # pX is not pool; d2 withheld; d3 published 2025-09 > as-of 2025-06; d1 (cocite hit) passes — the agent
+    # dedups on add; family hits come first in the merged order
     assert got == ["d1"]
     assert be.degraded == []
-    assert tools.calls == [(["p1"], "2025-06-30", 30)]     # seeds mapped, k overfetched by POOL_FACTOR
+    assert tools.calls == [("fam", ["p1"], "2025-06-30", 30), ("coc", ["p1"], "2025-06-30", 30)]
+
+
+def test_state_expand_seed_chunking():
+    tools = _Tools(rows=[])
+    idmap = _IdMap([(f"d{i}", f"p{i}") for i in range(1, 21)])
+    be = SystemSearch(idmap, _Corpus({f"d{i}": "2020-01-15" for i in range(1, 21)}), tools=tools)
+    be.state_expand([f"d{i}" for i in range(1, 21)], "2025-06-30", 10, withheld=set())
+    fam_chunks = [c[1] for c in tools.calls if c[0] == "fam"]
+    coc_chunks = [c[1] for c in tools.calls if c[0] == "coc"]
+    assert fam_chunks == [[f"p{i}" for i in range(1, 11)], [f"p{i}" for i in range(11, 21)]]
+    assert coc_chunks == [[f"p{i}" for i in range(a, a + 5)] for a in (1, 6, 11, 16)]
 
 
 def test_state_expand_same_month_passes():
@@ -64,7 +83,8 @@ def test_state_expand_records_degradation():
     be = SystemSearch(_IdMap([("d1", "p1")]), _Corpus({"d1": "2020-01-15"}),
                       tools=_Tools(boom=RuntimeError("cognition store missing")))
     assert be.state_expand(["d1"], "2025-06-30", 5, withheld=set()) == []
-    assert be.degraded and "family_neighbors" in be.degraded[0]
+    assert any("family_neighbors" in d for d in be.degraded)
+    assert any("expand_citations(state)" in d for d in be.degraded)
 
 
 def test_state_expand_no_mapped_seeds():

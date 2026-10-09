@@ -455,11 +455,18 @@ def _family_index(view: AsOf, snap: str) -> dict[str, list]:
     return idx
 
 
+MAX_EXPAND_FAMILY = 200   # a Leiden catch-all above this is a topic AREA, not a family: measured 10-10, the
+                          # families containing SC never-seen positives have median size ~14k (giant component
+                          # 16.5k-30k = 8%+ of the pool), where co-membership carries no ranking signal —
+                          # expansion from them returns alphabetical noise. Tight families only.
+
+
 @tool
 def family_neighbors(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
-    """The compiled state's family channel: co-members of the seeds' families at T (materialised Leiden
-    snapshots + LLM names), ranked by how many distinct seeds share a family with the co-member (support),
-    then family size. No LLM call — a pure read of the compiled state. Read-only."""
+    """The compiled state's family channel: co-members of the seeds' TIGHT families at T (materialised Leiden
+    snapshots + LLM names; families larger than MAX_EXPAND_FAMILY are skipped as topic areas), ranked by how
+    many distinct seeds share a family with the co-member (support), tighter family first on ties.
+    No LLM call — a pure read of the compiled state. Read-only."""
     view = _view(as_of)
     if isinstance(seeds, str):
         seeds = [seeds]
@@ -471,8 +478,12 @@ def family_neighbors(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
     seed_set = set(seeds)
     support: dict[str, set] = {}
     fam_of: dict[str, tuple] = {}
+    n_giant_skipped = 0
     for s in seeds:
         for fid, name, mm in idx.get(s, ()):
+            if len(mm) > MAX_EXPAND_FAMILY:
+                n_giant_skipped += 1
+                continue
             for m in mm:
                 if m in seed_set:
                     continue
@@ -481,7 +492,7 @@ def family_neighbors(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
                 if cur is None or len(mm) < cur[1]:       # prefer the tighter family when several overlap
                     fam_of[m] = (name, len(mm), fid)
     out = []
-    for pid, sup in sorted(support.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:k * 4]:
+    for pid, sup in sorted(support.items(), key=lambda kv: (-len(kv[1]), fam_of[kv[0]][1], kv[0]))[:k * 4]:
         if pid.startswith("stub:") or not view.visible(pid):
             continue
         name, n_mem, fid = fam_of[pid]
@@ -489,7 +500,8 @@ def family_neighbors(seeds, as_of: str, k: int = MAX_ITEMS) -> dict:
                     "family": name, "family_id": fid, "n_members": n_mem})
         if len(out) >= k:
             break
-    return {"seeds": seeds, "as_of": view.T, "snapshot": snap, "local": out}
+    return {"seeds": seeds, "as_of": view.T, "snapshot": snap, "local": out,
+            "giant_families_skipped": n_giant_skipped}
 
 
 # ---------------------------------------------------------------- read
