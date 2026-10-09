@@ -951,11 +951,14 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 todo_n = set(w.todo([(f, store.sha(PR.FAMILY_NAME_SHA, PR.MODEL, store.sha(sorted(mm))))
                                      for _, f, mm in to_name]))
 
+                snap_of = {f: s for s, f, _ in to_name}      # PK-prefix lookups below (family_id alone scans)
+
                 def one_name(fid):
                     if fid not in todo_n:
                         return
                     try:
-                        r = nconn.execute("SELECT members FROM family_snapshot WHERE family_id=?", (fid,)).fetchone()
+                        r = nconn.execute("SELECT members FROM family_snapshot WHERE snapshot=? AND family_id=?",
+                                          (snap_of[fid], fid)).fetchone()
                         members = json.loads(r[0])
                         head = members[:15]
                         deg: Counter = Counter()
@@ -997,8 +1000,8 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                         kept = sorted(set([p_ for i, p_ in enumerate(members, 1) if i not in drop]))
                         with run.lock:
                             con.execute("UPDATE family_snapshot SET name=?, members=?, named_by=? "
-                                        "WHERE family_id=?",
-                                        (name.strip().lower()[:80], json.dumps(kept), PR.MODEL, fid))
+                                        "WHERE snapshot=? AND family_id=?",
+                                        (name.strip().lower()[:80], json.dumps(kept), PR.MODEL, snap_of[fid], fid))
                             con.commit()
                             w.ok(fid)
                     except Exception as e:
@@ -1011,19 +1014,34 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 named_fams = [(n, set(json.loads(m))) for _s, f, m, n in
                               con.execute("SELECT snapshot, family_id, members, name FROM family_snapshot "
                                           "WHERE name IS NOT NULL")]
+                # 10-09 scale fix (measured on the 208k-row/4.5k-named rebuild: the old all-vs-all Jaccard was
+                # ~10^9 set intersections against member sets up to 27k — single-threaded, 2h+ with no end in
+                # sight, zero LLM/DB activity; its UPDATE also missed the PK prefix). Semantics unchanged: a
+                # name is inherited from the best-Jaccard named family (>= 0.3, first best wins in named_fams
+                # order); the inverted member index restricts candidates to the only ones that can score > 0 —
+                # families sharing at least one member.
+                inv: dict = defaultdict(list)
+                for pos, (_nm, ms2) in enumerate(named_fams):
+                    for m_ in ms2:
+                        inv[m_].append(pos)
                 inherited = 0
                 for s, f, mm, n in fam_rows:
                     if n or s in naming_snaps:
                         continue
                     ms = set(mm)
+                    hits: Counter = Counter()
+                    for m_ in ms:
+                        for pos in inv.get(m_, ()):
+                            hits[pos] += 1
                     best, bj = None, 0.0
-                    for n2, ms2 in named_fams:
-                        j = len(ms & ms2) / len(ms | ms2) if (ms | ms2) else 0.0
+                    for pos in sorted(hits):
+                        shared = hits[pos]
+                        j = shared / (len(ms) + len(named_fams[pos][1]) - shared)
                         if j > bj:
-                            best, bj = n2, j
+                            best, bj = named_fams[pos][0], j
                     if best is not None and bj >= 0.3:
-                        con.execute("UPDATE family_snapshot SET name=?, named_by='inherit' WHERE family_id=?",
-                                    (best, f))
+                        con.execute("UPDATE family_snapshot SET name=?, named_by='inherit' "
+                                    "WHERE snapshot=? AND family_id=?", (best, s, f))
                         inherited += 1
                 con.commit()
                 if inherited:
