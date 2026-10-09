@@ -15,9 +15,13 @@ the query as failed rather than silently swapping in a cheaper system):
                   direction?"); score >= 2 is kept, ties in discovery order
   rank   1 call    the kept candidates (<= RANK_CAP) ordered best-first; ids missing from a truncated reply
                   are appended in judge order (the reply is still usable)
+  fuse   0 calls   RRF (k=60) over the LLM order and the retrieval discovery order (pilot50 diagnosis 10-09:
+                  57-62% of official-BM25-top-20 positives that our channels DID surface were buried below
+                  rank 20 by judge-gate + LLM re-rank alone, median rank shift 11 -> 50; fusion keeps the
+                  LLM's confident head while letting retrieval-confident docs survive a skeptical judge)
 
 `seen` is every pool doc the search channels surfaced, in discovery order — it feeds the official trajectory
-segment (cap 25) and trajectory_recall. The agent's own ordered list is `agent_ids`.
+segment (cap 25) and trajectory_recall. The agent's own ordered list is `agent_ids` (the fused list).
 """
 from __future__ import annotations
 
@@ -88,6 +92,7 @@ class AgentConfig:
     question_chars: int = 1600
     use_evidence: bool = True
     use_expand: bool = True
+    rrf_k: int = 60                  # standard RRF constant; fuse step, see module docstring
 
 
 class SCSearchAgent:
@@ -141,6 +146,20 @@ class SCSearchAgent:
         return [c["doc_id"] for c in sorted(cands, key=lambda c: (-scores.get(c["doc_id"], 1),))
                 if scores.get(c["doc_id"], 1) >= 2]
 
+    def _rrf(self, ranked: list[str], discovery: list[str]) -> list[str]:
+        """Reciprocal-rank fusion (k=cfg.rrf_k) of the LLM rank order and the retrieval discovery order
+        over the same kept set. Rationale: pilot50 diagnosis — 57-62% of the official-BM25-top-20 positives
+        we DID surface were buried below rank 20 by the judge/rank layer alone (median rank shift 11 -> 50).
+        Discovery order is the lexical-retrieval confidence; the rank call is the LLM's inspiration judgment;
+        RRF keeps a doc high when EITHER signal is strong, so a judge-skeptical but retrieval-confident
+        positive is no longer demoted below the whole kept list."""
+        k = self.cfg.rrf_k
+        r = {d: i for i, d in enumerate(ranked)}
+        s = {d: i for i, d in enumerate(discovery)}
+        docs = list(dict.fromkeys(list(ranked) + list(discovery)))
+        return sorted(docs, key=lambda d: -(1.0 / (k + r.get(d, len(ranked)) + 1)
+                                            + 1.0 / (k + s.get(d, len(discovery)) + 1)))
+
     def _rank(self, question: str, cands: list[dict]) -> list[str]:
         cfg = self.cfg
         head = cands[: cfg.rank_cap]
@@ -189,10 +208,15 @@ class SCSearchAgent:
         cands = list(pool.values())[: cfg.pool_cap]
         kept_ids = self._judge(question, cands) if cands else []
         kept = [pool[d] for d in kept_ids]
-        agent_ids = self._rank(question, kept) if len(kept) > 1 else kept_ids
+        ranked = self._rank(question, kept) if len(kept) > 1 else kept_ids
+        # fuse step (0 LLM calls): discovery order over the kept set, from the pool's insertion order
+        kept_set = set(kept_ids)
+        discovery = [d for d in pool if d in kept_set]
+        agent_ids = self._rrf(ranked, discovery) if len(kept) > 1 else kept_ids
 
         return AgentResult(agent_ids=agent_ids, seen=seen,
                            summary={"model": cfg.model, "n_llm_calls": self.calls,
                                     "n_sub_queries": len(sub_queries), "n_pool": len(pool),
                                     "n_kept": len(kept), "n_ranked": len(agent_ids),
+                                    "fusion": f"rrf{cfg.rrf_k}",
                                     "degraded_tools": sorted(set(self.backend.degraded))})
