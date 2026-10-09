@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import concurrent.futures as cf
 import hashlib
+import html as _html
 import os
 import re
 import threading
@@ -33,6 +34,15 @@ os.environ.setdefault("SCIVERSE_MAX_WAIT_S", "600")
 os.environ.setdefault("SCIVERSE_SHARED_BUCKET", os.path.join(os.path.expanduser("~"), ".sciverse_bucket.json"))
 
 MODEL = os.environ.get("ANSWER_MODEL", "Qwen3.8-27B")
+
+_TAG = re.compile(r"<[^>]+>")
+
+
+def _detag(s: str) -> str:
+    """Publisher markup (JATS/HTML) out of external snippets — deterministic structural cleanup, so judges and
+    writers read text, not XML. (10-09: CS2 dry-run citations carried raw <jats:title> tags from sciverse
+    publisher abstracts into the judge's field of view.)"""
+    return re.sub(r"\s+", " ", _html.unescape(_TAG.sub(" ", s or ""))).strip()
 
 
 def chat(prompt: str, max_tokens: int = 6000, temperature: float = 0.2) -> str:
@@ -75,7 +85,7 @@ def ext_search(q: str, k: int = 8) -> list[dict]:
                 continue
             if not _cut_allowed(c.year):
                 continue  # 服务端已按年过滤；客户端再兜底（含线程局部截止）
-            ab = ((c.raw or {}).get("abstract") or "").strip()
+            ab = _detag((c.raw or {}).get("abstract") or "")
             if len(ab) < 40:
                 continue
             out.append({"src": "ext", "paper_key": "ext:" + hashlib.md5(c.title.lower().encode()).hexdigest()[:12],

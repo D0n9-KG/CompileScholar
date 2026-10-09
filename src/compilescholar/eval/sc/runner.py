@@ -190,6 +190,9 @@ def main() -> None:
     ap.add_argument("--index-dir", type=Path, default=None,
                     help="index root override (an ephemeral papers index while data/derived/index rebuilds)")
     ap.add_argument("--model", default="Qwen3.8-27B")
+    ap.add_argument("--provider", default="local",
+                    help="llm.client provider for the agent loop (dual-backbone protocol: local=Qwen3.8-27B "
+                         "‡ zone; paratera=DeepSeek-V3-250324 cutoff<2025 main-table eligible)")
     ap.add_argument("--max-llm-calls", type=int, default=8)
     ap.add_argument("--per-query-k", type=int, default=25)
     ap.add_argument("--pool-cap", type=int, default=100)
@@ -200,8 +203,8 @@ def main() -> None:
     a = ap.parse_args()
 
     qtypes = [a.query_type] if a.query_type else list(protocol.QUERY_TYPES)
-    cfg = AgentConfig(model=a.model, max_llm_calls=a.max_llm_calls, per_query_k=a.per_query_k,
-                      pool_cap=a.pool_cap)
+    cfg = AgentConfig(model=a.model, provider=a.provider, max_llm_calls=a.max_llm_calls,
+                      per_query_k=a.per_query_k, pool_cap=a.pool_cap)
     run(a.bench_dir, a.pipeline, qtypes, a.query_ids, a.limit, a.index_dir, cfg, a.workers, a.evaluate,
         deep_read_cap=a.deep_read_cap)
 

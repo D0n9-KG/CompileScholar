@@ -77,6 +77,8 @@ class AgentResult:
 @dataclass
 class AgentConfig:
     model: str = "Qwen3.8-27B"
+    provider: str = "local"               # llm.client provider; SC dual-backbone protocol: local 27B (‡ zone)
+                                          # or paratera DeepSeek-V3-250324 (cutoff<2025, main-table eligible)
     max_llm_calls: int = 8
     n_subqueries: int = 4
     per_query_k: int = 25          # pool hits kept per search call
@@ -103,7 +105,7 @@ class SCSearchAgent:
             if self.calls >= cfg.max_llm_calls:
                 raise LLMBudgetError(f"{step}: budget {cfg.max_llm_calls} exhausted")
             self.calls += 1
-            raw = chat("local", prompt, model=cfg.model, max_tokens=max_tokens, temperature=0.0,
+            raw = chat(cfg.provider, prompt, model=cfg.model, max_tokens=max_tokens, temperature=0.0,
                        enable_thinking=False, template=f"sc:{step}", item=f"sc:{step}",
                        cache=None if attempt == 0 else False)
             obj = parse_json_response(raw or "")
