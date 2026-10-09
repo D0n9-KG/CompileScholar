@@ -57,7 +57,9 @@ explicitly stated absences, definitions it gives, and stated experimental-config
 Sentences whose main content describes OTHER works (related work, others' methods and findings) are NOT
 extracted here — a separate pass owns them. But a sentence about this paper's own relation to another work
 ("we extend X", "unlike Y we ...") IS extracted: give the relation in "role" and the other work's surface name
-in "mentions".
+in "mentions". In such relation sentences, check the subject of each claim: a claim whose subject is the OTHER
+work (what it does, shows or lacks — the "Y fails at Z" half of "unlike Y, we ...") is that work's, so give it
+epistemic "cited"; only claims whose subject is this paper's own work get the other epistemic values.
 
 Paper title: {title}
 Chunk {chunk_i}/{chunk_n} (sentences numbered per paper):
