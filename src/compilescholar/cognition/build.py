@@ -171,6 +171,61 @@ def _author_key(surname: str, name: str) -> str | None:
 
 SNAPSHOT_SEED = 20261007
 MIN_FAMILY = 2
+# COG-1010 family governance (10-10 state review: at resolution 1 the latest snapshot had 28 families > 1000
+# members, max 28,498 — VQ-VAE landed in a 9,952-member "adaptive mcmc" catch-all): Leiden runs at a tuned
+# resolution_parameter, and any community still above FAMILY_MAX is re-clustered on its induced subgraph at
+# doubled resolution, recursively (giant-family treatment). Parameters are part of the pass digest below.
+# 1.5 = the 2026-12-01-snapshot sweep's pick (COG-1010 tuning report): with the split it zeroes the >1000
+# share (max 960), scores the best production-name-agreement purity (0.944 vs 0.826 at r=1), and keeps the
+# fragmentation lowest among equally pure settings (6,445 families vs 10,709 at r=4); resolution alone does
+# NOT cure the giants (nosplit >1000 count rises 28 -> 70 across the grid) — the split is the treatment.
+FAMILY_RESOLUTION = 1.5
+FAMILY_MAX = 1000
+FAMILY_SPLIT_DEPTH = 4
+
+
+def partition_families(edges, weight_of, resolution, max_size, seed=SNAPSHOT_SEED, n_iterations=3):
+    """Weighted Leiden (RBConfigurationVertexPartition, fixed seed) at `resolution` + the giant-family split:
+    a community larger than `max_size` is re-clustered on its induced subgraph at doubled resolution, at most
+    FAMILY_SPLIT_DEPTH doublings deep; a block Leiden refuses to split finer is returned as-is (never chopped
+    by position — the pieces would be arbitrary). `edges`: (a, b) pairs; `weight_of`: pair -> weight.
+    Returns the communities as sorted node-id lists (a partition: disjoint, complete)."""
+    import igraph as ig
+    import leidenalg
+
+    def run(nodes, el, res):
+        idx = {p: i for i, p in enumerate(nodes)}
+        g = ig.Graph(n=len(nodes), edges=[(idx[a], idx[b]) for a, b in el], directed=False)
+        part = leidenalg.find_partition(g, leidenalg.RBConfigurationVertexPartition,
+                                        weights=[weight_of[e] for e in el],
+                                        resolution_parameter=res, seed=seed, n_iterations=n_iterations)
+        return [sorted(nodes[i] for i in c) for c in part]
+
+    def rec(nodes, el, res, depth):
+        while True:
+            comms = run(nodes, el, res)
+            if len(comms) > 1 or len(nodes) <= max_size or depth >= FAMILY_SPLIT_DEPTH:
+                break
+            res, depth = res * 2, depth + 1            # one block: a finer resolution may still split it
+        todo = {p: ci for ci, c in enumerate(comms)
+                if len(c) > max_size and depth < FAMILY_SPLIT_DEPTH for p in c}
+        if not todo:
+            return comms
+        buckets: dict[int, list] = defaultdict(list)   # the INDUCED subgraph: inter-community edges stay out
+        for e in el:
+            ci = todo.get(e[0])
+            if ci is not None and todo.get(e[1]) == ci:
+                buckets[ci].append(e)
+        out = []
+        for ci, c in enumerate(comms):
+            if ci in buckets:
+                out.extend(rec(c, buckets[ci], res * 2, depth + 1))
+            else:
+                out.append(c)
+        return out
+
+    nodes = sorted({x for e in edges for x in e})
+    return rec(nodes, list(edges), resolution, 0)
 
 # Reception-shift screening (pre-registered constants, carried from the old shifts module; the arbitrary
 # half-split verdicts are replaced by Fisher + BH — the old rule-based shifts measured ~75% false positives)
@@ -352,6 +407,8 @@ def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list
 FACT_FACETS = ("limitation", "method", "result", "categorization", "contribution")
 FACT_RECALL_SIM = 0.3
 FACT_MAX_FAMILY_STMTS = 900
+FACT_LOGIC_V = 2          # COG-1010 (results-pass exclusion + contested independence gate) — in the pass digest
+                          # so the deterministic recompute re-opens on the logic change alone
 _FACT_STOP = set("a an the of in on for to and or with by from as is are was were be been this that these those "
                  "it its their they we our which such via using use used based into than also can may method "
                  "methods model models approach approaches work works paper papers all".split())
@@ -787,7 +844,8 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             if lo_row[0] and hi_cands:
                 data_hi = max(hi_cands)
                 snaps = snapshot_grid(lo_row[0], data_hi, extra=snapshot_extra)
-                fam_fp = store.sha(cit_fp, ext_fp, SNAPSHOT_SEED, ig.__version__, leidenalg.version)
+                fam_fp = store.sha(cit_fp, ext_fp, SNAPSHOT_SEED, ig.__version__, leidenalg.version,
+                                   FAMILY_RESOLUTION, FAMILY_MAX, FAMILY_SPLIT_DEPTH)
                 todo_f = set(w.todo([(s, store.sha(fam_fp, s)) for s in snaps]))
                 if todo_f:
                     log(f"[cognition] families: {len(todo_f):,} of {len(snaps):,} snapshots to cluster")
@@ -839,16 +897,10 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                              if wt > 0 and first_hi.get(a_, "9999") <= snap and first_hi.get(b_, "9999") <= snap]
                     con.execute("DELETE FROM family_snapshot WHERE snapshot=?", (snap,))
                     if edges:
-                        nodes = sorted({x for e in edges for x in e})
-                        idx = {p_: i for i, p_ in enumerate(nodes)}
-                        g = ig.Graph(n=len(nodes), edges=[(idx[a_], idx[b_]) for a_, b_ in edges], directed=False)
-                        part = leidenalg.find_partition(g, leidenalg.RBConfigurationVertexPartition,
-                                                        weights=[weights[e] for e in edges],
-                                                        seed=SNAPSHOT_SEED, n_iterations=3)
                         rows = []
-                        comms = sorted(part, key=lambda c: (-len(c), min(c)))
-                        for k, comm in enumerate(comms):
-                            members = sorted(nodes[i] for i in comm)
+                        comms = partition_families(edges, weights, FAMILY_RESOLUTION, FAMILY_MAX)
+                        for k, comm in enumerate(sorted(comms, key=lambda c: (-len(c), min(c)))):
+                            members = sorted(comm)
                             if len(members) < MIN_FAMILY:
                                 continue
                             rows.append((snap, f"{snap}#f{k}", None, json.dumps(members), None))
@@ -1058,10 +1110,15 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 (latest_snap2,))} if latest_snap2 else {}
             stmt_rows: dict[int, dict] = {}
             by_about: dict[str, list] = defaultdict(list)
+            # COG-1010: results-pass statements (rendered table cells 'obj — cond: metric: value', always
+            # kind=self about the speaker's own paper) are measurements, not field-level claims — they flooded
+            # the fact layer with same-speaker version-diff pairs (10-10 review: contested events were dominated
+            # by one paper's own result table in two versions). Excluded by provenance (the pass column, a
+            # structural marker), never by content.
             for i_, about, facet, text, quote, date, speaker, kind in ext.execute(
                     f"SELECT id, about, facet, text, quote, date, speaker, kind FROM statements "
                     f"WHERE facet IN ({','.join('?' * len(FACT_FACETS))}) AND date IS NOT NULL "
-                    f"AND text IS NOT NULL", FACT_FACETS):
+                    f"AND text IS NOT NULL AND COALESCE(pass, '') != 'results'", FACT_FACETS):
                 stmt_rows[i_] = {"about": about, "facet": facet, "text": text, "quote": quote or "",
                                  "date": date, "speaker": speaker, "kind": kind}
                 by_about[about].append(i_)
@@ -1126,7 +1183,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             w = run.work("facts")
             pair_digest = store.sha(list(con.execute("SELECT stmt_a, stmt_b, relation FROM fact_pair "
                                                      "ORDER BY stmt_a, stmt_b")))
-            if w.todo([("all", store.sha(ext_fp, pair_digest, store.sha(sorted(fam_members))))]):
+            if w.todo([("all", store.sha(ext_fp, pair_digest, store.sha(sorted(fam_members)), FACT_LOGIC_V))]):
                 parent: dict[int, int] = {}
 
                 def find(x):
@@ -1178,13 +1235,21 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                                                json.dumps({"n_independent": n_ind, "n_subjects": len(seen_ab)})))
                             status = new
                 for a_, b_ in con.execute("SELECT stmt_a, stmt_b FROM fact_pair WHERE relation='opposite'"):
+                    sa, sb = stmt_rows.get(a_), stmt_rows.get(b_)
+                    if not sa or not sb:
+                        continue                        # a side vanished: no speaker evidence, no verdict
+                    # COG-1010 speaker-independence gate: a contradiction is only evidence of a contested fact
+                    # between author-independent papers — one paper is one voice, the same rule the timeline
+                    # applies to established/consensus. Same-speaker 'opposite' pairs (one paper's own numbers
+                    # differing between text versions) used to raise contested at n_independent=1.
+                    if _independent({sa["speaker"], sb["speaker"]}, author_of) < 2:
+                        continue
                     fa = fid_of.get(group_of.get(a_)) if a_ in group_of else None
                     fb = fid_of.get(group_of.get(b_)) if b_ in group_of else None
                     if not fa and not fb:
                         continue
-                    d_ = max(stmt_rows[x]["date"] for x in (a_, b_) if x in stmt_rows)
-                    ev = json.dumps([stmt_rows[x]["quote"][:200] for x in (a_, b_) if x in stmt_rows],
-                                    ensure_ascii=False)
+                    d_ = max(sa["date"], sb["date"])
+                    ev = json.dumps([sa["quote"][:200], sb["quote"][:200]], ensure_ascii=False)
                     for fid in {fa, fb} - {None}:
                         event_rows.append((fid, d_, "contested", ev))
                 con.execute("DELETE FROM fact_member")

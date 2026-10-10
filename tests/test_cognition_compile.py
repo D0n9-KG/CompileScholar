@@ -89,9 +89,10 @@ def test_facts_status_timeline_at_T(store):
     assert f2["status"] == "established" and f2["contested_since"] == "2022-01-01"
     lims = [x for x in late if x["facet"] == "limitation"]
     assert len(lims) == 2 and all(x["contested_since"] == "2022-01-01" for x in lims)
-    fam_facts = FA.facts(v, family_id=_family_id(v))       # + PD's three method statements (6, 7, 9), each
-    assert {x["fact_id"] for x in late} < {x["fact_id"] for x in fam_facts}   # its own singleton fact
-    assert len(fam_facts) == 7
+    fam_facts = FA.facts(v, family_id=_family_id(v))       # + PD's three method statements (6, 7, 9) and its
+    assert {x["fact_id"] for x in late} < {x["fact_id"] for x in fam_facts}   # two version-variance facts
+    assert len(fam_facts) == 9                             # (15, 16 — same-speaker, so never contested)
+    assert all(x["contested_since"] is None for x in fam_facts if x["facet"] == "result")
     assert FA.facts(v, members=[]) == []
 
 

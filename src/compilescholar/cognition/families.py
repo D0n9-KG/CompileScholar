@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Method families at T (phase D reader): reads the materialised Leiden time-sliced snapshots
 (cognition.build — cumulative co-citation + lineage + shared-category edge weights, fixed seed, weighted
-RBConfigurationVertexPartition = modularity's built-in hub de-weighting; stubs are boundary nodes, never
-members).
+RBConfigurationVertexPartition = modularity's built-in hub de-weighting, at a tuned resolution_parameter
+with recursive re-clustering of any community above FAMILY_MAX — COG-1010 giant-family treatment; stubs
+are boundary nodes, never members).
 
 A query at T reads the newest snapshot whose date is <= T. The grid is monthly over the last 3 years of the
 data, quarterly before that, capped at 15 years, plus explicit benchmark cut-offs; a T before the earliest

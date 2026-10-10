@@ -90,11 +90,11 @@ def env(tmp_path, monkeypatch):
     ext = store.connect("extract")
     ext.executescript(EXT_DDL)
 
-    def _stmt(i, speaker, date, kind, about, role, facet, text, meta):
+    def _stmt(i, speaker, date, kind, about, role, facet, text, meta, pass_="t"):
         ext.execute("INSERT INTO statements(id, speaker, date, kind, about, role, facet, text, quote, epistemic, "
                     "condition, loc, meta, pass, item) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (i, speaker, date, kind, about, role, facet, text, "quote", "stated", "",
-                     json.dumps({"unit_id": "u", "sent_id": f"s{i}"}), json.dumps(meta), "t", speaker))
+                     json.dumps({"unit_id": "u", "sent_id": f"s{i}"}), json.dumps(meta), pass_, speaker))
 
     _stmt(1, PB, "2020-06-01", "other", PA, "compares", "result", "B beats A on graphs",
           {"outcome": "citing_better", "category": "Graph Attention Models"})
@@ -119,6 +119,18 @@ def env(tmp_path, monkeypatch):
           "GraphNet is slow on large graphs", {})
     _stmt(12, PD, "2022-01-01", "other", PB, "background", "limitation",
           "GraphNet is not slow on large graphs at all", {})
+    # COG-1010 repro material (10-10 state review): a same-speaker results-table version diff (13/14, the
+    # FlowNet2 artifact — one paper's own cell in two text versions) and a same-speaker claim version
+    # variance (15/16). Neither may produce a contested event: 13/14 never enter fact formation (results
+    # pass, excluded by provenance), 15/16 are one voice (speaker-independence gate).
+    _stmt(13, PB, "2020-06-01", "self", PB, "describes", "result", "GraphNet — Sintel: EPE: 0.78", {},
+          pass_="results")
+    _stmt(14, PB, "2021-01-15", "self", PB, "describes", "result", "GraphNet — Sintel: EPE: 3.41", {},
+          pass_="results")
+    _stmt(15, PD, "2021-02-01", "self", PD, "describes", "result",
+          "GraphNet variants converge slowly on huge graphs", {})
+    _stmt(16, PD, "2021-08-01", "self", PD, "describes", "result",
+          "GraphNet variants converge quickly on huge graphs", {})
     ext.commit()
     ext.close()
 
@@ -139,6 +151,10 @@ def _chat(prompt, **kw):
     if "research FAMILY" in prompt:                          # family naming
         return _json.dumps({"name": "Graph Transformer Family", "keep": []})
     if "same underlying fact" in prompt:                     # fact relation
+        if "0.78" in prompt or "3.41" in prompt:             # results-pass table version diff -> the LLM
+            return _json.dumps({"relation": "opposite"})     # reads the two cells as contradicting
+        if "converge" in prompt:                             # same-speaker version variance (15 vs 16)
+            return _json.dumps({"relation": "opposite"})
         if "not slow" in prompt:
             return _json.dumps({"relation": "opposite"})
         if "slow on" in prompt:
@@ -205,6 +221,15 @@ def test_cognition_build_materialises(env):
     assert ("2022-01-01", "contested") in ev                     # the contradiction
     assert con.execute("SELECT count(*) FROM fact_member WHERE fact_id=? AND role='representative'",
                        (f10,)).fetchone()[0] == 1
+    # COG-1010: results-pass table rows never enter fact formation (excluded by provenance), and a
+    # same-speaker 'opposite' pair is not contested (one paper = one voice) — while the cross-author
+    # contradiction above still is
+    assert con.execute("SELECT count(*) FROM fact_member WHERE statement_id IN (13,14)").fetchone()[0] == 0
+    f15 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=15").fetchone()[0]
+    f16 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=16").fetchone()[0]
+    assert f15 != f16                                        # 'opposite': the two versions never merge
+    assert con.execute("SELECT count(*) FROM fact_status_event WHERE status='contested' AND fact_id IN (?,?)",
+                       (f15, f16)).fetchone()[0] == 0
     assert con.execute("SELECT * FROM category_daily").fetchall() == [("graph attention models", "2020-06-01", 1)]
     edges = sorted(con.execute("SELECT child, parent, relation, kind, date, valid_from FROM lineage_edge"))
     assert edges == [(PD, PB, "extends", "self", "2022-01-01", "2022-01-01"),          # id6 self claim
@@ -252,7 +277,7 @@ def test_asof_statements_and_citations(env):
     from compilescholar.cognition.asof import AsOf
     v = AsOf("2020-12-31")
     ss = v.statements()
-    assert len(ss) == 6                                    # ids 1-5 and 8 are dated <= T (6 and 7 are 2022)
+    assert len(ss) == 7                                    # ids 1-5, 8, 13 are dated <= T (6, 7, 14-16 later)
     assert all(isinstance(s["loc"], dict) and isinstance(s["meta"], dict) for s in ss)
     assert v.statements(about=PA, kind="other")[0]["text"] == "B beats A on graphs"
     v19 = AsOf("2019-12-31")
@@ -311,3 +336,38 @@ def test_screen_recategorized_and_limitation_independence():
     assert len(got) == 1 and got[0]["window_end"] == "2020-06-01"
     # too few votes: nothing screened
     assert screen_shifts({"arxiv:z": lim[:5]}, {}, {}) == []
+
+
+# ---------------------------------------------------------------- family partitioning (COG-1010)
+def test_partition_families_giant_split():
+    from compilescholar.cognition.build import partition_families
+    # two 12-cliques joined by ONE weak bridge edge, plus a strong 2-node family; max_size 5 -> the cliques
+    # are recursively re-clustered at doubled resolution on their INDUCED subgraphs (the bridge edge leaves
+    # a community and must not reach the sub-run), the pair survives, the partition stays exact/deterministic
+    def clique(p):
+        return [(f"{p}{i}", f"{p}{j}") for i in range(12) for j in range(i + 1, 12)]
+    edges = clique("c") + clique("d") + [("c0", "d0"), ("p1", "p2")]
+    w = {e: (10 if e == ("p1", "p2") else 1) for e in edges}
+    comms = partition_families(edges, w, resolution=1.0, max_size=5)
+    assert sorted(x for c in comms for x in c) == sorted({x for e in edges for x in e})  # disjoint + complete
+    assert all(len(c) <= 5 for c in comms)
+    assert ["p1", "p2"] in comms                           # the small strong family is untouched
+    assert comms == partition_families(edges, w, resolution=1.0, max_size=5)   # fixed seed: deterministic
+    # no max_size pressure: the plain resolution-1 partition keeps the two cliques whole
+    assert sorted(map(len, partition_families(edges, w, resolution=1.0, max_size=1000))) == [2, 12, 12]
+
+
+def test_families_split_via_build(env, monkeypatch):
+    from compilescholar.cognition import build as CB
+    default_res, default_max = CB.FAMILY_RESOLUTION, CB.FAMILY_MAX
+    monkeypatch.setattr(CB, "FAMILY_RESOLUTION", 1.5)
+    monkeypatch.setattr(CB, "FAMILY_MAX", 1)               # the 2-member {PB,PD} family counts as "giant"
+    counts = CB.build(log=lambda *a: None, chat=_chat)
+    assert counts["families"] == 0                         # split to singletons -> below MIN_FAMILY
+    # restore by setattr, never monkeypatch.undo(): the env fixture's CS_DATA patch would go with it and the
+    # next build would gate against the REAL production manifests. The parameters are in the pass digest, so
+    # the normal values re-open the pass and restore the family.
+    monkeypatch.setattr(CB, "FAMILY_RESOLUTION", default_res)
+    monkeypatch.setattr(CB, "FAMILY_MAX", default_max)
+    counts = CB.build(log=lambda *a: None, chat=_chat)
+    assert counts["families"] == 6
