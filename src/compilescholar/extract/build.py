@@ -11,17 +11,22 @@ Work passes (every statement row carries pass+item; redoing an item replaces exa
            own_methods for the results pass
   results  item = a deep paper with MinerU-family tables (sv/careful tiers): LLM axis roles, structural gate,
            every value from a cell
-  other    item = a citing paper: its sampled citation sentences — per cited paper a time-stratified quota
-           (§7.3 他述抽样: year buckets, sqrt-of-count allocation, distinct citing papers first within a year)
+  other    item = a citing paper: its sampled citation sentences about the DEEP papers — per cited paper a
+           time-stratified quota (§7.3 他述抽样: year buckets, sqrt-of-count allocation, distinct citing papers
+           first within a year). Targets = the deep set (ring-2: reception records belong to the deep core;
+           while scope==deep the two readings coincide — the 10-10 mega-run separates them, and sampling the
+           full 190k scope would be a ~5.7M-pair pass nobody designed)
   figures  item = a paper with a careful parse: deterministic figure units (number, caption, page, bbox — the
            image itself is never stored, tools crop it from the PDF on demand)
 Deterministic tail (no work items): cite_counts(cited, month, n) — FULL monthly cited counts (v2.4: the count
 is no longer truncated by the sampled subset).
 
 Scope and deep selection are question-blind (the 10-03 user ruling; §13.1): scope = the benchmark's members
-(--benchmark) or the registry papers whose primary category is in `categories` with first_hi >= `since`; deep =
-scope papers with a materialised full text, ranked by in-corpus cited count, top n_deep. Only corpus statistics
-enter — never questions, never gold.
+(--benchmark), an explicit --ids file, or the registry papers whose primary category is in `categories` with
+first_hi >= `since`; deep = scope papers with a materialised full text, ranked by in-corpus cited count, top
+n_deep — or, for the staged mega-run, an explicit --deep-ids roster (built question-blind by the roster
+script: benchmark-corpus first, survey quota, then cited rank). Only corpus statistics enter — never
+questions, never gold.
 
 Fingerprints: (prompt sha, model, the documents/citations work keys of everything the pass reads) — a re-parsed
 PDF, a new Sciverse fetch, a re-resolved citation or a changed prompt re-opens exactly the items that read it.
@@ -121,11 +126,14 @@ def select_pairs(cit, targets, cap: int = N_OTHER) -> dict:
 
 def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",), since: str = "2018-01-01",
           n_deep: int = 500, sample: int | None = None, seed: int = 20261007, ids: list | None = None,
-          workers: int | None = None, rebuild: bool = False, log=print) -> dict:
+          deep_ids: list | None = None, workers: int | None = None, rebuild: bool = False, log=print) -> dict:
     workers = workers or 48                        # LLM lanes (the client paces per backend)
     params = {"benchmark": benchmark, "categories": list(categories), "since": since,
               "n_deep": n_deep, "n_other": N_OTHER, "sample": sample, "seed": seed,
-              "ids": sorted(ids) if ids else None}
+              "ids": sorted(ids) if ids else None,
+              # the explicit deep roster enters the digest by fingerprint (the list itself is 18k+ ids):
+              # a different roster is a different build
+              "deep_ids_sha": store.sha(*sorted(deep_ids)) if deep_ids else None}
     run_id = f"extract-{time.strftime('%Y%m%dT%H%M%S')}"
     with store.Run("extract", params, rebuild=rebuild) as run:
         con = run.con
@@ -163,8 +171,13 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 "SELECT cited, count(DISTINCT citing) FROM cites WHERE cited NOT LIKE 'stub:%' "
                 "GROUP BY cited")) if cit is not None else {}
             with_text = set(D.papers())
-            deep = set(sorted((p for p in scope if p in with_text),
-                              key=lambda p: (-cited_counts.get(p, 0), p))[:n_deep])
+            if deep_ids:
+                # an explicit question-blind roster (the deep-list file): order is irrelevant here — membership
+                # is what the user signed off; the cited-rank rule below stays the default for other runs
+                deep = {p for p in deep_ids if p in scope_set and p in with_text}
+            else:
+                deep = set(sorted((p for p in scope if p in with_text),
+                                  key=lambda p: (-cited_counts.get(p, 0), p))[:n_deep])
             con.execute("DELETE FROM scope")
             con.executemany("INSERT INTO scope VALUES (?,?)", [(p, int(p in deep)) for p in scope])
             con.commit()
@@ -351,10 +364,10 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 con.commit()
             w_res.sweep([p for p, _, _ in t2_items], lambda p: replace("results", p, []))
 
-            # ---- other: sampled citation sentences, item = citing paper
+            # ---- other: sampled citation sentences about the DEEP papers, item = citing paper
             w_other = run.work("other")
             if cit is not None:
-                pairs = select_pairs(cit, scope, N_OTHER)
+                pairs = select_pairs(cit, sorted(deep), N_OTHER)
                 by_citing: dict[str, list] = defaultdict(list)
                 for cited_, lst in pairs.items():
                     for sent_id, citing, date, version, key, self_cite in lst:

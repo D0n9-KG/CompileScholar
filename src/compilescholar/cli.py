@@ -205,9 +205,11 @@ def cmd_build(a):
             bc = cfg.build
             cats = tuple(a.categories.split(",")) if a.categories else tuple(bc.categories)
             ids = [x.strip() for x in open(a.ids, encoding="utf-8") if x.strip()] if a.ids else None
+            deep_ids = ([x.strip() for x in open(a.deep_ids, encoding="utf-8") if x.strip()]
+                        if a.deep_ids else None)
             print(json.dumps(B.build(benchmark=a.benchmark, categories=cats, since=a.since or bc.since,
                                      n_deep=a.n_deep if a.n_deep is not None else bc.n_deep,
-                                     sample=a.sample, seed=a.seed, ids=ids,
+                                     sample=a.sample, seed=a.seed, ids=ids, deep_ids=deep_ids,
                                      workers=a.workers or bc.workers, rebuild=rb)))
         elif s == "cognition":
             from .cognition import build as B
@@ -398,6 +400,10 @@ def main(argv=None):
     p.add_argument("--sample", type=int, default=None, help="extract: seeded random sample of the scope (smoke runs)")
     p.add_argument("--seed", type=int, default=20261007)
     p.add_argument("--ids", default=None, help="extract: file of paper_ids as the scope (smoke/gate runs)")
+    p.add_argument("--deep-ids", default=None,
+                   help="extract: file of paper_ids as the explicit deep roster (staged mega-run; question-blind "
+                        "by construction). Deep = roster ∩ scope ∩ has-text; without it, deep = top n_deep by "
+                        "in-corpus cited count")
     p.add_argument("--workers", type=int, default=None, help="default build.workers")
     p.add_argument("--dense", default=None, help="index: which indexes get dense vectors (default build.dense)")
     p.add_argument("--rebuild", action="store_true",

@@ -609,6 +609,16 @@ def test_extract_stage_endtoend(env, tmp_path, monkeypatch):
     _texts(tmp_path, P2, SV_MD_EXT)                       # the sv tier for P2 (table + prose)
     DB.build(workers=2, log=lambda *a: None)
     CB.build(workers=2, log=lambda *a: None)              # documents grew (sv): citations re-validates, no-op
+    # the other pass targets the DEEP set (ring-2 reception records; the 10-10 mega-run separates deep from
+    # scope). The fixture's cites all point at P0, which has no full text -> not deep. Add two rows citing P1
+    # so the pass stays covered end to end, preserving the v1-date and self-citation chain checks.
+    cw = env.connect("citations")
+    for citing, self_cite in ((P2, 1), (JD, 0)):
+        r = cw.execute("SELECT sentence_id, date, version, key, n_group FROM cites WHERE citing=? AND cited=?",
+                       (citing, P0)).fetchone()
+        cw.execute("INSERT INTO cites VALUES (?,?,?,?,?,?,?,?)", (r[0], citing, r[1], r[2], r[3], P1, r[4], self_cite))
+    cw.commit()
+    cw.close()
     calls = []
     monkeypatch.setattr(PS, "call_local", _stub_llm(calls))
     counts = EB.build(benchmark="testbench", n_deep=5, workers=2, log=lambda *a: None)
@@ -616,7 +626,7 @@ def test_extract_stage_endtoend(env, tmp_path, monkeypatch):
     bp = counts["by_pass"]
     assert bp.get("t1", 0) >= 4                           # P1: item + GraphFormer; P2: item + FastGF
     assert bp.get("t2", 0) >= 2 and bp.get("results") == 2
-    assert bp.get("other") == 4                             # P1, P2, P4 and JD all cite P0
+    assert bp.get("other") == 2                           # the two citing papers of the DEEP paper P1
     con = env.connect("extract", readonly=True)
     row = con.execute("SELECT date, epistemic, loc, schema_version, run_id, model, prompt_sha, meta FROM statements "
                       "WHERE pass='other' AND speaker=?", (P2,)).fetchone()

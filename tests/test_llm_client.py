@@ -220,3 +220,23 @@ def test_thinking_off_payloads(llm):
     s.plan = [("ok", ("x", "stop"))]
     C.call_local("q", enable_thinking=False)
     assert s.seen[-1]["chat_template_kwargs"] == {"enable_thinking": False} and "thinking" not in s.seen[-1]
+
+
+def test_mirror_route_deterministic_and_gated():
+    """10-10 mega-run: call_local overflow routing — deterministic per item, model-gated, fraction-bound."""
+    from compilescholar.llm import client as LC
+    LC.configure({"mirror": {"provider": "paratera", "model": "Qwen3.8-27B",
+                             "for_model": "Qwen3.8-27B", "fraction": 0.3}})
+    try:
+        routes = [LC._mirror_route("Qwen3.8-27B", f"item:{i}") for i in range(400)]
+        assert routes == [LC._mirror_route("Qwen3.8-27B", f"item:{i}") for i in range(400)]   # deterministic
+        n_mirror = sum(1 for p, _ in routes if p == "paratera")
+        assert 80 < n_mirror < 160, n_mirror                                                  # ~30% +- band
+        assert all(m == "Qwen3.8-27B" for p, m in routes if p == "paratera")
+        assert LC._mirror_route("some-other-model", "x") == ("local", "some-other-model")     # model-gated
+        LC.configure({"mirror": {"provider": "paratera", "fraction": 0.0}})
+        assert all(LC._mirror_route("Qwen3.8-27B", f"i{i}") == ("local", "Qwen3.8-27B") for i in range(50))
+        LC.configure({})
+        assert LC._mirror_route("Qwen3.8-27B", "x") == ("local", "Qwen3.8-27B")               # no mirror config
+    finally:
+        LC.configure({})
