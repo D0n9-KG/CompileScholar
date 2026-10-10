@@ -94,15 +94,67 @@ def norm_name(s: str) -> str:
     return " ".join(s.split()).strip(" .-")
 
 
-def name_vocab(ext) -> dict:
+# COG-1010 identity-vocabulary contamination filter (run-A quality audit DRIFT①: the 27B name vocabulary
+# mixes in lowercase descriptive phrases / borrowed prior-work names — "posterior sampling for reinforcement
+# learning", "objective perturbation method" — plus dataset residue (UCF101, Scikit-learn, "... dataset")
+# and "Algorithm N" placeholders). Structural morphology only — rules never judge semantics, and they are
+# deliberately narrow (a wrongly killed real name costs more than a leaked junk one: this vocabulary feeds
+# method identity, family naming and fact adjudication). Validated on the audit's real samples before
+# adoption (COG-1010 vocab_filter_validation, cog_fixes_1010).
+_DATASET_TAIL = {"dataset", "datasets", "corpus", "corpora", "benchmark", "benchmarks"}
+_DATASET_NAMES = {"ucf101", "ucf-101", "scikit-learn", "sklearn"}   # high-precision residue the audit named
+_ALGORITHM_N = re.compile(r"^algorithm\s+\d+$", re.I)
+_PAREN_TAIL = re.compile(r"(?:\s*\([^)]*\))+\s*$")
+
+
+def vocab_reject(surface: str) -> str | None:
+    """The contamination rule that rejects this vocabulary-name surface, None when it stays. Rules:
+      lowercase_phrase  no capital and no digit anywhere (no proper-name morphology) and >= 4 words —
+                        descriptive phrases / borrowed generic names ("posterior sampling for reinforcement
+                        learning", "privacy-preserving parameter tuning technique"). Narrowed from the
+                        audit's >= 3 wording (错杀比漏杀贵): real methods ARE conventionally written as
+                        lowercase 3-grams ("value iteration network", "sinusoidal representation networks",
+                        "holistically-nested edge detection") while the junk phrases measure 4+ words;
+                        3-word leaks stay in and go to the ambiguity adjudication like any weak name.
+      algorithm_n       "Algorithm 2" — a paper-local placeholder, never a method identity
+      dataset           trailing dataset/corpus/benchmark head noun (a trailing parenthetical acronym is
+                        stripped first: "Describable Textures Dataset (DTD)"), or an explicit residue name
+    """
+    s = (surface or "").strip()
+    if not s:
+        return None
+    if _ALGORITHM_N.match(s):
+        return "algorithm_n"
+    low = s.lower()
+    if low in _DATASET_NAMES:
+        return "dataset"
+    tail = _PAREN_TAIL.sub("", s).strip().lower().rstrip(" .,:;-")
+    if tail.rsplit(" ", 1)[-1] in _DATASET_TAIL:
+        return "dataset"
+    toks = s.split()
+    if len(toks) >= 4 and not re.search(r"[A-Z0-9]", s):
+        return "lowercase_phrase"
+    return None
+
+
+def name_vocab(ext, filtered: dict | None = None) -> dict:
     """norm_name -> {"papers": Counter(paper_id -> evidence weight), "surface": str}. Evidence weights keep the
     old Identity discipline: a self-reported proposal (3) outweighs its aliases (2) outweigh a third party's
-    naming (1); generic names are never in the vocabulary."""
+    naming (1); generic names are never in the vocabulary. COG-1010: `vocab_reject` surfaces are dropped at
+    this single funnel (proposals, aliases and third-party namings alike); when `filtered` is given it receives
+    {"counts": Counter(rule -> n), "samples": [(rule, surface), ...]} for the build log and manifest."""
     vocab: dict[str, dict] = defaultdict(lambda: {"papers": Counter(), "surface": ""})
 
     def note(name, pid, w):
         n = norm_name(name)
         if not n or n in GENERIC or len(n) < 3:
+            return
+        r = vocab_reject(name)
+        if r:
+            if filtered is not None:
+                filtered["counts"][r] += 1
+                if len(filtered["samples"]) < 40:
+                    filtered["samples"].append((r, name))
             return
         v = vocab[n]
         v["papers"][pid] += w
@@ -537,7 +589,12 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                 log(f"[cognition] comparison_edge: {n:,} rows")
 
             # ---- method-name vocabulary (shared by the mentions and lineage passes)
-            vocab = name_vocab(ext)
+            vocab_filtered: dict = {"counts": Counter(), "samples": []}
+            vocab = name_vocab(ext, filtered=vocab_filtered)
+            if vocab_filtered["counts"]:
+                log(f"[cognition] identity vocab: {sum(vocab_filtered['counts'].values()):,} names filtered "
+                    f"({dict(vocab_filtered['counts'])}), samples: "
+                    f"{[s for _, s in vocab_filtered['samples'][:8]]}")
             resolved = {n: resolve_name(v["papers"]) for n, v in vocab.items()}
             vocab_fp = store.sha(sorted((k, sorted(v["papers"].items())) for k, v in vocab.items()))
 
@@ -1270,6 +1327,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                       "mentions_ambiguous": q("SELECT count(*) FROM mention_link WHERE status='ambiguous'"),
                       "mentions_adjudicated": q("SELECT count(*) FROM mention_link WHERE status='adjudicated'"),
                       "names": len(vocab),
+                      "names_filtered": dict(vocab_filtered["counts"]),
                       "identities": dict(con.execute("SELECT status, count(*) FROM method_identity GROUP BY status")),
                       "lineage_edge": q("SELECT count(*) FROM lineage_edge"),
                       "lineage_hyper": q("SELECT count(*) FROM lineage_hyper"),

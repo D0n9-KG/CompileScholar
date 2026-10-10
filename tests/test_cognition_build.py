@@ -169,6 +169,7 @@ def test_cognition_build_materialises(env):
     assert counts["cocite"] == 1 and counts["reception"] == 3
     assert counts["author_link"] == 3 and counts["comparison_edge"] == 1
     assert counts["names"] == 3                              # fastgf, graphnet, biattn
+    assert counts["names_filtered"] == {}                    # the fixture vocabulary is clean
     assert counts["mention_link"] == 4
     assert counts["mentions_ambiguous"] == 0 and counts["mentions_adjudicated"] == 1
     assert counts["identities"] == {"ok": 2, "adjudicated": 1}
@@ -336,6 +337,55 @@ def test_screen_recategorized_and_limitation_independence():
     assert len(got) == 1 and got[0]["window_end"] == "2020-06-01"
     # too few votes: nothing screened
     assert screen_shifts({"arxiv:z": lim[:5]}, {}, {}) == []
+
+
+# ---------------------------------------------------------------- identity vocab filter (COG-1010 DRIFT①)
+def test_vocab_reject_rules():
+    from compilescholar.cognition.build import vocab_reject
+    # the audit's real contamination examples (audit_t2.json / report_t1t2.md §4) must be rejected
+    for bad, rule in [("posterior sampling for reinforcement learning", "lowercase_phrase"),
+                      ("privacy-preserving parameter tuning technique", "lowercase_phrase"),
+                      ("a method that enables physically simulated characters to learn skills from videos",
+                       "lowercase_phrase"),
+                      ("Algorithm 2", "algorithm_n"), ("algorithm 12", "algorithm_n"),
+                      ("UCF101", "dataset"), ("Scikit-learn", "dataset"), ("sklearn", "dataset"),
+                      ("MovieBook Dataset", "dataset"),
+                      ("Describable Textures Dataset (DTD)", "dataset"),
+                      ("Stanford Question Answering Dataset (SQuAD)", "dataset"),
+                      ("phrase localization benchmark", "dataset"),
+                      ("Stanford Natural Language Inference corpus", "dataset")]:
+        assert vocab_reject(bad) == rule, bad
+    # real names must be kept: proper-name morphology (caps/digits/hyphens), short lowercase names, the
+    # production names from the 2688fd0 family work (VQ-VAE's own ecosystem + the giant's name), and the
+    # conventionally-lowercase 3-gram real methods (the narrowing rationale: 错杀比漏杀贵)
+    for good in ["VQ-VAE", "GPT-4o", "Qwen3.8-27B", "k-means", "adaptive mcmc", "DAGGER", "PRM*",
+                 "1-nearest sPRM", "CoveringBalls", "Optimal Probabilistic RoadMaps", "RRG algorithm",
+                 "value iteration network", "sinusoidal representation networks", "model predictive control",
+                 "Neural Discrete Representation Learning", "DVAE#", "GumBolt", "LPCNet",
+                 "Objective perturbation", "Dataset Aggregation"]:   # capitalized surfaces: structure cannot
+        assert vocab_reject(good) is None, good                     # judge borrowed-vs-own, so they stay
+    assert vocab_reject("") is None and vocab_reject(None) is None
+
+
+def test_name_vocab_filters_at_the_funnel():
+    from collections import Counter
+    from compilescholar.cognition.build import name_vocab
+    rows_self = [(json.dumps({"name": "posterior sampling for reinforcement learning"}), "p1"),
+                 (json.dumps({"name": "FastGF", "aliases": ["MovieBook Dataset", "fast gf"]}), "p1")]
+    rows_other = [(json.dumps({"name": "Algorithm 3"}), "p2"),          # dies even earlier: norm_name's
+                  (json.dumps({"name": "Visual Genome dataset"}), "p2"),  # genre-modifier strip leaves "3"
+                  (json.dumps({"name": "GraphNet"}), "p2")]
+
+    class _Ext:                                    # name_vocab's two queries are its whole interface
+        def execute(self, q, *a):
+            return iter(rows_self if "kind='self'" in q else rows_other)
+
+    filt = {"counts": Counter(), "samples": []}
+    v = name_vocab(_Ext(), filtered=filt)
+    assert set(v) == {"fastgf", "fast gf", "graphnet"}          # proposals, aliases and third-party
+    assert filt["counts"] == {"lowercase_phrase": 1, "dataset": 2}     # namings alike
+    assert sorted(s for _, s in filt["samples"]) == sorted(
+        ["posterior sampling for reinforcement learning", "MovieBook Dataset", "Visual Genome dataset"])
 
 
 # ---------------------------------------------------------------- family partitioning (COG-1010)
