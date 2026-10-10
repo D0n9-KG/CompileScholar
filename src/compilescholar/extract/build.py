@@ -225,7 +225,7 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 t1_fp[pid] = store.sha(PR.T1_SHA, PS.MODEL, title,
                                        doc_keys.get(bk) if bk else store.sha(abstract)[:12])
             todo1 = set(w_t1.todo([(p, t1_fp[p]) for p in scope]))
-            log(f"[extract] t1: {len(todo1):,} of {len(scope):,}")
+            log(f"[extract] t1: {len(todo1):,} of {len(scope):,} (wave 1 = the {len(deep):,} deep papers first)")
 
             def one_t1(pid):
                 if pid not in todo1:
@@ -253,10 +253,12 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                 except Exception as e:
                     w_t1.fail(pid, f"{type(e).__name__}: {e}")
 
-            store.parallel(one_t1, scope, workers, log=log, every=5000, label="extract:t1")
+            # wave 1: the deep papers first — the deep passes consume t1's proposed names, and the staged
+            # mega-run wants ring-2 (deep statements + reception) ready before the pool-wide t1 finishes
+            # (10-10 user-approved reordering; wave 2 over the rest of the pool runs after the other pass)
+            store.parallel(one_t1, sorted(deep), workers, log=log, every=1000, label="extract:t1-deep")
             with lock:
                 con.commit()
-            w_t1.sweep(scope, lambda p: replace("t1", p, []))
 
             # ---- t2 + results: deep papers with a full text
             w_t2 = run.work("t2")
@@ -447,6 +449,13 @@ def build(benchmark: str | None = None, categories: tuple[str, ...] = ("cs.LG",)
                     con.commit()
                 w_other.sweep(other_items, lambda c: replace("other", c, []))
                 tot["other_pairs_sampled"] = n_pairs
+
+            # ---- t1 wave 2: the rest of the pool (wave-1 papers are already done; one_t1 skips non-todo)
+            store.parallel(one_t1, [p for p in scope if p not in deep], workers, log=log, every=5000,
+                           label="extract:t1")
+            with lock:
+                con.commit()
+            w_t1.sweep(scope, lambda p: replace("t1", p, []))
 
             # ---- figures: deterministic, careful-tier papers (the docs table is the documents stage's — via D);
             # one item per paper: the highest carefully-parsed version
