@@ -16,9 +16,3 @@ paths:
 # llm:
 #   providers:
 #     local: {lanes: 96}
-
-# llm.mirror (10-10 mega-run): deterministic call_local overflow to a second provider serving the same
-# model — route a fraction of fresh work-item traffic (hashed on the item key, so restarts replay against
-# the same provider's cache). Ledger records the true provider per call.
-# llm:
-#   mirror: {provider: paratera, model: Qwen3.8-27B, for_model: Qwen3.8-27B, fraction: 0.18}

@@ -92,11 +92,6 @@ class LLMSettings:
     ledger_path: str | None = None
     run_id: str = ""
     caller: str = ""
-    mirror: dict = field(default_factory=dict)
-    # call_local overflow routing: {"provider": "paratera", "model": "Qwen3.8-27B",
-    #                                "for_model": "Qwen3.8-27B", "fraction": 0.3}
-    # a deterministic share of FRESH call_local traffic (hashed on the work item, stable across restarts)
-    # goes to a second provider serving the same model; the ledger records the true provider per call.
 
 
 _SETTINGS = LLMSettings()
@@ -115,7 +110,6 @@ def configure(llm: dict | None = None, run_id: str | None = None, ledger_path: s
         base = s.providers.get(name) or Provider(name, f"{name.upper()}_BASE_URL", f"{name.upper()}_API_KEY", "")
         s.providers[name] = Provider(**{**vars(base), **(over or {})})
     s.allow = tuple(llm.get("allow") or ())
-    s.mirror = dict(llm.get("mirror") or {})
     s.seed = llm.get("seed")
     s.cache = bool(llm.get("cache", True))
     s.cache_path = llm.get("cache_path")
@@ -484,26 +478,10 @@ def _reset(p: Provider) -> None:
 
 # ---------------------------------------------------------------- the old entry points (same signatures)
 
-def _mirror_route(model: str, key: str) -> tuple[str, str]:
-    """Deterministic overflow routing for call_local (llm.mirror config): a fixed fraction of traffic for
-    `for_model` goes to a second provider serving the same model. The route is a hash of the work-item key,
-    so an item always lands on the same provider — response-cache replay stays coherent across restarts,
-    and the ledger records the true provider per call."""
-    m = settings().mirror or {}
-    frac = float(m.get("fraction") or 0.0)
-    if frac <= 0.0 or model != (m.get("for_model") or "Qwen3.8-27B"):
-        return "local", model
-    h = int(hashlib.sha256(key.encode("utf-8", "replace")).hexdigest()[:8], 16)
-    if h % 10000 < int(frac * 10000):
-        return m.get("provider") or "paratera", m.get("model") or model
-    return "local", model
-
-
 def call_local(prompt: str, model: str = "Qwen3.8-27B", max_tokens: int = 4000, temperature: float = 0.0,
                seed: int | None = None, enable_thinking: bool | None = None, template: str = "",
                item: str = "") -> str | None:
-    provider, mdl = _mirror_route(model, item or template or prompt[:256])
-    return chat(provider, prompt, model=mdl, max_tokens=max_tokens, temperature=temperature, seed=seed,
+    return chat("local", prompt, model=model, max_tokens=max_tokens, temperature=temperature, seed=seed,
                 enable_thinking=enable_thinking, template=template, item=item)
 
 
