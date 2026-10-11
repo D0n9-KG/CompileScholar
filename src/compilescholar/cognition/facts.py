@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Family-level facts at T (phase D reader): reads the materialised fact groups (cognition.build —
 deterministic recall by same-facet content-word Jaccard >= 0.3 inside one family over the claim passes
-(the results pass's table-cell statements are excluded by provenance, COG-1010), the LLM FACT_REL relation
+(the results pass's table-cell statements are excluded by provenance and the other pass's background-role
+reception records by their role column — the two structurally-marked noise classes, COG-1010), the LLM
+FACT_REL relation
 verdict on candidate pairs, union-find over 'same', and the status timeline single-source -> established
 (n_independent >= 2) -> consensus (n_independent >= 3 and >= 2 subjects), with a 'contested' event at the
 date an 'opposite' verdict's statements become visible — only between author-independent speakers; one

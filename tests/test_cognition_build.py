@@ -131,6 +131,15 @@ def env(tmp_path, monkeypatch):
           "GraphNet variants converge slowly on huge graphs", {})
     _stmt(16, PD, "2021-08-01", "self", PD, "describes", "result",
           "GraphNet variants converge quickly on huge graphs", {})
+    # COG-1010 background exclusion repro: the strong-role contradiction (17) carries the contested
+    # coverage that statement 12 (role='background') used to — background other statements are weak
+    # reception signals with noisy about-binding (run-A audit: 27% fail entailment) and stay out of
+    # fact adjudication AND out of lineage builds_on edges (18: a background row claiming builds_on
+    # must not add a 4th lineage edge; statement 7 with role='uses' must).
+    _stmt(17, PD, "2022-01-01", "other", PB, "criticizes", "limitation",
+          "GraphNet is not slow on large graphs at all", {})
+    _stmt(18, PB, "2022-06-15", "other", PD, "background", "method", "PD builds on GraphNet",
+          {"builds_on": "GraphNet", "builds_on_relation": "extends"})
     ext.commit()
     ext.close()
 
@@ -210,11 +219,14 @@ def test_cognition_build_materialises(env):
     # lineage: the time-inconsistent edge is dropped, the valid ones carry §2.4 effective dates
     assert con.execute("SELECT canonical, umbrella FROM category_canon WHERE phrase='Graph Attention Models'"
                        ).fetchone() == ("graph attention models", 0)
-    # facts: statements 10 and 11 form one fact (same), 12 contradicts it (opposite -> contested)
+    # facts: statements 10 and 11 form one fact (same), the strong-role 17 contradicts it (opposite ->
+    # contested); the background-role 12 (same text as 17) stays out of the adjudication entirely
     f10 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=10").fetchone()[0]
     f11 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=11").fetchone()[0]
-    f12 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=12").fetchone()[0]
-    assert f10 == f11 and f12 != f10
+    assert f10 == f11
+    assert con.execute("SELECT count(*) FROM fact_member WHERE statement_id=12").fetchone()[0] == 0
+    f17 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=17").fetchone()[0]
+    assert f17 != f10
     ev = con.execute("SELECT date, status FROM fact_status_event WHERE fact_id=? ORDER BY date, rowid",
                      (f10,)).fetchall()
     assert ("2021-01-01", "single-source") in ev                 # PA states it first
@@ -278,7 +290,7 @@ def test_asof_statements_and_citations(env):
     from compilescholar.cognition.asof import AsOf
     v = AsOf("2020-12-31")
     ss = v.statements()
-    assert len(ss) == 7                                    # ids 1-5, 8, 13 are dated <= T (6, 7, 14-16 later)
+    assert len(ss) == 7                                    # ids 1-5, 8, 13 are dated <= T (6, 7, 14-18 later)
     assert all(isinstance(s["loc"], dict) and isinstance(s["meta"], dict) for s in ss)
     assert v.statements(about=PA, kind="other")[0]["text"] == "B beats A on graphs"
     v19 = AsOf("2019-12-31")

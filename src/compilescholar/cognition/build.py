@@ -459,8 +459,12 @@ def snapshot_grid(earliest: str, latest: str, years: int = 15, extra=()) -> list
 FACT_FACETS = ("limitation", "method", "result", "categorization", "contribution")
 FACT_RECALL_SIM = 0.3
 FACT_MAX_FAMILY_STMTS = 900
-FACT_LOGIC_V = 2          # COG-1010 (results-pass exclusion + contested independence gate) — in the pass digest
-                          # so the deterministic recompute re-opens on the logic change alone
+FACT_LOGIC_V = 3          # COG-1010 (results-pass exclusion + contested independence gate; ③ background-role
+                          # exclusion) — in the pass digest so the deterministic recompute re-opens on the
+                          # logic change alone
+LIN_LOGIC_V = 2           # COG-1010③: builds_on claims from role='background' rows no longer make lineage
+                          # edges (65% of the other pass's builds_on carriers are background rows, whose
+                          # about-binding is the audit's noisiest judgement) — in the pass digest
 _FACT_STOP = set("a an the of in on for to and or with by from as is are was were be been this that these those "
                  "it its their they we our which such via using use used based into than also can may method "
                  "methods model models approach approaches work works paper papers all".split())
@@ -751,7 +755,7 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             # ---- lineage: paper -> paper edges with the §2.4 effective date (deterministic assembly; parent
             #      identities come from the resolution/adjudication above)
             w = run.work("lineage")
-            if w.todo([("all", store.sha(ext_fp, vocab_fp, id_fp))]):
+            if w.todo([("all", store.sha(ext_fp, vocab_fp, id_fp, LIN_LOGIC_V))]):
                 first_hi = dict(reg.execute("SELECT paper_id, first_hi FROM papers "
                                             "WHERE status='active' AND first_hi IS NOT NULL"))
                 edges, hyper, dropped = [], [], {"time": 0, "stub": 0, "unknown": 0}
@@ -806,7 +810,9 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
                             if role == "combines":
                                 add_hyper(sid, speaker, group, "combines", speaker, date)
                         bo, bor = m.get("builds_on"), m.get("builds_on_relation")
-                        if bo and bor in LINEAGE:
+                        if bo and bor in LINEAGE and role != "background":
+                            # COG-1010③: lineage rides only on strong treatment roles — a background row's
+                            # about (the edge's child) is the audit's mis-binding-prone judgement
                             bn = norm_name(bo)
                             p = owner(bn)
                             if p is None and bn in vocab:
@@ -1172,10 +1178,16 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             # the fact layer with same-speaker version-diff pairs (10-10 review: contested events were dominated
             # by one paper's own result table in two versions). Excluded by provenance (the pass column, a
             # structural marker), never by content.
+            # COG-1010③: other-pass background-role records are weak reception signals whose about-binding in
+            # multi-citation sentences is the audit's noisiest judgement (run-A other-pass entailment 79% < 88%
+            # gate; background 27% unqualified vs ~89% for the strong treatment roles) — they keep every other
+            # consumption (reception shifts, categories, profiles) but stay out of fact adjudication. The role
+            # column is deterministic; the rule is structural.
             for i_, about, facet, text, quote, date, speaker, kind in ext.execute(
                     f"SELECT id, about, facet, text, quote, date, speaker, kind FROM statements "
                     f"WHERE facet IN ({','.join('?' * len(FACT_FACETS))}) AND date IS NOT NULL "
-                    f"AND text IS NOT NULL AND COALESCE(pass, '') != 'results'", FACT_FACETS):
+                    f"AND text IS NOT NULL AND COALESCE(pass, '') != 'results' "
+                    f"AND NOT (kind = 'other' AND role = 'background')", FACT_FACETS):
                 stmt_rows[i_] = {"about": about, "facet": facet, "text": text, "quote": quote or "",
                                  "date": date, "speaker": speaker, "kind": kind}
                 by_about[about].append(i_)
