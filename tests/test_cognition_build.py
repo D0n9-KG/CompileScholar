@@ -140,6 +140,10 @@ def env(tmp_path, monkeypatch):
           "GraphNet is not slow on large graphs at all", {})
     _stmt(18, PB, "2022-06-15", "other", PD, "background", "method", "PD builds on GraphNet",
           {"builds_on": "GraphNet", "builds_on_relation": "extends"})
+    # COG-1010④ repro: strong-role bare placeholder records from two independent speakers — identical
+    # zero-content text pairs at Jaccard 1.0 and the LLM merges them into a placeholder "consensus" fact
+    _stmt(19, PA, "2021-03-01", "other", PB, "uses", "method", "(cited without description)", {"bare": 1})
+    _stmt(20, PD, "2021-09-01", "other", PB, "compares", "method", "(cited without description)", {"bare": 1})
     ext.commit()
     ext.close()
 
@@ -160,6 +164,8 @@ def _chat(prompt, **kw):
     if "research FAMILY" in prompt:                          # family naming
         return _json.dumps({"name": "Graph Transformer Family", "keep": []})
     if "same underlying fact" in prompt:                     # fact relation
+        if "(cited without description)" in prompt:          # bare placeholder pair -> the LLM merges the
+            return _json.dumps({"relation": "same"})         # zero-content twins (the false-consensus bug)
         if "0.78" in prompt or "3.41" in prompt:             # results-pass table version diff -> the LLM
             return _json.dumps({"relation": "opposite"})     # reads the two cells as contradicting
         if "converge" in prompt:                             # same-speaker version variance (15 vs 16)
@@ -227,6 +233,10 @@ def test_cognition_build_materialises(env):
     assert con.execute("SELECT count(*) FROM fact_member WHERE statement_id=12").fetchone()[0] == 0
     f17 = con.execute("SELECT fact_id FROM fact_member WHERE statement_id=17").fetchone()[0]
     assert f17 != f10
+    # COG-1010④: bare placeholder records never reach fact formation (their zero-content text used to
+    # pair across independent speakers at Jaccard 1.0 and merge into a placeholder "established" fact);
+    # real statements — including the strong-role ones — are untouched
+    assert con.execute("SELECT count(*) FROM fact_member WHERE statement_id IN (19,20)").fetchone()[0] == 0
     ev = con.execute("SELECT date, status FROM fact_status_event WHERE fact_id=? ORDER BY date, rowid",
                      (f10,)).fetchall()
     assert ("2021-01-01", "single-source") in ev                 # PA states it first

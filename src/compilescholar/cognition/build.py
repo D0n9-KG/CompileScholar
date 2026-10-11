@@ -460,8 +460,9 @@ FACT_FACETS = ("limitation", "method", "result", "categorization", "contribution
 FACT_RECALL_SIM = 0.3
 FACT_MAX_FAMILY_STMTS = 900
 FACT_LOGIC_V = 3          # COG-1010 (results-pass exclusion + contested independence gate; ③ background-role
-                          # exclusion) — in the pass digest so the deterministic recompute re-opens on the
-                          # logic change alone
+                          # exclusion; ④ bare-placeholder exclusion — v3 has never been consumed by a
+                          # production run, the killed 10-12 rebuild predates it, so one bump covers the batch)
+                          # — in the pass digest so the deterministic recompute re-opens on the logic change
 LIN_LOGIC_V = 2           # COG-1010③: builds_on claims from role='background' rows no longer make lineage
                           # edges (65% of the other pass's builds_on carriers are background rows, whose
                           # about-binding is the audit's noisiest judgement) — in the pass digest
@@ -1183,11 +1184,17 @@ def build(workers: int | None = None, rebuild: bool = False, log=print, cit=None
             # gate; background 27% unqualified vs ~89% for the strong treatment roles) — they keep every other
             # consumption (reception shifts, categories, profiles) but stay out of fact adjudication. The role
             # column is deterministic; the rule is structural.
+            # COG-1010④: bare placeholder records ("(cited without description)", meta.bare — strong-role
+            # residue of ③'s population) carry zero content; their identical text pairs at Jaccard 1.0 across
+            # independent speakers and merges into placeholder "established" facts — the same false-consensus
+            # disease. Both signals are structural: the bare marker column and the exact placeholder text.
             for i_, about, facet, text, quote, date, speaker, kind in ext.execute(
                     f"SELECT id, about, facet, text, quote, date, speaker, kind FROM statements "
                     f"WHERE facet IN ({','.join('?' * len(FACT_FACETS))}) AND date IS NOT NULL "
                     f"AND text IS NOT NULL AND COALESCE(pass, '') != 'results' "
-                    f"AND NOT (kind = 'other' AND role = 'background')", FACT_FACETS):
+                    f"AND NOT (kind = 'other' AND role = 'background') "
+                    f"AND COALESCE(json_extract(meta, '$.bare'), 0) != 1 "
+                    f"AND text != '(cited without description)'", FACT_FACETS):
                 stmt_rows[i_] = {"about": about, "facet": facet, "text": text, "quote": quote or "",
                                  "date": date, "speaker": speaker, "kind": kind}
                 by_about[about].append(i_)
