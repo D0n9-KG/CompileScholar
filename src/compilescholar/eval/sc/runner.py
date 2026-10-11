@@ -201,12 +201,15 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--deep-read-cap", type=int, default=0,
                     help="full-form switch (runtime deep_read per query); 0 = off (shallow pilot)")
+    ap.add_argument("--no-state", action="store_true",
+                    help="control arm: disable the family/cocite state channel; everything else identical "
+                         "(rehearsal 'state vs retrieval' delta: same library, same budget, one switch)")
     ap.add_argument("--evaluate", action="store_true", help="score with the official evaluate.py afterwards")
     a = ap.parse_args()
 
     qtypes = [a.query_type] if a.query_type else list(protocol.QUERY_TYPES)
     cfg = AgentConfig(model=a.model, provider=a.provider, max_llm_calls=a.max_llm_calls,
-                      per_query_k=a.per_query_k, pool_cap=a.pool_cap)
+                      per_query_k=a.per_query_k, pool_cap=a.pool_cap, use_state=not a.no_state)
     run(a.bench_dir, a.pipeline, qtypes, a.query_ids, a.limit, a.index_dir, cfg, a.workers, a.evaluate,
         deep_read_cap=a.deep_read_cap)
 
